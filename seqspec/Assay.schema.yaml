@@ -1,0 +1,28 @@
+# This uses schema based on https://json-schema.org/understanding-json-schema/index.html
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: Assay.schema.yaml
+title: Assay
+description: A Assay of DNA
+type: object
+properties:
+  name: 
+    description: The name of the assay
+    type: string
+  doi: 
+    description: the doi of the paper that describes the assay
+    type: string
+  description: 
+    description: A short description of the assay
+    type: string
+  modalities: 
+    description: The modalities the assay targets
+    type: array
+    items:
+      type: string
+  lib_struct: 
+    description: The link to Teichmann's libstructs page derived for this sequence
+    type: string
+  assay_spec: # should allow for multiple regions, regions should match modalities naming
+    description: The spec for the assay
+    type: object
+    $ref: './Region.schema.yaml'

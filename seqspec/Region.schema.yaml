@@ -1,0 +1,40 @@
+# This uses schema based on https://json-schema.org/understanding-json-schema/index.html
+$schema: https://json-schema.org/draft/2020-12/schema
+$id: Region.schema.yaml
+title: Region
+description: A region of DNA
+type: object
+properties:
+  seq_type:
+    description: The type of the sequence
+    type: string
+  seq:
+    description: The sequence
+    type: string
+  min_len:
+    description: The minimum length of the sequence (left closed)
+    type: integer
+    minimum: 1
+  max_len:
+    description: The maximum length of the sequence (right open)
+    type: integer
+    maximum: 1024
+  onlist:
+    description: The file containing the sequence if seq_type = onlist
+    type: string
+  join:
+    description: Join operator on regions
+    type: object
+    properties:
+      how:
+        description: How the regions will be joined
+        type: string
+      order: # items in array must match named regions
+        description: The order of the regions being joined
+        type: array
+        items:
+          type: string
+      regions: # this should technically allow multiple regions
+        description: The regions being joined
+        type: object
+        $ref: '#'

@@ -1,0 +1,115 @@
+assay:
+  name: sci-RNA-seq
+  doi: https://doi.org/10.1126/science.aam8940
+  description: combinatorial single-cell RNA-seq
+  modalities: [RNA]
+  lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq.html
+  assay_spec:
+    RNA:
+      seq_type: joined
+      seq: 
+      min_len: 
+      max_len: 
+      onlist: 
+      join:
+        how: union
+        order: [illumina_p5, i5_index, truseq_read_1_adapter, read_1, read_2, i7_primer, p7]
+        regions:
+          illumina_p5: 
+            seq_type: fixed
+            seq: AATGATACGGCGACCACCGAGATCTACAC
+            min_len: 29
+            max_len: 30
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          i5_index:
+            seq_type: onlist
+            seq: NNNNNNNN
+            min_len: 10
+            max_len: 11
+            onlist: i5_index_onlist.txt
+            join: 
+              regions:
+              how: 
+          
+          truseq_read_1_adapter:
+            seq_type: fixed
+            seq: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+            min_len: 33
+            max_len: 34
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          read_1:
+            seq_type: joined
+            seq:
+            min_len:
+            max_len:
+            onlist:
+            join:
+              how: union
+              order: [umi, cell_bc]
+              regions:
+                umi:
+                  seq_type: random
+                  seq: NNNNNNNN
+                  min_len: 8
+                  max_len: 9
+                  onlist: 
+                  join: 
+                    regions:
+                    how: 
+                
+                cell_bc:
+                  seq_type: onlist
+                  seq: NNNNNNNNNN
+                  min_len: 10
+                  max_len: 11
+                  onlist: cell_bc_onlist.txt
+                  join: 
+                    regions:
+                    how: 
+          read_2:
+            seq_type: joined
+            seq:
+            min_len:
+            max_len:
+            onlist:
+            join:
+              how: union
+              order: [cdna]
+              regions:
+                cdna:
+                  seq_type: random
+                  seq: 
+                  min_len: 1
+                  max_len: 99
+                  onlist: 
+                  join: 
+                    regions:
+                    how: 
+
+          i7_primer:
+            seq_type: fixed
+            seq: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+            min_len: 34
+            max_len: 35
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          illumina_p7: 
+            seq_type: fixed
+            seq: ATCTCGTATGCCGTCTTCTGCTTG
+            min_len: 24
+            max_len: 25
+            onlist: 
+            join: 
+              regions:
+              how: 
