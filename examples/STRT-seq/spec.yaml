@@ -1,106 +1,105 @@
-assay:
-  name: STRT-seq
-  doi: https://doi.org/10.1038/nprot.2012.022
-  description: single-cell tagged reverse transcripton
-  modalities: [RNA]
-  lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
-  assay_spec:
-    RNA:
-      seq_type: joined
-      seq: 
-      min_len: 
-      max_len: 
-      onlist: 
-      join:
-        how: union
-        order: [solexa_p1, link_1, ispcr, link_2, cell_bc, triple_G, cDNA, link_3, solexa_p2]
-        regions:
-          solexa_p1: 
-            seq_type: fixed
-            seq: AATGATACGGCGACCACCGA
-            min_len: 20
-            max_len: 21
-            onlist: 
-            join: 
-              regions:
-              how: 
+name: STRT-seq
+doi: https://doi.org/10.1038/nprot.2012.022
+description: single-cell tagged reverse transcripton
+modalities: [RNA]
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
+assay_spec:
+  RNA:
+    seq_type: joined
+    seq: 
+    min_len: 
+    max_len: 
+    onlist: 
+    join:
+      how: union
+      order: [solexa_p1, link_1, ispcr, link_2, cell_bc, triple_G, cDNA, link_3, solexa_p2]
+      regions:
+        solexa_p1: 
+          seq_type: fixed
+          seq: AATGATACGGCGACCACCGA
+          min_len: 20
+          max_len: 21
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          link_1:
-            seq_type: fixed
-            seq: GATCT
-            min_len: 5
-            max_len: 6
-            onlist: 
-            join: 
-              regions:
-              how: 
+        link_1:
+          seq_type: fixed
+          seq: GATCT
+          min_len: 5
+          max_len: 6
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          ispcr:
-            seq_type: fixed
-            seq: AAGCAGTGGTATCAACGCAGAGT
-            min_len: 23
-            max_len: 24
-            onlist: 
-            join: 
-              regions:
-              how: 
-          
-          link_2:
-            seq_type: fixed
-            seq: GCAGTGCT
-            min_len: 8
-            max_len: 9
-            onlist: 
-            join: 
-              regions:
-              how: 
+        ispcr:
+          seq_type: fixed
+          seq: AAGCAGTGGTATCAACGCAGAGT
+          min_len: 23
+          max_len: 24
+          onlist: 
+          join: 
+            regions:
+            how: 
+        
+        link_2:
+          seq_type: fixed
+          seq: GCAGTGCT
+          min_len: 8
+          max_len: 9
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          cell_bc:
-            seq_type: random
-            seq: NNNNNN
-            min_len: 6
-            max_len: 7
-            onlist: 
-            join: 
-              regions:
-              how: 
+        cell_bc:
+          seq_type: random
+          seq: NNNNNN
+          min_len: 6
+          max_len: 7
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          triple_G:
-            seq_type: fixed
-            seq: GGG
-            min_len: 3
-            max_len: 4
-            onlist: 
-            join: 
-              regions:
-              how: 
+        triple_G:
+          seq_type: fixed
+          seq: GGG
+          min_len: 3
+          max_len: 4
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          cDNA:
-            seq_type: random
-            seq: 
-            min_len: 1
-            max_len: 99
-            onlist: 
-            join: 
-              regions:
-              how: 
-              
-          link_3:
-            seq_type: fixed
-            seq: AGATCGGAAGAGC
-            min_len: 13
-            max_len: 14
-            onlist: 
-            join: 
-              regions:
-              how: 
+        cDNA:
+          seq_type: random
+          seq: 
+          min_len: 1
+          max_len: 99
+          onlist: 
+          join: 
+            regions:
+            how: 
+            
+        link_3:
+          seq_type: fixed
+          seq: AGATCGGAAGAGC
+          min_len: 13
+          max_len: 14
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          solexa_p2:
-            seq_type: fixed
-            seq: TCGTATGCCGTCTTCTGCTTG
-            min_len: 21
-            max_len: 22
-            onlist: 
-            join: 
-              regions:
-              how: 
+        solexa_p2:
+          seq_type: fixed
+          seq: TCGTATGCCGTCTTCTGCTTG
+          min_len: 21
+          max_len: 22
+          onlist: 
+          join: 
+            regions:
+            how: 

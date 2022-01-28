@@ -1,116 +1,115 @@
-assay:
-  name: CEL-Seq2
-  doi: https://doi.org/10.1186/s13059-016-0938-8
-  description: Improvement CEL-Seq, now with UMIs! Implemented on Fluidigm's C1
-  modalities: [RNA]
-  lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html
-  assay_spec:
-    RNA:
-      seq_type: joined
-      seq: 
-      min_len: 
-      max_len: 
-      onlist: 
-      join:
-        how: union
-        order: [illumina_p5, RA5, umi, cell_bc, poly_T, cDNA, RA3, link_1, sample_bc, illumina_p7]
-        regions:
-          illumina_p5: 
-            seq_type: fixed
-            seq: AATGATACGGCGACCACCGAGATCTACAC
-            min_len: 29
-            max_len: 30
-            onlist: 
-            join: 
-              regions:
-              how: 
+name: CEL-Seq2
+doi: https://doi.org/10.1186/s13059-016-0938-8
+description: Improvement CEL-Seq, now with UMIs! Implemented on Fluidigm's C1
+modalities: [RNA]
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html
+assay_spec:
+  RNA:
+    seq_type: joined
+    seq: 
+    min_len: 
+    max_len: 
+    onlist: 
+    join:
+      how: union
+      order: [illumina_p5, RA5, umi, cell_bc, poly_T, cDNA, RA3, link_1, sample_bc, illumina_p7]
+      regions:
+        illumina_p5: 
+          seq_type: fixed
+          seq: AATGATACGGCGACCACCGAGATCTACAC
+          min_len: 29
+          max_len: 30
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          RA5:
-            seq_type: fixed
-            seq: GTTCAGAGTTCTACAGTCCGACGATC
-            min_len: 26
-            max_len: 27
-            onlist: 
-            join: 
-              regions:
-              how: 
+        RA5:
+          seq_type: fixed
+          seq: GTTCAGAGTTCTACAGTCCGACGATC
+          min_len: 26
+          max_len: 27
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          umi:
-            seq_type: random
-            seq: NNNNNN
-            min_len: 6
-            max_len: 7
-            onlist: 
-            join: 
-              regions:
-              how: 
+        umi:
+          seq_type: random
+          seq: NNNNNN
+          min_len: 6
+          max_len: 7
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          cell_bc:
-            seq_type: random
-            seq: NNNNNN
-            min_len: 6
-            max_len: 7
-            onlist: 
-            join: 
-              regions:
-              how: 
+        cell_bc:
+          seq_type: random
+          seq: NNNNNN
+          min_len: 6
+          max_len: 7
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          poly_T:
-            seq_type: random
-            seq: 
-            min_len: 1
-            max_len: 99
-            onlist: 
-            join: 
-              regions:
-              how: 
+        poly_T:
+          seq_type: random
+          seq: 
+          min_len: 1
+          max_len: 99
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          cDNA:
-            seq_type: random
-            seq: 
-            min_len: 1
-            max_len: 99
-            onlist: 
-            join: 
-              regions:
-              how: 
+        cDNA:
+          seq_type: random
+          seq: 
+          min_len: 1
+          max_len: 99
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          RA3:
-            seq_type: fixed
-            seq: TGGAATTCTCGGGTGCCAAGG
-            min_len: 21
-            max_len: 22
-            onlist: 
-            join: 
-              regions:
-              how: 
+        RA3:
+          seq_type: fixed
+          seq: TGGAATTCTCGGGTGCCAAGG
+          min_len: 21
+          max_len: 22
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          link_1:
-            seq_type: fixed
-            seq: AACTCCAGTCAC
-            min_len: 12
-            max_len: 13
-            onlist: 
-            join: 
-              regions:
-              how: 
-          
-          sample_bc:
-            seq_type: onlist
-            seq: NNNNNN
-            min_len: 6
-            max_len: 7
-            onlist: sample_bc_onlist.txt
-            join: 
-              regions:
-              how: 
+        link_1:
+          seq_type: fixed
+          seq: AACTCCAGTCAC
+          min_len: 12
+          max_len: 13
+          onlist: 
+          join: 
+            regions:
+            how: 
+        
+        sample_bc:
+          seq_type: onlist
+          seq: NNNNNN
+          min_len: 6
+          max_len: 7
+          onlist: sample_bc_onlist.txt
+          join: 
+            regions:
+            how: 
 
-          illumina_p7:
-            seq_type: fixed
-            seq: ATCTCGTATGCCGTCTTCTGCTTG
-            min_len: 24
-            max_len: 25
-            onlist: 
-            join: 
-              regions:
-              how: 
+        illumina_p7:
+          seq_type: fixed
+          seq: ATCTCGTATGCCGTCTTCTGCTTG
+          min_len: 24
+          max_len: 25
+          onlist: 
+          join: 
+            regions:
+            how: 

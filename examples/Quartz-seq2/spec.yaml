@@ -1,126 +1,125 @@
-assay:
-  name: Quartz-seq2
-  doi: https://doi.org/10.1186/s13059-018-1407-3
-  description: Added umis to Quartz-seq
-  modalities: [RNA]
-  lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/Quartz-seq_family.html
-  assay_spec:
-    RNA:
-      seq_type: joined
-      seq: 
-      min_len: 
-      max_len: 
-      onlist: 
-      join:
-        how: union
-        order: [illumina_p5, double_T, gM_primer, link_1, cell_bc, umi, poly_T, cDNA, truseq_read_2, sample_index, illumina_p7]
-        regions:
-          illumina_p5: 
-            seq_type: fixed
-            seq: AATGATACGGCGACCACCGAGATCTACAC
-            min_len: 29
-            max_len: 30
-            onlist: 
-            join: 
-              regions:
-              how: 
+name: Quartz-seq2
+doi: https://doi.org/10.1186/s13059-018-1407-3
+description: Added umis to Quartz-seq
+modalities: [RNA]
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/Quartz-seq_family.html
+assay_spec:
+  RNA:
+    seq_type: joined
+    seq: 
+    min_len: 
+    max_len: 
+    onlist: 
+    join:
+      how: union
+      order: [illumina_p5, double_T, gM_primer, link_1, cell_bc, umi, poly_T, cDNA, truseq_read_2, sample_index, illumina_p7]
+      regions:
+        illumina_p5: 
+          seq_type: fixed
+          seq: AATGATACGGCGACCACCGAGATCTACAC
+          min_len: 29
+          max_len: 30
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          double_T:
-            seq_type: fixed
-            seq: TT
-            min_len: 2
-            max_len: 3
-            onlist: 
-            join: 
-              regions:
-              how: 
+        double_T:
+          seq_type: fixed
+          seq: TT
+          min_len: 2
+          max_len: 3
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          gM_primer:
-            seq_type: fixed
-            seq: GTATAGAATTCGCGGCCGCTCGCGAT
-            min_len: 24
-            max_len: 25
-            onlist: 
-            join: 
-              regions:
-              how: 
+        gM_primer:
+          seq_type: fixed
+          seq: GTATAGAATTCGCGGCCGCTCGCGAT
+          min_len: 24
+          max_len: 25
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          link_1:
-            seq_type: fixed
-            seq: AC
-            min_len: 2
-            max_len: 3
-            onlist: 
-            join: 
-              regions:
-              how: 
+        link_1:
+          seq_type: fixed
+          seq: AC
+          min_len: 2
+          max_len: 3
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          cell_bc:
-            seq_type: onlist
-            seq: NNNNNNNNNNNNNNN
-            min_len: 15
-            max_len: 16
-            onlist: cell_bc_onlist.txt
-            join: 
-              regions:
-              how: 
+        cell_bc:
+          seq_type: onlist
+          seq: NNNNNNNNNNNNNNN
+          min_len: 15
+          max_len: 16
+          onlist: cell_bc_onlist.txt
+          join: 
+            regions:
+            how: 
 
-          umi:
-            seq_type: random
-            seq: NNNNNNNN
-            min_len: 8
-            max_len: 9
-            onlist: 
-            join: 
-              regions:
-              how: 
+        umi:
+          seq_type: random
+          seq: NNNNNNNN
+          min_len: 8
+          max_len: 9
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          ploy_T: # note, how to represent variable length of known base?
-            seq_type: random
-            seq: 
-            min_len: 1
-            max_len: 99
-            onlist: 
-            join: 
-              regions:
-              how: 
+        ploy_T: # note, how to represent variable length of known base?
+          seq_type: random
+          seq: 
+          min_len: 1
+          max_len: 99
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          cDNA: 
-            seq_type: random
-            seq: 
-            min_len: 1
-            max_len: 99
-            onlist: 
-            join: 
-              regions:
-              how: 
+        cDNA: 
+          seq_type: random
+          seq: 
+          min_len: 1
+          max_len: 99
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          truseq_read_2: 
-            seq_type: fixed
-            seq: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
-            min_len: 34
-            max_len: 35
-            onlist: 
-            join: 
-              regions:
-              how: 
+        truseq_read_2: 
+          seq_type: fixed
+          seq: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+          min_len: 34
+          max_len: 35
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          sample_index:
-            seq_type: random
-            seq: NNNNNN
-            min_len: 6
-            max_len: 7
-            onlist: 
-            join: 
-              regions:
-              how: 
+        sample_index:
+          seq_type: random
+          seq: NNNNNN
+          min_len: 6
+          max_len: 7
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          illumina_p7:
-            seq_type: fixed
-            seq: ATCTCGTATGCCGTCTTCTGCTTG
-            min_len: 24
-            max_len: 25
-            onlist: 
-            join: 
-              regions:
-              how: 
+        illumina_p7:
+          seq_type: fixed
+          seq: ATCTCGTATGCCGTCTTCTGCTTG
+          min_len: 24
+          max_len: 25
+          onlist: 
+          join: 
+            regions:
+            how: 

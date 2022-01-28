@@ -1,17 +1,12 @@
-from enum import Enum
 from typing import Optional, List, Dict
 import yaml
 import json
 
 
-class SeqType(Enum):
-    FIXED = "fixed"
-    RANDOM = "random"
-    ONLIST = "onlist"
-    JOINED = "joined"
+# todo figure out how to do enums type options
+class Region(yaml.YAMLObject):
+    yaml_tag = u'!Region'
 
-
-class Region:
     def __init__(self,
                  name: str,
                  seq_type: str,
@@ -21,7 +16,7 @@ class Region:
                  onlist: Optional[str] = None,
                  join: Optional['Join'] = None) -> None:
         self.name = name
-        self.seq_type = SeqType[seq_type.upper()].value
+        self.seq_type = seq_type
         self.seq = seq
 
         self.min_len = min_len
@@ -32,19 +27,19 @@ class Region:
 
     def __repr__(self) -> str:
         d = {
-            self.name: {
-                "seq_type": self.seq_type,
-                "onlist": self.onlist,
-                "seq": self.seq,
-                "min_len": self.min_len,
-                "max_len": self.max_len,
-                "join": self.join
-            }
+            "seq_type": self.seq_type,
+            "onlist": self.onlist,
+            "seq": self.seq,
+            "min_len": self.min_len,
+            "max_len": self.max_len,
+            "join": self.join
         }
         return f"{d}"
 
 
-class Join:
+class Join(yaml.YAMLObject):
+    yaml_tag = u'!Join'
+
     def __init__(
         self,
         how: Optional[str] = None,
@@ -64,7 +59,9 @@ class Join:
         return f"{d}"
 
 
-class Assay:
+class Assay(yaml.YAMLObject):
+    yaml_tag = u'!Assay'
+
     def __init__(self, name: str, doi: str, description: str,
                  modalities: List[str], lib_struct: str,
                  assay_spec: Dict[str, Region]) -> None:
@@ -77,25 +74,24 @@ class Assay:
 
     def __repr__(self) -> str:
         d = {
-            "assay": {
-                "name": self.name,
-                "doi": self.doi,
-                "description": self.description,
-                "modalities": self.modalities,
-                "lib_struct": self.lib_struct,
-                "assay_spec": self.assay_spec,
-            }
+            "name": self.name,
+            "doi": self.doi,
+            "description": self.description,
+            "modalities": self.modalities,
+            "lib_struct": self.lib_struct,
+            "assay_spec": self.assay_spec,
         }
         return f"{d}"
 
     def toJSON(self):
-        return json.dumps({"assay": self},
+        return json.dumps(self,
                           default=lambda o: o.__dict__,
                           sort_keys=False,
                           indent=4)
 
-    def toYAML(self):
-        return yaml.dump({"assay": self}, sort_keys=False)
+    def toYAML(self, fname: str):
+        with open(fname, 'w') as f:
+            yaml.dump(self, f, sort_keys=False)
 
 
 # sci-rna-seq
@@ -246,9 +242,11 @@ assay = Assay(
     doi="https://doi.org/10.1126/science.aam8940",
     description="combinatorial single-cell RNA-seq",
     modalities=["RNA"],
-    lib_struct=
+    lib_struct=  # noqa
     "https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq.html",
     assay_spec={"RNA": RNA})
 
-print(assay.toJSON())
-print(assay.toYAML())
+print(assay.toYAML("spec.yaml"))
+with open("spec.yaml", 'r') as stream:
+    data_loaded: Assay = yaml.load(stream, Loader=yaml.Loader)
+print(data_loaded.doi)

@@ -1,126 +1,125 @@
-assay:
-  name: STRT-seq-2i
-  doi: https://doi.org/10.1038/s41598-017-16546-4
-  description: STRT-seq performed on microwells with dual-index 5 prime
-  modalities: [RNA]
-  lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
-  assay_spec:
-    RNA:
-      seq_type: joined
-      seq: 
-      min_len: 
-      max_len: 
-      onlist: 
-      join:
-        how: union
-        order: [solexa_p1, link_1, well_bc, link_2, umi, triple_G, cDNA, ME, link_3, subarray_bc, solexa_p2]
-        regions:
-          solexa_p1: 
-            seq_type: fixed
-            seq: AATGATACGGCGACCACCGA
-            min_len: 20
-            max_len: 21
-            onlist: 
-            join: 
-              regions:
-              how: 
+name: STRT-seq-2i
+doi: https://doi.org/10.1038/s41598-017-16546-4
+description: STRT-seq performed on microwells with dual-index 5 prime
+modalities: [RNA]
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
+assay_spec:
+  RNA:
+    seq_type: joined
+    seq: 
+    min_len: 
+    max_len: 
+    onlist: 
+    join:
+      how: union
+      order: [solexa_p1, link_1, well_bc, link_2, umi, triple_G, cDNA, ME, link_3, subarray_bc, solexa_p2]
+      regions:
+        solexa_p1: 
+          seq_type: fixed
+          seq: AATGATACGGCGACCACCGA
+          min_len: 20
+          max_len: 21
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          link_1:
-            seq_type: fixed
-            seq: GATCTACAC
-            min_len: 9
-            max_len: 10
-            onlist: 
-            join: 
-              regions:
-              how: 
-         
-          well_bc:
-            seq_type: random
-            seq: NNNNN
-            min_len: 5
-            max_len: 6
-            onlist: 
-            join: 
-              regions:
-              how: 
+        link_1:
+          seq_type: fixed
+          seq: GATCTACAC
+          min_len: 9
+          max_len: 10
+          onlist: 
+          join: 
+            regions:
+            how: 
+        
+        well_bc:
+          seq_type: random
+          seq: NNNNN
+          min_len: 5
+          max_len: 6
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          link_2:
-            seq_type: fixed
-            seq: CTACACGACGCTCTTCCGATCT
-            min_len: 22
-            max_len: 23
-            onlist: 
-            join: 
-              regions:
-              how: 
+        link_2:
+          seq_type: fixed
+          seq: CTACACGACGCTCTTCCGATCT
+          min_len: 22
+          max_len: 23
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          umi:
-            seq_type: random
-            seq: NNNNNN
-            min_len: 6
-            max_len: 7
-            onlist: 
-            join: 
-              regions:
-              how: 
+        umi:
+          seq_type: random
+          seq: NNNNNN
+          min_len: 6
+          max_len: 7
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          triple_G:
-            seq_type: fixed
-            seq: GGG
-            min_len: 3
-            max_len: 4
-            onlist: 
-            join: 
-              regions:
-              how: 
+        triple_G:
+          seq_type: fixed
+          seq: GGG
+          min_len: 3
+          max_len: 4
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          cDNA:
-            seq_type: random
-            seq: 
-            min_len: 1
-            max_len: 99
-            onlist: 
-            join: 
-              regions:
-              how: 
+        cDNA:
+          seq_type: random
+          seq: 
+          min_len: 1
+          max_len: 99
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          ME:
-            seq_type: fixed
-            seq: CTGTCTCTTATACACATCT
-            min_len: 19
-            max_len: 20
-            onlist: 
-            join: 
-              regions:
-              how: 
+        ME:
+          seq_type: fixed
+          seq: CTGTCTCTTATACACATCT
+          min_len: 19
+          max_len: 20
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          link_3:
-            seq_type: fixed
-            seq: GACGC
-            min_len: 5
-            max_len: 6
-            onlist: 
-            join: 
-              regions:
-              how: 
+        link_3:
+          seq_type: fixed
+          seq: GACGC
+          min_len: 5
+          max_len: 6
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          subarray_bc:
-            seq_type: random
-            seq: NNNNNNNN
-            min_len: 8
-            max_len: 9
-            onlist: 
-            join: 
-              regions:
-              how: 
+        subarray_bc:
+          seq_type: random
+          seq: NNNNNNNN
+          min_len: 8
+          max_len: 9
+          onlist: 
+          join: 
+            regions:
+            how: 
 
-          solexa_p2:
-            seq_type: fixed
-            seq: TCGTATGCCGTCTTCTGCTTG
-            min_len: 21
-            max_len: 22
-            onlist: 
-            join: 
-              regions:
-              how: 
+        solexa_p2:
+          seq_type: fixed
+          seq: TCGTATGCCGTCTTCTGCTTG
+          min_len: 21
+          max_len: 22
+          onlist: 
+          join: 
+            regions:
+            how: 
