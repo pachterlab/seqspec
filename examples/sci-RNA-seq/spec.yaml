@@ -13,7 +13,7 @@ assay:
       onlist: 
       join:
         how: union
-        order: [illumina_p5, i5_index, truseq_read_1_adapter, read_1, read_2, i7_primer, p7]
+        order: [illumina_p5, i5, truseq_read_1_adapter, read_1, poly_T, read_2, i7_primer, i7, illumina_p7]
         regions:
           illumina_p5: 
             seq_type: fixed
@@ -25,12 +25,12 @@ assay:
               regions:
               how: 
 
-          i5_index:
+          i5:
             seq_type: onlist
-            seq: NNNNNNNN
+            seq: NNNNNNNNNN
             min_len: 10
             max_len: 11
-            onlist: i5_index_onlist.txt
+            onlist: i5_onlist.txt
             join: 
               regions:
               how: 
@@ -74,6 +74,17 @@ assay:
                   join: 
                     regions:
                     how: 
+
+          poly_T:
+            seq_type: random
+            seq: 
+            min_len: 1
+            max_len: 99
+            onlist: 
+            join: 
+              regions:
+              how: 
+
           read_2:
             seq_type: joined
             seq:
@@ -93,13 +104,44 @@ assay:
                   join: 
                     regions:
                     how: 
-
+          
           i7_primer:
+            seq_type: joined
+            seq:
+            min_len: 
+            max_len: 
+            onlist:
+            join:
+              how: "union"
+              order: ["ME", "s7"]
+              regions:
+                ME:
+                  seq_type: fixed
+                  seq: CTGTCTCTTATACACATCT
+                  min_len: 19
+                  max_len: 20
+                  onlist: 
+                  join: 
+                    regions:
+                    how: 
+                
+                s7:
+                  seq_type: fixed
+                  seq: CCGAGCCCACGAGAC
+                  min_len: 15
+                  max_len: 16
+                  onlist: 
+                  join: 
+                    regions:
+                    how: 
+                
+
+          i7:
             seq_type: fixed
-            seq: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
-            min_len: 34
-            max_len: 35
-            onlist: 
+            seq: NNNNNNNNNN
+            min_len: 10
+            max_len: 11
+            onlist: i7_onlist.txt
             join: 
               regions:
               how: 

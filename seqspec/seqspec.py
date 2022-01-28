@@ -1,6 +1,7 @@
 from enum import Enum
-from typing import Optional, List
+from typing import Optional, List, Dict
 import yaml
+import json
 
 
 class SeqType(Enum):
@@ -46,11 +47,11 @@ class Region:
 class Join:
     def __init__(
         self,
-        how: str,
-        order: List[str],
-        regions: List[Region],
+        how: Optional[str] = None,
+        order: Optional[List[str]] = None,
+        regions: Optional[Dict[str, Region]] = None,
     ) -> None:
-        self.regions = {i.name: i for i in regions}
+        self.regions = regions
         self.how = how
         self.order = order
 
@@ -63,48 +64,72 @@ class Join:
         return f"{d}"
 
 
-# sci-rna-seq
-p5 = Region(name="p5",
-            seq_type="fixed",
-            onlist=None,
-            seq="AATGATACGGCGACCACCGAGATCTACAC",
-            min_len=29,
-            max_len=30)
+class Assay:
+    def __init__(self, name: str, doi: str, description: str,
+                 modalities: List[str], lib_struct: str,
+                 assay_spec: Dict[str, Region]) -> None:
+        self.name = name
+        self.doi = doi
+        self.description = description
+        self.modalities = modalities
+        self.lib_struct = lib_struct
+        self.assay_spec = assay_spec
 
-i1 = Region(name="i1",
+    def __repr__(self) -> str:
+        d = {
+            "assay": {
+                "name": self.name,
+                "doi": self.doi,
+                "description": self.description,
+                "modalities": self.modalities,
+                "lib_struct": self.lib_struct,
+                "assay_spec": self.assay_spec,
+            }
+        }
+        return f"{d}"
+
+    def toJSON(self):
+        return json.dumps({"assay": self},
+                          default=lambda o: o.__dict__,
+                          sort_keys=False,
+                          indent=4)
+
+    def toYAML(self):
+        return yaml.dump({"assay": self}, sort_keys=False)
+
+
+# sci-rna-seq
+illumina_p5 = Region(name="illumina_p5",
+                     seq_type="fixed",
+                     onlist=None,
+                     seq="AATGATACGGCGACCACCGAGATCTACAC",
+                     min_len=29,
+                     max_len=30,
+                     join=None)
+
+i5 = Region(name="i5",
             seq_type="onlist",
-            onlist="index1.txt",
+            onlist="i5_onlist.txt",
             seq="NNNNNNNN",
             min_len=8,
-            max_len=9)
+            max_len=9,
+            join=None)
 
-r1_adapter = Region(name="r1_adapter",
-                    seq_type="fixed",
-                    onlist=None,
-                    seq="ACACTCTTTCCCTACACGACGCTCTTCCGATCT",
-                    min_len=33,
-                    max_len=34)
-
-cdna = Region(name="cdna",
-              seq_type="random",
-              onlist=None,
-              seq=None,
-              min_len=1,
-              max_len=99)
+truseq_read_1_adapter = Region(name="truseq_read_1_adapter",
+                               seq_type="fixed",
+                               onlist=None,
+                               seq="ACACTCTTTCCCTACACGACGCTCTTCCGATCT",
+                               min_len=33,
+                               max_len=34,
+                               join=None)
 
 umi = Region(name="umi",
              seq_type="random",
              onlist=None,
-             seq="NNNNNNNNNN",
-             min_len=10,
-             max_len=11)
-
-r2_adapter = Region(name="r2_adapter",
-                    seq_type="fixed",
-                    onlist=None,
-                    seq="AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC",
-                    min_len=34,
-                    max_len=35)
+             seq="NNNNNNNN",
+             min_len=8,
+             max_len=9,
+             join=None)
 
 cell_bc = Region(name="cell_bc",
                  seq_type="onlist",
@@ -113,20 +138,117 @@ cell_bc = Region(name="cell_bc",
                  min_len=14,
                  max_len=15)
 
-p7 = Region(name="p7",
+read_1 = Region(name="read_1",
+                seq_type="joined",
+                seq=None,
+                min_len=None,
+                max_len=None,
+                join=Join(how="union",
+                          order=["umi", "cell_bc"],
+                          regions={
+                              "umi": umi,
+                              "cell_bc": cell_bc
+                          }))
+
+poly_T = Region(name="poly_T",
+                seq_type="random",
+                onlist=None,
+                seq=None,
+                min_len=1,
+                max_len=99,
+                join=None)
+
+cdna = Region(name="cdna",
+              seq_type="random",
+              onlist=None,
+              seq=None,
+              min_len=1,
+              max_len=99,
+              join=None)
+
+read_2 = Region(name="read_2",
+                seq_type="joined",
+                onlist=None,
+                min_len=None,
+                max_len=None,
+                join=Join(how="union", order=["cdna"], regions={"cdna": cdna}))
+
+ME = Region(name="ME",
             seq_type="fixed",
+            seq="CTGTCTCTTATACACATCT",
+            min_len=19,
+            max_len=20,
             onlist=None,
-            seq="ATCTCGTATGCCGTCTTCTGCTTG",
-            min_len=24,
-            max_len=25)
+            join=None)
+s7 = Region(name="s7",
+            seq_type="fixed",
+            seq="CCGAGCCCACGAGAC",
+            min_len=15,
+            max_len=16,
+            onlist=None,
+            join=None)
 
-assay = Region(
+i7_primer = Region(name="i7_primer",
+                   seq_type="joined",
+                   seq=None,
+                   min_len=None,
+                   max_len=None,
+                   onlist=None,
+                   join=Join(how="union",
+                             order=["ME", "s7"],
+                             regions={
+                                 "ME": ME,
+                                 "s7": s7
+                             }))
+
+i7 = Region(name="i7",
+            seq_type="fixed",
+            onlist="i7_onlist.txt",
+            seq="NNNNNNNNNN",
+            min_len=10,
+            max_len=11)
+
+illumina_p7 = Region(name="illumina_p7",
+                     seq_type="fixed",
+                     onlist=None,
+                     seq="ATCTCGTATGCCGTCTTCTGCTTG",
+                     min_len=24,
+                     max_len=25)
+
+RNA = Region(name="RNA",
+             seq_type="joined",
+             join=Join(
+                 order=[
+                     "illumina_p5",
+                     "i5",
+                     "truseq_read_1_adapter",
+                     "read_1",
+                     "read_2",
+                     "i7_primer",
+                     "i7",
+                     "illumina_p7",
+                 ],
+                 how="union",
+                 regions={
+                     "illumina_p5": illumina_p5,
+                     "i5": i5,
+                     "truseq_read_1_adapter": truseq_read_1_adapter,
+                     "read_1": read_1,
+                     "read_2": read_2,
+                     "i7_primer": i7_primer,
+                     "i7": i7,
+                     "illumina_p7": illumina_p7
+                 },
+             ))
+
+assay = Assay(
     name="sci-RNA-seq",
-    seq_type="joined",
-    join=Join(
-        order=["as"],
-        how="union",
-        regions=[p5, i1, r1_adapter, cdna, umi, r2_adapter, cell_bc, p7],
-    ))
+    doi="https://doi.org/10.1126/science.aam8940",
+    description="combinatorial single-cell RNA-seq",
+    modalities=["RNA"],
+    lib_struct=
+    "https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq.html",
+    assay_spec={"RNA": RNA})
 
-print(yaml.dump(assay))
+print(assay.toJSON())
+print(assay.toYAML())
