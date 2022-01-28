@@ -1,0 +1,36 @@
+assay:
+  name: my assay
+  doi: mydoi.org
+  description: a description of my assay
+  modalities: [modality_1]
+  lib_struct: https://teichlab.github.io/scg_lib_structs/ # find the assay here
+  assay_spec:
+    modality_1:
+      seq_type: joined
+      seq: 
+      min_len: 
+      max_len: 
+      onlist: 
+      join:
+        how: union
+        order: [region1, region2]
+        regions:
+          region1: 
+            seq_type: fixed
+            seq: AATGATACGGCGACCACCGAGATCTACAC
+            min_len: 29
+            max_len: 30
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          region2:
+            seq_type: random
+            seq: NNNNNNNN
+            min_len: 10
+            max_len: 11
+            onlist: 
+            join: 
+              regions:
+              how: 

@@ -1,0 +1,106 @@
+assay:
+  name: Smart-seq2
+  doi: https://doi.org/10.1038/s41587-020-0497-0
+  description: full-length rna-seq from individual cells
+  modalities: [RNA]
+  lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SMART-seq_family.html
+  assay_spec:
+    RNA:
+      seq_type: joined
+      seq: 
+      min_len: 
+      max_len: 
+      onlist: 
+      join:
+        how: union
+        order: [illumina_p5, i5, s5, ME1, cDNA, ME2, s7, i7, illumina_p7]
+        regions:
+          illumina_p5: 
+            seq_type: fixed
+            seq: AATGATACGGCGACCACCGAGATCTACAC
+            min_len: 29
+            max_len: 30
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          i5:
+            seq_type: onlist
+            seq: NNNNNNNN
+            min_len: 10
+            max_len: 11
+            onlist: i5_onlist.txt
+            join: 
+              regions:
+              how: 
+          
+          s5:
+            seq_type: fixed
+            seq: TCGTCGGCAGCGTC
+            min_len: 14
+            max_len: 15
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          ME1:
+            seq_type: fixed
+            seq: AGATGTGTATAAGAGACAG
+            min_len: 19
+            max_len: 20
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          cDNA:
+            seq_type: random
+            seq: 
+            min_len: 1
+            max_len: 99
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          ME2:
+            seq_type: fixed
+            seq: CTGTCTCTTATACACATCT
+            min_len: 19
+            max_len: 20
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          s7:
+            seq_type: fixed
+            seq: CCGAGCCCACGAGAC
+            min_len: 15
+            max_len: 16
+            onlist: 
+            join: 
+              regions:
+              how: 
+
+          i7:
+            seq_type: onlist
+            seq: NNNNNNNN
+            min_len: 8
+            max_len: 9
+            onlist: i7_onlist.txt # make
+            join: 
+              regions:
+              how: 
+
+          illumina_p7:
+            seq_type: 
+            seq: ATCTCGTATGCCGTCTTCTGCTTG
+            min_len: 24
+            max_len: 25
+            onlist: 
+            join: 
+              regions:
+              how: 
