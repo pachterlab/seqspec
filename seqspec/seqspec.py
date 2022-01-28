@@ -25,6 +25,16 @@ class Region(yaml.YAMLObject):
         self.onlist = onlist
         self.join = join
 
+    def printSeq(self):
+        if self.join:
+            for n, r in self.join.regions.items():
+                r.printSeq()
+        else:
+            if self.seq:
+                return print(self.seq, end="")
+            elif self.seq is None:
+                return print("X", end="")
+
     def __repr__(self) -> str:
         d = {
             "seq_type": self.seq_type,
@@ -42,9 +52,9 @@ class Join(yaml.YAMLObject):
 
     def __init__(
         self,
-        how: Optional[str] = None,
-        order: Optional[List[str]] = None,
-        regions: Optional[Dict[str, Region]] = None,
+        how: str,
+        order: List[str],
+        regions: Dict[str, Region],
     ) -> None:
         self.regions = regions
         self.how = how
@@ -92,6 +102,10 @@ class Assay(yaml.YAMLObject):
     def toYAML(self, fname: str):
         with open(fname, 'w') as f:
             yaml.dump(self, f, sort_keys=False)
+
+    def printSpec(self):
+        for name, region in self.assay_spec.items():
+            region.printSeq()
 
 
 # sci-rna-seq
@@ -246,7 +260,10 @@ assay = Assay(
     "https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq.html",
     assay_spec={"RNA": RNA})
 
-print(assay.toYAML("spec.yaml"))
+# i7_primer.printSeq()
+# assay.printSpec()
+
+assay.toYAML("spec.yaml")
 with open("spec.yaml", 'r') as stream:
     data_loaded: Assay = yaml.load(stream, Loader=yaml.Loader)
-print(data_loaded.doi)
+data_loaded.printSpec()
