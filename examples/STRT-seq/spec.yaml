@@ -1,105 +1,90 @@
+!Assay
 name: STRT-seq
 doi: https://doi.org/10.1038/nprot.2012.022
 description: single-cell tagged reverse transcripton
-modalities: [RNA]
+modalities:
+- RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
 assay_spec:
-  RNA:
-    seq_type: joined
-    seq: 
-    min_len: 
-    max_len: 
-    onlist: 
-    join:
+  RNA: !Region
+    sequence_type: joined
+    sequence: AATGATACGGCGACCACCGAGATCTAAGCAGTGGTATCAACGCAGAGTGCAGTGCTNNNNNNGGGXAGATCGGAAGAGCTCGTATGCCGTCTTCTGCTTG
+    min_len: 100
+    max_len: 188
+    onlist: null
+    join: !Join
       how: union
-      order: [solexa_p1, link_1, ispcr, link_2, cell_bc, triple_G, cDNA, link_3, solexa_p2]
+      order:
+      - solexa_p1
+      - link_1
+      - ispcr
+      - link_2
+      - cell_bc
+      - triple_G
+      - cDNA
+      - link_3
+      - solexa_p2
       regions:
-        solexa_p1: 
-          seq_type: fixed
-          seq: AATGATACGGCGACCACCGA
+        solexa_p1: !Region
+          sequence_type: fixed
+          sequence: AATGATACGGCGACCACCGA
           min_len: 20
-          max_len: 21
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        link_1:
-          seq_type: fixed
-          seq: GATCT
+          max_len: 20
+          onlist: null
+          join: null
+        link_1: !Region
+          sequence_type: fixed
+          sequence: GATCT
           min_len: 5
-          max_len: 6
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        ispcr:
-          seq_type: fixed
-          seq: AAGCAGTGGTATCAACGCAGAGT
+          max_len: 5
+          onlist: null
+          join: null
+        ispcr: !Region
+          sequence_type: fixed
+          sequence: AAGCAGTGGTATCAACGCAGAGT
           min_len: 23
-          max_len: 24
-          onlist: 
-          join: 
-            regions:
-            how: 
-        
-        link_2:
-          seq_type: fixed
-          seq: GCAGTGCT
+          max_len: 23
+          onlist: null
+          join: null
+        link_2: !Region
+          sequence_type: fixed
+          sequence: GCAGTGCT
           min_len: 8
-          max_len: 9
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        cell_bc:
-          seq_type: random
-          seq: NNNNNN
+          max_len: 8
+          onlist: null
+          join: null
+        cell_bc: !Region
+          sequence_type: random
+          sequence: NNNNNN
           min_len: 6
-          max_len: 7
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        triple_G:
-          seq_type: fixed
-          seq: GGG
+          max_len: 6
+          onlist: null
+          join: null
+        triple_G: !Region
+          sequence_type: fixed
+          sequence: GGG
           min_len: 3
-          max_len: 4
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        cDNA:
-          seq_type: random
-          seq: 
+          max_len: 3
+          onlist: null
+          join: null
+        cDNA: !Region
+          sequence_type: random
+          sequence: X
           min_len: 1
-          max_len: 99
-          onlist: 
-          join: 
-            regions:
-            how: 
-            
-        link_3:
-          seq_type: fixed
-          seq: AGATCGGAAGAGC
+          max_len: 98
+          onlist: null
+          join: null
+        link_3: !Region
+          sequence_type: fixed
+          sequence: AGATCGGAAGAGC
           min_len: 13
-          max_len: 14
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        solexa_p2:
-          seq_type: fixed
-          seq: TCGTATGCCGTCTTCTGCTTG
+          max_len: 13
+          onlist: null
+          join: null
+        solexa_p2: !Region
+          sequence_type: fixed
+          sequence: TCGTATGCCGTCTTCTGCTTG
           min_len: 21
-          max_len: 22
-          onlist: 
-          join: 
-            regions:
-            how: 
+          max_len: 21
+          onlist: null
+          join: null

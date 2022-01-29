@@ -150,7 +150,7 @@ def main():
         lib_struct=  # noqa
         "https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-sequence.html",  # noqa
         assay_spec={"RNA": RNA})
-    assay.print_sequence()
+    # assay.print_sequence()
     # print(i7_primer.get_len())
     # print(i7_primer.get_sequence())
 
@@ -158,10 +158,14 @@ def main():
     # print(read_1.get_sequence())
     # print(read_1.min_len, read_1.max_len)
     # print(read_1.sequence)
-    assay.to_YAML("test.yaml")
-    with open("test.yaml", 'r') as stream:
-        data_loaded: Assay = yaml.load(stream, Loader=yaml.Loader)
-    data_loaded.print_sequence()
+    # assay.to_YAML("test.yaml")
+    s = "STRT-seq-C1"
+    fn = f"examples/{s}/spec.yaml"
+    with open(fn, 'r') as stream:
+        data: Assay = yaml.load(stream, Loader=yaml.Loader)
+    data.print_sequence()
+    data.update_spec()
+    data.to_YAML(fn)
 
 
 if __name__ == "__main__":

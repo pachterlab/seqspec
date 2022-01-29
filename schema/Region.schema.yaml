@@ -5,10 +5,10 @@ title: Region
 description: A region of DNA
 type: object
 properties:
-  seq_type:
+  sequence_type:
     description: The type of the sequence
     type: string
-  seq:
+  sequence:
     description: The sequence
     type: string
   min_len:

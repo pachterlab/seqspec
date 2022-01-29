@@ -1,105 +1,90 @@
+!Assay
 name: STRT-seq-C1
 doi: https://doi.org/10.1007/978-1-4939-9240-9_9
 description: STRT-seq performed on microfluidics Fluidigm C1
-modalities: [RNA]
+modalities:
+- RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
 assay_spec:
-  RNA:
-    seq_type: joined
-    seq: 
-    min_len: 
-    max_len: 
-    onlist: 
-    join:
+  RNA: !Region
+    sequence_type: joined
+    sequence: AATGATACGGCGACCACCGATNNNNNGGGXCTGTCTCTTATACACATCTGACGCNNNNNNNNTCGTATGCCGTCTTCTGCTTG
+    min_len: 83
+    max_len: 171
+    onlist: null
+    join: !Join
       how: union
-      order: [solexa_p1, link_1, umi, triple_G, cDNA, ME, link_2, cell_bc, solexa_p2]
+      order:
+      - solexa_p1
+      - link_1
+      - umi
+      - triple_G
+      - cDNA
+      - ME
+      - link_2
+      - cell_bc
+      - solexa_p2
       regions:
-        solexa_p1: 
-          seq_type: fixed
-          seq: AATGATACGGCGACCACCGA
+        solexa_p1: !Region
+          sequence_type: fixed
+          sequence: AATGATACGGCGACCACCGA
           min_len: 20
-          max_len: 21
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        link_1:
-          seq_type: fixed
-          seq: T
-          min_len: 1
-          max_len: 2
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        umi:
-          seq_type: random
-          seq: NNNNN
-          min_len: 5
-          max_len: 6
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        triple_G:
-          seq_type: fixed
-          seq: GGG
-          min_len: 3
-          max_len: 4
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        cDNA:
-          seq_type: random
-          seq: 
-          min_len: 1
-          max_len: 99
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        ME:
-          seq_type: fixed
-          seq: CTGTCTCTTATACACATCT
-          min_len: 19
           max_len: 20
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        link_2:
-          seq_type: fixed
-          seq: GACGC
+          onlist: null
+          join: null
+        link_1: !Region
+          sequence_type: fixed
+          sequence: T
+          min_len: 1
+          max_len: 1
+          onlist: null
+          join: null
+        umi: !Region
+          sequence_type: random
+          sequence: NNNNN
           min_len: 5
-          max_len: 6
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        cell_bc:
-          seq_type: random
-          seq: NNNNNNNN
+          max_len: 5
+          onlist: null
+          join: null
+        triple_G: !Region
+          sequence_type: fixed
+          sequence: GGG
+          min_len: 3
+          max_len: 3
+          onlist: null
+          join: null
+        cDNA: !Region
+          sequence_type: random
+          sequence: X
+          min_len: 1
+          max_len: 98
+          onlist: null
+          join: null
+        ME: !Region
+          sequence_type: fixed
+          sequence: CTGTCTCTTATACACATCT
+          min_len: 19
+          max_len: 19
+          onlist: null
+          join: null
+        link_2: !Region
+          sequence_type: fixed
+          sequence: GACGC
+          min_len: 5
+          max_len: 5
+          onlist: null
+          join: null
+        cell_bc: !Region
+          sequence_type: random
+          sequence: NNNNNNNN
           min_len: 8
-          max_len: 9
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        solexa_p2:
-          seq_type: fixed
-          seq: TCGTATGCCGTCTTCTGCTTG
+          max_len: 8
+          onlist: null
+          join: null
+        solexa_p2: !Region
+          sequence_type: fixed
+          sequence: TCGTATGCCGTCTTCTGCTTG
           min_len: 21
-          max_len: 22
-          onlist: 
-          join: 
-            regions:
-            how: 
+          max_len: 21
+          onlist: null
+          join: null

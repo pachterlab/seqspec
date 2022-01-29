@@ -1,115 +1,98 @@
+!Assay
 name: CEL-Seq2
 doi: https://doi.org/10.1186/s13059-016-0938-8
 description: Improvement CEL-Seq, now with UMIs! Implemented on Fluidigm's C1
-modalities: [RNA]
+modalities:
+- RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html
 assay_spec:
-  RNA:
-    seq_type: joined
-    seq: 
-    min_len: 
-    max_len: 
-    onlist: 
-    join:
+  RNA: !Region
+    sequence_type: joined
+    sequence: AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNNNNNXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 132
+    max_len: 316
+    onlist: null
+    join: !Join
       how: union
-      order: [illumina_p5, RA5, umi, cell_bc, poly_T, cDNA, RA3, link_1, sample_bc, illumina_p7]
+      order:
+      - illumina_p5
+      - RA5
+      - umi
+      - cell_bc
+      - poly_T
+      - cDNA
+      - RA3
+      - link_1
+      - sample_bc
+      - illumina_p7
       regions:
-        illumina_p5: 
-          seq_type: fixed
-          seq: AATGATACGGCGACCACCGAGATCTACAC
+        illumina_p5: !Region
+          sequence_type: fixed
+          sequence: AATGATACGGCGACCACCGAGATCTACAC
           min_len: 29
-          max_len: 30
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        RA5:
-          seq_type: fixed
-          seq: GTTCAGAGTTCTACAGTCCGACGATC
+          max_len: 29
+          onlist: null
+          join: null
+        RA5: !Region
+          sequence_type: fixed
+          sequence: GTTCAGAGTTCTACAGTCCGACGATC
           min_len: 26
-          max_len: 27
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        umi:
-          seq_type: random
-          seq: NNNNNN
+          max_len: 26
+          onlist: null
+          join: null
+        umi: !Region
+          sequence_type: random
+          sequence: NNNNNN
           min_len: 6
-          max_len: 7
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        cell_bc:
-          seq_type: random
-          seq: NNNNNN
+          max_len: 6
+          onlist: null
+          join: null
+        cell_bc: !Region
+          sequence_type: random
+          sequence: NNNNNN
           min_len: 6
-          max_len: 7
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        poly_T:
-          seq_type: random
-          seq: 
+          max_len: 6
+          onlist: null
+          join: null
+        poly_T: !Region
+          sequence_type: random
+          sequence: X
           min_len: 1
-          max_len: 99
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        cDNA:
-          seq_type: random
-          seq: 
+          max_len: 98
+          onlist: null
+          join: null
+        cDNA: !Region
+          sequence_type: random
+          sequence: X
           min_len: 1
-          max_len: 99
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        RA3:
-          seq_type: fixed
-          seq: TGGAATTCTCGGGTGCCAAGG
+          max_len: 98
+          onlist: null
+          join: null
+        RA3: !Region
+          sequence_type: fixed
+          sequence: TGGAATTCTCGGGTGCCAAGG
           min_len: 21
-          max_len: 22
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        link_1:
-          seq_type: fixed
-          seq: AACTCCAGTCAC
+          max_len: 21
+          onlist: null
+          join: null
+        link_1: !Region
+          sequence_type: fixed
+          sequence: AACTCCAGTCAC
           min_len: 12
-          max_len: 13
-          onlist: 
-          join: 
-            regions:
-            how: 
-        
-        sample_bc:
-          seq_type: onlist
-          seq: NNNNNN
+          max_len: 12
+          onlist: null
+          join: null
+        sample_bc: !Region
+          sequence_type: onlist
+          sequence: NNNNNN
           min_len: 6
-          max_len: 7
+          max_len: 6
           onlist: sample_bc_onlist.txt
-          join: 
-            regions:
-            how: 
-
-        illumina_p7:
-          seq_type: fixed
-          seq: ATCTCGTATGCCGTCTTCTGCTTG
+          join: null
+        illumina_p7: !Region
+          sequence_type: fixed
+          sequence: ATCTCGTATGCCGTCTTCTGCTTG
           min_len: 24
-          max_len: 25
-          onlist: 
-          join: 
-            regions:
-            how: 
+          max_len: 24
+          onlist: null
+          join: null

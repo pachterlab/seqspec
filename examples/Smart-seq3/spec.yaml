@@ -1,234 +1,196 @@
+!Assay
 name: Smart-seq3
 doi: https://doi.org/10.1038/s41587-020-0497-0
 description: full-length and five-prime rna-seq from individual cells
-modalities: [RNA_end, RNA_internal]
+modalities:
+- RNA_end
+- RNA_internal
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SMART-seq_family.html
 assay_spec:
-  RNA_end:
-    seq_type: joined
-    seq: 
-    min_len: 
-    max_len: 
-    onlist: 
-    join:
+  RNA_end: !Region
+    sequence_type: joined
+    sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGATTGCGCAATGNNNNNNNNGGGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 161
+    max_len: 246
+    onlist: null
+    join: !Join
       how: union
-      order: [illumina_p5, i5, s5, ME1, five_prime_fragment_tag, umi, triple_G, cDNA, ME2, s7, i7, illumina_p7]
+      order:
+      - illumina_p5
+      - i5
+      - s5
+      - ME1
+      - five_prime_fragment_tag
+      - umi
+      - triple_G
+      - cDNA
+      - ME2
+      - s7
+      - i7
+      - illumina_p7
       regions:
-        illumina_p5: 
-          seq_type: fixed
-          seq: AATGATACGGCGACCACCGAGATCTACAC
+        illumina_p5: !Region
+          sequence_type: fixed
+          sequence: AATGATACGGCGACCACCGAGATCTACAC
           min_len: 29
-          max_len: 30
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        i5:
-          seq_type: onlist
-          seq: NNNNNNNN
+          max_len: 29
+          onlist: null
+          join: null
+        i5: !Region
+          sequence_type: onlist
+          sequence: NNNNNNNN
           min_len: 10
-          max_len: 11
+          max_len: 10
           onlist: i5_onlist.txt
-          join: 
-            regions:
-            how: 
-        
-        s5:
-          seq_type: fixed
-          seq: TCGTCGGCAGCGTC
+          join: null
+        s5: !Region
+          sequence_type: fixed
+          sequence: TCGTCGGCAGCGTC
           min_len: 14
-          max_len: 15
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        ME1:
-          seq_type: fixed
-          seq: AGATGTGTATAAGAGACAG
+          max_len: 14
+          onlist: null
+          join: null
+        ME1: !Region
+          sequence_type: fixed
+          sequence: AGATGTGTATAAGAGACAG
           min_len: 19
-          max_len: 20
-          onlist: 
-          join: 
-            regions:
-            how: 
-        
-        five_prime_fragment_tag:
-          seq_type: fixed
-          seq: ATTGCGCAATG
+          max_len: 19
+          onlist: null
+          join: null
+        five_prime_fragment_tag: !Region
+          sequence_type: fixed
+          sequence: ATTGCGCAATG
           min_len: 11
-          max_len: 12
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        umi:
-          seq_type: random
-          seq: NNNNNNNN
-          min_len: 8
-          max_len: 9
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        triple_G:
-          seq_type: fixed
-          seq: GGG
-          min_len: 3
-          max_len: 4
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        cDNA:
-          seq_type: random
-          seq: 
-          min_len: 1
-          max_len: 99
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        ME2:
-          seq_type: fixed
-          seq: CTGTCTCTTATACACATCT
-          min_len: 19
-          max_len: 20
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        s7:
-          seq_type: fixed
-          seq: CCGAGCCCACGAGAC
-          min_len: 15
-          max_len: 16
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        i7:
-          seq_type: onlist
-          seq: NNNNNNNN
-          min_len: 8
-          max_len: 9
-          onlist: i7_onlist.txt # make
-          join: 
-            regions:
-            how: 
-
-        illumina_p7:
-          seq_type: 
-          seq: ATCTCGTATGCCGTCTTCTGCTTG
-          min_len: 24
-          max_len: 25
-          onlist: 
-          join: 
-            regions:
-            how: 
-  RNA_internal:
-    seq_type: joined
-    seq: 
-    min_len: 
-    max_len: 
-    onlist: 
-    join:
-      how: union
-      order: [illumina_p5, i5, s5, ME1 cDNA, ME2, s7, i7, illumina_p7]
-      regions:
-        illumina_p5: 
-          seq_type: fixed
-          seq: AATGATACGGCGACCACCGAGATCTACAC
-          min_len: 29
-          max_len: 30
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        i5:
-          seq_type: onlist
-          seq: NNNNNNNN
-          min_len: 10
           max_len: 11
-          onlist: i5_onlist.txt
-          join: 
-            regions:
-            how: 
-        
-        s5:
-          seq_type: fixed
-          seq: TCGTCGGCAGCGTC
-          min_len: 14
-          max_len: 15
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        ME1:
-          seq_type: fixed
-          seq: AGATGTGTATAAGAGACAG
-          min_len: 19
-          max_len: 20
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        cDNA:
-          seq_type: random
-          seq: 
-          min_len: 1
-          max_len: 99
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        ME2:
-          seq_type: fixed
-          seq: CTGTCTCTTATACACATCT
-          min_len: 19
-          max_len: 20
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        s7:
-          seq_type: fixed
-          seq: CCGAGCCCACGAGAC
-          min_len: 15
-          max_len: 16
-          onlist: 
-          join: 
-            regions:
-            how: 
-
-        i7:
-          seq_type: onlist
-          seq: NNNNNNNN
+          onlist: null
+          join: null
+        umi: !Region
+          sequence_type: random
+          sequence: NNNNNNNN
           min_len: 8
-          max_len: 9
-          onlist: i7_onlist.txt # make
-          join: 
-            regions:
-            how: 
-
-        illumina_p7:
-          seq_type: 
-          seq: ATCTCGTATGCCGTCTTCTGCTTG
+          max_len: 8
+          onlist: null
+          join: null
+        triple_G: !Region
+          sequence_type: fixed
+          sequence: GGG
+          min_len: 3
+          max_len: 3
+          onlist: null
+          join: null
+        cDNA: !Region
+          sequence_type: random
+          sequence: X
+          min_len: 1
+          max_len: 98
+          onlist: null
+          join: null
+        ME2: !Region
+          sequence_type: fixed
+          sequence: CTGTCTCTTATACACATCT
+          min_len: 19
+          max_len: 19
+          onlist: null
+          join: null
+        s7: !Region
+          sequence_type: fixed
+          sequence: CCGAGCCCACGAGAC
+          min_len: 15
+          max_len: 15
+          onlist: null
+          join: null
+        i7: !Region
+          sequence_type: onlist
+          sequence: NNNNNNNN
+          min_len: 8
+          max_len: 8
+          onlist: i7_onlist.txt
+          join: null
+        illumina_p7: !Region
+          sequence_type: null
+          sequence: ATCTCGTATGCCGTCTTCTGCTTG
           min_len: 24
-          max_len: 25
-          onlist: 
-          join: 
-            regions:
-            how: 
+          max_len: 24
+          onlist: null
+          join: null
+  RNA_internal: !Region
+    sequence_type: joined
+    sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 139
+    max_len: 227
+    onlist: null
+    join: !Join
+      how: union
+      order:
+      - illumina_p5
+      - i5
+      - s5
+      - ME1 cDNA
+      - ME2
+      - s7
+      - i7
+      - illumina_p7
+      regions:
+        illumina_p5: !Region
+          sequence_type: fixed
+          sequence: AATGATACGGCGACCACCGAGATCTACAC
+          min_len: 29
+          max_len: 29
+          onlist: null
+          join: null
+        i5: !Region
+          sequence_type: onlist
+          sequence: NNNNNNNN
+          min_len: 10
+          max_len: 10
+          onlist: i5_onlist.txt
+          join: null
+        s5: !Region
+          sequence_type: fixed
+          sequence: TCGTCGGCAGCGTC
+          min_len: 14
+          max_len: 14
+          onlist: null
+          join: null
+        ME1: !Region
+          sequence_type: fixed
+          sequence: AGATGTGTATAAGAGACAG
+          min_len: 19
+          max_len: 19
+          onlist: null
+          join: null
+        cDNA: !Region
+          sequence_type: random
+          sequence: X
+          min_len: 1
+          max_len: 98
+          onlist: null
+          join: null
+        ME2: !Region
+          sequence_type: fixed
+          sequence: CTGTCTCTTATACACATCT
+          min_len: 19
+          max_len: 19
+          onlist: null
+          join: null
+        s7: !Region
+          sequence_type: fixed
+          sequence: CCGAGCCCACGAGAC
+          min_len: 15
+          max_len: 15
+          onlist: null
+          join: null
+        i7: !Region
+          sequence_type: onlist
+          sequence: NNNNNNNN
+          min_len: 8
+          max_len: 8
+          onlist: i7_onlist.txt
+          join: null
+        illumina_p7: !Region
+          sequence_type: null
+          sequence: ATCTCGTATGCCGTCTTCTGCTTG
+          min_len: 24
+          max_len: 24
+          onlist: null
+          join: null

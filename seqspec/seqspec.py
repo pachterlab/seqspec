@@ -38,10 +38,8 @@ class Region(yaml.YAMLObject):
         else:
             if self.sequence:
                 s += self.sequence
-                return s
             elif self.sequence is None:
                 s += "X"
-                return s
         return s
 
     def get_len(self, min_l: int = 0, max_l: int = 0):
@@ -52,6 +50,15 @@ class Region(yaml.YAMLObject):
             min_l += self.min_len
             max_l += self.max_len - 1
         return (min_l, max_l)
+
+    def update_attr(self):
+        if self.join:
+            for n, r in self.join.regions.items():
+                r.update_attr()
+
+        self.sequence = self.get_sequence()
+        self.min_len, self.max_len = self.get_len()
+        return
 
     def __repr__(self) -> str:
         d = {
@@ -126,3 +133,7 @@ class Assay(yaml.YAMLObject):
         for name, region in self.assay_spec.items():
             print(region.get_sequence(), end="")
         print("\n", end="")
+
+    def update_spec(self):
+        for n, r in self.assay_spec.items():
+            r.update_attr()
