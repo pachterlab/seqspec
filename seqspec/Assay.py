@@ -10,6 +10,7 @@ class Assay(yaml.YAMLObject):
     def __init__(self, name: str, doi: str, description: str,
                  modalities: List[str], lib_struct: str,
                  assay_spec: Dict[str, Region]) -> None:
+        super().__init__()
         self.name = name
         self.doi = doi
         self.description = description

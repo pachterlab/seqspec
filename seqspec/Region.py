@@ -14,6 +14,7 @@ class Region(yaml.YAMLObject):
                  max_len: int = 100,
                  onlist: Optional[str] = None,
                  join: Optional['Join'] = None) -> None:
+        super().__init__()
         self.name = name
         self.sequence_type = sequence_type
         self.sequence = sequence
@@ -80,6 +81,7 @@ class Join(yaml.YAMLObject):
         order: List[str],
         regions: Dict[str, Region],
     ) -> None:
+        super().__init__()
         self.regions = regions
         self.how = how
         self.order = order
