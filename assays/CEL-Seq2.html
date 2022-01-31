@@ -9,15 +9,15 @@
       <div style="width: 75%; margin: 0 auto">
         <h6><a href="../index.html">Back</a></h6>
         <div id="assay">
-  <h1 style="text-align: center">CEL-Seq</h1>
+  <h1 style="text-align: center">CEL-Seq2</h1>
   <ul>
     <li>
-      <a href="https://doi.org/10.1016/j.celrep.2012.08.003"
-        >https://doi.org/10.1016/j.celrep.2012.08.003</a
+      <a href="https://doi.org/10.1186/s13059-016-0938-8"
+        >https://doi.org/10.1186/s13059-016-0938-8</a
       >
     </li>
     <li>
-      barcoding and pooling samples before amplifying RNA with in vitro transcription
+      Improvement CEL-Seq, now with UMIs! Implemented on Fluidigm's C1
     </li>
     <li>RNA</li>
   </ul>
@@ -29,14 +29,14 @@
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
-AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG</pre>
+AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNNNNNXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG</pre>
   
         
   <ol>
   <li>
     
   <details>
-    <summary>Illumina P5</summary>
+    <summary>illumina_p5</summary>
     <ul>
       <li>sequence_type: fixed</li>
       <li>
@@ -80,7 +80,7 @@ GTTCAGAGTTCTACAGTCCGACGATC</pre
     </ul>
   </details></li><li>
   <details>
-    <summary>Cell Barcode</summary>
+    <summary>umi</summary>
     <ul>
       <li>sequence_type: random</li>
       <li>
@@ -93,16 +93,38 @@ GTTCAGAGTTCTACAGTCCGACGATC</pre
             display: inline;
           "
         >
-NNNNNNNN</pre
+NNNNNN</pre
         >
       </li>
-      <li>min_len: 8</li>
-      <li>max_len: 8</li>
+      <li>min_len: 6</li>
+      <li>max_len: 6</li>
       <li>onlist: null</li>
     </ul>
   </details></li><li>
   <details>
-    <summary>Poly-T</summary>
+    <summary>cell_bc</summary>
+    <ul>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+          style="
+            overflow-x: auto;
+            text-align: left;
+            margin: 0;
+            display: inline;
+          "
+        >
+NNNNNN</pre
+        >
+      </li>
+      <li>min_len: 6</li>
+      <li>max_len: 6</li>
+      <li>onlist: null</li>
+    </ul>
+  </details></li><li>
+  <details>
+    <summary>poly_T</summary>
     <ul>
       <li>sequence_type: random</li>
       <li>
@@ -168,7 +190,7 @@ TGGAATTCTCGGGTGCCAAGG</pre
     </ul>
   </details></li><li>
   <details>
-    <summary>Link 1</summary>
+    <summary>link_1</summary>
     <ul>
       <li>sequence_type: fixed</li>
       <li>
@@ -190,7 +212,7 @@ AACTCCAGTCAC</pre
     </ul>
   </details></li><li>
   <details>
-    <summary>Sample BC</summary>
+    <summary>sample_bc</summary>
     <ul>
       <li>sequence_type: onlist</li>
       <li>
@@ -212,7 +234,7 @@ NNNNNN</pre
     </ul>
   </details></li><li>
   <details>
-    <summary>Illumina P7</summary>
+    <summary>illumina_p7</summary>
     <ul>
       <li>sequence_type: fixed</li>
       <li>

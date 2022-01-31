@@ -7,10 +7,11 @@ modalities:
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq.html
 assay_spec:
   RNA: !Region
+    name: RNA
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
     min_len: 160
-    max_len: 343
+    max_len: 354
     onlist: null
     join: !Join
       how: union
@@ -26,6 +27,7 @@ assay_spec:
       - illumina_p7
       regions:
         illumina_p5: !Region
+          name: illumina_p5
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGAGATCTACAC
           min_len: 29
@@ -33,6 +35,7 @@ assay_spec:
           onlist: null
           join: null
         i5: !Region
+          name: i5
           sequence_type: onlist
           sequence: NNNNNNNNNN
           min_len: 10
@@ -40,6 +43,7 @@ assay_spec:
           onlist: i5_onlist.txt
           join: null
         truseq_read_1_adapter: !Region
+          name: truseq_read_1_adapter
           sequence_type: fixed
           sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
           min_len: 33
@@ -47,10 +51,11 @@ assay_spec:
           onlist: null
           join: null
         read_1: !Region
+          name: read_1
           sequence_type: joined
           sequence: NNNNNNNNNNNNNNNNNN
           min_len: 18
-          max_len: 16
+          max_len: 18
           onlist: null
           join: !Join
             how: union
@@ -59,6 +64,7 @@ assay_spec:
             - cell_bc
             regions:
               umi: !Region
+                name: umi
                 sequence_type: random
                 sequence: NNNNNNNN
                 min_len: 8
@@ -66,6 +72,7 @@ assay_spec:
                 onlist: null
                 join: null
               cell_bc: !Region
+                name: cell_bc
                 sequence_type: onlist
                 sequence: NNNNNNNNNN
                 min_len: 10
@@ -73,6 +80,7 @@ assay_spec:
                 onlist: cell_bc_onlist.txt
                 join: null
         poly_T: !Region
+          name: poly_T
           sequence_type: random
           sequence: X
           min_len: 1
@@ -80,10 +88,11 @@ assay_spec:
           onlist: null
           join: null
         read_2: !Region
+          name: read_2
           sequence_type: joined
           sequence: X
           min_len: 1
-          max_len: 97
+          max_len: 98
           onlist: null
           join: !Join
             how: union
@@ -91,6 +100,7 @@ assay_spec:
             - cdna
             regions:
               cdna: !Region
+                name: cdna
                 sequence_type: random
                 sequence: X
                 min_len: 1
@@ -98,10 +108,11 @@ assay_spec:
                 onlist: null
                 join: null
         i7_primer: !Region
+          name: i7_primer
           sequence_type: joined
           sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
           min_len: 34
-          max_len: 32
+          max_len: 34
           onlist: null
           join: !Join
             how: union
@@ -110,6 +121,7 @@ assay_spec:
             - s7
             regions:
               ME: !Region
+                name: ME
                 sequence_type: fixed
                 sequence: CTGTCTCTTATACACATCT
                 min_len: 19
@@ -117,6 +129,7 @@ assay_spec:
                 onlist: null
                 join: null
               s7: !Region
+                name: s7
                 sequence_type: fixed
                 sequence: CCGAGCCCACGAGAC
                 min_len: 15
@@ -124,6 +137,7 @@ assay_spec:
                 onlist: null
                 join: null
         i7: !Region
+          name: i7
           sequence_type: fixed
           sequence: NNNNNNNNNN
           min_len: 10
@@ -131,6 +145,7 @@ assay_spec:
           onlist: i7_onlist.txt
           join: null
         illumina_p7: !Region
+          name: illumina_p7
           sequence_type: fixed
           sequence: ATCTCGTATGCCGTCTTCTGCTTG
           min_len: 24

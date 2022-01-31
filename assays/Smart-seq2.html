@@ -9,15 +9,15 @@
       <div style="width: 75%; margin: 0 auto">
         <h6><a href="../index.html">Back</a></h6>
         <div id="assay">
-  <h1 style="text-align: center">CEL-Seq</h1>
+  <h1 style="text-align: center">Smart-seq2</h1>
   <ul>
     <li>
-      <a href="https://doi.org/10.1016/j.celrep.2012.08.003"
-        >https://doi.org/10.1016/j.celrep.2012.08.003</a
+      <a href="https://doi.org/10.1038/s41587-020-0497-0"
+        >https://doi.org/10.1038/s41587-020-0497-0</a
       >
     </li>
     <li>
-      barcoding and pooling samples before amplifying RNA with in vitro transcription
+      full-length rna-seq from individual cells
     </li>
     <li>RNA</li>
   </ul>
@@ -29,14 +29,14 @@
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
-AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG</pre>
+AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG</pre>
   
         
   <ol>
   <li>
     
   <details>
-    <summary>Illumina P5</summary>
+    <summary>illumina_p5</summary>
     <ul>
       <li>sequence_type: fixed</li>
       <li>
@@ -58,31 +58,9 @@ AATGATACGGCGACCACCGAGATCTACAC</pre
     </ul>
   </details></li><li>
   <details>
-    <summary>RA5</summary>
+    <summary>i5</summary>
     <ul>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-          style="
-            overflow-x: auto;
-            text-align: left;
-            margin: 0;
-            display: inline;
-          "
-        >
-GTTCAGAGTTCTACAGTCCGACGATC</pre
-        >
-      </li>
-      <li>min_len: 26</li>
-      <li>max_len: 26</li>
-      <li>onlist: null</li>
-    </ul>
-  </details></li><li>
-  <details>
-    <summary>Cell Barcode</summary>
-    <ul>
-      <li>sequence_type: random</li>
+      <li>sequence_type: onlist</li>
       <li>
         sequence:
         <pre
@@ -96,15 +74,15 @@ GTTCAGAGTTCTACAGTCCGACGATC</pre
 NNNNNNNN</pre
         >
       </li>
-      <li>min_len: 8</li>
-      <li>max_len: 8</li>
-      <li>onlist: null</li>
+      <li>min_len: 10</li>
+      <li>max_len: 10</li>
+      <li>onlist: i5_onlist.txt</li>
     </ul>
   </details></li><li>
   <details>
-    <summary>Poly-T</summary>
+    <summary>s5</summary>
     <ul>
-      <li>sequence_type: random</li>
+      <li>sequence_type: fixed</li>
       <li>
         sequence:
         <pre
@@ -115,11 +93,33 @@ NNNNNNNN</pre
             display: inline;
           "
         >
-X</pre
+TCGTCGGCAGCGTC</pre
         >
       </li>
-      <li>min_len: 1</li>
-      <li>max_len: 98</li>
+      <li>min_len: 14</li>
+      <li>max_len: 14</li>
+      <li>onlist: null</li>
+    </ul>
+  </details></li><li>
+  <details>
+    <summary>ME1</summary>
+    <ul>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+          style="
+            overflow-x: auto;
+            text-align: left;
+            margin: 0;
+            display: inline;
+          "
+        >
+AGATGTGTATAAGAGACAG</pre
+        >
+      </li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
       <li>onlist: null</li>
     </ul>
   </details></li><li>
@@ -146,7 +146,7 @@ X</pre
     </ul>
   </details></li><li>
   <details>
-    <summary>RA3</summary>
+    <summary>ME2</summary>
     <ul>
       <li>sequence_type: fixed</li>
       <li>
@@ -159,16 +159,16 @@ X</pre
             display: inline;
           "
         >
-TGGAATTCTCGGGTGCCAAGG</pre
+CTGTCTCTTATACACATCT</pre
         >
       </li>
-      <li>min_len: 21</li>
-      <li>max_len: 21</li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
       <li>onlist: null</li>
     </ul>
   </details></li><li>
   <details>
-    <summary>Link 1</summary>
+    <summary>s7</summary>
     <ul>
       <li>sequence_type: fixed</li>
       <li>
@@ -181,16 +181,16 @@ TGGAATTCTCGGGTGCCAAGG</pre
             display: inline;
           "
         >
-AACTCCAGTCAC</pre
+CCGAGCCCACGAGAC</pre
         >
       </li>
-      <li>min_len: 12</li>
-      <li>max_len: 12</li>
+      <li>min_len: 15</li>
+      <li>max_len: 15</li>
       <li>onlist: null</li>
     </ul>
   </details></li><li>
   <details>
-    <summary>Sample BC</summary>
+    <summary>i7</summary>
     <ul>
       <li>sequence_type: onlist</li>
       <li>
@@ -203,18 +203,18 @@ AACTCCAGTCAC</pre
             display: inline;
           "
         >
-NNNNNN</pre
+NNNNNNNN</pre
         >
       </li>
-      <li>min_len: 6</li>
-      <li>max_len: 6</li>
-      <li>onlist: sample_bc_onlist.txt</li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: i7_onlist.txt</li>
     </ul>
   </details></li><li>
   <details>
-    <summary>Illumina P7</summary>
+    <summary>illumina_p7</summary>
     <ul>
-      <li>sequence_type: fixed</li>
+      <li>sequence_type: null</li>
       <li>
         sequence:
         <pre

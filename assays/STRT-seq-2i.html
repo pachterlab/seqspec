@@ -9,15 +9,15 @@
       <div style="width: 75%; margin: 0 auto">
         <h6><a href="../index.html">Back</a></h6>
         <div id="assay">
-  <h1 style="text-align: center">CEL-Seq</h1>
+  <h1 style="text-align: center">STRT-seq-2i</h1>
   <ul>
     <li>
-      <a href="https://doi.org/10.1016/j.celrep.2012.08.003"
-        >https://doi.org/10.1016/j.celrep.2012.08.003</a
+      <a href="https://doi.org/10.1038/s41598-017-16546-4"
+        >https://doi.org/10.1038/s41598-017-16546-4</a
       >
     </li>
     <li>
-      barcoding and pooling samples before amplifying RNA with in vitro transcription
+      STRT-seq performed on microwells with dual-index 5 prime
     </li>
     <li>RNA</li>
   </ul>
@@ -29,14 +29,14 @@
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
-AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG</pre>
+AATGATACGGCGACCACCGAGATCTACACNNNNNCTACACGACGCTCTTCCGATCTNNNNNNGGGXCTGTCTCTTATACACATCTGACGCNNNNNNNNTCGTATGCCGTCTTCTGCTTG</pre>
   
         
   <ol>
   <li>
     
   <details>
-    <summary>Illumina P5</summary>
+    <summary>solexa_p1</summary>
     <ul>
       <li>sequence_type: fixed</li>
       <li>
@@ -49,16 +49,16 @@ AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNXXTGGAATTCTCGGGTG
             display: inline;
           "
         >
-AATGATACGGCGACCACCGAGATCTACAC</pre
+AATGATACGGCGACCACCGA</pre
         >
       </li>
-      <li>min_len: 29</li>
-      <li>max_len: 29</li>
+      <li>min_len: 20</li>
+      <li>max_len: 20</li>
       <li>onlist: null</li>
     </ul>
   </details></li><li>
   <details>
-    <summary>RA5</summary>
+    <summary>link_1</summary>
     <ul>
       <li>sequence_type: fixed</li>
       <li>
@@ -71,16 +71,16 @@ AATGATACGGCGACCACCGAGATCTACAC</pre
             display: inline;
           "
         >
-GTTCAGAGTTCTACAGTCCGACGATC</pre
+GATCTACAC</pre
         >
       </li>
-      <li>min_len: 26</li>
-      <li>max_len: 26</li>
+      <li>min_len: 9</li>
+      <li>max_len: 9</li>
       <li>onlist: null</li>
     </ul>
   </details></li><li>
   <details>
-    <summary>Cell Barcode</summary>
+    <summary>well_bc</summary>
     <ul>
       <li>sequence_type: random</li>
       <li>
@@ -93,16 +93,38 @@ GTTCAGAGTTCTACAGTCCGACGATC</pre
             display: inline;
           "
         >
-NNNNNNNN</pre
+NNNNN</pre
         >
       </li>
-      <li>min_len: 8</li>
-      <li>max_len: 8</li>
+      <li>min_len: 5</li>
+      <li>max_len: 5</li>
       <li>onlist: null</li>
     </ul>
   </details></li><li>
   <details>
-    <summary>Poly-T</summary>
+    <summary>link_2</summary>
+    <ul>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+          style="
+            overflow-x: auto;
+            text-align: left;
+            margin: 0;
+            display: inline;
+          "
+        >
+CTACACGACGCTCTTCCGATCT</pre
+        >
+      </li>
+      <li>min_len: 22</li>
+      <li>max_len: 22</li>
+      <li>onlist: null</li>
+    </ul>
+  </details></li><li>
+  <details>
+    <summary>umi</summary>
     <ul>
       <li>sequence_type: random</li>
       <li>
@@ -115,11 +137,33 @@ NNNNNNNN</pre
             display: inline;
           "
         >
-X</pre
+NNNNNN</pre
         >
       </li>
-      <li>min_len: 1</li>
-      <li>max_len: 98</li>
+      <li>min_len: 6</li>
+      <li>max_len: 6</li>
+      <li>onlist: null</li>
+    </ul>
+  </details></li><li>
+  <details>
+    <summary>triple_G</summary>
+    <ul>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+          style="
+            overflow-x: auto;
+            text-align: left;
+            margin: 0;
+            display: inline;
+          "
+        >
+GGG</pre
+        >
+      </li>
+      <li>min_len: 3</li>
+      <li>max_len: 3</li>
       <li>onlist: null</li>
     </ul>
   </details></li><li>
@@ -146,7 +190,7 @@ X</pre
     </ul>
   </details></li><li>
   <details>
-    <summary>RA3</summary>
+    <summary>ME</summary>
     <ul>
       <li>sequence_type: fixed</li>
       <li>
@@ -159,77 +203,77 @@ X</pre
             display: inline;
           "
         >
-TGGAATTCTCGGGTGCCAAGG</pre
+CTGTCTCTTATACACATCT</pre
+        >
+      </li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
+      <li>onlist: null</li>
+    </ul>
+  </details></li><li>
+  <details>
+    <summary>link_3</summary>
+    <ul>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+          style="
+            overflow-x: auto;
+            text-align: left;
+            margin: 0;
+            display: inline;
+          "
+        >
+GACGC</pre
+        >
+      </li>
+      <li>min_len: 5</li>
+      <li>max_len: 5</li>
+      <li>onlist: null</li>
+    </ul>
+  </details></li><li>
+  <details>
+    <summary>subarray_bc</summary>
+    <ul>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+          style="
+            overflow-x: auto;
+            text-align: left;
+            margin: 0;
+            display: inline;
+          "
+        >
+NNNNNNNN</pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: null</li>
+    </ul>
+  </details></li><li>
+  <details>
+    <summary>solexa_p2</summary>
+    <ul>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+          style="
+            overflow-x: auto;
+            text-align: left;
+            margin: 0;
+            display: inline;
+          "
+        >
+TCGTATGCCGTCTTCTGCTTG</pre
         >
       </li>
       <li>min_len: 21</li>
       <li>max_len: 21</li>
-      <li>onlist: null</li>
-    </ul>
-  </details></li><li>
-  <details>
-    <summary>Link 1</summary>
-    <ul>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-          style="
-            overflow-x: auto;
-            text-align: left;
-            margin: 0;
-            display: inline;
-          "
-        >
-AACTCCAGTCAC</pre
-        >
-      </li>
-      <li>min_len: 12</li>
-      <li>max_len: 12</li>
-      <li>onlist: null</li>
-    </ul>
-  </details></li><li>
-  <details>
-    <summary>Sample BC</summary>
-    <ul>
-      <li>sequence_type: onlist</li>
-      <li>
-        sequence:
-        <pre
-          style="
-            overflow-x: auto;
-            text-align: left;
-            margin: 0;
-            display: inline;
-          "
-        >
-NNNNNN</pre
-        >
-      </li>
-      <li>min_len: 6</li>
-      <li>max_len: 6</li>
-      <li>onlist: sample_bc_onlist.txt</li>
-    </ul>
-  </details></li><li>
-  <details>
-    <summary>Illumina P7</summary>
-    <ul>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-          style="
-            overflow-x: auto;
-            text-align: left;
-            margin: 0;
-            display: inline;
-          "
-        >
-ATCTCGTATGCCGTCTTCTGCTTG</pre
-        >
-      </li>
-      <li>min_len: 24</li>
-      <li>max_len: 24</li>
       <li>onlist: null</li>
     </ul>
   </details></li>
