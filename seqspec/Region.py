@@ -27,7 +27,6 @@ class Region(yaml.YAMLObject):
 
         if self.join:
             self.min_len, self.max_len = self.get_len()
-            self.max_len += 1
 
             self.sequence = self.get_sequence()
 
@@ -48,7 +47,7 @@ class Region(yaml.YAMLObject):
                 min_l, max_l = r.get_len(min_l, max_l)
         else:
             min_l += self.min_len
-            max_l += self.max_len - 1
+            max_l += self.max_len
         return (min_l, max_l)
 
     def update_attr(self):
@@ -62,6 +61,7 @@ class Region(yaml.YAMLObject):
 
     def __repr__(self) -> str:
         d = {
+            "name": self.name,
             "sequence_type": self.sequence_type,
             "onlist": self.onlist,
             "sequence": self.sequence,

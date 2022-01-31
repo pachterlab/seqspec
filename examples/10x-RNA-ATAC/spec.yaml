@@ -8,10 +8,11 @@ modalities:
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium_multiome.html
 assay_spec:
   RNA: !Region
+    name: RNA
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
     min_len: 154
-    max_len: 341
+    max_len: 350
     onlist: null
     join: !Join
       how: union
@@ -27,6 +28,7 @@ assay_spec:
       - illumina_p7
       regions:
         illumina_p5: !Region
+          name: Illumina P5
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGAGATCTACAC
           min_len: 29
@@ -34,6 +36,7 @@ assay_spec:
           onlist: null
           join: null
         truseq_read_1: !Region
+          name: Truseq Read 1
           sequence_type: fixed
           sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
           min_len: 29
@@ -41,6 +44,7 @@ assay_spec:
           onlist: null
           join: null
         cell_bc: !Region
+          name: Cell Barcode
           sequence_type: onlist
           sequence: NNNNNNNNNNNNNNNN
           min_len: 16
@@ -48,6 +52,7 @@ assay_spec:
           onlist: cell_bc_onlist.txt
           join: null
         umi: !Region
+          name: UMI
           sequence_type: random
           sequence: NNNNNNNNNNNN
           min_len: 12
@@ -55,6 +60,7 @@ assay_spec:
           onlist: null
           join: null
         poly_T: !Region
+          name: Poly-T
           sequence_type: random
           sequence: X
           min_len: 1
@@ -62,6 +68,7 @@ assay_spec:
           onlist: null
           join: null
         cDNA: !Region
+          name: cDNA
           sequence_type: random
           sequence: X
           min_len: 1
@@ -69,6 +76,7 @@ assay_spec:
           onlist: null
           join: null
         truseq_read_2: !Region
+          name: Truseq Read 2
           sequence_type: fixed
           sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
           min_len: 34
@@ -76,6 +84,7 @@ assay_spec:
           onlist: null
           join: null
         sample_index: !Region
+          name: Sample Index
           sequence_type: random
           sequence: NNNNNNNN
           min_len: 8
@@ -83,6 +92,7 @@ assay_spec:
           onlist: null
           join: null
         illumina_p7: !Region
+          name: Illumina P7
           sequence_type: fixed
           sequence: ATCTCGTATGCCGTCTTCTGCTTG
           min_len: 24
@@ -90,10 +100,11 @@ assay_spec:
           onlist: null
           join: null
   ATAC: !Region
+    name: ATAC
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNCGCGTCTGTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
     min_len: 153
-    max_len: 241
+    max_len: 251
     onlist: null
     join: !Join
       how: union
@@ -110,6 +121,7 @@ assay_spec:
       - illumina_p7
       regions:
         illumina_p5: !Region
+          name: Illumina P5
           sequence_type: random
           sequence: AATGATACGGCGACCACCGAGATCTACAC
           min_len: 29
@@ -117,6 +129,7 @@ assay_spec:
           onlist: null
           join: null
         cell_bc: !Region
+          name: Cell Barcode
           sequence_type: onlist
           sequence: NNNNNNNNNNNNNNNN
           min_len: 16
@@ -124,6 +137,7 @@ assay_spec:
           onlist: cell_bc_onlist.txt
           join: null
         spacer: !Region
+          name: Spacer
           sequence_type: fixed
           sequence: CGCGTCTG
           min_len: 8
@@ -131,6 +145,7 @@ assay_spec:
           onlist: null
           join: null
         s5: !Region
+          name: S5
           sequence_type: fixed
           sequence: TCGTCGGCAGCGTC
           min_len: 14
@@ -138,6 +153,7 @@ assay_spec:
           onlist: null
           join: null
         ME1: !Region
+          name: ME1
           sequence_type: fixed
           sequence: AGATGTGTATAAGAGACAG
           min_len: 19
@@ -145,6 +161,7 @@ assay_spec:
           onlist: null
           join: null
         gDNA: !Region
+          name: gDNA
           sequence_type: randpm
           sequence: X
           min_len: 1
@@ -152,6 +169,7 @@ assay_spec:
           onlist: null
           join: null
         ME2: !Region
+          name: ME2
           sequence_type: fixed
           sequence: CTGTCTCTTATACACATCT
           min_len: 19
@@ -159,6 +177,7 @@ assay_spec:
           onlist: null
           join: null
         s7: !Region
+          name: S7
           sequence_type: fixed
           sequence: CCGAGCCCACGAGAC
           min_len: 15
@@ -166,6 +185,7 @@ assay_spec:
           onlist: null
           join: null
         sample_index: !Region
+          name: Sample Index
           sequence_type: randm
           sequence: NNNNNNNN
           min_len: 8
@@ -173,6 +193,7 @@ assay_spec:
           onlist: null
           join: null
         illumina_p7: !Region
+          name: Illumina P7
           sequence_type: fixed
           sequence: ATCTCGTATGCCGTCTTCTGCTTG
           min_len: 24

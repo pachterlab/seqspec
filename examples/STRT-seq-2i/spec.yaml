@@ -7,10 +7,11 @@ modalities:
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
 assay_spec:
   RNA: !Region
+    name: RNA
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNCTACACGACGCTCTTCCGATCTNNNNNNGGGXCTGTCTCTTATACACATCTGACGCNNNNNNNNTCGTATGCCGTCTTCTGCTTG
     min_len: 119
-    max_len: 205
+    max_len: 216
     onlist: null
     join: !Join
       how: union
@@ -28,6 +29,7 @@ assay_spec:
       - solexa_p2
       regions:
         solexa_p1: !Region
+          name: solexa_p1
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGA
           min_len: 20
@@ -35,6 +37,7 @@ assay_spec:
           onlist: null
           join: null
         link_1: !Region
+          name: link_1
           sequence_type: fixed
           sequence: GATCTACAC
           min_len: 9
@@ -42,6 +45,7 @@ assay_spec:
           onlist: null
           join: null
         well_bc: !Region
+          name: well_bc
           sequence_type: random
           sequence: NNNNN
           min_len: 5
@@ -49,6 +53,7 @@ assay_spec:
           onlist: null
           join: null
         link_2: !Region
+          name: link_2
           sequence_type: fixed
           sequence: CTACACGACGCTCTTCCGATCT
           min_len: 22
@@ -56,6 +61,7 @@ assay_spec:
           onlist: null
           join: null
         umi: !Region
+          name: umi
           sequence_type: random
           sequence: NNNNNN
           min_len: 6
@@ -63,6 +69,7 @@ assay_spec:
           onlist: null
           join: null
         triple_G: !Region
+          name: triple_G
           sequence_type: fixed
           sequence: GGG
           min_len: 3
@@ -70,6 +77,7 @@ assay_spec:
           onlist: null
           join: null
         cDNA: !Region
+          name: cDNA
           sequence_type: random
           sequence: X
           min_len: 1
@@ -77,6 +85,7 @@ assay_spec:
           onlist: null
           join: null
         ME: !Region
+          name: ME
           sequence_type: fixed
           sequence: CTGTCTCTTATACACATCT
           min_len: 19
@@ -84,6 +93,7 @@ assay_spec:
           onlist: null
           join: null
         link_3: !Region
+          name: link_3
           sequence_type: fixed
           sequence: GACGC
           min_len: 5
@@ -91,6 +101,7 @@ assay_spec:
           onlist: null
           join: null
         subarray_bc: !Region
+          name: subarray_bc
           sequence_type: random
           sequence: NNNNNNNN
           min_len: 8
@@ -98,6 +109,7 @@ assay_spec:
           onlist: null
           join: null
         solexa_p2: !Region
+          name: solexa_p2
           sequence_type: fixed
           sequence: TCGTATGCCGTCTTCTGCTTG
           min_len: 21

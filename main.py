@@ -3,7 +3,7 @@ import yaml
 
 
 def main():
-    s = "10x-RNA-ATAC"
+    s = "STRT-seq-C1"
     fn = f"examples/{s}/spec.yaml"
     with open(fn, 'r') as stream:
         data: Assay = yaml.load(stream, Loader=yaml.Loader)

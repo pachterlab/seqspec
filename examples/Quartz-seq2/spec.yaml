@@ -7,10 +7,11 @@ modalities:
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/Quartz-seq_family.html
 assay_spec:
   RNA: !Region
+    name: RNA
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACTTGTATAGAATTCGCGGCCGCTCGCGATACNNNNNNNNNNNNNNNNNNNNNNNXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
     min_len: 146
-    max_len: 329
+    max_len: 340
     onlist: null
     join: !Join
       how: union
@@ -28,6 +29,7 @@ assay_spec:
       - illumina_p7
       regions:
         illumina_p5: !Region
+          name: illumina_p5
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGAGATCTACAC
           min_len: 29
@@ -35,6 +37,7 @@ assay_spec:
           onlist: null
           join: null
         double_T: !Region
+          name: double_T
           sequence_type: fixed
           sequence: TT
           min_len: 2
@@ -42,6 +45,7 @@ assay_spec:
           onlist: null
           join: null
         gM_primer: !Region
+          name: gM_primer
           sequence_type: fixed
           sequence: GTATAGAATTCGCGGCCGCTCGCGAT
           min_len: 24
@@ -49,6 +53,7 @@ assay_spec:
           onlist: null
           join: null
         link_1: !Region
+          name: link_1
           sequence_type: fixed
           sequence: AC
           min_len: 2
@@ -56,6 +61,7 @@ assay_spec:
           onlist: null
           join: null
         cell_bc: !Region
+          name: cell_bc
           sequence_type: onlist
           sequence: NNNNNNNNNNNNNNN
           min_len: 15
@@ -63,6 +69,7 @@ assay_spec:
           onlist: cell_bc_onlist.txt
           join: null
         umi: !Region
+          name: umi
           sequence_type: random
           sequence: NNNNNNNN
           min_len: 8
@@ -70,6 +77,7 @@ assay_spec:
           onlist: null
           join: null
         ploy_T: !Region
+          name: ploy_T
           sequence_type: random
           sequence: X
           min_len: 1
@@ -77,6 +85,7 @@ assay_spec:
           onlist: null
           join: null
         cDNA: !Region
+          name: cDNA
           sequence_type: random
           sequence: X
           min_len: 1
@@ -84,6 +93,7 @@ assay_spec:
           onlist: null
           join: null
         truseq_read_2: !Region
+          name: truseq_read_2
           sequence_type: fixed
           sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
           min_len: 34
@@ -91,6 +101,7 @@ assay_spec:
           onlist: null
           join: null
         sample_index: !Region
+          name: sample_index
           sequence_type: random
           sequence: NNNNNN
           min_len: 6
@@ -98,6 +109,7 @@ assay_spec:
           onlist: null
           join: null
         illumina_p7: !Region
+          name: illumina_p7
           sequence_type: fixed
           sequence: ATCTCGTATGCCGTCTTCTGCTTG
           min_len: 24
