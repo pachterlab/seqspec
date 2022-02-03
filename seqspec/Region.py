@@ -31,6 +31,7 @@ class Region(yaml.YAMLObject):
             self.sequence = self.get_sequence()
 
     def get_sequence(self, s: str = "") -> str:
+        # take into account "order" property
         if self.join:
             for n, r in self.join.regions.items():
                 s = r.get_sequence(s)
