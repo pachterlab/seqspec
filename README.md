@@ -8,23 +8,23 @@ A list of `seqspec` examples for multiple assays can be found in the `examples/`
 
 Each assay is described by two objects: the `Assay` object and the `Region` object. A library is described by one `Assay` object and multiple (possibly nested) `Region` objects. The `Region` objects are grouped with a `join` operation and an `ordering` on the sub`Region`s specified. A simple (but not fully specified example) looks like the following:
 
-```yaml
+```
 Assay:
-	modalities:
-		- Modality1
-		- Modality2
-	assay_spec:
-		Modality1:
-			join:
-				how: Union
-				order: [Region2, Region1]
-				regions:
-					Region1
-						...
-					Region2
-						...
-		Modality2:
-			...
+    modalities:
+        - Modality1
+        - Modality2
+    assay_spec:
+        Modality1:
+            join:
+                how: Union
+                order: [Region2, Region1]
+                regions:
+                    Region1
+                        ...
+                    Region2
+                        ...
+        Modality2:
+            ...
 ```
 
 In order to catalogue relevant information for each library structure, multiple properties are specified for each `Assay` and each `Region`. 
