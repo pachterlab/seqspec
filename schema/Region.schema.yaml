@@ -12,11 +12,11 @@ properties:
     description: The sequence
     type: string
   min_len:
-    description: The minimum length of the sequence (left closed)
+    description: The minimum length of the sequence
     type: integer
-    minimum: 1
+    minimum: 0
   max_len:
-    description: The maximum length of the sequence (right open)
+    description: The maximum length of the sequence
     type: integer
     maximum: 1024
   onlist:
