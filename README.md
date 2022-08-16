@@ -11,7 +11,7 @@ seqspec format --help
 
 ## Specification
 
-Each assay is described by two objects: the `Assay` object and the `Region` object. A library is described by one `Assay` object and multiple (possibly nested) `Region` objects. The `Region` objects are grouped with a `join` operation and an `ordering` on the sub`Region`s specified. A simple (but not fully specified example) looks like the following:
+Each assay is described by two objects: the `Assay` object and the `Region` object. A library is described by one `Assay` object and multiple (possibly nested) `Region` objects. The `Region` objects are grouped with a `join` operation and an `order` on the sub`Region`s specified. A simple (but not fully specified example) looks like the following:
 
 ```
 Assay:
