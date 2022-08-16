@@ -2,7 +2,7 @@
 
 `seqspec` is a machine-readable YAML file for genomic library sequence and structure. It was inspired by and builds off of the Teichmann Lab [Single Cell Genomics Library Structure](https://github.com/Teichlab/scg_lib_structs).
 
-A list of `seqspec` examples for multiple assays can be found in the `examples/` folder. Sequence specification files can be formatted with the `seqspec` command line tool.
+A list of `seqspec` examples for multiple assays can be found in the `examples/` folder. Each `spec.yaml` describes the 5' "Final library structure" for the assay. Sequence specification files can be formatted with the `seqspec` command line tool.
 
 ```bash
 pip install git+https://github.com/sbooeshaghi/seqspec.git
@@ -87,7 +87,7 @@ properties:
   min_len:
     description: The minimum length of the sequence (left closed)
     type: integer
-    minimum: 1
+    minimum: 0
   max_len:
     description: The maximum length of the sequence (right open)
     type: integer
@@ -112,3 +112,41 @@ properties:
         type: object
         $ref: '#'
 ```
+
+## Contributing
+
+Thank you for wanting to improve `seqspec`. If you have a bug that is related to `seqspec` please create an issue. The issue should contain
+
+- the `seqspec` command ran,
+- the error message, and
+- the `seqspec` and python version.
+
+If you'd like to add assays sequence specifications or make modifications to the `seqspec` tool please do the following:
+
+1. Fork the project.
+```
+# Press "Fork" at the top right of the GitHub page
+```
+
+2. Clone the fork and create a branch for your feature
+```bash
+git clone https://github.com/<USERNAME>/seqspec.git
+cd seqspec
+git checkout -b cool-new-feature
+```
+
+3. Make changes, add files, and commit
+```bash
+# make changes, add files, and commit them
+git add path/to/file1.yaml path/to/file2.yaml
+git commit -m "I made these changes"
+```
+
+4. Push changes to GitHub
+```bash
+git push origin cool-new-feature
+```
+
+5. Submit a pull request
+
+If you are unfamilar with pull requests, you find more information on the [GitHub help page.](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests)
