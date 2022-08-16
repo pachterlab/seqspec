@@ -4,16 +4,18 @@ import yaml
 
 # todo figure out how to do enums type options
 class Region(yaml.YAMLObject):
-    yaml_tag = u'!Region'
+    yaml_tag = "!Region"
 
-    def __init__(self,
-                 name: str,
-                 sequence_type: str,
-                 sequence: str = "",
-                 min_len: int = 1,
-                 max_len: int = 100,
-                 onlist: Optional[str] = None,
-                 join: Optional['Join'] = None) -> None:
+    def __init__(
+        self,
+        name: str,
+        sequence_type: str,
+        sequence: str = "",
+        min_len: int = 0,
+        max_len: int = 1024,
+        onlist: Optional[str] = None,
+        join: Optional["Join"] = None,
+    ) -> None:
         super().__init__()
         self.name = name
         self.sequence_type = sequence_type
@@ -68,13 +70,13 @@ class Region(yaml.YAMLObject):
             "sequence": self.sequence,
             "min_len": self.min_len,
             "max_len": self.max_len,
-            "join": self.join
+            "join": self.join,
         }
         return f"{d}"
 
 
 class Join(yaml.YAMLObject):
-    yaml_tag = u'!Join'
+    yaml_tag = "!Join"
 
     def __init__(
         self,
