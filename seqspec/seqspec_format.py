@@ -5,8 +5,8 @@ import yaml
 def setup_format_args(parser):
     parser_format = parser.add_parser(
         "format",
-        description="Format seqspec file",
-        help="Format seqspec file",
+        description="format seqspec file",
+        help="format seqspec file",
     )
     parser_format.add_argument("yaml", help="Sequencing specification yaml file")
     parser_format.add_argument(
