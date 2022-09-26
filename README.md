@@ -149,4 +149,4 @@ git push origin cool-new-feature
 
 5. Submit a pull request
 
-If you are unfamilar with pull requests, you find more information on the [GitHub help page.](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests)
+If you are unfamilar with pull requests, you can find more information on the [GitHub help page.](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests)
