@@ -6,7 +6,8 @@ modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
 assay_spec:
-  RNA: !Region
+  - !Region
+    region_id: RNA
     name: RNA
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTAAGCAGTGGTATCAACGCAGAGTGCAGTGCTNNNNNNGGGXAGATCGGAAGAGCTCGTATGCCGTCTTCTGCTTG
@@ -26,7 +27,8 @@ assay_spec:
       - link_3
       - solexa_p2
       regions:
-        solexa_p1: !Region
+        - !Region
+          region_id: solexa_p1
           name: solexa_p1
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGA
@@ -34,7 +36,8 @@ assay_spec:
           max_len: 20
           onlist: null
           join: null
-        link_1: !Region
+        - !Region
+          region_id: link_1
           name: link_1
           sequence_type: fixed
           sequence: GATCT
@@ -42,7 +45,8 @@ assay_spec:
           max_len: 5
           onlist: null
           join: null
-        ispcr: !Region
+        - !Region
+          region_id: ispcr
           name: ispcr
           sequence_type: fixed
           sequence: AAGCAGTGGTATCAACGCAGAGT
@@ -50,7 +54,8 @@ assay_spec:
           max_len: 23
           onlist: null
           join: null
-        link_2: !Region
+        - !Region
+          region_id: link_2
           name: link_2
           sequence_type: fixed
           sequence: GCAGTGCT
@@ -58,7 +63,8 @@ assay_spec:
           max_len: 8
           onlist: null
           join: null
-        cell_bc: !Region
+        - !Region
+          region_id: cell_bc
           name: cell_bc
           sequence_type: random
           sequence: NNNNNN
@@ -66,7 +72,8 @@ assay_spec:
           max_len: 6
           onlist: null
           join: null
-        triple_G: !Region
+        - !Region
+          region_id: triple_G
           name: triple_G
           sequence_type: fixed
           sequence: GGG
@@ -74,7 +81,8 @@ assay_spec:
           max_len: 3
           onlist: null
           join: null
-        cDNA: !Region
+        - !Region
+          region_id: cDNA
           name: cDNA
           sequence_type: random
           sequence: X
@@ -82,7 +90,8 @@ assay_spec:
           max_len: 98
           onlist: null
           join: null
-        link_3: !Region
+        - !Region
+          region_id: link_3
           name: link_3
           sequence_type: fixed
           sequence: AGATCGGAAGAGC
@@ -90,7 +99,8 @@ assay_spec:
           max_len: 13
           onlist: null
           join: null
-        solexa_p2: !Region
+        - !Region
+          region_id: solexa_p2
           name: solexa_p2
           sequence_type: fixed
           sequence: TCGTATGCCGTCTTCTGCTTG

@@ -3,6 +3,7 @@ import argparse
 import sys
 from .seqspec_format import setup_format_args, validate_format_args
 from .seqspec_print import setup_print_args, validate_print_args
+from .seqspec_check import setup_check_args, validate_check_args
 
 # Steps to add new subcommands
 # Create seqspec_subcommand.py (create setup_subcmd_args, validate_subcmd_args, run_subcmd in that file)
@@ -24,6 +25,7 @@ def main():
 
     # Setup the arguments for all subcommands
     command_to_parser = {
+        "check": setup_check_args(subparsers),
         "format": setup_format_args(subparsers),
         "print": setup_print_args(subparsers),
     }
@@ -42,7 +44,11 @@ def main():
     args = parser.parse_args()
 
     # Setup validator and runner for all subcommands (validate and run if valid)
-    COMMAND_TO_FUNCTION = {"format": validate_format_args, "print": validate_print_args}
+    COMMAND_TO_FUNCTION = {
+        "format": validate_format_args,
+        "print": validate_print_args,
+        "check": validate_check_args,
+    }
     COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)
 
 

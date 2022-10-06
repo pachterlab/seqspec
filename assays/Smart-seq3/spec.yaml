@@ -7,7 +7,8 @@ modalities:
 - RNA_internal
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SMART-seq_family.html
 assay_spec:
-  RNA_end: !Region
+  - !Region
+    region_id: RNA_end
     name: RNA_end
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGATTGCGCAATGNNNNNNNNGGGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
@@ -30,7 +31,8 @@ assay_spec:
       - i7
       - illumina_p7
       regions:
-        illumina_p5: !Region
+        - !Region
+          region_id: illumina_p5
           name: illumina_p5
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGAGATCTACAC
@@ -38,15 +40,19 @@ assay_spec:
           max_len: 29
           onlist: null
           join: null
-        i5: !Region
+        - !Region
+          region_id: i5
           name: i5
           sequence_type: onlist
           sequence: NNNNNNNN
           min_len: 10
           max_len: 10
-          onlist: i5_onlist.txt
+          onlist: !Onlist
+            filename: i5_onlist.txt
+            md5: null
           join: null
-        s5: !Region
+        - !Region
+          region_id: s5
           name: s5
           sequence_type: fixed
           sequence: TCGTCGGCAGCGTC
@@ -54,7 +60,8 @@ assay_spec:
           max_len: 14
           onlist: null
           join: null
-        ME1: !Region
+        - !Region
+          region_id: ME1
           name: ME1
           sequence_type: fixed
           sequence: AGATGTGTATAAGAGACAG
@@ -62,7 +69,8 @@ assay_spec:
           max_len: 19
           onlist: null
           join: null
-        five_prime_fragment_tag: !Region
+        - !Region
+          region_id: five_prime_fragment_tag
           name: five_prime_fragment_tag
           sequence_type: fixed
           sequence: ATTGCGCAATG
@@ -70,7 +78,8 @@ assay_spec:
           max_len: 11
           onlist: null
           join: null
-        umi: !Region
+        - !Region
+          region_id: umi
           name: umi
           sequence_type: random
           sequence: NNNNNNNN
@@ -78,7 +87,8 @@ assay_spec:
           max_len: 8
           onlist: null
           join: null
-        triple_G: !Region
+        - !Region
+          region_id: triple_G
           name: triple_G
           sequence_type: fixed
           sequence: GGG
@@ -86,7 +96,8 @@ assay_spec:
           max_len: 3
           onlist: null
           join: null
-        cDNA: !Region
+        - !Region
+          region_id: cDNA
           name: cDNA
           sequence_type: random
           sequence: X
@@ -94,7 +105,8 @@ assay_spec:
           max_len: 98
           onlist: null
           join: null
-        ME2: !Region
+        - !Region
+          region_id: ME2
           name: ME2
           sequence_type: fixed
           sequence: CTGTCTCTTATACACATCT
@@ -102,7 +114,8 @@ assay_spec:
           max_len: 19
           onlist: null
           join: null
-        s7: !Region
+        - !Region
+          region_id: s7
           name: s7
           sequence_type: fixed
           sequence: CCGAGCCCACGAGAC
@@ -110,15 +123,19 @@ assay_spec:
           max_len: 15
           onlist: null
           join: null
-        i7: !Region
+        - !Region
+          region_id: i7
           name: i7
           sequence_type: onlist
           sequence: NNNNNNNN
           min_len: 8
           max_len: 8
-          onlist: i7_onlist.txt
+          onlist: !Onlist
+            filename: i7_onlist.txt
+            md5: null
           join: null
-        illumina_p7: !Region
+        - !Region
+          region_id: illumina_p7
           name: illumina_p7
           sequence_type: null
           sequence: ATCTCGTATGCCGTCTTCTGCTTG
@@ -126,7 +143,8 @@ assay_spec:
           max_len: 24
           onlist: null
           join: null
-  RNA_internal: !Region
+  - !Region
+    region_id: RNA_internal
     name: RNA_internal
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
@@ -145,7 +163,8 @@ assay_spec:
       - i7
       - illumina_p7
       regions:
-        illumina_p5: !Region
+        - !Region
+          region_id: illumina_p5
           name: illumina_p5
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGAGATCTACAC
@@ -153,15 +172,19 @@ assay_spec:
           max_len: 29
           onlist: null
           join: null
-        i5: !Region
+        - !Region
+          region_id: i5
           name: i5
           sequence_type: onlist
           sequence: NNNNNNNN
           min_len: 10
           max_len: 10
-          onlist: i5_onlist.txt
+          onlist: !Onlist
+            filename: i5_onlist.txt
+            md5: null
           join: null
-        s5: !Region
+        - !Region
+          region_id: s5
           name: s5
           sequence_type: fixed
           sequence: TCGTCGGCAGCGTC
@@ -169,7 +192,8 @@ assay_spec:
           max_len: 14
           onlist: null
           join: null
-        ME1: !Region
+        - !Region
+          region_id: ME1
           name: ME1
           sequence_type: fixed
           sequence: AGATGTGTATAAGAGACAG
@@ -177,7 +201,8 @@ assay_spec:
           max_len: 19
           onlist: null
           join: null
-        cDNA: !Region
+        - !Region
+          region_id: cDNA
           name: cDNA
           sequence_type: random
           sequence: X
@@ -185,7 +210,8 @@ assay_spec:
           max_len: 98
           onlist: null
           join: null
-        ME2: !Region
+        - !Region
+          region_id: ME2
           name: ME2
           sequence_type: fixed
           sequence: CTGTCTCTTATACACATCT
@@ -193,7 +219,8 @@ assay_spec:
           max_len: 19
           onlist: null
           join: null
-        s7: !Region
+        - !Region
+          region_id: s7
           name: s7
           sequence_type: fixed
           sequence: CCGAGCCCACGAGAC
@@ -201,15 +228,19 @@ assay_spec:
           max_len: 15
           onlist: null
           join: null
-        i7: !Region
+        - !Region
+          region_id: i7
           name: i7
           sequence_type: onlist
           sequence: NNNNNNNN
           min_len: 8
           max_len: 8
-          onlist: i7_onlist.txt
+          onlist: !Onlist
+            filename: i7_onlist.txt
+            md5: null
           join: null
-        illumina_p7: !Region
+        - !Region
+          region_id: illumina_p7
           name: illumina_p7
           sequence_type: null
           sequence: ATCTCGTATGCCGTCTTCTGCTTG

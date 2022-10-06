@@ -6,7 +6,8 @@ modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html
 assay_spec:
-  RNA: !Region
+  - !Region
+    region_id: RNA
     name: RNA
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNNNNNXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
@@ -27,7 +28,8 @@ assay_spec:
       - sample_bc
       - illumina_p7
       regions:
-        illumina_p5: !Region
+        - !Region
+          region_id: illumina_p5
           name: illumina_p5
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGAGATCTACAC
@@ -35,7 +37,8 @@ assay_spec:
           max_len: 29
           onlist: null
           join: null
-        RA5: !Region
+        - !Region
+          region_id: RA5
           name: RA5
           sequence_type: fixed
           sequence: GTTCAGAGTTCTACAGTCCGACGATC
@@ -43,7 +46,8 @@ assay_spec:
           max_len: 26
           onlist: null
           join: null
-        umi: !Region
+        - !Region
+          region_id: umi
           name: umi
           sequence_type: random
           sequence: NNNNNN
@@ -51,7 +55,8 @@ assay_spec:
           max_len: 6
           onlist: null
           join: null
-        cell_bc: !Region
+        - !Region
+          region_id: cell_bc
           name: cell_bc
           sequence_type: random
           sequence: NNNNNN
@@ -59,7 +64,8 @@ assay_spec:
           max_len: 6
           onlist: null
           join: null
-        poly_T: !Region
+        - !Region
+          region_id: poly_T
           name: poly_T
           sequence_type: random
           sequence: X
@@ -67,7 +73,8 @@ assay_spec:
           max_len: 98
           onlist: null
           join: null
-        cDNA: !Region
+        - !Region
+          region_id: cDNA
           name: cDNA
           sequence_type: random
           sequence: X
@@ -75,7 +82,8 @@ assay_spec:
           max_len: 98
           onlist: null
           join: null
-        RA3: !Region
+        - !Region
+          region_id: RA3
           name: RA3
           sequence_type: fixed
           sequence: TGGAATTCTCGGGTGCCAAGG
@@ -83,7 +91,8 @@ assay_spec:
           max_len: 21
           onlist: null
           join: null
-        link_1: !Region
+        - !Region
+          region_id: link_1
           name: link_1
           sequence_type: fixed
           sequence: AACTCCAGTCAC
@@ -91,15 +100,19 @@ assay_spec:
           max_len: 12
           onlist: null
           join: null
-        sample_bc: !Region
+        - !Region
+          region_id: sample_bc
           name: sample_bc
           sequence_type: onlist
           sequence: NNNNNN
           min_len: 6
           max_len: 6
-          onlist: sample_bc_onlist.txt
+          onlist: !Onlist
+            filename: sample_bc_onlist.txt
+            md5: null
           join: null
-        illumina_p7: !Region
+        - !Region
+          region_id: illumina_p7
           name: illumina_p7
           sequence_type: fixed
           sequence: ATCTCGTATGCCGTCTTCTGCTTG

@@ -6,7 +6,8 @@ modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3.html
 assay_spec:
-  RNA: !Region
+  - !Region
+    region_id: RNA
     name: RNA
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
@@ -26,7 +27,8 @@ assay_spec:
       - sample_bc
       - illumina_p7
       regions:
-        illumina_p5: !Region
+        - !Region
+          region_id: illumina_p5
           name: Illumina P5
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGAGATCTACAC
@@ -34,7 +36,8 @@ assay_spec:
           max_len: 29
           onlist: null
           join: null
-        truseq_r1: !Region
+        - !Region
+          region_id: truseq_r1
           name: Truseq Read 1
           sequence_type: fixed
           sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
@@ -42,15 +45,19 @@ assay_spec:
           max_len: 10
           onlist: null
           join: null
-        cell_bc: !Region
+        - !Region
+          region_id: cell_bc
           name: Cell Barcode
           sequence_type: onlist
           sequence: NNNNNNNNNNNNNNNN
           min_len: 16
           max_len: 16
-          onlist: 737K-august-2016.txt.gz
+          onlist: !Onlist
+            filename: 737K-august-2016.txt.gz
+            md5: null
           join: null
-        umi: !Region
+        - !Region
+          region_id: umi
           name: UMI
           sequence_type: random
           sequence: NNNNNNNNNN
@@ -58,7 +65,8 @@ assay_spec:
           max_len: 10
           onlist: null
           join: null
-        poly_T: !Region
+        - !Region
+          region_id: poly_T
           name: Poly-T
           sequence_type: random
           sequence: X
@@ -66,7 +74,8 @@ assay_spec:
           max_len: 98
           onlist: null
           join: null
-        cDNA: !Region
+        - !Region
+          region_id: cDNA
           name: cDNA
           sequence_type: random
           sequence: X
@@ -74,7 +83,8 @@ assay_spec:
           max_len: 98
           onlist: null
           join: null
-        truseq_r2: !Region
+        - !Region
+          region_id: truseq_r2
           name: Truseq Read 2
           sequence_type: fixed
           sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
@@ -82,15 +92,19 @@ assay_spec:
           max_len: 34
           onlist: null
           join: null
-        sample_bc: !Region
+        - !Region
+          region_id: sample_bc
           name: Truseq Read 2
           sequence_type: onlist
           sequence: NNNNNNNN
           min_len: 8
           max_len: 8
-          onlist: sample_bc_onlist.txt
+          onlist: !Onlist
+            filename: sample_bc_onlist.txt
+            md5: null
           join: null
-        illumina_p7: !Region
+        - !Region
+          region_id: illumina_p7
           name: Illumina P7
           sequence_type: fixed
           sequence: ATCTCGTATGCCGTCTTCTGCTTG

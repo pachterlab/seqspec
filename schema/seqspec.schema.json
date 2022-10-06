@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "Assay.schema.json",
+  "title": "Assay",
+  "description": "A Assay of DNA",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The name of the assay",
+      "type": "string"
+    },
+    "doi": {
+      "description": "the doi of the paper that describes the assay",
+      "type": "string"
+    },
+    "description": {
+      "description": "A short description of the assay",
+      "type": "string"
+    },
+    "modalities": {
+      "description": "The modalities the assay targets",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lib_struct": {
+      "description": "The link to Teichmann's libstructs page derived for this sequence",
+      "type": "string"
+    },
+    "assay_spec": {
+      "description": "The spec for the assay",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/region"
+      }
+    }
+  },
+  "required": ["name", "doi", "description", "modalities", "lib_struct"],
+  "$defs": {
+    "region": {
+      "title": "Region",
+      "description": "A region of DNA",
+      "type": "object",
+      "properties": {
+        "region_id": {
+          "description": "identifier for the region",
+          "type": "string"
+        },
+        "sequence_type": {
+          "description": "The type of the sequence",
+          "type": "string"
+        },
+        "sequence": {
+          "description": "The sequence",
+          "type": "string"
+        },
+        "min_len": {
+          "description": "The minimum length of the sequence",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2048
+        },
+        "max_len": {
+          "description": "The maximum length of the sequence",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2048
+        },
+        "onlist": {
+          "description": "The file containing the sequence if seq_type = onlist",
+          "type": ["object", "null"],
+          "properties": {
+            "filename": {
+              "description": "filename for the onlist",
+              "type": "string"
+            },
+            "md5": {
+              "description": "md5sum for the file pointed to by filename",
+              "type": "string"
+            }
+          }
+        },
+        "join": {
+          "description": "Join operator on regions",
+          "type": ["object", "null"],
+          "properties": {
+            "how": {
+              "description": "How the regions will be joined",
+              "type": "string"
+            },
+            "order": {
+              "description": "The order of the regions being joined",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "regions": {
+              "description": "The regions being joined",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/region"
+              }
+            }
+          },
+          "required": ["how", "order", "regions"]
+        }
+      },
+      "required": [
+        "region_id",
+        "sequence_type",
+        "sequence",
+        "min_len",
+        "max_len"
+      ]
+    }
+  }
+}
