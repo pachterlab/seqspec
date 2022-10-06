@@ -1,8 +1,7 @@
 # from seqspec.Assay import Assay
-from textwrap import indent
-from jsonschema import validate, Draft4Validator
+from jsonschema import Draft4Validator
 import yaml
-import json
+from os import path
 
 from seqspec.Assay import Assay
 
@@ -25,10 +24,12 @@ def setup_check_args(parser):
 
 
 def validate_check_args(parser, args):
+    print(__file__)
     # if everything is valid the run_check
     spec_fn = args.yaml
     # o = args.o
-    schema_fn = "schema/seqspec.schema.json"
+    schema_fn = path.join(path.dirname(__file__), "../schema/seqspec.schema.json")
+    # schema_fn = "schema/seqspec.schema.json"
     with open(schema_fn, "r") as stream:
         schema = yaml.load(stream, Loader=yaml.Loader)
     # print(schema)
