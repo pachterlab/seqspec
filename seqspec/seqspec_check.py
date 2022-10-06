@@ -24,11 +24,10 @@ def setup_check_args(parser):
 
 
 def validate_check_args(parser, args):
-    print(__file__)
     # if everything is valid the run_check
     spec_fn = args.yaml
     # o = args.o
-    schema_fn = path.join(path.dirname(__file__), "../schema/seqspec.schema.json")
+    schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
     # schema_fn = "schema/seqspec.schema.json"
     with open(schema_fn, "r") as stream:
         schema = yaml.load(stream, Loader=yaml.Loader)
