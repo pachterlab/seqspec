@@ -2,7 +2,7 @@
 
 `seqspec` is a machine-readable YAML file format for genomic library sequence and structure. It was inspired by and builds off of the Teichmann Lab [Single Cell Genomics Library Structure](https://github.com/Teichlab/scg_lib_structs) by [Xi Chen](https://github.com/dbrg77).
 
-A list of `seqspec` examples for multiple assays can be found in the `examples/` folder. Each `spec.yaml` describes the 5'->3' "Final library structure" for the assay. Sequence specification files can be formatted with the `seqspec` command line tool.
+A list of `seqspec` examples for multiple assays can be found in the `assays/` folder. Each `spec.yaml` describes the 5'->3' "Final library structure" for the assay. Sequence specification files can be formatted with the `seqspec` command line tool.
 
 ```bash
 pip install git+https://github.com/sbooeshaghi/seqspec.git
@@ -14,22 +14,21 @@ seqspec format --help
 Each assay is described by two objects: the `Assay` object and the `Region` object. A library is described by one `Assay` object and multiple (possibly nested) `Region` objects. The `Region` objects are grouped with a `join` operation and an `order` on the sub`Region`s specified. A simple (but not fully specified example) looks like the following:
 
 ```
-Assay:
-    modalities:
-        - Modality1
-        - Modality2
-    assay_spec:
-        Modality1:
-            join:
-                how: Union
-                order: [Region2, Region1]
-                regions:
-                    Region1
-                        ...
-                    Region2
-                        ...
-        Modality2:
-            ...
+modalities:
+    - Modality1
+    - Modality2
+assay_spec:
+    - region_id: Modality1
+      join:
+          how: Union
+          order: [Region2, Region1]
+          regions:
+              - region_id: Region1
+                  ...
+              - region_id: Region2
+                  ...
+    - region_id: Modality2
+        ...
 ```
 
 In order to catalogue relevant information for each library structure, multiple properties are specified for each `Assay` and each `Region`. 
@@ -38,46 +37,56 @@ In order to catalogue relevant information for each library structure, multiple 
 `Assay`s have the following structure:
 
 ```yaml
-# This uses schema based on https://json-schema.org/understanding-json-schema/index.html
-$schema: https://json-schema.org/draft/2020-12/schema
-$id: Assay.schema.yaml
+---
+"$schema": https://json-schema.org/draft/2020-12/schema
+"$id": Assay.schema.yaml
 title: Assay
 description: A Assay of DNA
 type: object
 properties:
-  name: 
+  name:
     description: The name of the assay
     type: string
-  doi: 
+  doi:
     description: the doi of the paper that describes the assay
     type: string
-  description: 
+  description:
     description: A short description of the assay
     type: string
-  modalities: 
+  modalities:
     description: The modalities the assay targets
     type: array
     items:
       type: string
-  lib_struct: 
+  lib_struct:
     description: The link to Teichmann's libstructs page derived for this sequence
     type: string
-  assay_spec: # should allow for multiple regions, regions should match modalities naming
+  assay_spec:
     description: The spec for the assay
-    type: object
-    $ref: './Region.schema.yaml'
+    type: array
+    items:
+      "$ref": "Region.schema.yaml"
+required:
+- name
+- doi
+- description
+- modalities
+- lib_struct
 ```
 
 ### `Region` object
 `Region`s have the following structure:
 ```yaml
-# This uses schema based on https://json-schema.org/understanding-json-schema/index.html
-$schema: https://json-schema.org/draft/2020-12/schema
-$id: Region.schema.yaml
+---
+"$schema": https://json-schema.org/draft/2020-12/schema
+"$id": Region.schema.yaml
 title: Region
 description: A region of DNA
 type: object
 properties:
+  region_id:
+    description: identifier for the region
+    type: string
   sequence_type:
     description: The type of the sequence
     type: string
@@ -85,32 +94,56 @@ properties:
     description: The sequence
     type: string
   min_len:
-    description: The minimum length of the sequence (left closed)
+    description: The minimum length of the sequence
     type: integer
     minimum: 0
+    maximum: 2048
   max_len:
-    description: The maximum length of the sequence (right open)
+    description: The maximum length of the sequence
     type: integer
-    maximum: 1024
+    minimum: 0
+    maximum: 2048
   onlist:
     description: The file containing the sequence if seq_type = onlist
-    type: string
+    type:
+    - object
+    - 'null'
+    properties:
+      filename:
+        description: filename for the onlist
+        type: string
+      md5:
+        description: md5sum for the file pointed to by filename
+        type: string
   join:
     description: Join operator on regions
-    type: object
+    type:
+    - object
+    - 'null'
     properties:
       how:
         description: How the regions will be joined
         type: string
-      order: # items in array must match named regions
+      order:
         description: The order of the regions being joined
         type: array
         items:
           type: string
-      regions: # this should technically allow multiple regions
+      regions:
         description: The regions being joined
-        type: object
-        $ref: '#'
+        type: array
+        items:
+          "$ref": "#/$defs/region"
+    required:
+    - how
+    - order
+    - regions
+required:
+- region_id
+- sequence_type
+- sequence
+- min_len
+- max_len
 ```
 
 ## Contributing
