@@ -70,7 +70,7 @@ def regionsTemplate(regions):
                 + 1
                 + 1,  # length of string rep of number plus 1 for "." plus 1 for space
             )
-            for idx, (_, v) in enumerate(regions.items())
+            for idx, v in enumerate(regions)
         ]
     )
     return s
@@ -85,10 +85,8 @@ def libStructTemplate(region):
 def multiModalTemplate(assay_spec):
     s = "\n".join(
         [
-            libStructTemplate(assay_spec[k])
-            + "\n"
-            + regionsTemplate(assay_spec[k].join.regions)
-            for k, v in assay_spec.items()
+            libStructTemplate(v) + "\n" + regionsTemplate(v.join.regions)
+            for v in assay_spec
         ]
     )
     return s

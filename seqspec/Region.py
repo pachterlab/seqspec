@@ -1,4 +1,4 @@
-from typing import Optional, List, Dict
+from typing import Optional, List
 import yaml
 
 
@@ -8,15 +8,17 @@ class Region(yaml.YAMLObject):
 
     def __init__(
         self,
+        region_id: str,
         name: str,
         sequence_type: str,
         sequence: str = "",
         min_len: int = 0,
         max_len: int = 1024,
-        onlist: Optional[str] = None,
+        onlist: Optional["Onlist"] = None,
         join: Optional["Join"] = None,
     ) -> None:
         super().__init__()
+        self.region_id = region_id
         self.name = name
         self.sequence_type = sequence_type
         self.sequence = sequence
@@ -35,7 +37,7 @@ class Region(yaml.YAMLObject):
     def get_sequence(self, s: str = "") -> str:
         # take into account "order" property
         if self.join:
-            for n, r in self.join.regions.items():
+            for r in self.join.regions:
                 s = r.get_sequence(s)
         else:
             if self.sequence:
@@ -46,7 +48,7 @@ class Region(yaml.YAMLObject):
 
     def get_len(self, min_l: int = 0, max_l: int = 0):
         if self.join:
-            for n, r in self.join.regions.items():
+            for r in self.join.regions:
                 min_l, max_l = r.get_len(min_l, max_l)
         else:
             min_l += self.min_len
@@ -55,7 +57,7 @@ class Region(yaml.YAMLObject):
 
     def update_attr(self):
         if self.join:
-            for n, r in self.join.regions.items():
+            for r in self.join.regions:
                 r.update_attr()
 
         self.sequence = self.get_sequence()
@@ -64,6 +66,7 @@ class Region(yaml.YAMLObject):
 
     def __repr__(self) -> str:
         d = {
+            "region_id": self.region_id,
             "name": self.name,
             "sequence_type": self.sequence_type,
             "onlist": self.onlist,
@@ -74,6 +77,19 @@ class Region(yaml.YAMLObject):
         }
         return f"{d}"
 
+    def to_dict(self):
+        d = {
+            "region_id": self.region_id,
+            "name": self.name,
+            "sequence_type": self.sequence_type,
+            "onlist": self.onlist.to_dict() if self.onlist else None,
+            "sequence": self.sequence,
+            "min_len": self.min_len,
+            "max_len": self.max_len,
+            "join": self.join.to_dict() if self.join else None,
+        }
+        return d
+
 
 class Join(yaml.YAMLObject):
     yaml_tag = "!Join"
@@ -82,7 +98,7 @@ class Join(yaml.YAMLObject):
         self,
         how: str,
         order: List[str],
-        regions: Dict[str, Region],
+        regions: List[Region],
     ) -> None:
         super().__init__()
         self.regions = regions
@@ -96,3 +112,34 @@ class Join(yaml.YAMLObject):
             "regions": self.regions,
         }
         return f"{d}"
+
+    def to_dict(self):
+        d = {
+            "how": self.how,
+            "order": self.order,
+            "regions": [o.to_dict() for o in self.regions],
+        }
+        return d
+
+
+class Onlist(yaml.YAMLObject):
+    yaml_tag = "!Onlist"
+
+    def __init__(self, filename: str, md5: str) -> None:
+        super().__init__()
+        self.filename = filename
+        self.md5 = md5
+
+    def __repr__(self) -> str:
+        d = {
+            "filename": self.filename,
+            "md5": self.md5,
+        }
+        return f"{d}"
+
+    def to_dict(self):
+        d = {
+            "filename": self.filename,
+            "md5": self.md5,
+        }
+        return d
