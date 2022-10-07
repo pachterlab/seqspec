@@ -2,11 +2,11 @@
 name: sci-RNA-seq3
 doi: https://doi.org/10.1038/s41586-019-0969-x
 description: combinatorial single-cell RNA-seq 3
-modalities:
-- RNA
+modalities: [RNA]
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq3.html
 assay_spec:
-  RNA: !Region
+  - !Region
+    region_id: RNA
     name: RNA
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNXCAGAGCNNNNNNNNNNNNNNNNNNXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
@@ -15,20 +15,10 @@ assay_spec:
     onlist: null
     join: !Join
       how: union
-      order:
-      - illumina_p5
-      - i5
-      - truseq_read_1_adapter
-      - hairpin_barcode
-      - hairpin_adapter
-      - read_1
-      - poly_T
-      - read_2
-      - i7_primer
-      - i7
-      - illumina_p7
+      order: [illumina_p5, i5, truseq_read_1_adapter, read_1, poly_T, read_2, i7_primer, i7, illumina_p7]
       regions:
-        illumina_p5: !Region
+        - !Region
+          region_id: illumina_p5
           name: illumina_p5
           sequence_type: fixed
           sequence: AATGATACGGCGACCACCGAGATCTACAC
@@ -36,15 +26,21 @@ assay_spec:
           max_len: 29
           onlist: null
           join: null
-        i5: !Region
+          
+        - !Region
+          region_id: i5
           name: i5
           sequence_type: onlist
           sequence: NNNNNNNNNN
           min_len: 10
           max_len: 10
-          onlist: i5_onlist.txt
+          onlist: !Onlist
+            filename: i5_onlist.txt
+            md5sum: None
           join: null
-        truseq_read_1_adapter: !Region
+          
+        - !Region
+          region_id: truseq_read_1_adapter
           name: truseq_read_1_adapter
           sequence_type: fixed
           sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
@@ -52,36 +48,43 @@ assay_spec:
           max_len: 33
           onlist: null
           join: null
-        hairpin_barcode: !Region
-          name: hairpin_barcode
-          sequence_type: onlist
-          sequence: NNNNNNNNNX
-          min_len: 9
-          max_len: 10
-          onlist: hairpin_bc_onlist.txt
-          join: null
-        hairpin_adapter: !Region
-          name: truseq_read_1_adapter
-          sequence_type: fixed
-          sequence: CAGAGC
-          min_len: 6
-          max_len: 6
-          onlist: null
-          join: null
-        read_1: !Region
+          
+        - !Region
+          region_id: read_1
           name: read_1
           sequence_type: joined
-          sequence: NNNNNNNNNNNNNNNNNN
+          sequence: NNNNNNNNNXCAGAGCNNNNNNNNNNNNNNNNNN
           min_len: 18
           max_len: 18
           onlist: null
           join: !Join
             how: union
-            order:
-            - umi
-            - cell_bc
+            order: [hairpin_barcode, hairpin_adapter, umi, cell_bc]
             regions:
-              umi: !Region
+              - !Region
+                region_id: hairpin_barcode
+                name: hairpin_barcode
+                sequence_type: onlist
+                sequence: NNNNNNNNNX
+                min_len: 9
+                max_len: 10
+                onlist: !Onlist
+                  filename: hairpin_bc_onlist.txt
+                  md5sum: None
+                join: null
+                
+              - !Region
+                region_id: hairpin_adapter
+                name: truseq_read_1_adapter
+                sequence_type: fixed
+                sequence: CAGAGC
+                min_len: 6
+                max_len: 6
+                onlist: null
+                join: null
+                
+              - !Region
+                region_id: umi
                 name: umi
                 sequence_type: random
                 sequence: NNNNNNNN
@@ -89,15 +92,21 @@ assay_spec:
                 max_len: 8
                 onlist: null
                 join: null
-              cell_bc: !Region
+                
+              - !Region
+                region_id: cell_bc
                 name: cell_bc
                 sequence_type: onlist
                 sequence: NNNNNNNNNN
                 min_len: 10
                 max_len: 10
-                onlist: cell_bc_onlist.txt
+                onlist: !Onlist
+                  filename: cell_bc_onlist.txt
+                  md5sum: None
                 join: null
-        poly_T: !Region
+                
+        - !Region
+          region_id: poly_T
           name: poly_T
           sequence_type: random
           sequence: X
@@ -105,27 +114,19 @@ assay_spec:
           max_len: 98
           onlist: null
           join: null
-        read_2: !Region
+          
+        - !Region
+          region_id: read_2
           name: read_2
-          sequence_type: joined
+          sequence_type: random
           sequence: X
           min_len: 1
           max_len: 98
           onlist: null
-          join: !Join
-            how: union
-            order:
-            - cdna
-            regions:
-              cdna: !Region
-                name: cdna
-                sequence_type: random
-                sequence: X
-                min_len: 1
-                max_len: 98
-                onlist: null
-                join: null
-        i7_primer: !Region
+          join: null
+          
+        - !Region
+          region_id: i7_primer
           name: i7_primer
           sequence_type: joined
           sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
@@ -134,11 +135,10 @@ assay_spec:
           onlist: null
           join: !Join
             how: union
-            order:
-            - ME
-            - s7
+            order: [ME, s7]
             regions:
-              ME: !Region
+              - !Region
+                region_id: ME
                 name: ME
                 sequence_type: fixed
                 sequence: CTGTCTCTTATACACATCT
@@ -146,7 +146,8 @@ assay_spec:
                 max_len: 19
                 onlist: null
                 join: null
-              s7: !Region
+              - !Region
+                region_id: s7
                 name: s7
                 sequence_type: fixed
                 sequence: CCGAGCCCACGAGAC
@@ -154,15 +155,21 @@ assay_spec:
                 max_len: 15
                 onlist: null
                 join: null
-        i7: !Region
+                
+        - !Region
+          region_id: i7
           name: i7
           sequence_type: onlist
           sequence: NNNNNNNNNN
           min_len: 10
           max_len: 10
-          onlist: i7_onlist.txt
+          onlist: !Onlist
+            filename: i7_onlist.txt
+            md5sum: None
           join: null
-        illumina_p7: !Region
+          
+        - !Region
+          region_id: illumina_p7
           name: illumina_p7
           sequence_type: fixed
           sequence: ATCTCGTATGCCGTCTTCTGCTTG
