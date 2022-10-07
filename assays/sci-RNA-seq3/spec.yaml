@@ -36,7 +36,7 @@ assay_spec:
           max_len: 10
           onlist: !Onlist
             filename: i5_onlist.txt
-            md5sum: None
+            md5: None
           join: null
           
         - !Region
@@ -70,7 +70,7 @@ assay_spec:
                 max_len: 10
                 onlist: !Onlist
                   filename: hairpin_bc_onlist.txt
-                  md5sum: None
+                  md5: None
                 join: null
                 
               - !Region
@@ -102,7 +102,7 @@ assay_spec:
                 max_len: 10
                 onlist: !Onlist
                   filename: cell_bc_onlist.txt
-                  md5sum: None
+                  md5: None
                 join: null
                 
         - !Region
@@ -165,7 +165,7 @@ assay_spec:
           max_len: 10
           onlist: !Onlist
             filename: i7_onlist.txt
-            md5sum: None
+            md5: None
           join: null
           
         - !Region
