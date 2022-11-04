@@ -54,7 +54,7 @@ assay_spec:
           min_len: 16
           max_len: 16
           onlist: !Onlist
-            filename: cell_bc_onlist.txt
+            filename: 737K-august-2016.txt.gz
             md5: null
           join: null
         - !Region
@@ -151,7 +151,7 @@ assay_spec:
           min_len: 16
           max_len: 16
           onlist: !Onlist
-            filename: cell_bc_onlist.txt
+            filename: 737K-cratac-v1.txt.gz
             md5: null
           join: null
         - !Region

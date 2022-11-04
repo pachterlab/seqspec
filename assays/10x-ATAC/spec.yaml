@@ -1,0 +1,112 @@
+!Assay
+name: 10x-ATAC
+doi: https://support.10xgenomics.com/single-cell-atac
+description: Single Cell ATAC
+modalities:
+- ATAC
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium_scATAC.html
+assay_spec:
+- !Region
+  region_id: ATAC
+  name: ATAC
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 145
+  max_len: 243
+  onlist: null
+  join: !Join
+    how: union
+    order:
+    - illumina_p5
+    - cell_bc
+    - s5
+    - ME1
+    - gDNA
+    - ME2
+    - s7
+    - sample_index
+    - illumina_p7
+    regions:
+    - !Region
+      region_id: illumina_p5
+      name: Illumina P5
+      sequence_type: random
+      sequence: AATGATACGGCGACCACCGAGATCTACAC
+      min_len: 29
+      max_len: 29
+      onlist: null
+      join: null
+    - !Region
+      region_id: cell_bc
+      name: Cell Barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: 737K-cratac-v1.txt.gz
+        md5: null
+      join: null
+    - !Region
+      region_id: s5
+      name: S5
+      sequence_type: fixed
+      sequence: TCGTCGGCAGCGTC
+      min_len: 14
+      max_len: 14
+      onlist: null
+      join: null
+    - !Region
+      region_id: ME1
+      name: ME1
+      sequence_type: fixed
+      sequence: AGATGTGTATAAGAGACAG
+      min_len: 19
+      max_len: 19
+      onlist: null
+      join: null
+    - !Region
+      region_id: gDNA
+      name: gDNA
+      sequence_type: randpm
+      sequence: X
+      min_len: 1
+      max_len: 99
+      onlist: null
+      join: null
+    - !Region
+      region_id: ME2
+      name: ME2
+      sequence_type: fixed
+      sequence: CTGTCTCTTATACACATCT
+      min_len: 19
+      max_len: 19
+      onlist: null
+      join: null
+    - !Region
+      region_id: s7
+      name: S7
+      sequence_type: fixed
+      sequence: CCGAGCCCACGAGAC
+      min_len: 15
+      max_len: 15
+      onlist: null
+      join: null
+    - !Region
+      region_id: sample_index
+      name: Sample Index
+      sequence_type: randm
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: null
+      join: null
+    - !Region
+      region_id: illumina_p7
+      name: Illumina P7
+      sequence_type: fixed
+      sequence: ATCTCGTATGCCGTCTTCTGCTTG
+      min_len: 24
+      max_len: 24
+      onlist: null
+      join: null

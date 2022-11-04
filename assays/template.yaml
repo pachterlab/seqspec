@@ -30,10 +30,10 @@ assay_spec:
         - !Region
           region_id: region2
           name: region2
-          sequence_type: random
+          sequence_type: onlist
           sequence: NNNNNNNN
-          min_len: 10
-          max_len: 10
+          min_len: 8
+          max_len: 8
           onlist: !Onlist
             filename: region2_onlist.txt
             md5: null
