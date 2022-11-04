@@ -1,7 +1,7 @@
 !Assay
-name: 10xFB protein and RNA assay
+name: 10xFB protein and RNA assay 5'
 doi: https://doi.org/10.1038/ncomms14049
-description: 10x single-cell RNA-seq and protein
+description: 10x single-cell RNA-seq and protein 5'
 modalities:
 - RNA
 - Protein
