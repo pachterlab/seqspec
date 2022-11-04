@@ -52,7 +52,7 @@ assay_spec:
       sequence: NNNNNNN
       min_len: 7
       max_len: 7
-      onlist:
+      onlist: !Onlist
         filename: plate_bc_onlist.txt
         md5: null
       join: null
@@ -90,7 +90,7 @@ assay_spec:
       sequence: NNNNNN
       min_len: 6
       max_len: 6
-      onlist:
+      onlist: !Onlist
         filename: cell_bc_onlist.txt
         md5: null
       join: null
