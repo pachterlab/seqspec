@@ -1,7 +1,7 @@
 !Assay
-name: my assay
+name: 10xFB-3prime
 doi: https://doi.org/10.1038/ncomms14049
-description: 10xv3 single-cell RNA-seq & protein
+description: 10xv3 single-cell RNA-seq & protein 3'
 modalities:
 - RNA
 - Protein
