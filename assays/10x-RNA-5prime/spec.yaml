@@ -41,8 +41,8 @@ assay_spec:
       name: Truseq Read 1
       sequence_type: fixed
       sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
-      min_len: 10
-      max_len: 10
+      min_len: 29
+      max_len: 29
       onlist: null
       join: null
     - !Region
