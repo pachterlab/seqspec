@@ -11,6 +11,7 @@ class Assay(yaml.YAMLObject):
         self,
         name: str,
         doi: str,
+        publication_date: str,
         description: str,
         modalities: List[str],
         lib_struct: str,
@@ -19,6 +20,7 @@ class Assay(yaml.YAMLObject):
         super().__init__()
         self.name = name
         self.doi = doi
+        self.publication_date = publication_date
         self.description = description
         self.modalities = modalities
         self.lib_struct = lib_struct
@@ -28,6 +30,7 @@ class Assay(yaml.YAMLObject):
         d = {
             "name": self.name,
             "doi": self.doi,
+            "publication_date": self.publication_date,
             "description": self.description,
             "modalities": self.modalities,
             "lib_struct": self.lib_struct,
@@ -39,6 +42,7 @@ class Assay(yaml.YAMLObject):
         d = {
             "name": self.name,
             "doi": self.doi,
+            "publication_date": self.publication_date,
             "description": self.description,
             "modalities": self.modalities,
             "lib_struct": self.lib_struct,

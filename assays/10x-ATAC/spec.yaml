@@ -1,6 +1,7 @@
 !Assay
 name: 10x-ATAC
-doi: https://support.10xgenomics.com/single-cell-atac
+doi: https://www.10xgenomics.com/blog/demonstrated-protocol-for-nuclei-isolation-for-single-cell-atac-solution
+publication_date: 19 October 2018
 description: Single Cell ATAC
 modalities:
 - ATAC

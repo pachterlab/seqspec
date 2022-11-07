@@ -1,6 +1,7 @@
 !Assay
 name: STRT-seq
 doi: https://doi.org/10.1038/nprot.2012.022
+publication_date: 05 April 2012
 description: single-cell tagged reverse transcripton
 modalities:
 - RNA

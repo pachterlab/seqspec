@@ -1,6 +1,7 @@
 !Assay
 name: Seq-well
 doi: https://doi.org/10.1038/nmeth.4179
+publication_date: 13 February 2017
 description: Barcoded mRNA capture beads and single cells are sealed in an array of
   subnanoliter wells using a semipermeable membrane, enabling efficient cell lysis
   and transcript capture

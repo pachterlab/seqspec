@@ -1,6 +1,7 @@
 !Assay
 name: STRT-seq-2i
 doi: https://doi.org/10.1038/s41598-017-16546-4
+publication_date: 27 November 2017
 description: STRT-seq performed on microwells with dual-index 5 prime
 modalities:
 - RNA

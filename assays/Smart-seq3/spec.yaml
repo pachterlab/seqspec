@@ -1,6 +1,7 @@
 !Assay
 name: Smart-seq3
 doi: https://doi.org/10.1038/s41587-020-0497-0
+publication_date: 04 May 2020
 description: full-length and five-prime rna-seq from individual cells
 modalities:
 - RNA_end

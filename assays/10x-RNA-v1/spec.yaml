@@ -1,6 +1,7 @@
 !Assay
 name: 10x-RNA-v1
-doi: mydoi.org
+doi: https://www.businesswire.com/news/home/20160415005184/en/10x-Genomics-Announces-Commercial-Availability-of-Single-Cell-3%E2%80%99-Solution-at-the-AACR-Annual-Meeting-2016
+publication_date: 15 April 2016
 description: 10x Genomics RNA assay v1
 modalities:
 - RNA

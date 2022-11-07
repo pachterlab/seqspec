@@ -1,6 +1,7 @@
 !Assay
 name: SHARE-seq
 doi: https://doi.org/10.1016/j.cell.2020.09.056
+publication_date: 23 October 2020
 description: The SHARE-seq method is developed based on the idea of combinatorial
   indexing stratgy that is used in sci-RNA-seq and SPLiT-seq
 modalities:

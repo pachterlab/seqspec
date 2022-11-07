@@ -1,6 +1,7 @@
 !Assay
 name: sci-RNA-seq3
 doi: https://doi.org/10.1038/s41586-019-0969-x
+publication_date: 20 February 2019
 description: combinatorial single-cell RNA-seq 3
 modalities: [RNA]
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq3.html

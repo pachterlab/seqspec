@@ -1,6 +1,7 @@
 !Assay
 name: CEL-Seq2
 doi: https://doi.org/10.1186/s13059-016-0938-8
+publication_date: 28 April 2016
 description: Improvement CEL-Seq, now with UMIs! Implemented on Fluidigm's C1
 modalities:
 - RNA

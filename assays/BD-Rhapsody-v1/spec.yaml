@@ -1,6 +1,7 @@
 !Assay
 name: BD-Rhapsody-v1
 doi: https://doi.org/10.1038/s41592-018-0255-0
+publication_date: 20 December 2018
 description: BD Rhapsody WTA is a nanowell-based commercial system that uses a split-pool
   approach to generate oligos on magnetic beads.
 modalities:

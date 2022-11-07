@@ -1,6 +1,7 @@
 !Assay
 name: 10xFB-3prime
-doi: https://doi.org/10.1038/ncomms14049
+doi: https://www.10xgenomics.com/blog/san-diego-user-group-meeting-2018-recap
+publication_date: 12 February 2018
 description: 10xv3 single-cell RNA-seq & protein 3'
 modalities:
 - RNA

@@ -1,6 +1,7 @@
 !Assay
-name: 10xCrispr assay
-doi: https://www.10xgenomics.com/products/single-cell-crispr-screening
+name: 10xCRISPR
+doi: https://www.sigmaaldrich.com/US/en/collections/press/p265893918
+publication_date: 10 June 2020
 description: single-cell CRISPR screen and RNA-seq
 modalities:
 - CRISPR

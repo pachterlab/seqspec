@@ -1,6 +1,7 @@
 !Assay
-name: my assay
+name: 10x-RNA-v3
 doi: https://doi.org/10.1038/ncomms14049
+publication_date: null
 description: 10xv3 single-cell RNA-seq
 modalities:
 - RNA

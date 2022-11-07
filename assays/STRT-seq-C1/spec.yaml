@@ -1,6 +1,7 @@
 !Assay
 name: STRT-seq-C1
 doi: https://doi.org/10.1007/978-1-4939-9240-9_9
+publication_date: 27 April 2019
 description: STRT-seq performed on microfluidics Fluidigm C1
 modalities:
 - RNA

@@ -1,6 +1,7 @@
 !Assay
 name: scifi-RNA-Seq
 doi: https://doi.org/10.1038/s41592-021-01153-z
+publication_date: 31 May 2021
 description: single-cell combinatorial fluidic indexing RNA-sequencing
 modalities:
 - RNA

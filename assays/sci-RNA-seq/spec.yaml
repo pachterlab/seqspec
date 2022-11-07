@@ -1,6 +1,7 @@
 !Assay
 name: sci-RNA-seq
 doi: https://doi.org/10.1126/science.aam8940
+publication_date: 18 August 2017
 description: combinatorial single-cell RNA-seq
 modalities:
 - RNA

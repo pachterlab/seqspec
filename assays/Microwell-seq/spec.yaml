@@ -1,14 +1,15 @@
 !Assay
-name: my assay
-doi: mydoi.org
-description: a description of my assay
+name: Microwell-seq
+doi: https://doi.org/10.1016/j.cell.2018.02.001
+publication_date: 22 February 2018
+description: a high-throughput and low-cost scRNA-seq platform using simple, inexpensive devices
 modalities:
-- modality_1
+- RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/
 assay_spec:
 - !Region
-  region_id: modality_1
-  name: modality_1
+  region_id: RNA
+  name: RNA
   sequence_type: joined
   sequence: AATGATACGGCGACCACCGAGATCTACACGCCTGTCCGCGGAAGCAGTGGTATCAACGCAGAGTACGTNNNNNNCGACTCACTACAGGGNNNNNNTCGGTGACACGATCGNNNNNNNNNNNNXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 190

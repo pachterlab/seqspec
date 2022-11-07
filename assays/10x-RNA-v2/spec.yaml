@@ -1,6 +1,7 @@
 !Assay
 name: 10x-RNA-v2
 doi: https://doi.org/10.1038/ncomms14049
+publication_date: null
 description: The 10x Genomics Chromium Single Cell 3' Solution V2 chemistry
 modalities:
 - RNA

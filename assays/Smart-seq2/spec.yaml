@@ -1,6 +1,7 @@
 !Assay
 name: Smart-seq2
-doi: https://doi.org/10.1038/s41587-020-0497-0
+doi: https://doi.org/10.1038/nprot.2014.006
+publication_date: 02 January 2014
 description: full-length rna-seq from individual cells
 modalities:
 - RNA

@@ -1,6 +1,7 @@
 !Assay
 name: Drop-seq
 doi: https://doi.org/10.1016/j.cell.2015.05.002
+publication_date: 21 May 2015
 description: Droplet single cell rna seq with beads
 modalities:
 - RNA

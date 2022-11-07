@@ -1,7 +1,8 @@
 !Assay
-name: 10xFB VDJ and RNA assay 5'
-doi: https://doi.org/10.1038/ncomms14049
+name: 10xFB-VDJ-5prime
+doi: https://www.10xgenomics.com/blog/ashg-2016-round-up
 description: 10x single-cell RNA-seq and VDJ 5'
+publication_date: 21 October 2016
 modalities:
 - RNA
 - VDJ

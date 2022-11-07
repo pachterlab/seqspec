@@ -1,6 +1,7 @@
 !Assay
 name: SureCell
-doi: https://support.illumina.com/sequencing/sequencing_kits/surecell-wta-3-kit.html
+doi: https://doi.org/10.1007/978-1-4939-9240-9_10
+publication_date: 27 April 2019
 description: Illumina Bio-Rad SureCell 3' WTA for ddSEQ
 modalities:
 - RNA
