@@ -1,0 +1,93 @@
+!Assay 
+name: Illumina-Truseq-Dual
+doi: 
+publication_date: 
+description: 
+modalities: [template]
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/Illumina.html
+assay_spec:
+  - !Region
+    region_id: template
+    name: template
+    sequence_type: joined
+    sequence: 
+    min_len: 
+    max_len: 
+    onlist: 
+    join: !Join 
+      how: union
+      order: [illumina_p5, i5, truseq_read1, insert, truseq_read2, i7]
+      regions:
+        - !Region
+          region_id: illumina_p5
+          name: illumina_p5
+          sequence_type: fixed
+          sequence: AATGATACGGCGACCACCGAGATCTACAC
+          min_len: 29
+          max_len: 29
+          onlist: 
+          join: 
+
+        - !Region
+          region_id: i5
+          name: i5
+          sequence_type: onlist
+          sequence: NNNNNNNN
+          min_len: 8
+          max_len: 8
+          onlist: !Onlist
+            filename: i5_onlist.txt
+            md5: null
+          join: 
+
+        - !Region
+          region_id: truseq_read1
+          name: truseq_read1
+          sequence_type: fixed
+          sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+          min_len: 33
+          max_len: 33
+          onlist:
+          join: 
+
+        - !Region
+          region_id: insert
+          name: insert
+          sequence_type: random
+          sequence: X
+          min_len: 1
+          max_len: 98
+          onlist:
+          join: 
+
+        - !Region
+          region_id: truseq_read2
+          name: truseq_read2
+          sequence_type: fixed
+          sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+          min_len: 34
+          max_len: 34
+          onlist:
+          join: 
+
+        - !Region
+          region_id: i7
+          name: i7
+          sequence_type: onlist
+          sequence: NNNNNNNN
+          min_len: 8
+          max_len: 8
+          onlist: !Onlist
+            filename: i7_onlist.txt
+            md5: null
+          join: 
+
+        - !Region
+          region_id: illumina_p7
+          name: illumina_p7
+          sequence_type: fixed
+          sequence: ATCTCGTATGCCGTCTTCTGCTTG
+          min_len: 24
+          max_len: 24
+          onlist: 
+          join: 
