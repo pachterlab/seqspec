@@ -59,8 +59,8 @@ assay_spec:
           name: s5
           sequence_type: fixed
           sequence: TCGTCGGCAGCGTC
-          min_len: 33
-          max_len: 33
+          min_len: 14
+          max_len: 14
           onlist: null
           join: null
         - !Region
