@@ -1,0 +1,115 @@
+!Assay
+name: MARS-seq
+doi: https://doi.org/10.1038/s41596-019-0164-4
+publication_date: 17 May 2019
+description: indexed sorting combined with single-cell RNA sequencing (technically this is v2.0)
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/MARS-seq.html
+assay_spec:
+- !Region
+  region_id: RNA
+  name: RNA
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNXXNNNNNNNNNNAGATCGGAAGAGCACACGTCTGAACTCCAGTCACATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 144
+  max_len: 338
+  onlist: null
+  join: !Join
+    how: union
+    order:
+    - illumina_p5
+    - truseq_r1
+    - plate_bc
+    - cdna
+    - polyA
+    - umi
+    - cell_bc
+    - truseq_r2
+    - illumina_p7
+    regions:
+    - !Region
+      region_id: illumina_p5
+      name: illumina_p5
+      sequence_type: fixed
+      sequence: AATGATACGGCGACCACCGAGATCTACAC
+      min_len: 29
+      max_len: 29
+      onlist: null
+      join: null
+    - !Region
+      region_id: truseq_r1
+      name: truseq_r1
+      sequence_type: fixed
+      sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
+      min_len: 29
+      max_len: 29
+      onlist: null
+      join: null
+    - !Region
+      region_id: plate_bc
+      name: plate_bc
+      sequence_type: onlist
+      sequence: NNNNNNN
+      min_len: 7
+      max_len: 7
+      onlist: !Onlist
+        filename: plate_bc_onlist.txt
+        md5: null
+      join: null
+    - !Region
+      region_id: cdna
+      name: cdna
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      join: null
+    - !Region
+      region_id: polyA
+      name: polyA
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      join: null
+    - !Region
+      region_id: umi
+      name: umi
+      sequence_type: random
+      sequence: NNNN
+      min_len: 4
+      max_len: 4
+      onlist: null
+      join: null
+    - !Region
+      region_id: cell_bc
+      name: cell_bc
+      sequence_type: onlist
+      sequence: NNNNNN
+      min_len: 6
+      max_len: 6
+      onlist: !Onlist
+        filename: cell_bc_onlist.txt
+        md5: null
+      join: null
+    - !Region
+      region_id: truseq_r2
+      name: truseq_r2
+      sequence_type: fixed
+      sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+      min_len: 34
+      max_len: 34
+      onlist: null
+      join: null
+    - !Region
+      region_id: illumina_p7
+      name: illumina_p7
+      sequence_type: fixed
+      sequence: ATCTCGTATGCCGTCTTCTGCTTG
+      min_len: 33
+      max_len: 33
+      onlist: null
+      join: null

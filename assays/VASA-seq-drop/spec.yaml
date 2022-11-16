@@ -1,0 +1,146 @@
+!Assay
+name: VASA-seq-drop
+doi: https://doi.org/10.1038/s41587-022-01361-8
+publication_date: 27 June 2022
+description: profile full-length + total RNA from single cells by adding poly-A to
+  fragmented RNA molecules in droplets
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/VASA-seq.html
+assay_spec:
+- !Region
+  region_id: RNA
+  name: RNA
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXXNNNNNNNNNNNNNNCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNCTGCACCCGACACCCNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 175
+  max_len: 369
+  onlist: null
+  join: !Join
+    how: union
+    order:
+    - illumina_p5
+    - i5
+    - nextera_read1
+    - cdna
+    - polyT
+    - umi
+    - bc2
+    - nextera_read2
+    - bc1
+    - linker
+    - i7
+    - illumina_p7
+    regions:
+    - !Region
+      region_id: illumina_p5
+      name: illumina_p5
+      sequence_type: fixed
+      sequence: AATGATACGGCGACCACCGAGATCTACAC
+      min_len: 29
+      max_len: 29
+      onlist: null
+      join: null
+    - !Region
+      region_id: i5
+      name: i5
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: i5_onlist.txt
+        md5: null
+      join: null
+    - !Region
+      region_id: nextera_read1
+      name: nextera_read1
+      sequence_type: fixed
+      sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
+      min_len: 33
+      max_len: 33
+      onlist: null
+      join: null
+    - !Region
+      region_id: cdna
+      name: cdna
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      join: null
+    - !Region
+      region_id: polyT
+      name: polyT
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      join: null
+    - !Region
+      region_id: umi
+      name: umi
+      sequence_type: random
+      sequence: NNNNNN
+      min_len: 6
+      max_len: 6
+      onlist: null
+      join: null
+    - !Region
+      region_id: bc2
+      name: bc2
+      sequence_type: random
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: null
+      join: null
+    - !Region
+      region_id: nextera_read2
+      name: nextera_read2
+      sequence_type: fixed
+      sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+      min_len: 34
+      max_len: 34
+      onlist: null
+      join: null
+    - !Region
+      region_id: bc1
+      name: bc1
+      sequence_type: random
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: null
+      join: null
+    - !Region
+      region_id: linker
+      name: linker
+      sequence_type: fixed
+      sequence: CTGCACCCGACACCC
+      min_len: 15
+      max_len: 15
+      onlist: null
+      join: null
+    - !Region
+      region_id: i7
+      name: i7
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: i7_onlist.txt
+        md5: null
+      join: null
+    - !Region
+      region_id: illumina_p7
+      name: illumina_p7
+      sequence_type: fixed
+      sequence: ATCTCGTATGCCGTCTTCTGCTTG
+      min_len: 24
+      max_len: 24
+      onlist: null
+      join: null

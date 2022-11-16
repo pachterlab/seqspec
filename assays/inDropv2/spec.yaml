@@ -1,0 +1,137 @@
+!Assay
+name: inDropv2
+doi: https://doi.org/10.1038/nprot.2016.154
+publication_date: 08 December 2016
+description: Single-cell RNA-seq in Droplets
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/Illumina.html
+assay_spec:
+- !Region
+  region_id: RNA
+  name: RNA
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCTXXNNNNNNNNNNNNNNAAGGCGTCACAAGCAATCACTCNNNNNNNNAGATCGGAAGAGCGTCGTGTAGGGAAAGAGNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 175
+  max_len: 369
+  onlist: null
+  join: !Join
+    how: union
+    order:
+    - illumina_p5
+    - PE2
+    - cdna
+    - polyA
+    - umi
+    - bc2
+    - W1
+    - bc1
+    - PE1
+    - sample_index
+    - illumina_p7
+    regions:
+    - !Region
+      region_id: illumina_p5
+      name: illumina_p5
+      sequence_type: fixed
+      sequence: AATGATACGGCGACCACCGAGATCTACAC
+      min_len: 29
+      max_len: 29
+      onlist: null
+      join: null
+    - !Region
+      region_id: PE2
+      name: PE2
+      sequence_type: fixed
+      sequence: GGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCT
+      min_len: 36
+      max_len: 36
+      onlist: null
+      join: null
+    - !Region
+      region_id: cdna
+      name: cdna
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      join: null
+    - !Region
+      region_id: polyA
+      name: polyA
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      join: null
+    - !Region
+      region_id: umi
+      name: umi
+      sequence_type: random
+      sequence: NNNNNN
+      min_len: 6
+      max_len: 6
+      onlist: null
+      join: null
+    - !Region
+      region_id: bc2
+      name: bc2
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: bc2_onlist.txt
+        md5: null
+      join: null
+    - !Region
+      region_id: W1
+      name: W1
+      sequence_type: fixed
+      sequence: AAGGCGTCACAAGCAATCACTC
+      min_len: 22
+      max_len: 22
+      onlist: null
+      join: null
+    - !Region
+      region_id: bc1
+      name: bc1
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 11
+      onlist: !Onlist
+        filename: bc1_onlist.txt
+        md5: null
+      join: null
+    - !Region
+      region_id: PE1
+      name: PE1
+      sequence_type: fixed
+      sequence: AGATCGGAAGAGCGTCGTGTAGGGAAAGAG
+      min_len: 34
+      max_len: 34
+      onlist: null
+      join: null
+    - !Region
+      region_id: sample_index
+      name: sample_index
+      sequence_type: onlist
+      sequence: NNNNNN
+      min_len: 6
+      max_len: 6
+      onlist: !Onlist
+        filename: sample_index_onlist.txt
+        md5: null
+      join: null
+    - !Region
+      region_id: illumina_p7
+      name: illumina_p7
+      sequence_type: fixed
+      sequence: ATCTCGTATGCCGTCTTCTGCTTG
+      min_len: 24
+      max_len: 24
+      onlist: null
+      join: null

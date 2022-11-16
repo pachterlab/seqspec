@@ -1,0 +1,108 @@
+!Assay
+name: 10x-RNA-v1
+doi: https://www.businesswire.com/news/home/20160415005184/en/10x-Genomics-Announces-Commercial-Availability-of-Single-Cell-3%E2%80%99-Solution-at-the-AACR-Annual-Meeting-2016
+publication_date: 15 April 2016
+description: 10x Genomics RNA assay v1
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3v1.html
+assay_spec:
+- !Region
+  region_id: RNA
+  name: RNA
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTXXNNNNNNNNNNAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 154
+  max_len: 348
+  onlist: null
+  join: !Join
+    how: union
+    order:
+    - illumina_p5
+    - sample_bc
+    regions:
+    - !Region
+      region_id: illumina_p5
+      name: illumina_p5
+      sequence_type: fixed
+      sequence: AATGATACGGCGACCACCGAGATCTACAC
+      min_len: 29
+      max_len: 29
+      onlist: null
+      join: null
+    - !Region
+      region_id: sample_bc
+      name: sample_bc
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: region2_onlist.txt
+        md5: null
+      join: null
+    - !Region
+      region_id: truseq_r1
+      name: truseq_r1
+      sequence_type: fixed
+      sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+      min_len: 33
+      max_len: 33
+      onlist: null
+      join: null
+    - !Region
+      region_id: cdna
+      name: cdna
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      join: null
+    - !Region
+      region_id: polyA
+      name: polyA
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      join: null
+    - !Region
+      region_id: umi
+      name: umi
+      sequence_type: random
+      sequence: NNNNNNNNNN
+      min_len: 10
+      max_len: 10
+      onlist: null
+      join: null
+    - !Region
+      region_id: truseq_r2
+      name: truseq_r2
+      sequence_type: fixed
+      sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+      min_len: 34
+      max_len: 34
+      onlist: null
+      join: null
+    - !Region
+      region_id: cell_bc
+      name: cell_bc
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNN
+      min_len: 14
+      max_len: 14
+      onlist: !Onlist
+        filename: 737K-april-2014_rc.txt.gz
+        md5: null
+      join: null
+    - !Region
+      region_id: illumina_p7
+      name: illumina_p7
+      sequence_type: fixed
+      sequence: ATCTCGTATGCCGTCTTCTGCTTG
+      min_len: 24
+      max_len: 24
+      onlist: null
+      join: null

@@ -1,21 +1,23 @@
 const yaml = require("js-yaml");
 const fs = require("fs");
-
+const args = process.argv.slice(2);
 let AssayYamlType = new yaml.Type("!Assay", { kind: "mapping" });
 let RegionYamlType = new yaml.Type("!Region", { kind: "mapping" });
 let JoinYamlType = new yaml.Type("!Join", { kind: "mapping" });
+let OnlistYamlType = new yaml.Type("!Onlist", { kind: "mapping" });
 
 let SCHEMA = yaml.DEFAULT_SCHEMA.extend([
   AssayYamlType,
   RegionYamlType,
   JoinYamlType,
+  OnlistYamlType,
 ]);
 
 // Get document, or throw exception on error
 let data;
-let assay = "10x-RNA-ATAC";
-let yaml_fn = `examples/${assay}/spec.yaml`;
-let html_fn = `assays/${assay}.html`;
+let assay = args[0];// ;"10x-RNA-ATAC";
+let yaml_fn = `assays/${assay}/spec.yaml`;
+let html_fn = `public/${assay}.html`;
 try {
   data = yaml.load(fs.readFileSync(yaml_fn, "utf8"), { schema: SCHEMA });
 } catch (e) {
@@ -79,7 +81,7 @@ function regionsTemplate(regions) {
     ${Object.keys(regions)
       .map(function (key, index) {
         return atomicRegionTemplate(
-          regions[key].name,
+          regions[key].region_id,
           regions[key].sequence_type,
           regions[key].sequence,
           regions[key].min_len,

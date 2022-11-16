@@ -1,0 +1,73 @@
+!Assay
+name: my assay
+doi: https://doi.org/10.1038/nmeth.1315
+publication_date: 06 April 2009
+description: first method to sequence the whole transcriptome (mRNA) of a single cell
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.html
+assay_spec:
+- !Region
+  region_id: RNA
+  name: RNA
+  sequence_type: joined
+  sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGATXCGCCTTGGCCGTACAGCAGNNNNNNAGAGAATGAGGAACCCGGGGCAG
+  min_len: 90
+  max_len: 187
+  onlist: null
+  join: !Join
+    how: union
+    order:
+    - SOLiD_P1_adaptor
+    - cDNA
+    - SOLiD_bc_adapter
+    - index
+    - p2_adapter
+    regions:
+    - !Region
+      region_id: SOLiD_P1_adaptor
+      name: SOLiD_P1_adaptor
+      sequence_type: fixed
+      sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGAT
+      min_len: 41
+      max_len: 41
+      onlist: null
+      join: null
+    - !Region
+      region_id: cDNA
+      name: cDNA
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      join: null
+    - !Region
+      region_id: SOLiD_bc_adapter
+      name: SOLiD_bc_adapter
+      sequence_type: fixed
+      sequence: CGCCTTGGCCGTACAGCAG
+      min_len: 19
+      max_len: 19
+      onlist: null
+      join: null
+    - !Region
+      region_id: index
+      name: index
+      sequence_type: onlist
+      sequence: NNNNNN
+      min_len: 6
+      max_len: 6
+      onlist: !Onlist
+        filename: index_onlist.txt
+        md5: null
+      join: null
+    - !Region
+      region_id: p2_adapter
+      name: p2_adapter
+      sequence_type: fixed
+      sequence: AGAGAATGAGGAACCCGGGGCAG
+      min_len: 23
+      max_len: 23
+      onlist: null
+      join: null

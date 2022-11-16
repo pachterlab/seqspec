@@ -1,0 +1,111 @@
+!Assay
+name: STRT-seq
+doi: https://doi.org/10.1038/nprot.2012.022
+publication_date: 05 April 2012
+description: single-cell tagged reverse transcripton
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
+assay_spec:
+  - !Region
+    region_id: RNA
+    name: RNA
+    sequence_type: joined
+    sequence: AATGATACGGCGACCACCGAGATCTAAGCAGTGGTATCAACGCAGAGTGCAGTGCTNNNNNNGGGXAGATCGGAAGAGCTCGTATGCCGTCTTCTGCTTG
+    min_len: 100
+    max_len: 197
+    onlist: null
+    join: !Join
+      how: union
+      order:
+      - solexa_p1
+      - link_1
+      - ispcr
+      - link_2
+      - cell_bc
+      - triple_G
+      - cDNA
+      - link_3
+      - solexa_p2
+      regions:
+        - !Region
+          region_id: solexa_p1
+          name: solexa_p1
+          sequence_type: fixed
+          sequence: AATGATACGGCGACCACCGA
+          min_len: 20
+          max_len: 20
+          onlist: null
+          join: null
+        - !Region
+          region_id: link_1
+          name: link_1
+          sequence_type: fixed
+          sequence: GATCT
+          min_len: 5
+          max_len: 5
+          onlist: null
+          join: null
+        - !Region
+          region_id: ispcr
+          name: ispcr
+          sequence_type: fixed
+          sequence: AAGCAGTGGTATCAACGCAGAGT
+          min_len: 23
+          max_len: 23
+          onlist: null
+          join: null
+        - !Region
+          region_id: link_2
+          name: link_2
+          sequence_type: fixed
+          sequence: GCAGTGCT
+          min_len: 8
+          max_len: 8
+          onlist: null
+          join: null
+        - !Region
+          region_id: cell_bc
+          name: cell_bc
+          sequence_type: random
+          sequence: NNNNNN
+          min_len: 6
+          max_len: 6
+          onlist: null
+          join: null
+        - !Region
+          region_id: triple_G
+          name: triple_G
+          sequence_type: fixed
+          sequence: GGG
+          min_len: 3
+          max_len: 3
+          onlist: null
+          join: null
+        - !Region
+          region_id: cDNA
+          name: cDNA
+          sequence_type: random
+          sequence: X
+          min_len: 1
+          max_len: 98
+          onlist: null
+          join: null
+        - !Region
+          region_id: link_3
+          name: link_3
+          sequence_type: fixed
+          sequence: AGATCGGAAGAGC
+          min_len: 13
+          max_len: 13
+          onlist: null
+          join: null
+        - !Region
+          region_id: solexa_p2
+          name: solexa_p2
+          sequence_type: fixed
+          sequence: TCGTATGCCGTCTTCTGCTTG
+          min_len: 21
+          max_len: 21
+          onlist: null
+          join: null
