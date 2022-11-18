@@ -47,7 +47,7 @@ In order to catalogue relevant information for each library structure, multiple 
 
 ## Naming `Regions`
 
-For consistency across assays I suggest the following naming conventions for standard regions
+For consistency across assays I suggest the following naming conventions for standard regions. Note that the `region_id` for all atomic regions should be unique.
 
 ```yaml
 # illumina_p5
@@ -211,9 +211,11 @@ For consistency across assays I suggest the following naming conventions for sta
         join:
 
 # barcode
+# note for multiple of the same region
+# the region id gets a number, i.e. barcode-1 barcode-2
 - !Region
   region_id: barcode
-  name: barcode
+  name: Barcode
   sequence_type: onlist
   sequence: NNNNNNNNNNNNNNNN
   min_len: 16
@@ -223,10 +225,10 @@ For consistency across assays I suggest the following naming conventions for sta
     md5: null
   join:
 
-# umi
+# umi "Unique Molecular Identifier"
 - !Region
   region_id: umi
-  name: umi
+  name: Unique Molecular Identifier
   sequence_type: random
   sequence: NNNNNNNNNN
   min_len: 10
@@ -234,10 +236,21 @@ For consistency across assays I suggest the following naming conventions for sta
   onlist:
   join:
 
-# cDNA
+# cDNA "complementary DNA"
 - !Region
   region_id: cDNA
-  name: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist:
+  join:
+
+# gDNA "genomic DNA
+- !Region
+  region_id: gDNA
+  name: Genomic DNA
   sequence_type: random
   sequence: X
   min_len: 1
