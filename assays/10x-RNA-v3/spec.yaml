@@ -19,13 +19,11 @@ assay_spec:
     how: union
     order:
     - illumina_p5
-    - truseq_r1
-    - cell_bc
-    - umi
-    - poly_T
-    - cDNA
-    - truseq_r2
-    - sample_bc
+    - truseq_read1
+    - R1.fastq.gz
+    - R2.fastq.gz
+    - truseq_read2
+    - I1.fastq.gz
     - illumina_p7
     regions:
     - !Region
@@ -38,7 +36,7 @@ assay_spec:
       onlist: null
       join: null
     - !Region
-      region_id: truseq_r1
+      region_id: truseq_read1
       name: Truseq Read 1
       sequence_type: fixed
       sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
@@ -56,12 +54,12 @@ assay_spec:
       onlist: null
       join: !Join
         how:
-        - cell_bc
+        - barcode
         - umi
         order: union
         regions:
         - !Region
-          region_id: cell_bc
+          region_id: barcode
           name: Cell Barcode
           sequence_type: onlist
           sequence: NNNNNNNNNNNNNNNN
@@ -113,7 +111,7 @@ assay_spec:
           onlist: null
           join: null
     - !Region
-      region_id: truseq_r2
+      region_id: truseq_read2
       name: Truseq Read 2
       sequence_type: fixed
       sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
@@ -132,17 +130,17 @@ assay_spec:
       join: !Join
         how: union
         order:
-        - sample_bc
+        - index7
         regions:
         - !Region
-          region_id: sample_bc
+          region_id: index7
           name: Truseq Read 2
           sequence_type: onlist
           sequence: NNNNNNNN
           min_len: 8
           max_len: 8
           onlist: !Onlist
-            filename: sample_bc_onlist.txt
+            filename: index7_onlist.txt
             md5: null
           join: null
     - !Region
