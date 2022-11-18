@@ -36,122 +36,212 @@ assay_spec:
         ...
 ```
 
-In order to catalogue relevant information for each library structure, multiple properties are specified for each `Assay` and each `Region`.
+In order to catalogue relevant information for each library structure, multiple properties are specified for each `Assay` and each `Region`. A description of the `Assay` and `Region` schema can be found in `seqspec/schema/seqspec.schema.json`.
 
-### `Assay` object
+## Naming `Regions`
 
-`Assay`s have the following structure:
-
-```yaml
----
-"$schema": https://json-schema.org/draft/2020-12/schema
-"$id": Assay.schema.yaml
-title: Assay
-description: A Assay of DNA
-type: object
-properties:
-  name:
-    description: The name of the assay
-    type: string
-  doi:
-    description: the doi of the paper that describes the assay
-    type: string
-  description:
-    description: A short description of the assay
-    type: string
-  modalities:
-    description: The modalities the assay targets
-    type: array
-    items:
-      type: string
-  lib_struct:
-    description: The link to Teichmann's libstructs page derived for this sequence
-    type: string
-  assay_spec:
-    description: The spec for the assay
-    type: array
-    items:
-      "$ref": "Region.schema.yaml"
-required:
-  - name
-  - doi
-  - description
-  - modalities
-  - lib_struct
-```
-
-### `Region` object
-
-`Region`s have the following structure:
+For consistency across assays I suggest the following naming conventions for standard regions
 
 ```yaml
----
-"$schema": https://json-schema.org/draft/2020-12/schema
-"$id": Region.schema.yaml
-title: Region
-description: A region of DNA
-type: object
-properties:
-  region_id:
-    description: identifier for the region
-    type: string
-  sequence_type:
-    description: The type of the sequence
-    type: string
-  sequence:
-    description: The sequence
-    type: string
-  min_len:
-    description: The minimum length of the sequence
-    type: integer
-    minimum: 0
-    maximum: 2048
-  max_len:
-    description: The maximum length of the sequence
-    type: integer
-    minimum: 0
-    maximum: 2048
+# illumina_p5
+- !Region
+  region_id: illumina_p5
+  name: illumina_p5
+  sequence_type: fixed
+  sequence: AATGATACGGCGACCACCGAGATCTACAC
+  min_len: 29
+  max_len: 29
   onlist:
-    description: The file containing the sequence if seq_type = onlist
-    type:
-      - object
-      - "null"
-    properties:
-      filename:
-        description: filename for the onlist
-        type: string
-      md5:
-        description: md5sum for the file pointed to by filename
-        type: string
   join:
-    description: Join operator on regions
-    type:
-      - object
-      - "null"
-    properties:
-      how:
-        description: How the regions will be joined
-        type: string
-      order:
-        description: The order of the regions being joined
-        type: array
-        items:
-          type: string
-      regions:
-        description: The regions being joined
-        type: array
-        items:
-          "$ref": "#/$defs/region"
-    required:
-      - how
-      - order
-      - regions
-required:
-  - region_id
-  - sequence_type
-  - sequence
-  - min_len
-  - max_len
+
+# illumina_p7
+- !Region
+  region_id: illumina_p7
+  name: illumina_p7
+  sequence_type: fixed
+  sequence: ATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 24
+  max_len: 24
+  onlist:
+  join:
+
+# nextera_read1
+- !Region
+  region_id: nextera_read1
+  name: nextera_read1
+  sequence_type: fixed
+  sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
+  min_len: 33
+  max_len: 33
+  onlist:
+  join: !Join
+    how:
+    order: [s5, ME1]
+    regions:
+      - !Region
+        region_id: s5
+        name: s5
+        sequence_type: TCGTCGGCAGCGTC
+        sequence: fixed
+        min_len: 14
+        max_len: 14
+        onlist:
+        join:
+      - !Region
+        region_id: ME1
+        name: ME1
+        sequence_type: AGATGTGTATAAGAGACAG
+        sequence: fixed
+        min_len: 19
+        max_len: 19
+        onlist:
+        join:
+
+# nextera_read2
+- !Region
+  region_id: nextera_read2
+  name: nextera_read2
+  sequence_type: joined
+  sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+  min_len: 34
+  max_len: 34
+  onlist: null
+  join: !Join
+    how: union
+    order:
+      - ME2
+      - s7
+    regions:
+      - !Region
+        region_id: ME2
+        name: ME2
+        sequence_type: fixed
+        sequence: CTGTCTCTTATACACATCT
+        min_len: 19
+        max_len: 19
+        onlist: null
+        join: null
+      - !Region
+        region_id: s7
+        name: s7
+        sequence_type: fixed
+        sequence: CCGAGCCCACGAGAC
+        min_len: 15
+        max_len: 15
+        onlist: null
+        join: null
+
+# truseq_read1
+- !Region
+  region_id: truseq_read1
+  name: truseq_read1
+  sequence_type: fixed
+  sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+  min_len: 33
+  max_len: 33
+  onlist:
+  join:
+
+# truseq_read2
+- !Region
+  region_id: truseq_read2
+  name: truseq_read2
+  sequence_type: fixed
+  sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+  min_len: 34
+  max_len: 34
+  onlist:
+  join:
+
+# index5
+- !Region
+  region_id: I2.fastq.gz
+  name: Index 2 FASTQ
+  sequence_type: joined
+  sequence: NNNNNNNN
+  min_len: 8
+  max_len: 8
+  onlist:
+  join:
+    how: union
+    order: [index5]
+    regions:
+      - !Region
+        region_id: index5
+        name: index5
+        sequence_type: onlist
+        sequence: NNNNNNNN
+        min_len: 8
+        max_len: 8
+        onlist: !Onlist
+          filename: index5_onlist.txt
+          md5: null
+        join:
+
+# index7
+- !Region
+  region_id: I1.fastq.gz
+  name: Index 1 FASTQ
+  sequence_type: joined
+  sequence: NNNNNNNN
+  min_len: 8
+  max_len: 8
+  onlist:
+  join:
+    how: union
+    order: [index7]
+    regions:
+      - !Region
+        region_id: index7
+        name: index7
+        sequence_type: onlist
+        sequence: NNNNNNNN
+        min_len: 8
+        max_len: 8
+        onlist: !Onlist
+          filename: index7_onlist.txt
+          md5: null
+        join:
+
+# barcode
+- !Region
+  region_id: barcode
+  name: barcode
+  sequence_type: onlist
+  sequence: NNNNNNNNNNNNNNNN
+  min_len: 16
+  max_len: 16
+  onlist: !Onlist
+    filename: barcode_onlist.txt
+    md5: null
+  join:
+
+# umi
+- !Region
+  region_id: umi
+  name: umi
+  sequence_type: random
+  sequence: NNNNNNNNNN
+  min_len: 10
+  max_len: 10
+  onlist:
+  join:
+
+# cDNA
+- !Region
+  region_id: cDNA
+  name: cDNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist:
+  join:
+# Regions corresponding to FASTQ files are annotated a standard naming convention
+# R1.fastq.gz "Read 1"
+# R2.fastq.gz "Read 2"
+# I1.fastq.gz "Index 1, i7 index"
+# I2.fastq.gz "Index 2, i5 index"
 ```
 
 ## Contributing

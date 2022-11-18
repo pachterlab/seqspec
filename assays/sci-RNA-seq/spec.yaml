@@ -19,12 +19,11 @@ assay_spec:
       how: union
       order:
       - illumina_p5
-      - i5
+      - I2.fastq.gz
       - truseq_read_1_adapter
-      - read_1
-      - poly_T
-      - read_2
-      - i7_primer
+      - R1.fastq.gz
+      - R2.fastq.gz
+      - nextera_read2
       - i7
       - illumina_p7
       regions:
@@ -37,17 +36,30 @@ assay_spec:
           max_len: 29
           onlist: null
           join: null
+
         - !Region
-          region_id: i5
-          name: i5
-          sequence_type: onlist
-          sequence: NNNNNNNNNN
-          min_len: 10
-          max_len: 10
-          onlist: !Onlist
-            filename: i5_onlist.txt
-            md5: null
-          join: null
+          region_id: I2.fastq.gz
+          name: Index 2 FASTQ
+          sequence_type: 
+          sequence: 
+          min_len: 
+          max_len: 
+          onlist: null
+          join: !Join 
+            how: union
+            order: [i5]
+            regions:
+            - !Region
+              region_id: i5
+              name: i5
+              sequence_type: onlist
+              sequence: NNNNNNNNNN
+              min_len: 10
+              max_len: 10
+              onlist: !Onlist
+                filename: i5_onlist.txt
+                md5: null
+              join: null
         - !Region
           region_id: truseq_read_1_adapter
           name: truseq_read_1_adapter
@@ -58,12 +70,12 @@ assay_spec:
           onlist: null
           join: null
         - !Region
-          region_id: read_1
-          name: read_1
-          sequence_type: joined
-          sequence: NNNNNNNNNNNNNNNNNN
-          min_len: 18
-          max_len: 18
+          region_id: R1.fastq.gz
+          name: Read 1 FASTQ
+          sequence_type: 
+          sequence: 
+          min_len: 
+          max_len: 
           onlist: null
           join: !Join
             how: union
@@ -92,27 +104,28 @@ assay_spec:
                   md5: null
                 join: null
         - !Region
-          region_id: poly_T
-          name: poly_T
-          sequence_type: random
-          sequence: X
-          min_len: 1
-          max_len: 98
-          onlist: null
-          join: null
-        - !Region
-          region_id: read_2
-          name: read_2
-          sequence_type: joined
-          sequence: X
-          min_len: 1
-          max_len: 98
+          region_id: R2.fastq.gz
+          name: Read 2 FASTQ
+          sequence_type: 
+          sequence: 
+          min_len: 
+          max_len: 
           onlist: null
           join: !Join
             how: union
             order:
+            - poly_T
             - cdna
             regions:
+            - !Region
+              region_id: poly_T
+              name: poly_T
+              sequence_type: random
+              sequence: X
+              min_len: 1
+              max_len: 98
+              onlist: null
+              join: null
               - !Region
                 region_id: cdna
                 name: cdna
@@ -123,8 +136,8 @@ assay_spec:
                 onlist: null
                 join: null
         - !Region
-          region_id: i7_primer
-          name: i7_primer
+          region_id: nextera_read2
+          name: nextera_read2
           sequence_type: joined
           sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
           min_len: 34
@@ -155,16 +168,30 @@ assay_spec:
                 onlist: null
                 join: null
         - !Region
-          region_id: i7
-          name: i7
-          sequence_type: fixed
-          sequence: NNNNNNNNNN
-          min_len: 10
-          max_len: 10
+          region_id: I1.fastq.gz
+          name: Index 1 FASTQ
+          sequence_type: 
+          sequence: 
+          min_len: 
+          max_len: 
           onlist: !Onlist
             filename: i7_onlist.txt
             md5: null
-          join: null
+          join: !Join
+            how: union
+            order: [i7]
+            regions:
+            - !Region
+              region_id: i7
+              name: i7
+              sequence_type: fixed
+              sequence: NNNNNNNNNN
+              min_len: 10
+              max_len: 10
+              onlist: !Onlist
+                filename: i7_onlist.txt
+                md5: null
+              join: null
         - !Region
           region_id: illumina_p7
           name: illumina_p7
