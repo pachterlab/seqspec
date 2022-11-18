@@ -1,7 +1,7 @@
 !Assay
 name: SPLiT-seq
 doi: https://doi.org/10.1126/science.aam8999
-publication_date: 15 Mar 2018
+publication_date: 15 March 2018
 description: split-pool ligation-based transcriptome sequencing
 modalities:
 - RNA
