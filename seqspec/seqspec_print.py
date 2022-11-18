@@ -1,5 +1,4 @@
-from seqspec.Assay import Assay
-import yaml
+from seqspec.utils import load_spec
 
 
 def setup_print_args(parser):
@@ -23,13 +22,12 @@ def validate_print_args(parser, args):
     # if everything is valid the run_print
     fn = args.yaml
     o = args.o
-    run_print(fn, o)
+    spec = load_spec(fn)
+    run_print(spec)
 
 
-def run_print(fn, o):
-    with open(fn, "r") as stream:
-        data: Assay = yaml.load(stream, Loader=yaml.Loader)
-    print_markdown(data)
+def run_print(spec):
+    print_markdown(spec)
     # data.update_spec()
     # data.to_YAML(o)
 
