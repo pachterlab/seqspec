@@ -3,7 +3,7 @@ from jsonschema import Draft4Validator
 import yaml
 from os import path
 
-from seqspec.Assay import Assay
+from seqspec.utils import load_spec
 
 
 def setup_check_args(parser):
@@ -33,8 +33,7 @@ def validate_check_args(parser, args):
         schema = yaml.load(stream, Loader=yaml.Loader)
     # print(schema)
 
-    with open(spec_fn, "r") as stream:
-        spec: Assay = yaml.load(stream, Loader=yaml.Loader).to_dict()
+    spec = load_spec(spec_fn)
 
     run_check(schema, spec)  # , o)
 

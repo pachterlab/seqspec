@@ -1,6 +1,6 @@
 from .Region import Region
 from seqspec.Assay import Assay
-import yaml
+from seqspec.utils import load_spec
 
 
 def setup_diff_args(parser):
@@ -26,10 +26,8 @@ def validate_diff_args(parser, args):
     A_fn = args.yamlA
     B_fn = args.yamlB
     o = args.o
-    with open(A_fn, "r") as stream:
-        A: Assay = yaml.load(stream, Loader=yaml.Loader)
-    with open(B_fn, "r") as stream:
-        B: Assay = yaml.load(stream, Loader=yaml.Loader)
+    A = load_spec(A_fn)
+    B = load_spec(B_fn)
 
     # load in two specs
     run_diff(A, B)
