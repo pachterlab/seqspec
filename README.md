@@ -14,6 +14,13 @@ pip install seqspec
 seqspec format --help
 ```
 
+## TODO
+
+- format check that every element in “order” is present in “regions”
+- format verify presence of onlist files
+- list onlist files
+- specify in each assay which sequencer is being used (dictates which strand is sequenced)
+
 ## Specification
 
 Each assay is described by two objects: the `Assay` object and the `Region` object. A library is described by one `Assay` object and multiple (possibly nested) `Region` objects. The `Region` objects are grouped with a `join` operation and an `order` on the sub`Region`s specified. A simple (but not fully specified example) looks like the following:
