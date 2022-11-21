@@ -53,10 +53,10 @@ assay_spec:
       max_len: 28
       onlist: null
       join: !Join
-        how:
+        how: union
+        order: 
         - barcode
         - umi
-        order: union
         regions:
         - !Region
           region_id: barcode

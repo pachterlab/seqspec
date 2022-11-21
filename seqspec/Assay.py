@@ -66,3 +66,6 @@ class Assay(yaml.YAMLObject):
     def update_spec(self):
         for r in self.assay_spec:
             r.update_attr()
+
+    def get_modality(self, modality):
+        return self.assay_spec[self.modalities.index(modality)]
