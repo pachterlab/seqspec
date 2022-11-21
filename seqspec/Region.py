@@ -89,6 +89,26 @@ class Region(yaml.YAMLObject):
             "join": self.join.to_dict() if self.join else None,
         }
         return d
+    
+    def get_region(self, region_id, found = []):
+        if not found:
+            found = []
+        if self.region_id == region_id:
+            found.append(self)
+        if self.join:
+            for r in self.join.regions:
+            found = self.get_region(r, region_id, found=found)
+        return found
+
+    def get_leaves(self, leaves=[]):
+        if not leaves:
+            leaves = []
+        if not self.join:
+            leaves.append(self)
+        else:
+            for r in self.join.regions:
+                leaves = get_leaves(r, leaves=leaves)
+        return leaves
 
 
 class Join(yaml.YAMLObject):
