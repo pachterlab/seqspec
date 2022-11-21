@@ -97,7 +97,7 @@ class Region(yaml.YAMLObject):
             found.append(self)
         if self.join:
             for r in self.join.regions:
-                found = self.get_region(r, region_id, found)
+                found = r.get_region(region_id, found)
         return found
 
     def get_leaves(self, leaves=[]):
@@ -107,7 +107,7 @@ class Region(yaml.YAMLObject):
             leaves.append(self)
         else:
             for r in self.join.regions:
-                leaves = get_leaves(r, leaves=leaves)
+                leaves = r.get_leaves(leaves=leaves)
         return leaves
 
 
