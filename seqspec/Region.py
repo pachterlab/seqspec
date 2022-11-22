@@ -9,6 +9,7 @@ class Region(yaml.YAMLObject):
     def __init__(
         self,
         region_id: str,
+        region_type: str,
         name: str,
         sequence_type: str,
         sequence: str = "",
@@ -19,6 +20,7 @@ class Region(yaml.YAMLObject):
     ) -> None:
         super().__init__()
         self.region_id = region_id
+        self.region_type = region_type
         self.name = name
         self.sequence_type = sequence_type
         self.sequence = sequence
@@ -67,6 +69,7 @@ class Region(yaml.YAMLObject):
     def __repr__(self) -> str:
         d = {
             "region_id": self.region_id,
+            "region_type": self.region_type,
             "name": self.name,
             "sequence_type": self.sequence_type,
             "onlist": self.onlist,
@@ -80,6 +83,7 @@ class Region(yaml.YAMLObject):
     def to_dict(self):
         d = {
             "region_id": self.region_id,
+            "region_type": self.region_type,
             "name": self.name,
             "sequence_type": self.sequence_type,
             "onlist": self.onlist.to_dict() if self.onlist else None,
