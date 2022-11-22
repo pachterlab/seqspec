@@ -1,5 +1,6 @@
 from seqspec.utils import load_spec
 from seqspec.Assay import Assay
+import yaml
 
 
 def setup_find_args(parser):
@@ -39,6 +40,7 @@ def validate_find_args(parser, args):
     fn = args.yaml
     m = args.m
     r = args.r
+    o = args.o
 
     # load spec
     spec = load_spec(fn)
@@ -47,7 +49,11 @@ def validate_find_args(parser, args):
     regions = run_find(spec, m, r)
 
     # post processing
-    print(regions)
+    if o:
+        with open(o, "w") as f:
+            yaml.dump(regions, f, sort_keys=False)
+    else:
+        print(yaml.dump(regions, sort_keys=False))
 
 
 def run_find(spec: Assay, modality: str, region_id: str):
