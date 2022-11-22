@@ -96,19 +96,8 @@ assay_spec:
       join: !Join
         how: null
         order:
-        - poly_T
         - cDNA
         regions:
-        - !Region
-          region_id: poly_T
-          region_type: poly_T
-          name: Poly-T
-          sequence_type: random
-          sequence: X
-          min_len: 1
-          max_len: 98
-          onlist: null
-          join: null
         - !Region
           region_id: cDNA
           region_type: cDNA
