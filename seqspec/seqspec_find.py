@@ -1,4 +1,4 @@
-from seqspec.utils import load_spec
+from seqspec.utils import load_spec, get_cuts
 from seqspec.Assay import Assay
 import yaml
 
