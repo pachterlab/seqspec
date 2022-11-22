@@ -12,9 +12,9 @@ assay_spec:
   region_type: RNA
   name: RNA
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
-  min_len: 135
-  max_len: 329
+  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 134
+  max_len: 231
   onlist: null
   join: !Join
     how: union
@@ -58,7 +58,7 @@ assay_spec:
       onlist: null
       join: !Join
         how: union
-        order: 
+        order:
         - barcode
         - umi
         regions:
@@ -89,9 +89,9 @@ assay_spec:
       region_type: fastq
       name: Read 2 FASTQ
       sequence_type: null
-      sequence: XX
-      min_len: 2
-      max_len: 196
+      sequence: X
+      min_len: 1
+      max_len: 98
       onlist: null
       join: !Join
         how: null
