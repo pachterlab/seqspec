@@ -58,6 +58,10 @@
           "description": "identifier for the region",
           "type": "string"
         },
+        "region_type": {
+          "description": "the type of region",
+          "type": "string"
+        },
         "sequence_type": {
           "description": "The type of the sequence",
           "type": "string"
@@ -120,6 +124,7 @@
       },
       "required": [
         "region_id",
+        "region_type",
         "sequence_type",
         "sequence",
         "min_len",

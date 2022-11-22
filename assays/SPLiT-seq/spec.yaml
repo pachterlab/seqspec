@@ -9,6 +9,7 @@ lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SPLiT-seq.ht
 assay_spec:
 - !Region
   region_id: RNA
+  region_type: RNA
   name: RNA
   sequence_type: joined
   sequence: AATGATACGGCGACCACCGAGATCTACACTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXNNNNNNNNCGAATGCTCTGGCCTCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNNNNNNNNNNNNAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
@@ -28,6 +29,7 @@ assay_spec:
     regions:
     - !Region
       region_id: illumina_p5
+      region_type: illumina_p5
       name: illumina_p5
       sequence_type: fixed
       sequence: AATGATACGGCGACCACCGAGATCTACAC
@@ -37,6 +39,7 @@ assay_spec:
       join: null
     - !Region
       region_id: nextera_read1
+      region_type: nextera_read1
       name: nextera_read1
       sequence_type: fixed
       sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
@@ -51,6 +54,7 @@ assay_spec:
         regions:
         - !Region
           region_id: s5
+          region_type: s5
           name: s5
           sequence_type: fixed
           sequence: TCGTCGGCAGCGTC
@@ -60,6 +64,7 @@ assay_spec:
           join: null
         - !Region
           region_id: ME1
+          region_type: ME1
           name: ME1
           sequence_type: fixed
           sequence: AGATGTGTATAAGAGACAG
@@ -69,6 +74,7 @@ assay_spec:
           join: null
     - !Region
       region_id: R1.fastq.gz
+      region_type: fastq
       name: R1.fastq.gz
       sequence_type: 
       sequence: 
@@ -90,6 +96,7 @@ assay_spec:
           join: null
     - !Region
       region_id: R2.fastq.gz
+      region_type: fastq
       name: Read 2 FASTQ
       sequence_type: 
       sequence: 
@@ -102,6 +109,7 @@ assay_spec:
         regions:
         - !Region
           region_id: barcode-1
+          region_type: barcode
           name: barcode-1
           sequence_type: onlist
           sequence: NNNNNNNN
@@ -113,6 +121,7 @@ assay_spec:
           join: null
         - !Region
           region_id: linker-2
+          region_type: linker
           name: linker-2
           sequence_type: fixed
           sequence: CGAATGCTCTGGCCTCTCAAGCACGTGGAT
@@ -122,6 +131,7 @@ assay_spec:
           join: null
         - !Region
           region_id: barcode-2
+          region_type: barcode
           name: barcode-2
           sequence_type: onlist
           sequence: NNNNNNNN
@@ -133,6 +143,7 @@ assay_spec:
           join: null
         - !Region
           region_id: linker-3
+          region_type: linker
           name: linker-3
           sequence_type: fixed
           sequence: AGTCGTACGCCGATGCGAAACATCGGCCAC
@@ -142,6 +153,7 @@ assay_spec:
           join: null
         - !Region
           region_id: barcode-3
+          region_type: barcode
           name: barcode-3
           sequence_type: onlist
           sequence: NNNNNNNN
@@ -153,6 +165,7 @@ assay_spec:
           join: null
         - !Region
           region_id: umi
+          region_type: umi
           name: umi
           sequence_type: random
           sequence: NNNNNNNNNN
@@ -162,6 +175,7 @@ assay_spec:
           join: null
     - !Region
       region_id: truseq_read2
+      region_type: truseq_read2
       name: truseq_read2
       sequence_type: fixed
       sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
@@ -171,6 +185,7 @@ assay_spec:
       join: null
     - !Region
       region_id: I1.fastq.gz
+      region_type: fastq
       name: Index 1 FASTQ
       sequence_type: 
       sequence: 
@@ -183,6 +198,7 @@ assay_spec:
         regions:
         - !Region
           region_id: index7
+          region_type: index7
           name: index7
           sequence_type: onlist
           sequence: NNNNNN
@@ -194,6 +210,7 @@ assay_spec:
           join: null
     - !Region
       region_id: illumina_p7
+      region_type: illumina_p7
       name: illumina_p7
       sequence_type: fixed
       sequence: ATCTCGTATGCCGTCTTCTGCTTG

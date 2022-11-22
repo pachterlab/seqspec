@@ -9,6 +9,7 @@ lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3
 assay_spec:
 - !Region
   region_id: RNA
+  region_type: RNA
   name: RNA
   sequence_type: joined
   sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
@@ -28,6 +29,7 @@ assay_spec:
     regions:
     - !Region
       region_id: illumina_p5
+      region_type: illumina_p5
       name: Illumina P5
       sequence_type: fixed
       sequence: AATGATACGGCGACCACCGAGATCTACAC
@@ -37,6 +39,7 @@ assay_spec:
       join: null
     - !Region
       region_id: truseq_read1
+      region_type: truseq_read1
       name: Truseq Read 1
       sequence_type: fixed
       sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
@@ -46,6 +49,7 @@ assay_spec:
       join: null
     - !Region
       region_id: R1.fastq.gz
+      region_type: fastq
       name: Read 1 FASTQ
       sequence_type: null
       sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
@@ -60,6 +64,7 @@ assay_spec:
         regions:
         - !Region
           region_id: barcode
+          region_type: barcode
           name: Cell Barcode
           sequence_type: onlist
           sequence: NNNNNNNNNNNNNNNN
@@ -71,6 +76,7 @@ assay_spec:
           join: null
         - !Region
           region_id: umi
+          region_type: umi
           name: UMI
           sequence_type: random
           sequence: NNNNNNNNNNNN
@@ -80,6 +86,7 @@ assay_spec:
           join: null
     - !Region
       region_id: R2.fastq.gz
+      region_type: fastq
       name: Read 2 FASTQ
       sequence_type: null
       sequence: XX
@@ -94,6 +101,7 @@ assay_spec:
         regions:
         - !Region
           region_id: poly_T
+          region_type: poly_T
           name: Poly-T
           sequence_type: random
           sequence: X
@@ -103,6 +111,7 @@ assay_spec:
           join: null
         - !Region
           region_id: cDNA
+          region_type: cDNA
           name: cDNA
           sequence_type: random
           sequence: X
@@ -112,6 +121,7 @@ assay_spec:
           join: null
     - !Region
       region_id: truseq_read2
+      region_type: truseq_read2
       name: Truseq Read 2
       sequence_type: fixed
       sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
@@ -121,6 +131,7 @@ assay_spec:
       join: null
     - !Region
       region_id: I1.fastq.gz
+      region_type: fastq
       name: Index Read 2
       sequence_type: null
       sequence: NNNNNNNN
@@ -134,6 +145,7 @@ assay_spec:
         regions:
         - !Region
           region_id: index7
+          region_type: index7
           name: Truseq Read 2
           sequence_type: onlist
           sequence: NNNNNNNN
@@ -145,6 +157,7 @@ assay_spec:
           join: null
     - !Region
       region_id: illumina_p7
+      region_type: illumina_p7
       name: Illumina P7
       sequence_type: fixed
       sequence: ATCTCGTATGCCGTCTTCTGCTTG

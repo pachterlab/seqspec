@@ -22,6 +22,7 @@ seqspec format --help
 - specify in each assay which sequencer is being used (dictates which strand is sequenced)
 - add `container_type` to assay, options are `well, cell, droplet`
 - add `region_type` to each region, make the `region_type`s standardized (make region_id free form)
+- `region_id` can now become the ordering of the regions
 - add `strand` to each region which states the strand the region is ordered in
 - add `sequencer` to assay
 
