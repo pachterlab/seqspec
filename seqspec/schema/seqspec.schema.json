@@ -54,6 +54,12 @@
       "description": "A region of DNA",
       "type": "object",
       "properties": {
+        "order": {
+          "description": "order the region appears",
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2048
+        },
         "region_id": {
           "description": "identifier for the region",
           "type": "string"
@@ -96,33 +102,16 @@
             }
           }
         },
-        "join": {
-          "description": "Join operator on regions",
-          "type": ["object", "null"],
-          "properties": {
-            "how": {
-              "description": "How the regions will be joined",
-              "type": "string"
-            },
-            "order": {
-              "description": "The order of the regions being joined",
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "regions": {
-              "description": "The regions being joined",
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/region"
-              }
-            }
-          },
-          "required": ["how", "order", "regions"]
+        "regions": {
+          "description": "The regions being joined",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/region"
+          }
         }
       },
       "required": [
+        "order",
         "region_id",
         "region_type",
         "sequence_type",
