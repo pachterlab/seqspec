@@ -12,34 +12,48 @@ class Region(yaml.YAMLObject):
         region_type: str,
         name: str,
         sequence_type: str,
+        order: int = 0,
         sequence: str = "",
         min_len: int = 0,
         max_len: int = 1024,
         onlist: Optional["Onlist"] = None,
-        join: Optional["Join"] = None,
+        regions: Optional[List["Region"]] = None
+        # join: Optional["Join"] = None,
     ) -> None:
         super().__init__()
+        self.parent = None
         self.region_id = region_id
         self.region_type = region_type
         self.name = name
         self.sequence_type = sequence_type
+        self.order = order
         self.sequence = sequence
 
         self.min_len = min_len
         self.max_len = max_len
 
         self.onlist = onlist
-        self.join = join
+        self.regions = regions
+        # self.join = join
 
-        if self.join:
+        if self.regions:
             self.min_len, self.max_len = self.get_len()
 
             self.sequence = self.get_sequence()
 
+    def set_parent_id(self, parent_id):
+        if self.regions:
+            parent_id = self.region_id
+            for r in self.regions:
+                r.set_parent_id(parent_id)
+        else:
+            self.parent_id = parent_id
+        return
+
     def get_sequence(self, s: str = "") -> str:
         # take into account "order" property
-        if self.join:
-            for r in self.join.regions:
+        if self.regions:
+            for r in self.regions:
                 s = r.get_sequence(s)
         else:
             if self.sequence:
@@ -49,8 +63,8 @@ class Region(yaml.YAMLObject):
         return s
 
     def get_len(self, min_l: int = 0, max_l: int = 0):
-        if self.join:
-            for r in self.join.regions:
+        if self.regions:
+            for r in self.regions:
                 min_l, max_l = r.get_len(min_l, max_l)
         else:
             min_l += self.min_len
@@ -58,8 +72,8 @@ class Region(yaml.YAMLObject):
         return (min_l, max_l)
 
     def update_attr(self):
-        if self.join:
-            for r in self.join.regions:
+        if self.regions:
+            for r in self.regions:
                 r.update_attr()
 
         self.sequence = self.get_sequence()
@@ -76,7 +90,7 @@ class Region(yaml.YAMLObject):
             "sequence": self.sequence,
             "min_len": self.min_len,
             "max_len": self.max_len,
-            "join": self.join,
+            "regions": self.regions,
         }
         return f"{d}"
 
@@ -90,7 +104,7 @@ class Region(yaml.YAMLObject):
             "sequence": self.sequence,
             "min_len": self.min_len,
             "max_len": self.max_len,
-            "join": self.join.to_dict() if self.join else None,
+            "regions": [i.to_dict() for i in (self.regions or [])],
         }
         return d
 
@@ -99,51 +113,51 @@ class Region(yaml.YAMLObject):
             found = []
         if self.region_id == region_id:
             found.append(self)
-        if self.join:
-            for r in self.join.regions:
+        if self.regions:
+            for r in self.regions:
                 found = r.get_region(region_id, found)
         return found
 
     def get_leaves(self, leaves=[]):
         if not leaves:
             leaves = []
-        if not self.join:
+        if not self.regions:
             leaves.append(self)
         else:
-            for r in self.join.regions:
+            for r in self.regions:
                 leaves = r.get_leaves(leaves=leaves)
         return leaves
 
 
-class Join(yaml.YAMLObject):
-    yaml_tag = "!Join"
+# class Join(yaml.YAMLObject):
+#     yaml_tag = "!Join"
 
-    def __init__(
-        self,
-        how: str,
-        order: List[str],
-        regions: List[Region],
-    ) -> None:
-        super().__init__()
-        self.regions = regions
-        self.how = how
-        self.order = order
+#     def __init__(
+#         self,
+#         how: str,
+#         order: List[str],
+#         regions: List[Region],
+#     ) -> None:
+#         super().__init__()
+#         self.regions = regions
+#         self.how = how
+#         self.order = order
 
-    def __repr__(self) -> str:
-        d = {
-            "how": self.how,
-            "order": self.order,
-            "regions": self.regions,
-        }
-        return f"{d}"
+#     def __repr__(self) -> str:
+#         d = {
+#             "how": self.how,
+#             "order": self.order,
+#             "regions": self.regions,
+#         }
+#         return f"{d}"
 
-    def to_dict(self):
-        d = {
-            "how": self.how,
-            "order": self.order,
-            "regions": [o.to_dict() for o in self.regions],
-        }
-        return d
+#     def to_dict(self):
+#         d = {
+#             "how": self.how,
+#             "order": self.order,
+#             "regions": [o.to_dict() for o in self.regions],
+#         }
+#         return d
 
 
 class Onlist(yaml.YAMLObject):
