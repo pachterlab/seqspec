@@ -138,6 +138,13 @@ class Region(yaml.YAMLObject):
                 leaves = r.get_leaves(leaves=leaves)
         return leaves
 
+    def get_leaf_region_types(self):
+        leaves = self.get_leaves()
+        rtypes = set()
+        for r in leaves:
+            rtypes.add(r.region_type)
+        return rtypes
+
 
 # class Join(yaml.YAMLObject):
 #     yaml_tag = "!Join"
