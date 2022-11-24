@@ -111,6 +111,7 @@
         }
       },
       "required": [
+        "order",
         "region_id",
         "region_type",
         "sequence_type",
