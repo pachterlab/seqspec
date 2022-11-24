@@ -108,14 +108,24 @@ class Region(yaml.YAMLObject):
         }
         return d
 
-    def get_region(self, region_id, found=[]):
+    def get_region_by_id(self, region_id, found=[]):
         if not found:
             found = []
         if self.region_id == region_id:
             found.append(self)
         if self.regions:
             for r in self.regions:
-                found = r.get_region(region_id, found)
+                found = r.get_region_by_id(region_id, found)
+        return found
+
+    def get_region_by_type(self, region_type, found=[]):
+        if not found:
+            found = []
+        if self.region_type == region_type:
+            found.append(self)
+        if self.regions:
+            for r in self.regions:
+                found = r.get_region_by_type(region_type, found)
         return found
 
     def get_leaves(self, leaves=[]):
