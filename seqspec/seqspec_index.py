@@ -48,18 +48,24 @@ def validate_index_args(parser, args):
     # load spec
     spec = load_spec(fn)
 
-    # run function
-    regions = run_find(spec, m, r)
-    leaves = regions[0].get_leaves()
-    if rev:
-        leaves.reverse()
-    cuts = get_cuts(leaves)
+    cuts, rtypes = run_index(spec, m, r, rev)
 
     # post processing
     if o:
         with open(o, "w") as f:
-            for c, l in zip(cuts, leaves):
-                print(f"{l.region_id}\t{c[0]}\t{c[1]}", file=f)
+            for c, rt in zip(cuts, rtypes):
+                print(f"{rt}\t{c[0]}\t{c[1]}", file=f)
     else:
-        for c, l in zip(cuts, leaves):
-            print(f"{l.region_id}\t{c[0]}\t{c[1]}")
+        for c, rt in zip(cuts, rtypes):
+            print(f"{rt}\t{c[0]}\t{c[1]}")
+
+
+def run_index(spec, modality, region, rev=False):
+    # run function
+    regions = run_find(spec, modality, region)
+    leaves = regions[0].get_leaves()
+    if rev:
+        leaves.reverse()
+    cuts = get_cuts(leaves)
+    rtypes = [i.region_type for i in leaves]
+    return (cuts, rtypes)
