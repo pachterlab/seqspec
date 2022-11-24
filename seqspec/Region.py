@@ -71,13 +71,14 @@ class Region(yaml.YAMLObject):
             max_l += self.max_len
         return (min_l, max_l)
 
-    def update_attr(self):
+    def update_attr(self, order=0):
         if self.regions:
-            for r in self.regions:
-                r.update_attr()
+            for idx, r in enumerate(self.regions):
+                r.update_attr(idx)
 
         self.sequence = self.get_sequence()
         self.min_len, self.max_len = self.get_len()
+        self.order = order
         return
 
     def __repr__(self) -> str:
