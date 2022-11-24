@@ -1,5 +1,7 @@
 from seqspec.utils import load_spec, get_cuts
 from seqspec.seqspec_find import run_find
+from collections import defaultdict
+from typing import Dict, List, Tuple
 
 
 def setup_index_args(parser):
@@ -48,24 +50,52 @@ def validate_index_args(parser, args):
     # load spec
     spec = load_spec(fn)
 
-    cuts, rtypes = run_index(spec, m, r, rev)
+    index = run_index(spec, m, r, rev=rev)
 
     # post processing
     if o:
         with open(o, "w") as f:
-            for c, rt in zip(cuts, rtypes):
-                print(f"{rt}\t{c[0]}\t{c[1]}", file=f)
+            for k, v in index.items():
+                print(f"{v}\t{k[0]}\t{k[1]}", file=f)
     else:
-        for c, rt in zip(cuts, rtypes):
-            print(f"{rt}\t{c[0]}\t{c[1]}")
+        for k, v in index.items():
+            print(f"{v}\t{k[0]}\t{k[1]}")
 
 
-def run_index(spec, modality, region, rev=False):
+def run_index_by_type(
+    spec, modality, region_id, rev=False
+) -> Dict[str, List[Tuple[int, int]]]:
+    rid = region_id
     # run function
-    regions = run_find(spec, modality, region)
+    index = defaultdict(list)
+    regions = run_find(spec, modality, rid)
     leaves = regions[0].get_leaves()
     if rev:
         leaves.reverse()
     cuts = get_cuts(leaves)
-    rtypes = [i.region_type for i in leaves]
-    return (cuts, rtypes)
+
+    # groupby requested region
+    for idx, l in enumerate(leaves):
+        t = l.region_type
+        c = cuts[idx]
+
+        index[t].extend([c])
+    return index
+
+
+def run_index(spec, modality, region_id, rev=False) -> Dict[Tuple[int, int], str]:
+    rid = region_id
+    # run function
+    index = defaultdict()
+    regions = run_find(spec, modality, rid)
+    leaves = regions[0].get_leaves()
+    if rev:
+        leaves.reverse()
+    cuts = get_cuts(leaves)
+
+    for idx, l in enumerate(leaves):
+        t = l.region_type
+        c = cuts[idx]
+        index[c] = t
+
+    return index

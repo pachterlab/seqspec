@@ -9,105 +9,103 @@ lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_fami
 assay_spec:
   - !Region
     region_id: RNA
+    region_type: RNA
     name: RNA
     sequence_type: joined
     sequence: AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
     min_len: 128
     max_len: 322
     onlist: null
-    join: !Join
-      how: union
-      order:
-      - illumina_p5
-      - RA5
-      - cell_bc
-      - poly_T
-      - cDNA
-      - RA3
-      - link_1
-      - sample_bc
-      - illumina_p7
-      regions:
-        - !Region
-          region_id: illumina_p5
-          name: Illumina P5
-          sequence_type: fixed
-          sequence: AATGATACGGCGACCACCGAGATCTACAC
-          min_len: 29
-          max_len: 29
-          onlist: null
-          join: null
-        - !Region
-          region_id: RA5
-          name: RA5
-          sequence_type: fixed
-          sequence: GTTCAGAGTTCTACAGTCCGACGATC
-          min_len: 26
-          max_len: 26
-          onlist: null
-          join: null
-        - !Region
-          region_id: cell_bc
-          name: Cell Barcode
-          sequence_type: random
-          sequence: NNNNNNNN
-          min_len: 8
-          max_len: 8
-          onlist: null
-          join: null
-        - !Region
-          region_id: poly_T
-          name: Poly-T
-          sequence_type: random
-          sequence: X
-          min_len: 1
-          max_len: 98
-          onlist: null
-          join: null
-        - !Region
-          region_id: cDNA
-          name: cDNA
-          sequence_type: random
-          sequence: X
-          min_len: 1
-          max_len: 98
-          onlist: null
-          join: null
-        - !Region
-          region_id: RA3
-          name: RA3
-          sequence_type: fixed
-          sequence: TGGAATTCTCGGGTGCCAAGG
-          min_len: 21
-          max_len: 21
-          onlist: null
-          join: null
-        - !Region
-          region_id: link_1
-          name: Link 1
-          sequence_type: fixed
-          sequence: AACTCCAGTCAC
-          min_len: 12
-          max_len: 12
-          onlist: null
-          join: null
-        - !Region
-          region_id: sample_bc
-          name: Sample BC
-          sequence_type: onlist
-          sequence: NNNNNN
-          min_len: 6
-          max_len: 6
-          onlist: !Onlist
-            filename: sample_bc_onlist.txt
-            md5: null
-          join: null
-        - !Region
-          region_id: illumina_p7
-          name: Illumina P7
-          sequence_type: fixed
-          sequence: ATCTCGTATGCCGTCTTCTGCTTG
-          min_len: 24
-          max_len: 24
-          onlist: null
-          join: null
+    regions:
+      - !Region
+        region_id: illumina_p5
+        region_type: illumina_p5
+        name: Illumina P5
+        sequence_type: fixed
+        sequence: AATGATACGGCGACCACCGAGATCTACAC
+        min_len: 29
+        max_len: 29
+        onlist: null
+        regions: null
+      - !Region
+        region_id: RA5
+        region_type: RA5
+        name: RA5
+        sequence_type: fixed
+        sequence: GTTCAGAGTTCTACAGTCCGACGATC
+        min_len: 26
+        max_len: 26
+        onlist: null
+        regions: null
+      - !Region
+        region_id: cell_bc
+        region_type: cell_bc
+        name: Cell Barcode
+        sequence_type: random
+        sequence: NNNNNNNN
+        min_len: 8
+        max_len: 8
+        onlist: null
+        regions: null
+      - !Region
+        region_id: poly_T
+        region_type: poly_T
+        name: Poly-T
+        sequence_type: random
+        sequence: X
+        min_len: 1
+        max_len: 98
+        onlist: null
+        regions: null
+      - !Region
+        region_id: cDNA
+        region_type: cDNA
+        name: cDNA
+        sequence_type: random
+        sequence: X
+        min_len: 1
+        max_len: 98
+        onlist: null
+        regions: null
+      - !Region
+        region_id: RA3
+        region_type: RA3
+        name: RA3
+        sequence_type: fixed
+        sequence: TGGAATTCTCGGGTGCCAAGG
+        min_len: 21
+        max_len: 21
+        onlist: null
+        regions: null
+      - !Region
+        region_id: link_1
+        region_type: link_1
+        name: Link 1
+        sequence_type: fixed
+        sequence: AACTCCAGTCAC
+        min_len: 12
+        max_len: 12
+        onlist: null
+        regions: null
+      - !Region
+        region_id: sample_bc
+        region_type: sample_bc
+        name: Sample BC
+        sequence_type: onlist
+        sequence: NNNNNN
+        min_len: 6
+        max_len: 6
+        onlist: !Onlist
+          filename: sample_bc_onlist.txt
+          md5: null
+        regions: null
+      - !Region
+        region_id: illumina_p7
+        region_type: illumina_p7
+        name: Illumina P7
+        sequence_type: fixed
+        sequence: ATCTCGTATGCCGTCTTCTGCTTG
+        min_len: 24
+        max_len: 24
+        onlist: null
+        regions: null
