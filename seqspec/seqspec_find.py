@@ -58,5 +58,5 @@ def validate_find_args(parser, args):
 
 def run_find(spec: Assay, modality: str, region_id: str):
     m = spec.get_modality(modality)
-    regions = m.get_region(region_id)
+    regions = m.get_region_by_id(region_id)
     return regions
