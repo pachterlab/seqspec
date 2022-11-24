@@ -1,5 +1,4 @@
-
-git commfrom seqspec.utils import load_spec
+from seqspec.utils import load_spec
 
 
 def setup_print_args(parser):
