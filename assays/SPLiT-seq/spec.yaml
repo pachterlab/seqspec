@@ -76,6 +76,7 @@ assay_spec:
     - !Region
       order: 0
       region_id: cDNA
+      region_type: cDNA
       name: cDNA
       sequence_type: random
       sequence: X
