@@ -1,4 +1,5 @@
-from seqspec.utils import load_spec
+
+git commfrom seqspec.utils import load_spec
 
 
 def setup_print_args(parser):
@@ -23,13 +24,20 @@ def validate_print_args(parser, args):
     fn = args.yaml
     o = args.o
     spec = load_spec(fn)
-    run_print(spec)
+    s = run_print(spec)
+    if o:
+        with open(o, "w") as f:
+            print(s, file=f)
+    else:
+        print(s)
 
 
-def run_print(spec):
-    print_markdown(spec)
-    # data.update_spec()
-    # data.to_YAML(o)
+def run_print(data):
+    header = headerTemplate(data.name, data.doi, data.description, data.modalities)
+    header2 = "## Final Library"
+    assay_spec = multiModalTemplate(data.assay_spec)
+    s = f"{header}\n{header2}\n{assay_spec}"
+    return s
 
 
 def headerTemplate(name, doi, description, modalities):
@@ -41,9 +49,12 @@ def headerTemplate(name, doi, description, modalities):
     return s
 
 
-def atomicRegionTemplate(name, sequence_type, sequence, min_len, max_len, onlist, ns=0):
+def atomicRegionTemplate(
+    name, region_type, sequence_type, sequence, min_len, max_len, onlist, ns=0
+):
     s = f"""<details><summary>{name}</summary>
 
+{' '*ns}- region_type: {region_type}
 {' '*ns}- sequence_type: {sequence_type}
 {' '*ns}- sequence: <pre style="overflow-x: auto; text-align: left; margin: 0; display: inline;">{sequence}</pre>
 {' '*ns}- min_len: {min_len}
@@ -59,6 +70,7 @@ def regionsTemplate(regions):
             f"{idx + 1}. "
             + atomicRegionTemplate(
                 v.name,
+                v.region_type,
                 v.sequence_type,
                 v.sequence,
                 v.min_len,
@@ -82,15 +94,6 @@ def libStructTemplate(region):
 
 def multiModalTemplate(assay_spec):
     s = "\n".join(
-        [
-            libStructTemplate(v) + "\n" + regionsTemplate(v.join.regions)
-            for v in assay_spec
-        ]
+        [libStructTemplate(v) + "\n" + regionsTemplate(v.regions) for v in assay_spec]
     )
     return s
-
-
-def print_markdown(data):
-    print(headerTemplate(data.name, data.doi, data.description, data.modalities))
-    print("## Final Library")
-    print(multiModalTemplate(data.assay_spec))
