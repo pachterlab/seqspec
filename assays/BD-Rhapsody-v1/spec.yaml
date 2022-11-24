@@ -27,7 +27,9 @@ assay_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 0
   - !Region
     region_id: truseq_r1
     region_type: truseq_r1
@@ -37,7 +39,9 @@ assay_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 1
   - !Region
     region_id: cls1
     region_type: cls1
@@ -49,7 +53,9 @@ assay_spec:
     onlist: !Onlist
       filename: cls1_onlist.txt
       md5: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 2
   - !Region
     region_id: linker1
     region_type: linker1
@@ -59,7 +65,9 @@ assay_spec:
     min_len: 12
     max_len: 12
     onlist: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 3
   - !Region
     region_id: cls2
     region_type: cls2
@@ -71,7 +79,9 @@ assay_spec:
     onlist: !Onlist
       filename: cls2_onlist.txt
       md5: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 4
   - !Region
     region_id: linker2
     region_type: linker2
@@ -81,7 +91,9 @@ assay_spec:
     min_len: 13
     max_len: 13
     onlist: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 5
   - !Region
     region_id: cls3
     region_type: cls3
@@ -93,7 +105,9 @@ assay_spec:
     onlist: !Onlist
       filename: cls3_onlist.txt
       md5: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 6
   - !Region
     region_id: umi
     region_type: umi
@@ -103,7 +117,9 @@ assay_spec:
     min_len: 8
     max_len: 8
     onlist: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 7
   - !Region
     region_id: polyT
     region_type: polyT
@@ -113,7 +129,9 @@ assay_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 8
   - !Region
     region_id: cdna
     region_type: cdna
@@ -123,7 +141,9 @@ assay_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 9
   - !Region
     region_id: truseq_r2
     region_type: truseq_r2
@@ -133,7 +153,9 @@ assay_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 10
   - !Region
     region_id: sample_index
     region_type: sample_index
@@ -145,7 +167,9 @@ assay_spec:
     onlist: !Onlist
       filename: sample_index_onlist.txt
       md5: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 11
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -155,4 +179,7 @@ assay_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    join: null
+    regions: null
+    parent_id: RNA
+    order: 12
+  order: 0

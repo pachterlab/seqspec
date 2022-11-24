@@ -27,6 +27,8 @@ assay_spec:
     max_len: 41
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 0
   - !Region
     region_id: cDNA
     region_type: cDNA
@@ -37,6 +39,8 @@ assay_spec:
     max_len: 98
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 1
   - !Region
     region_id: SOLiD_bc_adapter
     region_type: SOLiD_bc_adapter
@@ -47,6 +51,8 @@ assay_spec:
     max_len: 19
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 2
   - !Region
     region_id: index
     region_type: index
@@ -59,6 +65,8 @@ assay_spec:
       filename: index_onlist.txt
       md5: null
     regions: null
+    parent_id: RNA
+    order: 3
   - !Region
     region_id: p2_adapter
     region_type: p2_adapter
@@ -69,3 +77,6 @@ assay_spec:
     max_len: 23
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 4
+  order: 0

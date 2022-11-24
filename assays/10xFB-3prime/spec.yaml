@@ -28,6 +28,8 @@ assay_spec:
     max_len: 29
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 0
   - !Region
     region_id: truseq_r1
     region_type: truseq_r1
@@ -38,6 +40,8 @@ assay_spec:
     max_len: 10
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 1
   - !Region
     region_id: cell_bc
     region_type: cell_bc
@@ -50,6 +54,8 @@ assay_spec:
       filename: 737K-august-2016.txt.gz
       md5: null
     regions: null
+    parent_id: RNA
+    order: 2
   - !Region
     region_id: umi
     region_type: umi
@@ -60,6 +66,8 @@ assay_spec:
     max_len: 12
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 3
   - !Region
     region_id: poly_T
     region_type: poly_T
@@ -70,6 +78,8 @@ assay_spec:
     max_len: 98
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 4
   - !Region
     region_id: cDNA
     region_type: cDNA
@@ -80,6 +90,8 @@ assay_spec:
     max_len: 98
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 5
   - !Region
     region_id: truseq_r2
     region_type: truseq_r2
@@ -90,6 +102,8 @@ assay_spec:
     max_len: 34
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 6
   - !Region
     region_id: sample_bc
     region_type: sample_bc
@@ -102,6 +116,8 @@ assay_spec:
       filename: sample_bc_onlist.txt
       md5: null
     regions: null
+    parent_id: RNA
+    order: 7
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -112,6 +128,9 @@ assay_spec:
     max_len: 24
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 8
+  order: 0
 - !Region
   region_id: Protein
   region_type: Protein
@@ -132,6 +151,8 @@ assay_spec:
     max_len: 29
     onlist: null
     regions: null
+    parent_id: Protein
+    order: 0
   - !Region
     region_id: nextera_read1
     region_type: nextera_read1
@@ -142,6 +163,8 @@ assay_spec:
     max_len: 33
     onlist: null
     regions: null
+    parent_id: Protein
+    order: 1
   - !Region
     region_id: cell_bc
     region_type: cell_bc
@@ -154,6 +177,8 @@ assay_spec:
       filename: 737K-august-2016.txt.gz
       md5: null
     regions: null
+    parent_id: Protein
+    order: 2
   - !Region
     region_id: umi
     region_type: umi
@@ -164,6 +189,8 @@ assay_spec:
     max_len: 12
     onlist: null
     regions: null
+    parent_id: Protein
+    order: 3
   - !Region
     region_id: capture_seq
     region_type: capture_seq
@@ -174,6 +201,8 @@ assay_spec:
     max_len: 22
     onlist: null
     regions: null
+    parent_id: Protein
+    order: 4
   - !Region
     region_id: random_9mer1
     region_type: random_9mer1
@@ -184,6 +213,8 @@ assay_spec:
     max_len: 9
     onlist: null
     regions: null
+    parent_id: Protein
+    order: 5
   - !Region
     region_id: feature_barcode
     region_type: feature_barcode
@@ -196,6 +227,8 @@ assay_spec:
       filename: feature_barcode_onlist.txt
       md5: null
     regions: null
+    parent_id: Protein
+    order: 6
   - !Region
     region_id: random_9mer2
     region_type: random_9mer2
@@ -206,6 +239,8 @@ assay_spec:
     max_len: 9
     onlist: null
     regions: null
+    parent_id: Protein
+    order: 7
   - !Region
     region_id: truseq_r2
     region_type: truseq_r2
@@ -216,6 +251,8 @@ assay_spec:
     max_len: 34
     onlist: null
     regions: null
+    parent_id: Protein
+    order: 8
   - !Region
     region_id: sample_bc
     region_type: sample_bc
@@ -228,6 +265,8 @@ assay_spec:
       filename: sample_bc_onlist.txt
       md5: null
     regions: null
+    parent_id: Protein
+    order: 9
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -238,3 +277,6 @@ assay_spec:
     max_len: 24
     onlist: null
     regions: null
+    parent_id: Protein
+    order: 10
+  order: 0

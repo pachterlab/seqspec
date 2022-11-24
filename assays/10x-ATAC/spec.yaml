@@ -27,6 +27,8 @@ assay_spec:
     max_len: 29
     onlist: null
     regions: null
+    parent_id: ATAC
+    order: 0
   - !Region
     region_id: cell_bc
     region_type: cell_bc
@@ -39,6 +41,8 @@ assay_spec:
       filename: 737K-cratac-v1.txt.gz
       md5: null
     regions: null
+    parent_id: ATAC
+    order: 1
   - !Region
     region_id: s5
     region_type: s5
@@ -49,6 +53,8 @@ assay_spec:
     max_len: 14
     onlist: null
     regions: null
+    parent_id: ATAC
+    order: 2
   - !Region
     region_id: ME1
     region_type: ME1
@@ -59,6 +65,8 @@ assay_spec:
     max_len: 19
     onlist: null
     regions: null
+    parent_id: ATAC
+    order: 3
   - !Region
     region_id: gDNA
     region_type: gDNA
@@ -69,6 +77,8 @@ assay_spec:
     max_len: 99
     onlist: null
     regions: null
+    parent_id: ATAC
+    order: 4
   - !Region
     region_id: ME2
     region_type: ME2
@@ -79,6 +89,8 @@ assay_spec:
     max_len: 19
     onlist: null
     regions: null
+    parent_id: ATAC
+    order: 5
   - !Region
     region_id: s7
     region_type: s7
@@ -89,6 +101,8 @@ assay_spec:
     max_len: 15
     onlist: null
     regions: null
+    parent_id: ATAC
+    order: 6
   - !Region
     region_id: sample_index
     region_type: sample_index
@@ -99,6 +113,8 @@ assay_spec:
     max_len: 8
     onlist: null
     regions: null
+    parent_id: ATAC
+    order: 7
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -109,3 +125,6 @@ assay_spec:
     max_len: 24
     onlist: null
     regions: null
+    parent_id: ATAC
+    order: 8
+  order: 0

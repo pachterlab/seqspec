@@ -1,168 +1,187 @@
-!Assay 
+!Assay
 name: Illumina-Nextera-Dual
-doi: 
-publication_date: 
-description: 
-modalities: [template]
+doi: null
+publication_date: null
+description: null
+modalities:
+- template
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/Illumina.html
 assay_spec:
+- !Region
+  region_id: template
+  region_type: template
+  name: template
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNfixedfixedXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 137
+  max_len: 234
+  onlist: null
+  regions:
   - !Region
-    region_id: template
-    region_type: template
-    name: template
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: illumina_p5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: template
+    order: 0
+  - !Region
+    region_id: I2.fastq.gz
+    region_type: gz
+    name: Index 2 FASTQ
     sequence_type: joined
-    sequence: 
-    min_len: 
-    max_len: 
-    onlist: 
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
     regions:
-      - !Region
-        region_id: illumina_p5
-        region_type: illumina_p5
-        name: illumina_p5
-        sequence_type: fixed
-        sequence: AATGATACGGCGACCACCGAGATCTACAC
-        min_len: 29
-        max_len: 29
-        onlist: 
-        regions: 
-
-      - !Region
-        region_id: I2.fastq.gz
-        region_type: gz
-        name: Index 2 FASTQ
-        sequence_type: joined
-        sequence: NNNNNNNN
-        min_len: 8
-        max_len: 8
-        onlist:
-        regions:
-          - !Region
-            region_id: index5
-            region_type: index5
-            name: index5
-            sequence_type: onlist
-            sequence: NNNNNNNN
-            min_len: 8
-            max_len: 8
-            onlist: !Onlist
-              filename: index5_onlist.txt
-              md5: null
-            regions:      
-
-      - !Region
-        region_id: nextera_read1
-        region_type: nextera_read1
-        name: nextera_read1
-        sequence_type: fixed
-        sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
-        min_len: 33
-        max_len: 33
-        onlist:
-        regions:
-        - !Region
-          region_id: s5
-          region_type: s5
-          name: s5
-          sequence_type: TCGTCGGCAGCGTC
-          sequence: fixed
-          min_len: 14
-          max_len: 14
-          onlist:
-          regions: 
-        - !Region
-          region_id: ME1
-          region_type: ME1
-          name: ME1
-          sequence_type: AGATGTGTATAAGAGACAG
-          sequence: fixed
-          min_len: 19
-          max_len: 19
-          onlist:
-          regions: 
-
-      - !Region
-        region_id: R1.fastq.gz
-        region_type: gz
-        name: Read 1 FASTQ
-        sequence_type: 
-        sequence: 
-        min_len: 
-        max_len:
-        onlist:
-        regions:
-        - !Region
-          region_id: insert
-          region_type: insert
-          name: insert
-          sequence_type: random
-          sequence: X
-          min_len: 1
-          max_len: 98
-          onlist:
-          regions: 
-
-      - !Region
-        region_id: nextera_read2
-        region_type: nextera_read2
-        name: nextera_read2
-        sequence_type: joined
-        sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
-        min_len: 34
-        max_len: 34
-        onlist: null
-        regions:
-          - !Region
-            region_id: ME2
-            region_type: ME2
-            name: ME2
-            sequence_type: fixed
-            sequence: CTGTCTCTTATACACATCT
-            min_len: 19
-            max_len: 19
-            onlist: null
-            regions: null
-          - !Region
-            region_id: s7
-            region_type: s7
-            name: s7
-            sequence_type: fixed
-            sequence: CCGAGCCCACGAGAC
-            min_len: 15
-            max_len: 15
-            onlist: null
-            regions: null
-
-      - !Region
-        region_id: I1.fastq.gz
-        region_type: gz
-        name: Index 1 FASTQ
-        sequence_type: joined
-        sequence: NNNNNNNN
-        min_len: 8
-        max_len: 8
-        onlist:
-        regions:
-          - !Region
-            region_id: index7
-            region_type: index7
-            name: index7
-            sequence_type: onlist
-            sequence: NNNNNNNN
-            min_len: 8
-            max_len: 8
-            onlist: !Onlist
-              filename: index7_onlist.txt
-              md5: null
-            regions:
-
-      - !Region
-        region_id: illumina_p7
-        region_type: illumina_p7
-        name: illumina_p7
-        sequence_type: fixed
-        sequence: ATCTCGTATGCCGTCTTCTGCTTG
-        min_len: 24
-        max_len: 24
-        onlist: 
-        regions: 
+    - !Region
+      region_id: index5
+      region_type: index5
+      name: index5
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: index5_onlist.txt
+        md5: null
+      regions: null
+      parent_id: I2.fastq.gz
+      order: 0
+    order: 1
+  - !Region
+    region_id: nextera_read1
+    region_type: nextera_read1
+    name: nextera_read1
+    sequence_type: fixed
+    sequence: fixedfixed
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions:
+    - !Region
+      region_id: s5
+      region_type: s5
+      name: s5
+      sequence_type: TCGTCGGCAGCGTC
+      sequence: fixed
+      min_len: 14
+      max_len: 14
+      onlist: null
+      regions: null
+      parent_id: nextera_read1
+      order: 0
+    - !Region
+      region_id: ME1
+      region_type: ME1
+      name: ME1
+      sequence_type: AGATGTGTATAAGAGACAG
+      sequence: fixed
+      min_len: 19
+      max_len: 19
+      onlist: null
+      regions: null
+      parent_id: nextera_read1
+      order: 1
+    order: 2
+  - !Region
+    region_id: R1.fastq.gz
+    region_type: gz
+    name: Read 1 FASTQ
+    sequence_type: null
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions:
+    - !Region
+      region_id: insert
+      region_type: insert
+      name: insert
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      regions: null
+      parent_id: R1.fastq.gz
+      order: 0
+    order: 3
+  - !Region
+    region_id: nextera_read2
+    region_type: nextera_read2
+    name: nextera_read2
+    sequence_type: joined
+    sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions:
+    - !Region
+      region_id: ME2
+      region_type: ME2
+      name: ME2
+      sequence_type: fixed
+      sequence: CTGTCTCTTATACACATCT
+      min_len: 19
+      max_len: 19
+      onlist: null
+      regions: null
+      parent_id: nextera_read2
+      order: 0
+    - !Region
+      region_id: s7
+      region_type: s7
+      name: s7
+      sequence_type: fixed
+      sequence: CCGAGCCCACGAGAC
+      min_len: 15
+      max_len: 15
+      onlist: null
+      regions: null
+      parent_id: nextera_read2
+      order: 1
+    order: 4
+  - !Region
+    region_id: I1.fastq.gz
+    region_type: gz
+    name: Index 1 FASTQ
+    sequence_type: joined
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+    - !Region
+      region_id: index7
+      region_type: index7
+      name: index7
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: index7_onlist.txt
+        md5: null
+      regions: null
+      parent_id: I1.fastq.gz
+      order: 0
+    order: 5
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: illumina_p7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: template
+    order: 6
+  order: 0

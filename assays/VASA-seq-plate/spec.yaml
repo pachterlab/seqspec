@@ -28,6 +28,8 @@ assay_spec:
     max_len: 29
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 0
   - !Region
     region_id: RA5
     region_type: RA5
@@ -38,6 +40,8 @@ assay_spec:
     max_len: 26
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 1
   - !Region
     region_id: umi
     region_type: umi
@@ -48,6 +52,8 @@ assay_spec:
     max_len: 98
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 2
   - !Region
     region_id: cell_barcode
     region_type: cell_barcode
@@ -58,6 +64,8 @@ assay_spec:
     max_len: 6
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 3
   - !Region
     region_id: polyT
     region_type: polyT
@@ -68,6 +76,8 @@ assay_spec:
     max_len: 98
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 4
   - !Region
     region_id: cdna
     region_type: cdna
@@ -78,6 +88,8 @@ assay_spec:
     max_len: 98
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 5
   - !Region
     region_id: RA3
     region_type: RA3
@@ -88,6 +100,8 @@ assay_spec:
     max_len: 33
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 6
   - !Region
     region_id: sample_bc
     region_type: sample_bc
@@ -100,6 +114,8 @@ assay_spec:
       filename: sample_bc_onlist.txt
       md5: null
     regions: null
+    parent_id: RNA
+    order: 7
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -110,3 +126,6 @@ assay_spec:
     max_len: 24
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 8
+  order: 0

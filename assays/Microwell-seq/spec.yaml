@@ -2,7 +2,8 @@
 name: Microwell-seq
 doi: https://doi.org/10.1016/j.cell.2018.02.001
 publication_date: 22 February 2018
-description: a high-throughput and low-cost scRNA-seq platform using simple, inexpensive devices
+description: a high-throughput and low-cost scRNA-seq platform using simple, inexpensive
+  devices
 modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/
@@ -27,6 +28,8 @@ assay_spec:
     max_len: 29
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 0
   - !Region
     region_id: read_1_primer
     region_type: read_1_primer
@@ -37,6 +40,8 @@ assay_spec:
     max_len: 39
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 1
   - !Region
     region_id: bc1
     region_type: bc1
@@ -49,6 +54,8 @@ assay_spec:
       filename: bc1_onlist.txt
       md5: null
     regions: null
+    parent_id: RNA
+    order: 2
   - !Region
     region_id: linker1
     region_type: linker1
@@ -59,6 +66,8 @@ assay_spec:
     max_len: 15
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 3
   - !Region
     region_id: bc2
     region_type: bc2
@@ -71,6 +80,8 @@ assay_spec:
       filename: bc2_onlist.txt
       md5: null
     regions: null
+    parent_id: RNA
+    order: 4
   - !Region
     region_id: linker2
     region_type: linker2
@@ -81,6 +92,8 @@ assay_spec:
     max_len: 15
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 5
   - !Region
     region_id: bc3
     region_type: bc3
@@ -93,6 +106,8 @@ assay_spec:
       filename: bc3_onlist.txt
       md5: null
     regions: null
+    parent_id: RNA
+    order: 6
   - !Region
     region_id: umi
     region_type: umi
@@ -103,6 +118,8 @@ assay_spec:
     max_len: 6
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 7
   - !Region
     region_id: polyT
     region_type: polyT
@@ -113,6 +130,8 @@ assay_spec:
     max_len: 98
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 8
   - !Region
     region_id: cdna
     region_type: cdna
@@ -123,6 +142,8 @@ assay_spec:
     max_len: 98
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 9
   - !Region
     region_id: ME
     region_type: ME
@@ -133,6 +154,8 @@ assay_spec:
     max_len: 19
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 10
   - !Region
     region_id: s7
     region_type: s7
@@ -143,6 +166,8 @@ assay_spec:
     max_len: 15
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 11
   - !Region
     region_id: sample_index
     region_type: sample_index
@@ -155,6 +180,8 @@ assay_spec:
       filename: sample_index_onlist.txt
       md5: null
     regions: null
+    parent_id: RNA
+    order: 12
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -165,3 +192,6 @@ assay_spec:
     max_len: 24
     onlist: null
     regions: null
+    parent_id: RNA
+    order: 13
+  order: 0

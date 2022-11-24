@@ -14,8 +14,8 @@ assay_spec:
   name: RNA
   sequence_type: joined
   sequence: AATGATACGGCGACCACCGAGATCTACACTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXNNNNNNNNCGAATGCTCTGGCCTCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNNNNNNNNNNNNAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
-  min_len: 240
-  max_len: 337
+  min_len: 221
+  max_len: 318
   onlist: null
   regions:
   - !Region
@@ -29,6 +29,7 @@ assay_spec:
     max_len: 29
     onlist: null
     regions: null
+    parent_id: RNA
   - !Region
     order: 1
     region_id: nextera_read1
@@ -36,8 +37,8 @@ assay_spec:
     name: nextera_read1
     sequence_type: fixed
     sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
-    min_len: 52
-    max_len: 52
+    min_len: 33
+    max_len: 33
     onlist: null
     regions:
     - !Region
@@ -51,6 +52,7 @@ assay_spec:
       max_len: 14
       onlist: null
       regions: null
+      parent_id: nextera_read1
     - !Region
       order: 1
       region_id: ME1
@@ -62,15 +64,16 @@ assay_spec:
       max_len: 19
       onlist: null
       regions: null
+      parent_id: nextera_read1
   - !Region
     order: 2
     region_id: R1.fastq.gz
     region_type: fastq
     name: R1.fastq.gz
-    sequence_type: 
-    sequence: 
-    min_len: 
-    max_len: 
+    sequence_type: null
+    sequence: X
+    min_len: 1
+    max_len: 98
     onlist: null
     regions:
     - !Region
@@ -84,15 +87,16 @@ assay_spec:
       max_len: 98
       onlist: null
       regions: null
+      parent_id: R1.fastq.gz
   - !Region
     order: 3
     region_id: R2.fastq.gz
     region_type: fastq
     name: Read 2 FASTQ
-    sequence_type: 
-    sequence: 
-    min_len: 
-    max_len: 
+    sequence_type: null
+    sequence: NNNNNNNNCGAATGCTCTGGCCTCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNNNNNNNNNNNN
+    min_len: 94
+    max_len: 94
     onlist: null
     regions:
     - !Region
@@ -108,6 +112,7 @@ assay_spec:
         filename: barcode-1_onlist.txt
         md5: null
       regions: null
+      parent_id: R2.fastq.gz
     - !Region
       order: 1
       region_id: linker-2
@@ -119,6 +124,7 @@ assay_spec:
       max_len: 30
       onlist: null
       regions: null
+      parent_id: R2.fastq.gz
     - !Region
       order: 2
       region_id: barcode-2
@@ -132,6 +138,7 @@ assay_spec:
         filename: barcode-2_onlist.txt
         md5: null
       regions: null
+      parent_id: R2.fastq.gz
     - !Region
       order: 3
       region_id: linker-3
@@ -143,6 +150,7 @@ assay_spec:
       max_len: 30
       onlist: null
       regions: null
+      parent_id: R2.fastq.gz
     - !Region
       order: 4
       region_id: barcode-3
@@ -156,6 +164,7 @@ assay_spec:
         filename: barcode-3_onlist.txt
         md5: null
       regions: null
+      parent_id: R2.fastq.gz
     - !Region
       order: 5
       region_id: umi
@@ -167,6 +176,7 @@ assay_spec:
       max_len: 10
       onlist: null
       regions: null
+      parent_id: R2.fastq.gz
   - !Region
     order: 4
     region_id: truseq_read2
@@ -178,16 +188,17 @@ assay_spec:
     max_len: 34
     onlist: null
     regions: null
+    parent_id: RNA
   - !Region
     order: 5
     region_id: I1.fastq.gz
     region_type: fastq
     name: Index 1 FASTQ
-    sequence_type: 
-    sequence: 
-    min_len: 
-    max_len: 
-    onlist:
+    sequence_type: null
+    sequence: NNNNNN
+    min_len: 6
+    max_len: 6
+    onlist: null
     regions:
     - !Region
       order: 0
@@ -202,6 +213,7 @@ assay_spec:
         filename: index7_onlist.txt
         md5: null
       regions: null
+      parent_id: I1.fastq.gz
   - !Region
     order: 6
     region_id: illumina_p7
@@ -213,3 +225,4 @@ assay_spec:
     max_len: 24
     onlist: null
     regions: null
+    parent_id: RNA
