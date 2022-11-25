@@ -3,19 +3,17 @@ const fs = require("fs");
 const args = process.argv.slice(2);
 let AssayYamlType = new yaml.Type("!Assay", { kind: "mapping" });
 let RegionYamlType = new yaml.Type("!Region", { kind: "mapping" });
-let JoinYamlType = new yaml.Type("!Join", { kind: "mapping" });
 let OnlistYamlType = new yaml.Type("!Onlist", { kind: "mapping" });
 
 let SCHEMA = yaml.DEFAULT_SCHEMA.extend([
   AssayYamlType,
   RegionYamlType,
-  JoinYamlType,
   OnlistYamlType,
 ]);
 
 // Get document, or throw exception on error
 let data;
-let assay = args[0];// ;"10x-RNA-ATAC";
+let assay = args[0]; // ;"10x-RNA-ATAC";
 let yaml_fn = `assays/${assay}/spec.yaml`;
 let html_fn = `public/${assay}.html`;
 try {
@@ -43,6 +41,7 @@ function headerTemplate(name, doi, description, modalities) {
 
 function atomicRegionTemplate(
   name,
+  region_type,
   sequence_type,
   sequence,
   min_len,
@@ -56,6 +55,7 @@ function atomicRegionTemplate(
       <li>sequence_type: ${sequence_type}</li>
       <li>
         sequence:
+        <${region_type}
         <pre
           style="
             overflow-x: auto;
@@ -65,6 +65,7 @@ function atomicRegionTemplate(
           "
         >
 ${sequence}</pre
+        >
         >
       </li>
       <li>min_len: ${min_len}</li>
@@ -82,6 +83,7 @@ function regionsTemplate(regions) {
       .map(function (key, index) {
         return atomicRegionTemplate(
           regions[key].region_id,
+          regions[key].region_type,
           regions[key].sequence_type,
           regions[key].sequence,
           regions[key].min_len,
@@ -123,7 +125,7 @@ function multiModalTemplate(assay_spec) {
     .map(function (key, index) {
       return (
         libStructTemplate(assay_spec[key]) +
-        regionsTemplate(assay_spec[key].join.regions)
+        regionsTemplate(assay_spec[key].regions)
       );
     })
     .join("")}
