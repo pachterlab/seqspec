@@ -14,8 +14,11 @@ let SCHEMA = yaml.DEFAULT_SCHEMA.extend([
 // Get document, or throw exception on error
 let data;
 let assay = args[0]; // ;"10x-RNA-ATAC";
-let yaml_fn = `assays/${assay}/spec.yaml`;
-let html_fn = `public/${assay}.html`;
+// let yaml_fn = `assays/${assay}/spec.yaml`;
+// let html_fn = `public/assays/${assay}.html`;
+let yaml_fn = args[0];
+let html_fn = args[1];
+
 try {
   data = yaml.load(fs.readFileSync(yaml_fn, "utf8"), { schema: SCHEMA });
 } catch (e) {
@@ -38,40 +41,73 @@ function headerTemplate(name, doi, description, modalities) {
   </ul>
     `;
 }
-
+// recursively make detail/summaries with colors using this function
 function atomicRegionTemplate(
+  region,
   name,
+  order,
   region_type,
   sequence_type,
   sequence,
   min_len,
   max_len,
-  onlist
+  onlist,
+  regions
 ) {
   return `
   <details>
     <summary>${name}</summary>
     <ul>
+      <li>order: ${order}</li>
+      <li>region_type: ${region_type}</li>
       <li>sequence_type: ${sequence_type}</li>
       <li>
         sequence:
-        <${region_type}
         <pre
-          style="
-            overflow-x: auto;
-            text-align: left;
-            margin: 0;
-            display: inline;
-          "
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
         >
-${sequence}</pre
-        >
+${
+  regions
+    ? colorSeq(getLeaves(region))
+    : `<${region_type}>${sequence}</${region_type}>`
+}</pre
         >
       </li>
       <li>min_len: ${min_len}</li>
       <li>max_len: ${max_len}</li>
-      <li>onlist: ${onlist}</li>
-    </ul>
+      <li>onlist: ${
+        onlist ? `${onlist.filename} (md5: ${onlist.md5})` : null
+      }</li>
+      <li> regions: 
+      ${
+        regions
+          ? "<ul><li>" +
+            Object.keys(regions)
+              .map(function (key, index) {
+                return atomicRegionTemplate(
+                  regions[key],
+                  regions[key].region_id,
+                  regions[key].order,
+                  regions[key].region_type,
+                  regions[key].sequence_type,
+                  regions[key].sequence,
+                  regions[key].min_len,
+                  regions[key].max_len,
+                  regions[key].onlist,
+                  regions[key].regions
+                );
+              })
+              .join("</li><li>") +
+            "</li></ul>"
+          : ""
+      }</li>
+
+    
   </details>`;
 }
 
@@ -82,18 +118,43 @@ function regionsTemplate(regions) {
     ${Object.keys(regions)
       .map(function (key, index) {
         return atomicRegionTemplate(
+          regions[key],
           regions[key].region_id,
+          regions[key].order,
           regions[key].region_type,
           regions[key].sequence_type,
           regions[key].sequence,
           regions[key].min_len,
           regions[key].max_len,
-          regions[key].onlist
+          regions[key].onlist,
+          regions[key].regions
         );
       })
       .join("</li><li>")}</li>
   </ol>
   `;
+}
+// note color all of the atomic regions and just use those for all of the `seq`
+function colorSeq(regions) {
+  return regions
+    .map(function (element, index) {
+      return `<${element.region_type}>${element.sequence}</${element.region_type}>`;
+    })
+    .join("");
+}
+
+function getLeaves(region, leaves = []) {
+  if (!leaves) {
+    var leaves = [];
+  }
+  if (region.regions === null) {
+    leaves.push(region);
+  } else {
+    for (var i = 0; i < region.regions.length; i++) {
+      leaves = getLeaves(region.regions[i], leaves);
+    }
+  }
+  return leaves;
 }
 
 function libStructTemplate(region) {
@@ -102,7 +163,7 @@ function libStructTemplate(region) {
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
-${region.sequence}</pre>
+${colorSeq(getLeaves(region))}</pre>
   `;
 }
 
@@ -138,7 +199,7 @@ function htmlTemplate(data) {
   <html>
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="stylesheet" type="../text/css" href="styles.css" />
+      <link rel="stylesheet" href="../styles.css" />
     </head>
     <body>
       <div style="width: 75%; margin: 0 auto">

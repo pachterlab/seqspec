@@ -1,0 +1,625 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="stylesheet" href="../styles.css" />
+    </head>
+    <body>
+      <div style="width: 75%; margin: 0 auto">
+        <h6><a href="../index.html">Back</a></h6>
+        <div id="assay">
+          
+  <h1 style="text-align: center">Smart-seq3</h1>
+  <ul>
+    <li>
+      <a href="https://doi.org/10.1038/s41587-020-0497-0"
+        >https://doi.org/10.1038/s41587-020-0497-0</a
+      >
+    </li>
+    <li>
+      full-length and five-prime rna-seq from individual cells
+    </li>
+    <li>RNA_end, RNA_internal</li>
+  </ul>
+    
+        </div>
+        <div id="assay_spec">
+          <h2>Final library</h2>
+          
+  
+  <h6 style="text-align: center">RNA_end</h6>
+  <pre
+    style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
+  >
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><i5>NNNNNNNN</i5><s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1><five_prime_fragment_tag>ATTGCGCAATG</five_prime_fragment_tag><umi>NNNNNNNN</umi><triple_G>GGG</triple_G><cDNA>X</cDNA><ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7><i7>NNNNNNNN</i7><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
+  
+  <ol>
+  <li>
+    
+  <details>
+    <summary>illumina_p5</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: illumina_p5</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5></pre
+        >
+      </li>
+      <li>min_len: 29</li>
+      <li>max_len: 29</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>i5</summary>
+    <ul>
+      <li>order: 1</li>
+      <li>region_type: i5</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<i5>NNNNNNNN</i5></pre
+        >
+      </li>
+      <li>min_len: 10</li>
+      <li>max_len: 10</li>
+      <li>onlist: i5_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>s5</summary>
+    <ul>
+      <li>order: 2</li>
+      <li>region_type: s5</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<s5>TCGTCGGCAGCGTC</s5></pre
+        >
+      </li>
+      <li>min_len: 14</li>
+      <li>max_len: 14</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>ME1</summary>
+    <ul>
+      <li>order: 3</li>
+      <li>region_type: ME1</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<ME1>AGATGTGTATAAGAGACAG</ME1></pre
+        >
+      </li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>five_prime_fragment_tag</summary>
+    <ul>
+      <li>order: 4</li>
+      <li>region_type: five_prime_fragment_tag</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<five_prime_fragment_tag>ATTGCGCAATG</five_prime_fragment_tag></pre
+        >
+      </li>
+      <li>min_len: 11</li>
+      <li>max_len: 11</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>umi</summary>
+    <ul>
+      <li>order: 5</li>
+      <li>region_type: umi</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<umi>NNNNNNNN</umi></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>triple_G</summary>
+    <ul>
+      <li>order: 6</li>
+      <li>region_type: triple_G</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<triple_G>GGG</triple_G></pre
+        >
+      </li>
+      <li>min_len: 3</li>
+      <li>max_len: 3</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>cDNA</summary>
+    <ul>
+      <li>order: 7</li>
+      <li>region_type: cDNA</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<cDNA>X</cDNA></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 98</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>ME2</summary>
+    <ul>
+      <li>order: 8</li>
+      <li>region_type: ME2</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<ME2>CTGTCTCTTATACACATCT</ME2></pre
+        >
+      </li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>s7</summary>
+    <ul>
+      <li>order: 9</li>
+      <li>region_type: s7</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<s7>CCGAGCCCACGAGAC</s7></pre
+        >
+      </li>
+      <li>min_len: 15</li>
+      <li>max_len: 15</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>i7</summary>
+    <ul>
+      <li>order: 10</li>
+      <li>region_type: i7</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<i7>NNNNNNNN</i7></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: i7_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>illumina_p7</summary>
+    <ul>
+      <li>order: 11</li>
+      <li>region_type: illumina_p7</li>
+      <li>sequence_type: null</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre
+        >
+      </li>
+      <li>min_len: 24</li>
+      <li>max_len: 24</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li>
+  </ol>
+  
+  <h6 style="text-align: center">RNA_internal</h6>
+  <pre
+    style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
+  >
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><i5>NNNNNNNN</i5><s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1><cDNA>X</cDNA><ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7><i7>NNNNNNNN</i7><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
+  
+  <ol>
+  <li>
+    
+  <details>
+    <summary>illumina_p5</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: illumina_p5</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5></pre
+        >
+      </li>
+      <li>min_len: 29</li>
+      <li>max_len: 29</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>i5</summary>
+    <ul>
+      <li>order: 1</li>
+      <li>region_type: i5</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<i5>NNNNNNNN</i5></pre
+        >
+      </li>
+      <li>min_len: 10</li>
+      <li>max_len: 10</li>
+      <li>onlist: i5_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>s5</summary>
+    <ul>
+      <li>order: 2</li>
+      <li>region_type: s5</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<s5>TCGTCGGCAGCGTC</s5></pre
+        >
+      </li>
+      <li>min_len: 14</li>
+      <li>max_len: 14</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>ME1</summary>
+    <ul>
+      <li>order: 3</li>
+      <li>region_type: ME1</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<ME1>AGATGTGTATAAGAGACAG</ME1></pre
+        >
+      </li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>cDNA</summary>
+    <ul>
+      <li>order: 4</li>
+      <li>region_type: cDNA</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<cDNA>X</cDNA></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 98</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>ME2</summary>
+    <ul>
+      <li>order: 5</li>
+      <li>region_type: ME2</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<ME2>CTGTCTCTTATACACATCT</ME2></pre
+        >
+      </li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>s7</summary>
+    <ul>
+      <li>order: 6</li>
+      <li>region_type: s7</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<s7>CCGAGCCCACGAGAC</s7></pre
+        >
+      </li>
+      <li>min_len: 15</li>
+      <li>max_len: 15</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>i7</summary>
+    <ul>
+      <li>order: 7</li>
+      <li>region_type: i7</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<i7>NNNNNNNN</i7></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: i7_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>illumina_p7</summary>
+    <ul>
+      <li>order: 8</li>
+      <li>region_type: illumina_p7</li>
+      <li>sequence_type: null</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre
+        >
+      </li>
+      <li>min_len: 24</li>
+      <li>max_len: 24</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li>
+  </ol>
+  
+  
+        </div>
+      </div>
+    </body>
+  </html>
+  

@@ -1,0 +1,17 @@
+highlight {
+  color: green;
+}
+
+illumina_p5 {color:#08519c;}
+illumina_p7 {color:#a50f15;}
+nextera_read1 {color:#bcbddc;}
+nextera_read2 {color:#9ebcda;}
+truseq_read1 {color:#4a1486;}
+truseq_read2 {color:#6a51a3;}
+ME {color:#969696;}
+s5 {color:#6baed6;}
+s7 {color:#fc9272;}
+barcode {color:#f768a1;}
+umi {color:#807dba;}
+gDNA {color:#f03b20;}
+cDNA {color:#7e331f;}

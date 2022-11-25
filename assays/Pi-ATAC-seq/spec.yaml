@@ -10,133 +10,146 @@ lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/Illumina.htm
 assay_spec:
 - !Region
   region_id: ATAC
+  region_type: ATAC
   name: ATAC
   sequence_type: joined
   sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 156
   max_len: 253
   onlist: null
-  join: !Join
-    how: union
-    order:
-    - illumina_p5
-    - i5
-    - nextera_read1
-    - gdna
-    - nextera_read2
-    - i7
-    - illumina_p7
+  regions:
+  - !Region
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: illumina_p5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: ATAC
+    order: 0
+  - !Region
+    region_id: i5
+    region_type: i5
+    name: i5
+    sequence_type: onlist
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: !Onlist
+      filename: i5_onlist.txt
+      md5: null
+    regions: null
+    parent_id: ATAC
+    order: 1
+  - !Region
+    region_id: nextera_read1
+    region_type: nextera_read1
+    name: nextera_read1
+    sequence_type: fixed
+    sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
+    min_len: 52
+    max_len: 52
+    onlist: null
     regions:
     - !Region
-      region_id: illumina_p5
-      name: illumina_p5
+      region_id: s5
+      region_type: s5
+      name: s5
       sequence_type: fixed
-      sequence: AATGATACGGCGACCACCGAGATCTACAC
-      min_len: 29
-      max_len: 29
+      sequence: TCGTCGGCAGCGTC
+      min_len: 33
+      max_len: 33
       onlist: null
-      join: null
+      regions: null
+      parent_id: nextera_read1
+      order: 0
     - !Region
-      region_id: i5
-      name: i5
-      sequence_type: onlist
-      sequence: NNNNNNNN
-      min_len: 8
-      max_len: 8
-      onlist: !Onlist
-        filename: i5_onlist.txt
-        md5: null
-      join: null
-    - !Region
-      region_id: nextera_read1
-      name: nextera_read1
+      region_id: ME
+      region_type: ME
+      name: ME
       sequence_type: fixed
-      sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
-      min_len: 52
-      max_len: 52
+      sequence: AGATGTGTATAAGAGACAG
+      min_len: 19
+      max_len: 19
       onlist: null
-      join: !Join
-        how: union
-        order:
-        - s5
-        - ME
-        regions:
-        - !Region
-          region_id: s5
-          name: s5
-          sequence_type: fixed
-          sequence: TCGTCGGCAGCGTC
-          min_len: 33
-          max_len: 33
-          onlist: null
-          join: null
-        - !Region
-          region_id: ME
-          name: ME
-          sequence_type: fixed
-          sequence: AGATGTGTATAAGAGACAG
-          min_len: 19
-          max_len: 19
-          onlist: null
-          join: null
+      regions: null
+      parent_id: nextera_read1
+      order: 1
+    order: 2
+  - !Region
+    region_id: gdna
+    region_type: gdna
+    name: gdna
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: ATAC
+    order: 3
+  - !Region
+    region_id: nextera_read2
+    region_type: nextera_read2
+    name: nextera_read2
+    sequence_type: fixed
+    sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions:
     - !Region
-      region_id: gdna
-      name: gdna
-      sequence_type: random
-      sequence: X
-      min_len: 1
-      max_len: 98
-      onlist: null
-      join: null
-    - !Region
-      region_id: nextera_read2
-      name: nextera_read2
+      region_id: ME
+      region_type: ME
+      name: ME
       sequence_type: fixed
-      sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
-      min_len: 34
-      max_len: 34
+      sequence: CTGTCTCTTATACACATCT
+      min_len: 19
+      max_len: 19
       onlist: null
-      join: !Join
-        how: union
-        order:
-        - ME
-        - s5
-        regions:
-        - !Region
-          region_id: ME
-          name: ME
-          sequence_type: fixed
-          sequence: CTGTCTCTTATACACATCT
-          min_len: 19
-          max_len: 19
-          onlist: null
-          join: null
-        - !Region
-          region_id: s5
-          name: s5
-          sequence_type: fixed
-          sequence: CCGAGCCCACGAGAC
-          min_len: 15
-          max_len: 15
-          onlist: null
-          join: null
+      regions: null
+      parent_id: nextera_read2
+      order: 0
     - !Region
-      region_id: i7
-      name: i7
-      sequence_type: onlist
-      sequence: NNNNNNNN
-      min_len: 8
-      max_len: 8
-      onlist: !Onlist
-        filename: i7_onlist.txt
-        md5: null
-      join: null
-    - !Region
-      region_id: illumina_p7
-      name: illumina_p7
+      region_id: s5
+      region_type: s5
+      name: s5
       sequence_type: fixed
-      sequence: ATCTCGTATGCCGTCTTCTGCTTG
-      min_len: 24
-      max_len: 24
+      sequence: CCGAGCCCACGAGAC
+      min_len: 15
+      max_len: 15
       onlist: null
-      join: null
+      regions: null
+      parent_id: nextera_read2
+      order: 1
+    order: 4
+  - !Region
+    region_id: i7
+    region_type: i7
+    name: i7
+    sequence_type: onlist
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: !Onlist
+      filename: i7_onlist.txt
+      md5: null
+    regions: null
+    parent_id: ATAC
+    order: 5
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: illumina_p7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: ATAC
+    order: 6
+  order: 0

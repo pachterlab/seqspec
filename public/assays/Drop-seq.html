@@ -1,0 +1,317 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="stylesheet" href="../styles.css" />
+    </head>
+    <body>
+      <div style="width: 75%; margin: 0 auto">
+        <h6><a href="../index.html">Back</a></h6>
+        <div id="assay">
+          
+  <h1 style="text-align: center">Drop-seq</h1>
+  <ul>
+    <li>
+      <a href="https://doi.org/10.1016/j.cell.2015.05.002"
+        >https://doi.org/10.1016/j.cell.2015.05.002</a
+      >
+    </li>
+    <li>
+      Droplet single cell rna seq with beads
+    </li>
+    <li>RNA</li>
+  </ul>
+    
+        </div>
+        <div id="assay_spec">
+          <h2>Final library</h2>
+          
+  
+  <h6 style="text-align: center">RNA</h6>
+  <pre
+    style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
+  >
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><r1_primer>GCCTGTCCGCGGAAGCAGTGGTATCAACGCAGAGTACGT</r1_primer><cell_bc>NNNNNNNNNNNN</cell_bc><umi>NNNNNNNN</umi><polyT>X</polyT><cdna>X</cdna><ME>CTGTCTCTTATACACATCT</ME><s7>CCGAGCCCACGAGAC</s7><i7_index>NNNNNNNN</i7_index><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
+  
+  <ol>
+  <li>
+    
+  <details>
+    <summary>illumina_p5</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: illumina_p5</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5></pre
+        >
+      </li>
+      <li>min_len: 29</li>
+      <li>max_len: 29</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>r1_primer</summary>
+    <ul>
+      <li>order: 1</li>
+      <li>region_type: r1_primer</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<r1_primer>GCCTGTCCGCGGAAGCAGTGGTATCAACGCAGAGTACGT</r1_primer></pre
+        >
+      </li>
+      <li>min_len: 39</li>
+      <li>max_len: 39</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>cell_bc</summary>
+    <ul>
+      <li>order: 2</li>
+      <li>region_type: cell_bc</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<cell_bc>NNNNNNNNNNNN</cell_bc></pre
+        >
+      </li>
+      <li>min_len: 12</li>
+      <li>max_len: 12</li>
+      <li>onlist: cell_bc_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>umi</summary>
+    <ul>
+      <li>order: 3</li>
+      <li>region_type: umi</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<umi>NNNNNNNN</umi></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>polyT</summary>
+    <ul>
+      <li>order: 4</li>
+      <li>region_type: polyT</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<polyT>X</polyT></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 98</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>cdna</summary>
+    <ul>
+      <li>order: 5</li>
+      <li>region_type: cdna</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<cdna>X</cdna></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 98</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>ME</summary>
+    <ul>
+      <li>order: 6</li>
+      <li>region_type: ME</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<ME>CTGTCTCTTATACACATCT</ME></pre
+        >
+      </li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>s7</summary>
+    <ul>
+      <li>order: 7</li>
+      <li>region_type: s7</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<s7>CCGAGCCCACGAGAC</s7></pre
+        >
+      </li>
+      <li>min_len: 15</li>
+      <li>max_len: 15</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>i7_index</summary>
+    <ul>
+      <li>order: 8</li>
+      <li>region_type: i7_index</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<i7_index>NNNNNNNN</i7_index></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: i7_index_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>illumina_p7</summary>
+    <ul>
+      <li>order: 9</li>
+      <li>region_type: illumina_p7</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre
+        >
+      </li>
+      <li>min_len: 24</li>
+      <li>max_len: 24</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li>
+  </ol>
+  
+  
+        </div>
+      </div>
+    </body>
+  </html>
+  

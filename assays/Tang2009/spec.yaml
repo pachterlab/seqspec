@@ -9,65 +9,74 @@ lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.htm
 assay_spec:
 - !Region
   region_id: RNA
+  region_type: RNA
   name: RNA
   sequence_type: joined
   sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGATXCGCCTTGGCCGTACAGCAGNNNNNNAGAGAATGAGGAACCCGGGGCAG
   min_len: 90
   max_len: 187
   onlist: null
-  join: !Join
-    how: union
-    order:
-    - SOLiD_P1_adaptor
-    - cDNA
-    - SOLiD_bc_adapter
-    - index
-    - p2_adapter
-    regions:
-    - !Region
-      region_id: SOLiD_P1_adaptor
-      name: SOLiD_P1_adaptor
-      sequence_type: fixed
-      sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGAT
-      min_len: 41
-      max_len: 41
-      onlist: null
-      join: null
-    - !Region
-      region_id: cDNA
-      name: cDNA
-      sequence_type: random
-      sequence: X
-      min_len: 1
-      max_len: 98
-      onlist: null
-      join: null
-    - !Region
-      region_id: SOLiD_bc_adapter
-      name: SOLiD_bc_adapter
-      sequence_type: fixed
-      sequence: CGCCTTGGCCGTACAGCAG
-      min_len: 19
-      max_len: 19
-      onlist: null
-      join: null
-    - !Region
-      region_id: index
-      name: index
-      sequence_type: onlist
-      sequence: NNNNNN
-      min_len: 6
-      max_len: 6
-      onlist: !Onlist
-        filename: index_onlist.txt
-        md5: null
-      join: null
-    - !Region
-      region_id: p2_adapter
-      name: p2_adapter
-      sequence_type: fixed
-      sequence: AGAGAATGAGGAACCCGGGGCAG
-      min_len: 23
-      max_len: 23
-      onlist: null
-      join: null
+  regions:
+  - !Region
+    region_id: SOLiD_P1_adaptor
+    region_type: SOLiD_P1_adaptor
+    name: SOLiD_P1_adaptor
+    sequence_type: fixed
+    sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGAT
+    min_len: 41
+    max_len: 41
+    onlist: null
+    regions: null
+    parent_id: RNA
+    order: 0
+  - !Region
+    region_id: cDNA
+    region_type: cDNA
+    name: cDNA
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: RNA
+    order: 1
+  - !Region
+    region_id: SOLiD_bc_adapter
+    region_type: SOLiD_bc_adapter
+    name: SOLiD_bc_adapter
+    sequence_type: fixed
+    sequence: CGCCTTGGCCGTACAGCAG
+    min_len: 19
+    max_len: 19
+    onlist: null
+    regions: null
+    parent_id: RNA
+    order: 2
+  - !Region
+    region_id: index
+    region_type: index
+    name: index
+    sequence_type: onlist
+    sequence: NNNNNN
+    min_len: 6
+    max_len: 6
+    onlist: !Onlist
+      filename: index_onlist.txt
+      md5: null
+    regions: null
+    parent_id: RNA
+    order: 3
+  - !Region
+    region_id: p2_adapter
+    region_type: p2_adapter
+    name: p2_adapter
+    sequence_type: fixed
+    sequence: AGAGAATGAGGAACCCGGGGCAG
+    min_len: 23
+    max_len: 23
+    onlist: null
+    regions: null
+    parent_id: RNA
+    order: 4
+  order: 0
