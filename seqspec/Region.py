@@ -147,37 +147,6 @@ class Region(yaml.YAMLObject):
         return rtypes
 
 
-# class Join(yaml.YAMLObject):
-#     yaml_tag = "!Join"
-
-#     def __init__(
-#         self,
-#         how: str,
-#         order: List[str],
-#         regions: List[Region],
-#     ) -> None:
-#         super().__init__()
-#         self.regions = regions
-#         self.how = how
-#         self.order = order
-
-#     def __repr__(self) -> str:
-#         d = {
-#             "how": self.how,
-#             "order": self.order,
-#             "regions": self.regions,
-#         }
-#         return f"{d}"
-
-#     def to_dict(self):
-#         d = {
-#             "how": self.how,
-#             "order": self.order,
-#             "regions": [o.to_dict() for o in self.regions],
-#         }
-#         return d
-
-
 class Onlist(yaml.YAMLObject):
     yaml_tag = "!Onlist"
 
