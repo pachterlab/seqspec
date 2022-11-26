@@ -1,4 +1,5 @@
 from seqspec.utils import load_spec
+from seqspec.seqspec_print_html import run_print_html
 
 
 def setup_print_args(parser):
@@ -15,6 +16,7 @@ def setup_print_args(parser):
         type=str,
         default=None,
     )
+    parser_print.add_argument("--html", help="print html", action="store_true")
     return parser_print
 
 
@@ -22,8 +24,12 @@ def validate_print_args(parser, args):
     # if everything is valid the run_print
     fn = args.yaml
     o = args.o
+    html = args.html
     spec = load_spec(fn)
-    s = run_print(spec)
+    if html:
+        s = run_print_html(spec)
+    else:
+        s = run_print(spec)
     if o:
         with open(o, "w") as f:
             print(s, file=f)
