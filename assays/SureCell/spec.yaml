@@ -49,7 +49,7 @@ assay_spec:
     sequence: NNNNNN
     min_len: 6
     max_len: 6
-    onlist:
+    onlist: !Onlist
       filename: bc_onlist.txt
       md5: null
     regions: null
@@ -75,7 +75,7 @@ assay_spec:
     sequence: NNNNNN
     min_len: 6
     max_len: 6
-    onlist:
+    onlist: !Onlist
       filename: bc_onlist.txt
       md5: null
     regions: null
@@ -101,7 +101,7 @@ assay_spec:
     sequence: NNNNNN
     min_len: 6
     max_len: 6
-    onlist:
+    onlist: !Onlist
       filename: bc_onlist.txt
       md5: null
     regions: null
@@ -199,7 +199,7 @@ assay_spec:
     sequence: NNNNNNNN
     min_len: 8
     max_len: 8
-    onlist:
+    onlist: !Onlist
       filename: sample_index_onlist.txt
       md5: null
     regions: null

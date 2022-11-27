@@ -3,14 +3,31 @@
   <html>
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="stylesheet" href="../styles.css" />
+      <style>
+      highlight {
+      color: green;
+      }
+
+      illumina_p5 {color:#08519c;}
+      illumina_p7 {color:#a50f15;}
+      nextera_read1 {color:#bcbddc;}
+      nextera_read2 {color:#9ebcda;}
+      truseq_read1 {color:#4a1486;}
+      truseq_read2 {color:#6a51a3;}
+      ME {color:#969696;}
+      s5 {color:#6baed6;}
+      s7 {color:#fc9272;}
+      barcode {color:#f768a1;}
+      umi {color:#807dba;}
+      gDNA {color:#f03b20;}
+    cDNA {color:#7e331f;}
+      </style>
     </head>
     <body>
       <div style="width: 75%; margin: 0 auto">
         <h6><a href="../index.html">Back</a></h6>
         <div id="assay">
-          
-  <h1 style="text-align: center">sci-RNA-seq</h1>
+          <h1 style="text-align: center">sci-RNA-seq</h1>
   <ul>
     <li>
       <a href="https://doi.org/10.1126/science.aam8940"
@@ -27,21 +44,18 @@
         <div id="assay_spec">
           <h2>Final library</h2>
           
-  
   <h6 style="text-align: center">RNA</h6>
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
-<undefined>AATGATACGGCGACCACCGAGATCTACAC</undefined><undefined>NNNNNNNNNN</undefined><undefined>ACACTCTTTCCCTACACGACGCTCTTCCGATCT</undefined><undefined>NNNNNNNN</undefined><undefined>NNNNNNNNNN</undefined><undefined>X</undefined><undefined>X</undefined><undefined>CTGTCTCTTATACACATCT</undefined><undefined>CCGAGCCCACGAGAC</undefined><undefined>NNNNNNNNNN</undefined><undefined>ATCTCGTATGCCGTCTTCTGCTTG</undefined></pre>
-  
-  <ol>
-  <li>
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><index5>NNNNNNNNNN</index5><truseq_read1>ACACTCTTTCCCTACACGACGCTCTTCCGATCT</truseq_read1><umi>NNNNNNNN</umi><barcode>NNNNNNNNNN</barcode><poly_T>X</poly_T><cDNA>X</cDNA><ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7><index7>NNNNNNNNNN</index7><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
     
-  <details>
+<ol><li>
+    <details>
     <summary>illumina_p5</summary>
     <ul>
       <li>order: 0</li>
-      <li>region_type: undefined</li>
+      <li>region_type: illumina_p5</li>
       <li>sequence_type: fixed</li>
       <li>
         sequence:
@@ -53,23 +67,21 @@
         display: inline;
         "
         >
-<undefined>AATGATACGGCGACCACCGAGATCTACAC</undefined></pre
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5></pre
         >
       </li>
       <li>min_len: 29</li>
       <li>max_len: 29</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>I2.fastq.gz</summary>
     <ul>
       <li>order: 1</li>
-      <li>region_type: undefined</li>
-      <li>sequence_type: null</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: None</li>
       <li>
         sequence:
         <pre
@@ -80,19 +92,17 @@
         display: inline;
         "
         >
-<undefined>NNNNNNNNNN</undefined></pre
+<index5>NNNNNNNNNN</index5></pre
         >
       </li>
       <li>min_len: 10</li>
       <li>max_len: 10</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>index5</summary>
     <ul>
       <li>order: 0</li>
-      <li>region_type: undefined</li>
+      <li>region_type: index5</li>
       <li>sequence_type: onlist</li>
       <li>
         sequence:
@@ -104,25 +114,23 @@
         display: inline;
         "
         >
-<undefined>NNNNNNNNNN</undefined></pre
+<index5>NNNNNNNNNN</index5></pre
         >
       </li>
       <li>min_len: 10</li>
       <li>max_len: 10</li>
-      <li>onlist: index5_onlist.txt (md5: null)</li>
+      <li>onlist: index5_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>truseq_read1</summary>
     <ul>
       <li>order: 2</li>
-      <li>region_type: undefined</li>
+      <li>region_type: truseq_read1</li>
       <li>sequence_type: fixed</li>
       <li>
         sequence:
@@ -134,23 +142,21 @@
         display: inline;
         "
         >
-<undefined>ACACTCTTTCCCTACACGACGCTCTTCCGATCT</undefined></pre
+<truseq_read1>ACACTCTTTCCCTACACGACGCTCTTCCGATCT</truseq_read1></pre
         >
       </li>
       <li>min_len: 33</li>
       <li>max_len: 33</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>R1.fastq.gz</summary>
     <ul>
       <li>order: 3</li>
-      <li>region_type: undefined</li>
-      <li>sequence_type: null</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: None</li>
       <li>
         sequence:
         <pre
@@ -161,19 +167,17 @@
         display: inline;
         "
         >
-<undefined>NNNNNNNN</undefined><undefined>NNNNNNNNNN</undefined></pre
+<umi>NNNNNNNN</umi><barcode>NNNNNNNNNN</barcode></pre
         >
       </li>
       <li>min_len: 18</li>
       <li>max_len: 18</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>umi</summary>
     <ul>
       <li>order: 0</li>
-      <li>region_type: undefined</li>
+      <li>region_type: umi</li>
       <li>sequence_type: random</li>
       <li>
         sequence:
@@ -185,22 +189,20 @@
         display: inline;
         "
         >
-<undefined>NNNNNNNN</undefined></pre
+<umi>NNNNNNNN</umi></pre
         >
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>barcode</summary>
     <ul>
       <li>order: 1</li>
-      <li>region_type: undefined</li>
+      <li>region_type: barcode</li>
       <li>sequence_type: onlist</li>
       <li>
         sequence:
@@ -212,26 +214,24 @@
         display: inline;
         "
         >
-<undefined>NNNNNNNNNN</undefined></pre
+<barcode>NNNNNNNNNN</barcode></pre
         >
       </li>
       <li>min_len: 10</li>
       <li>max_len: 10</li>
-      <li>onlist: barcode_onlist.txt (md5: null)</li>
+      <li>onlist: barcode_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>R2.fastq.gz</summary>
     <ul>
       <li>order: 4</li>
-      <li>region_type: undefined</li>
-      <li>sequence_type: null</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: None</li>
       <li>
         sequence:
         <pre
@@ -242,19 +242,17 @@
         display: inline;
         "
         >
-<undefined>X</undefined><undefined>X</undefined></pre
+<poly_T>X</poly_T><cDNA>X</cDNA></pre
         >
       </li>
       <li>min_len: 2</li>
       <li>max_len: 196</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>poly_T</summary>
     <ul>
       <li>order: 0</li>
-      <li>region_type: undefined</li>
+      <li>region_type: poly_T</li>
       <li>sequence_type: random</li>
       <li>
         sequence:
@@ -266,22 +264,20 @@
         display: inline;
         "
         >
-<undefined>X</undefined></pre
+<poly_T>X</poly_T></pre
         >
       </li>
       <li>min_len: 1</li>
       <li>max_len: 98</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>cDNA</summary>
     <ul>
       <li>order: 1</li>
-      <li>region_type: undefined</li>
+      <li>region_type: cDNA</li>
       <li>sequence_type: random</li>
       <li>
         sequence:
@@ -293,25 +289,23 @@
         display: inline;
         "
         >
-<undefined>X</undefined></pre
+<cDNA>X</cDNA></pre
         >
       </li>
       <li>min_len: 1</li>
       <li>max_len: 98</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>nextera_read2</summary>
     <ul>
       <li>order: 5</li>
-      <li>region_type: undefined</li>
+      <li>region_type: nextera_read2</li>
       <li>sequence_type: joined</li>
       <li>
         sequence:
@@ -323,19 +317,17 @@
         display: inline;
         "
         >
-<undefined>CTGTCTCTTATACACATCT</undefined><undefined>CCGAGCCCACGAGAC</undefined></pre
+<ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7></pre
         >
       </li>
       <li>min_len: 34</li>
       <li>max_len: 34</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>ME2</summary>
     <ul>
       <li>order: 0</li>
-      <li>region_type: undefined</li>
+      <li>region_type: ME2</li>
       <li>sequence_type: fixed</li>
       <li>
         sequence:
@@ -347,22 +339,20 @@
         display: inline;
         "
         >
-<undefined>CTGTCTCTTATACACATCT</undefined></pre
+<ME2>CTGTCTCTTATACACATCT</ME2></pre
         >
       </li>
       <li>min_len: 19</li>
       <li>max_len: 19</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>s7</summary>
     <ul>
       <li>order: 1</li>
-      <li>region_type: undefined</li>
+      <li>region_type: s7</li>
       <li>sequence_type: fixed</li>
       <li>
         sequence:
@@ -374,26 +364,24 @@
         display: inline;
         "
         >
-<undefined>CCGAGCCCACGAGAC</undefined></pre
+<s7>CCGAGCCCACGAGAC</s7></pre
         >
       </li>
       <li>min_len: 15</li>
       <li>max_len: 15</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>I1.fastq.gz</summary>
     <ul>
       <li>order: 6</li>
-      <li>region_type: undefined</li>
-      <li>sequence_type: null</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: None</li>
       <li>
         sequence:
         <pre
@@ -404,19 +392,17 @@
         display: inline;
         "
         >
-<undefined>NNNNNNNNNN</undefined></pre
+<index7>NNNNNNNNNN</index7></pre
         >
       </li>
       <li>min_len: 10</li>
       <li>max_len: 10</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>index7</summary>
     <ul>
       <li>order: 0</li>
-      <li>region_type: undefined</li>
+      <li>region_type: index7</li>
       <li>sequence_type: fixed</li>
       <li>
         sequence:
@@ -428,25 +414,23 @@
         display: inline;
         "
         >
-<undefined>NNNNNNNNNN</undefined></pre
+<index7>NNNNNNNNNN</index7></pre
         >
       </li>
       <li>min_len: 10</li>
       <li>max_len: 10</li>
-      <li>onlist: index7_onlist.txt (md5: null)</li>
+      <li>onlist: index7_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>illumina_p7</summary>
     <ul>
       <li>order: 7</li>
-      <li>region_type: undefined</li>
+      <li>region_type: illumina_p7</li>
       <li>sequence_type: fixed</li>
       <li>
         sequence:
@@ -458,22 +442,19 @@
         display: inline;
         "
         >
-<undefined>ATCTCGTATGCCGTCTTCTGCTTG</undefined></pre
+<illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre
         >
       </li>
       <li>min_len: 24</li>
       <li>max_len: 24</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
+  </details>
     
-  </details></li>
-  </ol>
-  
-  
+    </li></ol>
         </div>
       </div>
     </body>
   </html>
-  
+    

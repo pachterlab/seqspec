@@ -48,7 +48,7 @@
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
-<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><sample_bc>NNNNNNNN</sample_bc><truseq_r1>ACACTCTTTCCCTACACGACGCTCTTCCGATCT</truseq_r1><cdna>X</cdna><polyA>X</polyA><umi>NNNNNNNNNN</umi><truseq_r2>AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC</truseq_r2><cell_bc>NNNNNNNNNNNNNN</cell_bc><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><index5>NNNNNNNN</index5><truseq_read1>ACACTCTTTCCCTACACGACGCTCTTCCGATCT</truseq_read1><cDNA>X</cDNA><umi>NNNNNNNNNN</umi><truseq_read2>AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC</truseq_read2><barcode>NNNNNNNNNNNNNN</barcode><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
     
 <ol><li>
     <details>
@@ -77,10 +77,32 @@
       </li>
   </details>
     </li><li><details>
-    <summary>sample_bc</summary>
+    <summary>I2.fastq.gz</summary>
     <ul>
       <li>order: 1</li>
-      <li>region_type: sample_bc</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: None</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<index5>NNNNNNNN</index5></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
+    <summary>index5</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: index5</li>
       <li>sequence_type: onlist</li>
       <li>
         sequence:
@@ -92,20 +114,23 @@
         display: inline;
         "
         >
-<sample_bc>NNNNNNNN</sample_bc></pre
+<index5>NNNNNNNN</index5></pre
         >
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: region2_onlist.txt (md5: None)</li>
+      <li>onlist: index5_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
   </details>
+    </li></ol>
+      </li>
+  </details>
     </li><li><details>
-    <summary>truseq_r1</summary>
+    <summary>truseq_read1</summary>
     <ul>
       <li>order: 2</li>
-      <li>region_type: truseq_r1</li>
+      <li>region_type: truseq_read1</li>
       <li>sequence_type: fixed</li>
       <li>
         sequence:
@@ -117,7 +142,7 @@
         display: inline;
         "
         >
-<truseq_r1>ACACTCTTTCCCTACACGACGCTCTTCCGATCT</truseq_r1></pre
+<truseq_read1>ACACTCTTTCCCTACACGACGCTCTTCCGATCT</truseq_read1></pre
         >
       </li>
       <li>min_len: 33</li>
@@ -127,10 +152,10 @@
       </li>
   </details>
     </li><li><details>
-    <summary>cdna</summary>
+    <summary>R1.fastq.gz</summary>
     <ul>
       <li>order: 3</li>
-      <li>region_type: cdna</li>
+      <li>region_type: gz</li>
       <li>sequence_type: random</li>
       <li>
         sequence:
@@ -142,7 +167,29 @@
         display: inline;
         "
         >
-<cdna>X</cdna></pre
+<cDNA>X</cDNA></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 98</li>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
+    <summary>cDNA</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: cDNA</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<cDNA>X</cDNA></pre
         >
       </li>
       <li>min_len: 1</li>
@@ -151,11 +198,14 @@
       <li> regions: 
       </li>
   </details>
+    </li></ol>
+      </li>
+  </details>
     </li><li><details>
-    <summary>polyA</summary>
+    <summary>R2.fastq.gz</summary>
     <ul>
       <li>order: 4</li>
-      <li>region_type: polyA</li>
+      <li>region_type: fastq</li>
       <li>sequence_type: random</li>
       <li>
         sequence:
@@ -167,19 +217,16 @@
         display: inline;
         "
         >
-<polyA>X</polyA></pre
+<umi>NNNNNNNNNN</umi></pre
         >
       </li>
-      <li>min_len: 1</li>
-      <li>max_len: 98</li>
+      <li>min_len: 10</li>
+      <li>max_len: 10</li>
       <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
+      <li> regions: <ol><li><details>
     <summary>umi</summary>
     <ul>
-      <li>order: 5</li>
+      <li>order: 0</li>
       <li>region_type: umi</li>
       <li>sequence_type: random</li>
       <li>
@@ -201,11 +248,14 @@
       <li> regions: 
       </li>
   </details>
+    </li></ol>
+      </li>
+  </details>
     </li><li><details>
-    <summary>truseq_r2</summary>
+    <summary>truseq_read2</summary>
     <ul>
-      <li>order: 6</li>
-      <li>region_type: truseq_r2</li>
+      <li>order: 5</li>
+      <li>region_type: truseq_read2</li>
       <li>sequence_type: fixed</li>
       <li>
         sequence:
@@ -217,7 +267,7 @@
         display: inline;
         "
         >
-<truseq_r2>AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC</truseq_r2></pre
+<truseq_read2>AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC</truseq_read2></pre
         >
       </li>
       <li>min_len: 34</li>
@@ -227,10 +277,32 @@
       </li>
   </details>
     </li><li><details>
-    <summary>cell_bc</summary>
+    <summary>I1.fastq.gz</summary>
     <ul>
-      <li>order: 7</li>
-      <li>region_type: cell_bc</li>
+      <li>order: 6</li>
+      <li>region_type: fastq</li>
+      <li>sequence_type: joined</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<barcode>NNNNNNNNNNNNNN</barcode></pre
+        >
+      </li>
+      <li>min_len: 14</li>
+      <li>max_len: 14</li>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
+    <summary>barcode</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: barcode</li>
       <li>sequence_type: onlist</li>
       <li>
         sequence:
@@ -242,7 +314,7 @@
         display: inline;
         "
         >
-<cell_bc>NNNNNNNNNNNNNN</cell_bc></pre
+<barcode>NNNNNNNNNNNNNN</barcode></pre
         >
       </li>
       <li>min_len: 14</li>
@@ -251,10 +323,13 @@
       <li> regions: 
       </li>
   </details>
+    </li></ol>
+      </li>
+  </details>
     </li><li><details>
     <summary>illumina_p7</summary>
     <ul>
-      <li>order: 8</li>
+      <li>order: 7</li>
       <li>region_type: illumina_p7</li>
       <li>sequence_type: fixed</li>
       <li>
