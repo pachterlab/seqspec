@@ -3,14 +3,31 @@
   <html>
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="stylesheet" href="../styles.css" />
+      <style>
+      highlight {
+      color: green;
+      }
+
+      illumina_p5 {color:#08519c;}
+      illumina_p7 {color:#a50f15;}
+      nextera_read1 {color:#bcbddc;}
+      nextera_read2 {color:#9ebcda;}
+      truseq_read1 {color:#4a1486;}
+      truseq_read2 {color:#6a51a3;}
+      ME {color:#969696;}
+      s5 {color:#6baed6;}
+      s7 {color:#fc9272;}
+      barcode {color:#f768a1;}
+      umi {color:#807dba;}
+      gDNA {color:#f03b20;}
+    cDNA {color:#7e331f;}
+      </style>
     </head>
     <body>
       <div style="width: 75%; margin: 0 auto">
         <h6><a href="../index.html">Back</a></h6>
         <div id="assay">
-          
-  <h1 style="text-align: center">SPLiT-seq</h1>
+          <h1 style="text-align: center">SPLiT-seq</h1>
   <ul>
     <li>
       <a href="https://doi.org/10.1126/science.aam8999"
@@ -27,17 +44,14 @@
         <div id="assay_spec">
           <h2>Final library</h2>
           
-  
   <h6 style="text-align: center">RNA</h6>
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
 <illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1><cDNA>X</cDNA><barcode>NNNNNNNN</barcode><linker>CGAATGCTCTGGCCTCTCAAGCACGTGGAT</linker><barcode>NNNNNNNN</barcode><linker>AGTCGTACGCCGATGCGAAACATCGGCCAC</linker><barcode>NNNNNNNN</barcode><umi>NNNNNNNNNN</umi><truseq_read2>AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC</truseq_read2><index7>NNNNNN</index7><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
-  
-  <ol>
-  <li>
     
-  <details>
+<ol><li>
+    <details>
     <summary>illumina_p5</summary>
     <ul>
       <li>order: 0</li>
@@ -58,13 +72,11 @@
       </li>
       <li>min_len: 29</li>
       <li>max_len: 29</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>nextera_read1</summary>
     <ul>
       <li>order: 1</li>
@@ -85,10 +97,8 @@
       </li>
       <li>min_len: 33</li>
       <li>max_len: 33</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>s5</summary>
     <ul>
       <li>order: 0</li>
@@ -109,13 +119,11 @@
       </li>
       <li>min_len: 14</li>
       <li>max_len: 14</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>ME1</summary>
     <ul>
       <li>order: 1</li>
@@ -136,21 +144,19 @@
       </li>
       <li>min_len: 19</li>
       <li>max_len: 19</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>R1.fastq.gz</summary>
     <ul>
       <li>order: 2</li>
       <li>region_type: fastq</li>
-      <li>sequence_type: null</li>
+      <li>sequence_type: None</li>
       <li>
         sequence:
         <pre
@@ -166,10 +172,8 @@
       </li>
       <li>min_len: 1</li>
       <li>max_len: 98</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>cDNA</summary>
     <ul>
       <li>order: 0</li>
@@ -190,21 +194,19 @@
       </li>
       <li>min_len: 1</li>
       <li>max_len: 98</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>R2.fastq.gz</summary>
     <ul>
       <li>order: 3</li>
       <li>region_type: fastq</li>
-      <li>sequence_type: null</li>
+      <li>sequence_type: None</li>
       <li>
         sequence:
         <pre
@@ -220,10 +222,8 @@
       </li>
       <li>min_len: 94</li>
       <li>max_len: 94</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>barcode-1</summary>
     <ul>
       <li>order: 0</li>
@@ -244,13 +244,11 @@
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: barcode-1_onlist.txt (md5: null)</li>
+      <li>onlist: barcode-1_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>linker-2</summary>
     <ul>
       <li>order: 1</li>
@@ -271,13 +269,11 @@
       </li>
       <li>min_len: 30</li>
       <li>max_len: 30</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>barcode-2</summary>
     <ul>
       <li>order: 2</li>
@@ -298,13 +294,11 @@
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: barcode-2_onlist.txt (md5: null)</li>
+      <li>onlist: barcode-2_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>linker-3</summary>
     <ul>
       <li>order: 3</li>
@@ -325,13 +319,11 @@
       </li>
       <li>min_len: 30</li>
       <li>max_len: 30</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>barcode-3</summary>
     <ul>
       <li>order: 4</li>
@@ -352,13 +344,11 @@
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: barcode-3_onlist.txt (md5: null)</li>
+      <li>onlist: barcode-3_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>umi</summary>
     <ul>
       <li>order: 5</li>
@@ -379,16 +369,14 @@
       </li>
       <li>min_len: 10</li>
       <li>max_len: 10</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>truseq_read2</summary>
     <ul>
       <li>order: 4</li>
@@ -409,18 +397,16 @@
       </li>
       <li>min_len: 34</li>
       <li>max_len: 34</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>I1.fastq.gz</summary>
     <ul>
       <li>order: 5</li>
       <li>region_type: fastq</li>
-      <li>sequence_type: null</li>
+      <li>sequence_type: None</li>
       <li>
         sequence:
         <pre
@@ -436,10 +422,8 @@
       </li>
       <li>min_len: 6</li>
       <li>max_len: 6</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>index7</summary>
     <ul>
       <li>order: 0</li>
@@ -460,16 +444,14 @@
       </li>
       <li>min_len: 6</li>
       <li>max_len: 6</li>
-      <li>onlist: index7_onlist.txt (md5: null)</li>
+      <li>onlist: index7_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>illumina_p7</summary>
     <ul>
       <li>order: 6</li>
@@ -490,17 +472,14 @@
       </li>
       <li>min_len: 24</li>
       <li>max_len: 24</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
+  </details>
     
-  </details></li>
-  </ol>
-  
-  
+    </li></ol>
         </div>
       </div>
     </body>
   </html>
-  
+    

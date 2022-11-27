@@ -3,14 +3,31 @@
   <html>
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="stylesheet" href="../styles.css" />
+      <style>
+      highlight {
+      color: green;
+      }
+
+      illumina_p5 {color:#08519c;}
+      illumina_p7 {color:#a50f15;}
+      nextera_read1 {color:#bcbddc;}
+      nextera_read2 {color:#9ebcda;}
+      truseq_read1 {color:#4a1486;}
+      truseq_read2 {color:#6a51a3;}
+      ME {color:#969696;}
+      s5 {color:#6baed6;}
+      s7 {color:#fc9272;}
+      barcode {color:#f768a1;}
+      umi {color:#807dba;}
+      gDNA {color:#f03b20;}
+    cDNA {color:#7e331f;}
+      </style>
     </head>
     <body>
       <div style="width: 75%; margin: 0 auto">
         <h6><a href="../index.html">Back</a></h6>
         <div id="assay">
-          
-  <h1 style="text-align: center">10x-ATAC</h1>
+          <h1 style="text-align: center">10x-ATAC</h1>
   <ul>
     <li>
       <a href="https://www.10xgenomics.com/blog/demonstrated-protocol-for-nuclei-isolation-for-single-cell-atac-solution"
@@ -27,17 +44,14 @@
         <div id="assay_spec">
           <h2>Final library</h2>
           
-  
   <h6 style="text-align: center">ATAC</h6>
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
 <illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><cell_bc>NNNNNNNNNNNNNNNN</cell_bc><s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1><gDNA>X</gDNA><ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7><sample_index>NNNNNNNN</sample_index><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
-  
-  <ol>
-  <li>
     
-  <details>
+<ol><li>
+    <details>
     <summary>illumina_p5</summary>
     <ul>
       <li>order: 0</li>
@@ -58,13 +72,11 @@
       </li>
       <li>min_len: 29</li>
       <li>max_len: 29</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>cell_bc</summary>
     <ul>
       <li>order: 1</li>
@@ -85,13 +97,11 @@
       </li>
       <li>min_len: 16</li>
       <li>max_len: 16</li>
-      <li>onlist: 737K-cratac-v1.txt.gz (md5: null)</li>
+      <li>onlist: 737K-cratac-v1.txt.gz (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>s5</summary>
     <ul>
       <li>order: 2</li>
@@ -112,13 +122,11 @@
       </li>
       <li>min_len: 14</li>
       <li>max_len: 14</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>ME1</summary>
     <ul>
       <li>order: 3</li>
@@ -139,13 +147,11 @@
       </li>
       <li>min_len: 19</li>
       <li>max_len: 19</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>gDNA</summary>
     <ul>
       <li>order: 4</li>
@@ -166,13 +172,11 @@
       </li>
       <li>min_len: 1</li>
       <li>max_len: 99</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>ME2</summary>
     <ul>
       <li>order: 5</li>
@@ -193,13 +197,11 @@
       </li>
       <li>min_len: 19</li>
       <li>max_len: 19</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>s7</summary>
     <ul>
       <li>order: 6</li>
@@ -220,13 +222,11 @@
       </li>
       <li>min_len: 15</li>
       <li>max_len: 15</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>sample_index</summary>
     <ul>
       <li>order: 7</li>
@@ -247,13 +247,11 @@
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>illumina_p7</summary>
     <ul>
       <li>order: 8</li>
@@ -274,17 +272,14 @@
       </li>
       <li>min_len: 24</li>
       <li>max_len: 24</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
+  </details>
     
-  </details></li>
-  </ol>
-  
-  
+    </li></ol>
         </div>
       </div>
     </body>
   </html>
-  
+    

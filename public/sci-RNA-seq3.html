@@ -3,14 +3,31 @@
   <html>
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="stylesheet" href="../styles.css" />
+      <style>
+      highlight {
+      color: green;
+      }
+
+      illumina_p5 {color:#08519c;}
+      illumina_p7 {color:#a50f15;}
+      nextera_read1 {color:#bcbddc;}
+      nextera_read2 {color:#9ebcda;}
+      truseq_read1 {color:#4a1486;}
+      truseq_read2 {color:#6a51a3;}
+      ME {color:#969696;}
+      s5 {color:#6baed6;}
+      s7 {color:#fc9272;}
+      barcode {color:#f768a1;}
+      umi {color:#807dba;}
+      gDNA {color:#f03b20;}
+    cDNA {color:#7e331f;}
+      </style>
     </head>
     <body>
       <div style="width: 75%; margin: 0 auto">
         <h6><a href="../index.html">Back</a></h6>
         <div id="assay">
-          
-  <h1 style="text-align: center">sci-RNA-seq3</h1>
+          <h1 style="text-align: center">sci-RNA-seq3</h1>
   <ul>
     <li>
       <a href="https://doi.org/10.1038/s41586-019-0969-x"
@@ -27,17 +44,14 @@
         <div id="assay_spec">
           <h2>Final library</h2>
           
-  
   <h6 style="text-align: center">RNA</h6>
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
 <illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><i5>NNNNNNNNNN</i5><truseq_read_1_adapter>ACACTCTTTCCCTACACGACGCTCTTCCGATCT</truseq_read_1_adapter><hairpin_barcode>NNNNNNNNNX</hairpin_barcode><hairpin_adapter>CAGAGC</hairpin_adapter><umi>NNNNNNNN</umi><cell_bc>NNNNNNNNNN</cell_bc><poly_T>X</poly_T><read_2>X</read_2><ME>CTGTCTCTTATACACATCT</ME><s7>CCGAGCCCACGAGAC</s7><i7>NNNNNNNNNN</i7><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
-  
-  <ol>
-  <li>
     
-  <details>
+<ol><li>
+    <details>
     <summary>illumina_p5</summary>
     <ul>
       <li>order: 0</li>
@@ -58,13 +72,11 @@
       </li>
       <li>min_len: 29</li>
       <li>max_len: 29</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>i5</summary>
     <ul>
       <li>order: 1</li>
@@ -88,10 +100,8 @@
       <li>onlist: i5_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>truseq_read_1_adapter</summary>
     <ul>
       <li>order: 2</li>
@@ -112,13 +122,11 @@
       </li>
       <li>min_len: 33</li>
       <li>max_len: 33</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>read_1</summary>
     <ul>
       <li>order: 3</li>
@@ -139,10 +147,8 @@
       </li>
       <li>min_len: 33</li>
       <li>max_len: 34</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>hairpin_barcode</summary>
     <ul>
       <li>order: 0</li>
@@ -166,10 +172,8 @@
       <li>onlist: hairpin_bc_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>hairpin_adapter</summary>
     <ul>
       <li>order: 1</li>
@@ -190,13 +194,11 @@
       </li>
       <li>min_len: 6</li>
       <li>max_len: 6</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>umi</summary>
     <ul>
       <li>order: 2</li>
@@ -217,13 +219,11 @@
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>cell_bc</summary>
     <ul>
       <li>order: 3</li>
@@ -247,13 +247,11 @@
       <li>onlist: cell_bc_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>poly_T</summary>
     <ul>
       <li>order: 4</li>
@@ -274,13 +272,11 @@
       </li>
       <li>min_len: 1</li>
       <li>max_len: 98</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>read_2</summary>
     <ul>
       <li>order: 5</li>
@@ -301,13 +297,11 @@
       </li>
       <li>min_len: 1</li>
       <li>max_len: 98</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>i7_primer</summary>
     <ul>
       <li>order: 6</li>
@@ -328,10 +322,8 @@
       </li>
       <li>min_len: 34</li>
       <li>max_len: 34</li>
-      <li>onlist: null</li>
-      <li> regions: 
-      <ul><li>
-  <details>
+      <li>onlist: None</li>
+      <li> regions: <ol><li><details>
     <summary>ME</summary>
     <ul>
       <li>order: 0</li>
@@ -352,13 +344,11 @@
       </li>
       <li>min_len: 19</li>
       <li>max_len: 19</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>s7</summary>
     <ul>
       <li>order: 1</li>
@@ -379,16 +369,14 @@
       </li>
       <li>min_len: 15</li>
       <li>max_len: 15</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
-    
-  </details></li></ul></li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li></ol>
+      </li>
+  </details>
+    </li><li><details>
     <summary>i7</summary>
     <ul>
       <li>order: 7</li>
@@ -412,10 +400,8 @@
       <li>onlist: i7_onlist.txt (md5: None)</li>
       <li> regions: 
       </li>
-
-    
-  </details></li><li>
-  <details>
+  </details>
+    </li><li><details>
     <summary>illumina_p7</summary>
     <ul>
       <li>order: 8</li>
@@ -436,17 +422,14 @@
       </li>
       <li>min_len: 24</li>
       <li>max_len: 24</li>
-      <li>onlist: null</li>
+      <li>onlist: None</li>
       <li> regions: 
       </li>
-
+  </details>
     
-  </details></li>
-  </ol>
-  
-  
+    </li></ol>
         </div>
       </div>
     </body>
   </html>
-  
+    
