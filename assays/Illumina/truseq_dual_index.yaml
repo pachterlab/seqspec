@@ -53,112 +53,112 @@ assay_spec:
       regions: null
       parent_id: I2.fastq.gz
       order: 0
+  - !Region
+    region_id: truseq_read1
+    region_type: truseq_read1
+    name: truseq_read1
+    sequence_type: fixed
+    sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: null
+    parent_id: I2.fastq.gz
+    order: 1
+  - !Region
+    region_id: R1.fastq.gz
+    region_type: gz
+    name: R1.fastq.gz
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions:
     - !Region
-      region_id: truseq_read1
-      region_type: truseq_read1
-      name: truseq_read1
-      sequence_type: fixed
-      sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
-      min_len: 33
-      max_len: 33
-      onlist: null
-      regions: null
-      parent_id: I2.fastq.gz
-      order: 1
-    - !Region
-      region_id: R1.fastq.gz
-      region_type: gz
-      name: R1.fastq.gz
+      region_id: insert
+      region_type: insert
+      name: insert
       sequence_type: random
       sequence: X
       min_len: 1
       max_len: 98
       onlist: null
-      regions:
-      - !Region
-        region_id: insert
-        region_type: insert
-        name: insert
-        sequence_type: random
-        sequence: X
-        min_len: 1
-        max_len: 98
-        onlist: null
-        regions: null
-        parent_id: R1.fastq.gz
-        order: 0
-      order: 2
+      regions: null
+      parent_id: R1.fastq.gz
+      order: 0
+    order: 2
+  - !Region
+    region_id: R2.fastq.gz
+    region_type: gz
+    name: R2.fastq.gz
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions:
     - !Region
-      region_id: R2.fastq.gz
-      region_type: gz
-      name: R2.fastq.gz
+      region_id: insert
+      region_type: insert
+      name: insert
       sequence_type: random
       sequence: X
       min_len: 1
       max_len: 98
       onlist: null
-      regions:
-      - !Region
-        region_id: insert
-        region_type: insert
-        name: insert
-        sequence_type: random
-        sequence: X
-        min_len: 1
-        max_len: 98
-        onlist: null
-        regions: null
-        parent_id: R2.fastq.gz
-        order: 0
-      order: 3
-    - !Region
-      region_id: truseq_read2
-      region_type: truseq_read2
-      name: truseq_read2
-      sequence_type: fixed
-      sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
-      min_len: 34
-      max_len: 34
-      onlist: null
       regions: null
-      parent_id: I2.fastq.gz
-      order: 4
+      parent_id: R2.fastq.gz
+      order: 0
+    order: 3
+  - !Region
+    region_id: truseq_read2
+    region_type: truseq_read2
+    name: truseq_read2
+    sequence_type: fixed
+    sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: null
+    parent_id: I2.fastq.gz
+    order: 4
+  - !Region
+    region_id: I1.fastq.gz
+    region_type: gz
+    name: I1.fastq.gz
+    sequence_type: null
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
     - !Region
-      region_id: I1.fastq.gz
-      region_type: gz
-      name: I1.fastq.gz
-      sequence_type: null
+      region_id: index7
+      region_type: index7
+      name: index7
+      sequence_type: onlist
       sequence: NNNNNNNN
       min_len: 8
       max_len: 8
-      onlist: null
-      regions:
-      - !Region
-        region_id: index7
-        region_type: index7
-        name: index7
-        sequence_type: onlist
-        sequence: NNNNNNNN
-        min_len: 8
-        max_len: 8
-        onlist: !Onlist
-          filename: index7_onlist.txt
-          md5: null
-        regions: null
-        parent_id: I1.fastq.gz
-        order: 0
-      order: 5
-    - !Region
-      region_id: illumina_p7
-      region_type: illumina_p7
-      name: illumina_p7
-      sequence_type: fixed
-      sequence: ATCTCGTATGCCGTCTTCTGCTTG
-      min_len: 24
-      max_len: 24
-      onlist: null
+      onlist: !Onlist
+        filename: index7_onlist.txt
+        md5: null
       regions: null
-      parent_id: I2.fastq.gz
-      order: 6
-    order: 1
-  order: 0
+      parent_id: I1.fastq.gz
+      order: 0
+    order: 5
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: illumina_p7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: I2.fastq.gz
+    order: 6
+  order: 1
+order: 0

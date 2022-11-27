@@ -12,9 +12,9 @@ assay_spec:
   region_type: ATAC
   name: ATAC
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
-  min_len: 145
-  max_len: 243
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNfixedfixedXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 146
+  max_len: 340
   onlist: null
   regions:
   - !Region
@@ -30,91 +30,172 @@ assay_spec:
     parent_id: ATAC
     order: 0
   - !Region
-    region_id: cell_bc
-    region_type: cell_bc
-    name: Cell Barcode
-    sequence_type: onlist
+    region_id: I2.fastq.gz
+    region_type: fastq
+    name: Index 2
+    sequence_type: joined
     sequence: NNNNNNNNNNNNNNNN
     min_len: 16
     max_len: 16
-    onlist: !Onlist
-      filename: 737K-cratac-v1.txt.gz
-      md5: null
-    regions: null
+    onlist: null
     parent_id: ATAC
     order: 1
+    regions:
+    - !Region
+      region_id: cell_bc
+      region_type: cell_bc
+      name: Cell Barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: 737K-cratac-v1.txt.gz
+        md5: null
+      regions: null
+      parent_id: I2.fastq.gz
+      order: 0
   - !Region
-    region_id: s5
-    region_type: s5
-    name: S5
+    region_id: nextera_read1
+    region_type: nextera_read1
+    name: nextera_read1
     sequence_type: fixed
-    sequence: TCGTCGGCAGCGTC
-    min_len: 14
-    max_len: 14
+    sequence: fixedfixed
+    min_len: 33
+    max_len: 33
     onlist: null
-    regions: null
-    parent_id: ATAC
     order: 2
+    regions:
+    - !Region
+      region_id: s5
+      region_type: s5
+      name: s5
+      sequence_type: fixed 
+      sequence: TCGTCGGCAGCGTC
+      min_len: 14
+      max_len: 14
+      onlist: null
+      regions: null
+      parent_id: nextera_read1
+      order: 0
+    - !Region
+      region_id: ME1
+      region_type: ME1
+      name: ME1
+      sequence_type: fixed
+      sequence: AGATGTGTATAAGAGACAG
+      min_len: 19
+      max_len: 19
+      onlist: null
+      regions: null
+      parent_id: nextera_read1
+      order: 1
   - !Region
-    region_id: ME1
-    region_type: ME1
-    name: ME1
-    sequence_type: fixed
-    sequence: AGATGTGTATAAGAGACAG
-    min_len: 19
-    max_len: 19
-    onlist: null
-    regions: null
-    parent_id: ATAC
-    order: 3
-  - !Region
-    region_id: gDNA
-    region_type: gDNA
-    name: gDNA
-    sequence_type: randpm
+    region_id: R1.fastq.gz
+    region_type: fastq
+    name: Read 1 FASTQ
+    sequence_type: null
     sequence: X
     min_len: 1
-    max_len: 99
+    max_len: 98
     onlist: null
-    regions: null
-    parent_id: ATAC
-    order: 4
+    order: 3
+    regions:
+    - !Region
+      region_id: gDNA-1
+      region_type: gDNA
+      name: gDNA 1
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      regions: null
+      parent_id: R1.fastq.gz
+      order: 0
   - !Region
-    region_id: ME2
-    region_type: ME2
-    name: ME2
-    sequence_type: fixed
-    sequence: CTGTCTCTTATACACATCT
-    min_len: 19
-    max_len: 19
+    region_id: R2.fastq.gz
+    region_type: fastq
+    name: Read 2 FASTQ
+    sequence_type: null
+    sequence: X
+    min_len: 1
+    max_len: 98
     onlist: null
-    regions: null
-    parent_id: ATAC
+    order: 4
+    regions:
+    - !Region
+      region_id: gDNA-2
+      region_type: gDNA
+      name: gDNA 2
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      regions: null
+      parent_id: R2.fastq.gz
+      order: 0
+  - !Region
+    region_id: nextera_read2
+    region_type: nextera_read2
+    name: nextera_read2
+    sequence_type: joined
+    sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions:
+    - !Region
+      region_id: ME2
+      region_type: ME2
+      name: ME2
+      sequence_type: fixed
+      sequence: CTGTCTCTTATACACATCT
+      min_len: 19
+      max_len: 19
+      onlist: null
+      regions: null
+      parent_id: nextera_read2
+      order: 0
+    - !Region
+      region_id: s7
+      region_type: s7
+      name: s7
+      sequence_type: fixed
+      sequence: CCGAGCCCACGAGAC
+      min_len: 15
+      max_len: 15
+      onlist: null
+      regions: null
+      parent_id: nextera_read2
+      order: 1
     order: 5
   - !Region
-    region_id: s7
-    region_type: s7
-    name: S7
-    sequence_type: fixed
-    sequence: CCGAGCCCACGAGAC
-    min_len: 15
-    max_len: 15
-    onlist: null
-    regions: null
-    parent_id: ATAC
-    order: 6
-  - !Region
-    region_id: sample_index
-    region_type: sample_index
-    name: Sample Index
-    sequence_type: randm
+    region_id: I1.fastq.gz
+    region_type: gz
+    name: Index 1 FASTQ
+    sequence_type: joined
     sequence: NNNNNNNN
     min_len: 8
     max_len: 8
     onlist: null
-    regions: null
-    parent_id: ATAC
-    order: 7
+    regions:
+    - !Region
+      region_id: index7
+      region_type: index7
+      name: index7
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: index7_onlist.txt
+        md5: null
+      regions: null
+      parent_id: I1.fastq.gz
+      order: 0
+    order: 6
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -126,5 +207,5 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: ATAC
-    order: 8
+    order: 7
   order: 0

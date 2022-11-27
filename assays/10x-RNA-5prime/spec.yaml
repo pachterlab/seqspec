@@ -12,9 +12,9 @@ assay_spec:
   region_type: RNA
   name: RNA
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNTTTCTTATATGGGXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
-  min_len: 164
-  max_len: 261
+  sequence: AATGATACGGCGACCACCGAGATCTACACACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNTTTCTTATATGGGXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 168
+  max_len: 265
   onlist: null
   regions:
   - !Region
@@ -30,43 +30,57 @@ assay_spec:
     parent_id: RNA
     order: 0
   - !Region
-    region_id: truseq_r1
-    region_type: truseq_r1
-    name: Truseq Read 1
+    region_id: truseq_read1
+    region_type: truseq_read1
+    name: truseq_read1
     sequence_type: fixed
-    sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
-    min_len: 29
-    max_len: 29
+    sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 33
+    max_len: 33
     onlist: null
     regions: null
     parent_id: RNA
     order: 1
   - !Region
-    region_id: cell_bc
-    region_type: cell_bc
-    name: Cell Barcode
+    region_id: R1.fastq.gz
+    region_type: fastq
+    name: R1.fastq.gz
     sequence_type: onlist
-    sequence: NNNNNNNNNNNNNNNN
-    min_len: 16
-    max_len: 16
+    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNN
+    min_len: 26
+    max_len: 26
     onlist: !Onlist
       filename: 737K-august-2016.txt.gz
       md5: null
-    regions: null
     parent_id: RNA
+    regions:
+    - !Region
+      region_id: cell_bc
+      region_type: cell_bc
+      name: Cell Barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: 737K-august-2016.txt.gz
+        md5: null
+      regions: null
+      parent_id: R1.fastq.gz
+      order: 0
+    - !Region
+      region_id: umi
+      region_type: umi
+      name: UMI
+      sequence_type: random
+      sequence: NNNNNNNNNN
+      min_len: 10
+      max_len: 10
+      onlist: null
+      regions: null
+      parent_id: R1.fastq.gz
+      order: 1
     order: 2
-  - !Region
-    region_id: umi
-    region_type: umi
-    name: UMI
-    sequence_type: random
-    sequence: NNNNNNNNNN
-    min_len: 10
-    max_len: 10
-    onlist: null
-    regions: null
-    parent_id: RNA
-    order: 3
   - !Region
     region_id: bead_TSO
     region_type: bead_TSO
@@ -78,23 +92,35 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 4
+    order: 3
   - !Region
-    region_id: cDNA
-    region_type: cDNA
-    name: cDNA
+    region_id: R2.fastq.gz
+    region_type: fastq
+    name: R2.fastq.gz
     sequence_type: random
     sequence: X
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
     parent_id: RNA
-    order: 5
+    order: 4
+    regions:
+    - !Region
+      region_id: cDNA
+      region_type: cDNA
+      name: cDNA
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      regions: null
+      parent_id: R2.fastq.gz
+      order: 0
   - !Region
-    region_id: truseq_r2
-    region_type: truseq_r2
-    name: Truseq Read 2
+    region_id: truseq_read2
+    region_type: truseq_read2
+    name: truseq_read2
     sequence_type: fixed
     sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
     min_len: 34
@@ -102,21 +128,32 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 6
+    order: 5
   - !Region
-    region_id: sample_bc
-    region_type: sample_bc
-    name: Truseq Read 2
-    sequence_type: onlist
+    region_id: I1.fastq.gz
+    region_type: gz
+    name: I1.fastq.gz
+    sequence_type: null
     sequence: NNNNNNNN
     min_len: 8
     max_len: 8
-    onlist: !Onlist
-      filename: sample_bc_onlist.txt
-      md5: null
-    regions: null
-    parent_id: RNA
-    order: 7
+    onlist: null
+    regions:
+    - !Region
+      region_id: index7
+      region_type: index7
+      name: index7
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: index7_onlist.txt
+        md5: null
+      regions: null
+      parent_id: I1.fastq.gz
+      order: 0
+    order: 6
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -128,5 +165,5 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 8
+    order: 7
   order: 0
