@@ -9,6 +9,7 @@ lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq.
 assay_spec:
 - !Region
   region_id: RNA
+  region_type: RNA
   name: RNA
   sequence_type: joined
   sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
@@ -18,6 +19,7 @@ assay_spec:
   regions:
   - !Region
     region_id: illumina_p5
+    region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
     sequence: AATGATACGGCGACCACCGAGATCTACAC
@@ -29,6 +31,7 @@ assay_spec:
     order: 0
   - !Region
     region_id: I2.fastq.gz
+    region_type: gz
     name: Index 2 FASTQ
     sequence_type: null
     sequence: NNNNNNNNNN
@@ -38,6 +41,7 @@ assay_spec:
     regions:
     - !Region
       region_id: index5
+      region_type: index5
       name: index5
       sequence_type: onlist
       sequence: NNNNNNNNNN
@@ -52,6 +56,7 @@ assay_spec:
     order: 1
   - !Region
     region_id: truseq_read1
+    region_type: truseq_read1
     name: truseq_read1
     sequence_type: fixed
     sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
@@ -63,6 +68,7 @@ assay_spec:
     order: 2
   - !Region
     region_id: R1.fastq.gz
+    region_type: gz
     name: Read 1 FASTQ
     sequence_type: null
     sequence: NNNNNNNNNNNNNNNNNN
@@ -72,6 +78,7 @@ assay_spec:
     regions:
     - !Region
       region_id: umi
+      region_type: umi
       name: umi
       sequence_type: random
       sequence: NNNNNNNN
@@ -83,6 +90,7 @@ assay_spec:
       order: 0
     - !Region
       region_id: barcode
+      region_type: barcode
       name: barcode
       sequence_type: onlist
       sequence: NNNNNNNNNN
@@ -97,6 +105,7 @@ assay_spec:
     order: 3
   - !Region
     region_id: R2.fastq.gz
+    region_type: gz
     name: Read 2 FASTQ
     sequence_type: null
     sequence: XX
@@ -106,6 +115,7 @@ assay_spec:
     regions:
     - !Region
       region_id: poly_T
+      region_type: poly_T
       name: poly_T
       sequence_type: random
       sequence: X
@@ -117,6 +127,7 @@ assay_spec:
       order: 0
     - !Region
       region_id: cDNA
+      region_type: cDNA
       name: cDNA
       sequence_type: random
       sequence: X
@@ -129,6 +140,7 @@ assay_spec:
     order: 4
   - !Region
     region_id: nextera_read2
+    region_type: nextera_read2
     name: nextera_read2
     sequence_type: joined
     sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
@@ -138,6 +150,7 @@ assay_spec:
     regions:
     - !Region
       region_id: ME2
+      region_type: ME2
       name: ME2
       sequence_type: fixed
       sequence: CTGTCTCTTATACACATCT
@@ -149,6 +162,7 @@ assay_spec:
       order: 0
     - !Region
       region_id: s7
+      region_type: s7
       name: s7
       sequence_type: fixed
       sequence: CCGAGCCCACGAGAC
@@ -161,6 +175,7 @@ assay_spec:
     order: 5
   - !Region
     region_id: I1.fastq.gz
+    region_type: gz
     name: Index 1 FASTQ
     sequence_type: null
     sequence: NNNNNNNNNN
@@ -170,6 +185,7 @@ assay_spec:
     regions:
     - !Region
       region_id: index7
+      region_type: index7
       name: index7
       sequence_type: fixed
       sequence: NNNNNNNNNN
@@ -184,6 +200,7 @@ assay_spec:
     order: 6
   - !Region
     region_id: illumina_p7
+    region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
     sequence: ATCTCGTATGCCGTCTTCTGCTTG
