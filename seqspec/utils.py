@@ -21,3 +21,7 @@ def get_cuts(regions, cuts=[]):
         cuts.append((prev, nxt))
         prev = nxt
     return cuts
+
+
+def write_read(header, seq, qual, f):
+    f.write(f"{header}\n{seq}\n+\n{qual}\n")
