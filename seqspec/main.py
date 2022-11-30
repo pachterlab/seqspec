@@ -7,6 +7,7 @@ from .seqspec_check import setup_check_args, validate_check_args
 from .seqspec_find import setup_find_args, validate_find_args
 from .seqspec_convert import setup_convert_args, validate_convert_args
 from .seqspec_index import setup_index_args, validate_index_args
+from .seqspec_split import setup_split_args, validate_split_args
 
 # Steps to add new subcommands
 # Create seqspec_subcommand.py (create setup_subcmd_args, validate_subcmd_args, run_subcmd in that file)
@@ -34,6 +35,7 @@ def main():
         "format": setup_format_args(subparsers),
         "index": setup_index_args(subparsers),
         "print": setup_print_args(subparsers),
+        "split": setup_split_args(subparsers),
     }
 
     # Show help when no arguments are given
@@ -57,6 +59,7 @@ def main():
         "check": validate_check_args,
         "find": validate_find_args,
         "index": validate_index_args,
+        "split": validate_split_args,
     }
     COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)
 
