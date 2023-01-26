@@ -36,14 +36,11 @@ modalities:
     - Modality2
 assay_spec:
     - region_id: Modality1
-      join:
-          how: Union
-          order: [Region2, Region1]
-          regions:
-              - region_id: Region1
-                  ...
-              - region_id: Region2
-                  ...
+      regions:
+          - region_id: Region1
+              ...
+          - region_id: Region2
+              ...
     - region_id: Modality2
         ...
 ```
