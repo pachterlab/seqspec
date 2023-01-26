@@ -61,7 +61,6 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 29
   max_len: 29
   onlist:
-  join:
 
 # illumina_p7
 - !Region
@@ -72,7 +71,6 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 24
   max_len: 24
   onlist:
-  join:
 
 # nextera_read1
 - !Region
@@ -83,28 +81,23 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 33
   max_len: 33
   onlist:
-  join: !Join
-    how:
-    order: [s5, ME1]
-    regions:
-      - !Region
-        region_id: s5
-        name: s5
-        sequence_type: TCGTCGGCAGCGTC
-        sequence: fixed
-        min_len: 14
-        max_len: 14
-        onlist:
-        join:
-      - !Region
-        region_id: ME1
-        name: ME1
-        sequence_type: AGATGTGTATAAGAGACAG
-        sequence: fixed
-        min_len: 19
-        max_len: 19
-        onlist:
-        join:
+  regions:
+    - !Region
+      region_id: s5
+      name: s5
+      sequence_type: TCGTCGGCAGCGTC
+      sequence: fixed
+      min_len: 14
+      max_len: 14
+      onlist:
+    - !Region
+      region_id: ME1
+      name: ME1
+      sequence_type: AGATGTGTATAAGAGACAG
+      sequence: fixed
+      min_len: 19
+      max_len: 19
+      onlist:
 
 # nextera_read2
 - !Region
@@ -115,30 +108,23 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 34
   max_len: 34
   onlist: null
-  join: !Join
-    how: union
-    order:
-      - ME2
-      - s7
-    regions:
-      - !Region
-        region_id: ME2
-        name: ME2
-        sequence_type: fixed
-        sequence: CTGTCTCTTATACACATCT
-        min_len: 19
-        max_len: 19
-        onlist: null
-        join: null
-      - !Region
-        region_id: s7
-        name: s7
-        sequence_type: fixed
-        sequence: CCGAGCCCACGAGAC
-        min_len: 15
-        max_len: 15
-        onlist: null
-        join: null
+  regions:
+    - !Region
+      region_id: ME2
+      name: ME2
+      sequence_type: fixed
+      sequence: CTGTCTCTTATACACATCT
+      min_len: 19
+      max_len: 19
+      onlist: null
+    - !Region
+      region_id: s7
+      name: s7
+      sequence_type: fixed
+      sequence: CCGAGCCCACGAGAC
+      min_len: 15
+      max_len: 15
+      onlist: null
 
 # truseq_read1
 - !Region
@@ -149,7 +135,6 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 33
   max_len: 33
   onlist:
-  join:
 
 # truseq_read2
 - !Region
@@ -160,7 +145,6 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 34
   max_len: 34
   onlist:
-  join:
 
 # index5
 - !Region
@@ -171,21 +155,17 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 8
   max_len: 8
   onlist:
-  join:
-    how: union
-    order: [index5]
-    regions:
-      - !Region
-        region_id: index5
-        name: index5
-        sequence_type: onlist
-        sequence: NNNNNNNN
-        min_len: 8
-        max_len: 8
-        onlist: !Onlist
-          filename: index5_onlist.txt
-          md5: null
-        join:
+  regions:
+    - !Region
+      region_id: index5
+      name: index5
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: index5_onlist.txt
+        md5: null
 
 # index7
 - !Region
@@ -196,21 +176,17 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 8
   max_len: 8
   onlist:
-  join:
-    how: union
-    order: [index7]
-    regions:
-      - !Region
-        region_id: index7
-        name: index7
-        sequence_type: onlist
-        sequence: NNNNNNNN
-        min_len: 8
-        max_len: 8
-        onlist: !Onlist
-          filename: index7_onlist.txt
-          md5: null
-        join:
+  regions:
+    - !Region
+      region_id: index7
+      name: index7
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: index7_onlist.txt
+        md5: null
 
 # barcode
 # note for multiple of the same region
@@ -225,7 +201,6 @@ For consistency across assays I suggest the following naming conventions for sta
   onlist: !Onlist
     filename: barcode_onlist.txt
     md5: null
-  join:
 
 # umi "Unique Molecular Identifier"
 - !Region
@@ -236,7 +211,6 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 10
   max_len: 10
   onlist:
-  join:
 
 # cDNA "complementary DNA"
 - !Region
@@ -247,9 +221,8 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 1
   max_len: 98
   onlist:
-  join:
 
-# gDNA "genomic DNA
+# gDNA "genomic DNA"
 - !Region
   region_id: gDNA
   name: Genomic DNA
@@ -258,7 +231,7 @@ For consistency across assays I suggest the following naming conventions for sta
   min_len: 1
   max_len: 98
   onlist:
-  join:
+
 # Regions corresponding to FASTQ files are annotated a standard naming convention
 # R1.fastq.gz "Read 1"
 # R2.fastq.gz "Read 2"
