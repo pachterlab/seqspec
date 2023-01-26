@@ -52,6 +52,28 @@ In order to catalogue relevant information for each library structure, multiple 
 For consistency across assays I suggest the following naming conventions for standard regions. Note that the `region_id` for all atomic regions should be unique.
 
 ```yaml
+# Assay region
+!Assay
+name: My-RNA-Assay
+doi: mydoi.org
+publication_date: 01 January 2001
+description: My custom assay
+modalities:
+- RNA
+lib_struct: www.link-to-libstructs.com
+assay_spec:
+  - !Region
+    region_id: RNA
+    region_type: RNA
+    name: My RNA
+    sequence_type: joined
+    sequence: 
+    min_len: 0
+    max_len: 0
+    onlist: null
+    regions:
+
+
 # illumina_p5
 - !Region
   region_id: illumina_p5
