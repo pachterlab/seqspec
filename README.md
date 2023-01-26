@@ -209,6 +209,30 @@ assay_spec:
       onlist: !Onlist
         filename: index7_onlist.txt
         md5: null
+        
+
+# Read 1 Fastq
+- !Region
+  region_id: R1.fastq.gz
+  name: Read 1 FASTQ
+  sequence_type: joined
+  sequence: 
+  min_len: 0
+  max_len: 0
+  onlist:
+  regions:
+  
+
+# Read 2 Fastq
+- !Region
+  region_id: R2.fastq.gz
+  name: Read 2 FASTQ
+  sequence_type: joined
+  sequence: 
+  min_len: 0
+  max_len: 0
+  onlist:
+  regions:
 
 # barcode
 # note for multiple of the same region
