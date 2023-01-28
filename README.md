@@ -49,7 +49,7 @@ In order to catalogue relevant information for each library structure, multiple 
 
 ### `Assay` Parameters
 Below is an example of an `Assay`.
-```
+```yaml
 !Assay
 name: SPLiT-seq
 doi: https://doi.org/10.1126/science.aam8999
@@ -72,7 +72,7 @@ assay_spec:
 ### `Region` Parameters
 Below is an example of a `Region`. 
 
-```
+```yaml
 !Region
 region_id: barcode-1
 region_type: barcode
