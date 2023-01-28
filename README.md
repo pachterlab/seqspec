@@ -47,7 +47,105 @@ assay_spec:
 
 In order to catalogue relevant information for each library structure, multiple properties are specified for each `Assay` and each `Region`. A description of the `Assay` and `Region` schema can be found in `seqspec/schema/seqspec.schema.json`.
 
-## Naming `Regions`
+### `Assay` Parameters
+Below is an example of an `Assay`.
+```
+!Assay
+name: SPLiT-seq
+doi: https://doi.org/10.1126/science.aam8999
+publication_date: 15 March 2018
+description: split-pool ligation-based transcriptome sequencing
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SPLiT-seq.html
+assay_spec:
+```
+
+- `name` is a free-form string that labels the assay
+- `doi` is the doi link to the paper/protocol that describes the assay (if it exists)
+- `publication_date` is the date the assay was published (linked to by the `doi`). Must be in DD Month Year format.
+- `description` is a free-form string that describes the assay
+- `modalities` is a list of `region_types` that are contained within the library. Each string must be present in exactly one `Region` in the first "level" of the `assay_spec`.
+- `lib_struct` is a link to the manually annotated library structure developed by Xi Chen in Sarah Teichmann's lab.
+- `assay_spec` is a list of `Regions`.
+
+### `Region` Parameters
+Below is an example of a `Region`. 
+
+```
+!Region
+region_id: barcode-1
+region_type: barcode
+name: barcode-1
+sequence_type: onlist
+sequence: NNNNNNNN
+min_len: 8
+max_len: 8
+onlist: !Onlist
+    filename: barcode-1_onlist.txt
+    md5: null
+regions: null
+```
+
+- `region_id` is a free-form string and must be unique across all regions in the `seqspec` file.
+    - if the assay contains multiple regions of the same `region_type` it may be useful to append an integer to the end of the `region_id` to differentiate those regions. For example, if the assay had four `barcodes` then each of the individual `barcode` regions could have the `region_id`s `barcode-1`, `barcode-2`, `barcode-3`, `barcode-4`.
+- `region_type` can be one of the following:
+    - RNA
+    - ATAC
+    - CRISPR
+    - Protein
+    - illumina_p5
+    - illumina_p7
+    - nextera_read1
+    - nextera_read2
+    - s5
+    - s7
+    - ME1
+    - ME2
+    - truseq_read1
+    - truseq_read2
+    - index5
+    - index7
+    - fastq
+    - barcode
+    - umi
+    - cDNA
+    - gDNA
+- `name` is a free-form string for describing the region
+- `sequence_type` can be one of the following:
+    - `fixed` indicates that sequence string is known 
+    - `joined` indicates that the sequence is created (joined) from nested regions
+    - `onlist` indicates that the sequence is derived from an onlist (if specified, then `onlist` must be non-null
+    - `random` indicates that the sequence is not known a-priori
+- `sequence` is a representation of the sequence
+    - if the `sequence_type` is `fixed` then the actual sequence string is provided
+    - if the `sequence_type` is `joined` then field must be the concatenation of the nested regions
+    - if the `sequence_type` is `onlist` then field must an `N` string of length of the shortest sequence on the onlist
+    - if the `sequence_type` is `random` then the field must be an `X`
+- `min_len` is an integer greater than or equal to zero. It represents the minimum possible length of the `sequence`
+- `max_len` is an integer greater than or equal to the `min_len`. It represents the maximum length of the `sequence`
+- `onlist` can be `null` or contain
+    - `filename` which is a path (relative to the `seqspec` file containing a list of sequences
+    - `md5`  is the md5sum of the uncompressed file in `filename`
+- `regions` can either be `null` or contain a list of `regions` as specified above.
+    
+For more information about the specification of the various fields, please see `seqspec.schema.json` which is the JSON schema representation of the various fields described above.
+    
+    
+### YAML Tags
+The YAML file contains tags (strings prepended with an exclamation point `!`) to describe the various objects (`Assay`, `Region`, `Onlist`). The purpose of these tags is to make it easy to load the `seqspec` into python as a python object. This makes it possibe to access the various attrbiutes of the `seqspec` file with "dot notation" as follows:
+
+```python
+from seqspec.utils import load_spec
+
+spec = load_spec("seqspec/assays/10x-RNA-v3/spec.yaml")
+
+print(specA.get_modality("RNA").sequence)
+# AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+```
+
+
+## Named `Regions`
 
 For consistency across assays I suggest the following naming conventions for standard regions. Note that the `region_id` for all atomic regions should be unique.
 
