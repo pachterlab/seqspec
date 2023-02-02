@@ -1,0 +1,112 @@
+# Assay region
+!Assay
+name: SHARE-Seq
+doi: 10.1016/j.cell.2020.09.056
+publication_date: 23 October 2020
+description: Simultaneous high-throughput ATAC and RNA expression in the same single cell
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SHARE-seq.html
+
+modalities:
+- ATAC
+- RNA
+
+assay_spec:
+    - region_id: ATAC
+      regions:
+        # Read 1 Fastq
+        - !Region
+          region_id: R1.fastq.gz
+          region_type: R1.fastq.gz
+          name: Read 1 FASTQ
+          sequence_type: random
+          sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+          onlist: null
+          min_len: 50
+          max_len: 50
+          regions:
+            - !Region
+              region_id: gDNA
+              region_type: gDNA
+              name: Genomic DNA
+              sequence_type: random
+              sequence: X
+              min_len: 50
+              max_len: 50
+              onlist: null
+        # Read 2 Fastq
+        - !Region
+          region_id: R2.fastq.gz
+          region_type: R2.fastq.gz
+          name: Read 2 FASTQ
+          sequence_type: random
+          sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+          onlist: null
+          min_len: 50
+          max_len: 50
+          regions:
+            - !Region
+              region_id: gDNA
+              region_type: gDNA
+              name: Genomic DNA
+              sequence_type: random
+              sequence: X
+              min_len: 50
+              max_len: 50
+              onlist: null
+    - region_id: RNA
+      regions:
+        # Read 1 Fastq
+        - !Region
+          region_id: R1.fastq.gz
+          region_type: R1.fastq.gz
+          name: Read 1 FASTQ
+          sequence_type: random
+          sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+          onlist: null
+          min_len: 50
+          max_len: 50
+          regions:
+            - !Region
+              region_id: cDNA
+              region_type: cDNA
+              name: Complementary DNA
+              sequence_type: random
+              sequence: X
+              min_len: 50
+              max_len: 50
+              onlist: null
+        # Read 2 Fastq
+        - !Region
+          region_id: R2.fastq.gz
+          region_type: R2.fastq.gz
+          name: Read 2 FASTQ
+          sequence_type: joined
+          sequence:
+          min_len: 34
+          max_len: 34
+          onlist: null
+          regions:
+          # Cell Barcode
+            - !Region
+              region_id: cell_barcode
+              region_type: cell_barcode
+              name: Barcode
+              sequence_type: onlist
+              sequence: NNNNNNNNNNNNNNNNNNNNNNNN
+              min_len: 24
+              max_len: 24
+              order: 1
+              onlist: !Onlist
+                filename: "gs://broad-buenrostro-bcl-outputs/192_PLATE1_PLATE2_whitelist.txt"
+          # UMI
+            - !Region
+              region_id: umi
+              region_type: umi
+              name: Unique Molecular Identifier
+              sequence_type: random
+              sequence: NNNNNNNNNN
+              min_len: 10
+              max_len: 10
+              onlist: null
+              order: 2
+
