@@ -1,7 +1,7 @@
 # Assay region
 !Assay
 name: SHARE-Seq
-doi: 10.1016/j.cell.2020.09.056
+doi_url: https://doi.org/10.1016/j.cell.2020.09.056
 publication_date: 23 October 2020
 description: Simultaneous high-throughput ATAC and RNA expression in the same single cell
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SHARE-seq.html
@@ -11,102 +11,129 @@ modalities:
 - RNA
 
 assay_spec:
-    - region_id: ATAC
+    # ATAC
+    # Read 1 Fastq
+    - !Region
+      region_id: ATAC-R1.fastq.gz
+      region_type: fastq
+      name: ATAC Read 1 FASTQ
+      sequence_type: joined
+      sequence: x
+      min_len: 50
+      max_len: 50
+      onlist: null
       regions:
-        # Read 1 Fastq
         - !Region
-          region_id: R1.fastq.gz
-          region_type: R1.fastq.gz
-          name: Read 1 FASTQ
+          region_id: ATAC-read1
+          region_type: gDNA
+          name: Genomic DNA read 1
           sequence_type: random
-          sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-          onlist: null
+          sequence: X
           min_len: 50
           max_len: 50
-          regions:
-            - !Region
-              region_id: gDNA
-              region_type: gDNA
-              name: Genomic DNA
-              sequence_type: random
-              sequence: X
-              min_len: 50
-              max_len: 50
-              onlist: null
-        # Read 2 Fastq
-        - !Region
-          region_id: R2.fastq.gz
-          region_type: R2.fastq.gz
-          name: Read 2 FASTQ
-          sequence_type: random
-          sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
           onlist: null
-          min_len: 50
-          max_len: 50
-          regions:
-            - !Region
-              region_id: gDNA
-              region_type: gDNA
-              name: Genomic DNA
-              sequence_type: random
-              sequence: X
-              min_len: 50
-              max_len: 50
-              onlist: null
-    - region_id: RNA
+          parent_id: ATAC-R1.fastq.gz
+    # Read 2 Fastq
+    - !Region
+      region_id: ATAC-R2.fastq.gz
+      region_type: fastq
+      name: ATAC Read 2 FASTQ
+      sequence_type: joined
+      sequence: x
+      min_len: 50
+      max_len: 50
+      onlist: null
       regions:
-        # Read 1 Fastq
         - !Region
-          region_id: R1.fastq.gz
-          region_type: R1.fastq.gz
-          name: Read 1 FASTQ
+          region_id: ATAC-read2
+          region_type: gDNA
+          name: Genomic DNA read 2
           sequence_type: random
-          sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-          onlist: null
+          sequence: X
           min_len: 50
           max_len: 50
-          regions:
-            - !Region
-              region_id: cDNA
-              region_type: cDNA
-              name: Complementary DNA
-              sequence_type: random
-              sequence: X
-              min_len: 50
-              max_len: 50
-              onlist: null
-        # Read 2 Fastq
-        - !Region
-          region_id: R2.fastq.gz
-          region_type: R2.fastq.gz
-          name: Read 2 FASTQ
-          sequence_type: joined
-          sequence:
-          min_len: 34
-          max_len: 34
           onlist: null
-          regions:
-          # Cell Barcode
-            - !Region
-              region_id: cell_barcode
-              region_type: cell_barcode
-              name: Barcode
-              sequence_type: onlist
-              sequence: NNNNNNNNNNNNNNNNNNNNNNNN
-              min_len: 24
-              max_len: 24
-              order: 1
-              onlist: !Onlist
-                filename: "gs://broad-buenrostro-bcl-outputs/192_PLATE1_PLATE2_whitelist.txt"
-          # UMI
-            - !Region
-              region_id: umi
-              region_type: umi
-              name: Unique Molecular Identifier
-              sequence_type: random
-              sequence: NNNNNNNNNN
-              min_len: 10
-              max_len: 10
-              onlist: null
-              order: 2
+          parent_id: ATAC-R2.fastq.gz
+    # RNA
+    # Read 1 Fastq
+    - !Region
+      region_id: RNA-R1.fastq.gz
+      region_type: fastq
+      name: RNA Read 1 FASTQ
+      sequence_type: joined
+      sequence: x
+      onlist: null
+      min_len: 50
+      max_len: 50
+      regions:
+        - !Region
+          region_id: RNA-read1
+          region_type: cDNA
+          name: Complementary DNA read 1
+          sequence_type: random
+          sequence: X
+          min_len: 50
+          max_len: 50
+          onlist: null
+          parent_id: RNA-R1.fastq.gz
+    # Read 2 Fastq
+    - !Region
+      region_id: RNA-R2.fastq.gz
+      region_type: fastq
+      name: RNA Read 2 FASTQ
+      sequence_type: joined
+      sequence: x
+      min_len: 34
+      max_len: 34
+      onlist: null
+      regions:
+      # Cell Barcode
+        - !Region
+          order: 0
+          region_id: barcode-round1
+          region_type: barcode
+          name: Round 1 barcode
+          sequence_type: onlist
+          sequence: x
+          min_len: 8
+          max_len: 8
+          parent_id: RNA-R2.fastq.gz
+          onlist: !Onlist
+            filename: "./192_PLATE1_PLATE2_cell_barcodes_onlist.txt"
+        - !Region
+          order: 1
+          region_id: barcode-round2
+          region_type: barcode
+          name: Round 2 barcode
+          sequence_type: onlist
+          sequence: x
+          min_len: 8
+          max_len: 8
+          parent_id: RNA-R2.fastq.gz
+          onlist: !Onlist
+            filename: "./192_PLATE1_PLATE2_cell_barcodes_onlist.txt"
+        - !Region
+          order: 2
+          region_id: barcode-round3
+          region_type: barcode
+          name: Round 3 barcode
+          sequence_type: onlist
+          sequence: x
+          min_len: 8
+          max_len: 8
+          parent_id: RNA-R2.fastq.gz
+          onlist: !Onlist
+            filename: "./192_PLATE1_PLATE2_cell_barcodes_onlist.txt"
+      # UMI
+        - !Region
+          order: 3
+          region_id: umi
+          region_type: umi
+          name: Unique Molecular Identifier
+          sequence_type: random
+          sequence: NNNNNNNNNN
+          min_len: 10
+          max_len: 10
+          onlist: null
+          parent_id: RNA-R2.fastq.gz
 
