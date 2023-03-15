@@ -3,31 +3,14 @@
   <html>
     <head>
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style>
-      highlight {
-      color: green;
-      }
-
-      illumina_p5 {color:#08519c;}
-      illumina_p7 {color:#a50f15;}
-      nextera_read1 {color:#bcbddc;}
-      nextera_read2 {color:#9ebcda;}
-      truseq_read1 {color:#4a1486;}
-      truseq_read2 {color:#6a51a3;}
-      ME {color:#969696;}
-      s5 {color:#6baed6;}
-      s7 {color:#fc9272;}
-      barcode {color:#f768a1;}
-      umi {color:#807dba;}
-      gDNA {color:#f03b20;}
-    cDNA {color:#7e331f;}
-      </style>
+      <link rel="stylesheet" href="../styles.css" />
     </head>
     <body>
       <div style="width: 75%; margin: 0 auto">
         <h6><a href="../index.html">Back</a></h6>
         <div id="assay">
-          <h1 style="text-align: center">SHARE-seq</h1>
+          
+  <h1 style="text-align: center">SHARE-seq</h1>
   <ul>
     <li>
       <a href="https://doi.org/10.1016/j.cell.2020.09.056"
@@ -44,14 +27,17 @@
         <div id="assay_spec">
           <h2>Final library</h2>
           
+  
   <h6 style="text-align: center">RNA</h6>
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
-<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><i5>NNNNNNNN</i5><s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1><cDNA>X</cDNA><poly_A>X</poly_A><UMI>NNNNNNNNNN</UMI><ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7><linker1>TCGGACGATCATGGG</linker1><bc1>NNNNNNNN</bc1><linker2>CAAGTATGCAGCGCGCTCAAGCACGTGGAT</linker2><bc2>NNNNNNNN</bc2><linker3>AGTCGTACGCCGATGCGAAACATCGGCCAC</linker3><bc3>NNNNNNNN</bc3><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><index5>NNNNNNNN</index5><s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1><cDNA>X</cDNA><poly_A>X</poly_A><UMI>NNNNNNNNNN</UMI><ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7><linker1>TCGGACGATCATGGG</linker1><bc1>NNNNNNNN</bc1><linker2>CAAGTATGCAGCGCGCTCAAGCACGTGGAT</linker2><bc2>NNNNNNNN</bc2><linker3>AGTCGTACGCCGATGCGAAACATCGGCCAC</linker3><bc3>NNNNNNNN</bc3><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
+  
+  <ol>
+  <li>
     
-<ol><li>
-    <details>
+  <details>
     <summary>illumina_p5</summary>
     <ul>
       <li>order: 0</li>
@@ -72,16 +58,18 @@
       </li>
       <li>min_len: 29</li>
       <li>max_len: 29</li>
-      <li>onlist: None</li>
+      <li>onlist: null</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
-    <summary>i5</summary>
+
+    
+  </details></li><li>
+  <details>
+    <summary>I2.fastq.gz</summary>
     <ul>
       <li>order: 1</li>
-      <li>region_type: i5</li>
-      <li>sequence_type: onlist</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: joined</li>
       <li>
         sequence:
         <pre
@@ -92,404 +80,19 @@
         display: inline;
         "
         >
-<i5>NNNNNNNN</i5></pre
+<index5>NNNNNNNN</index5></pre
         >
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: RNA_i5_onlist.txt (md5: None)</li>
+      <li>onlist: null</li>
       <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>s5</summary>
-    <ul>
-      <li>order: 2</li>
-      <li>region_type: s5</li>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<s5>TCGTCGGCAGCGTC</s5></pre
-        >
-      </li>
-      <li>min_len: 13</li>
-      <li>max_len: 13</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>ME1</summary>
-    <ul>
-      <li>order: 3</li>
-      <li>region_type: ME1</li>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<ME1>AGATGTGTATAAGAGACAG</ME1></pre
-        >
-      </li>
-      <li>min_len: 19</li>
-      <li>max_len: 19</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>cDNA</summary>
-    <ul>
-      <li>order: 4</li>
-      <li>region_type: cDNA</li>
-      <li>sequence_type: random</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<cDNA>X</cDNA></pre
-        >
-      </li>
-      <li>min_len: 1</li>
-      <li>max_len: 99</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>poly_A</summary>
-    <ul>
-      <li>order: 5</li>
-      <li>region_type: poly_A</li>
-      <li>sequence_type: random</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<poly_A>X</poly_A></pre
-        >
-      </li>
-      <li>min_len: 1</li>
-      <li>max_len: 99</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>UMI</summary>
-    <ul>
-      <li>order: 6</li>
-      <li>region_type: UMI</li>
-      <li>sequence_type: random</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<UMI>NNNNNNNNNN</UMI></pre
-        >
-      </li>
-      <li>min_len: 10</li>
-      <li>max_len: 10</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>ME2</summary>
-    <ul>
-      <li>order: 7</li>
-      <li>region_type: ME2</li>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<ME2>CTGTCTCTTATACACATCT</ME2></pre
-        >
-      </li>
-      <li>min_len: 19</li>
-      <li>max_len: 19</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>s7</summary>
-    <ul>
-      <li>order: 8</li>
-      <li>region_type: s7</li>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<s7>CCGAGCCCACGAGAC</s7></pre
-        >
-      </li>
-      <li>min_len: 15</li>
-      <li>max_len: 15</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>linker1</summary>
-    <ul>
-      <li>order: 9</li>
-      <li>region_type: linker1</li>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<linker1>TCGGACGATCATGGG</linker1></pre
-        >
-      </li>
-      <li>min_len: 15</li>
-      <li>max_len: 15</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>bc1</summary>
-    <ul>
-      <li>order: 10</li>
-      <li>region_type: bc1</li>
-      <li>sequence_type: onlist</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<bc1>NNNNNNNN</bc1></pre
-        >
-      </li>
-      <li>min_len: 8</li>
-      <li>max_len: 8</li>
-      <li>onlist: bc_onlist.txt (md5: None)</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>linker2</summary>
-    <ul>
-      <li>order: 11</li>
-      <li>region_type: linker2</li>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<linker2>CAAGTATGCAGCGCGCTCAAGCACGTGGAT</linker2></pre
-        >
-      </li>
-      <li>min_len: 30</li>
-      <li>max_len: 30</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>bc2</summary>
-    <ul>
-      <li>order: 12</li>
-      <li>region_type: bc2</li>
-      <li>sequence_type: onlist</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<bc2>NNNNNNNN</bc2></pre
-        >
-      </li>
-      <li>min_len: 8</li>
-      <li>max_len: 8</li>
-      <li>onlist: bc_onlist.txt (md5: None)</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>linker3</summary>
-    <ul>
-      <li>order: 13</li>
-      <li>region_type: linker3</li>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<linker3>AGTCGTACGCCGATGCGAAACATCGGCCAC</linker3></pre
-        >
-      </li>
-      <li>min_len: 30</li>
-      <li>max_len: 30</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>bc3</summary>
-    <ul>
-      <li>order: 14</li>
-      <li>region_type: bc3</li>
-      <li>sequence_type: onlist</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<bc3>NNNNNNNN</bc3></pre
-        >
-      </li>
-      <li>min_len: 8</li>
-      <li>max_len: 8</li>
-      <li>onlist: bc_onlist.txt (md5: None)</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>illumina_p7</summary>
-    <ul>
-      <li>order: 15</li>
-      <li>region_type: illumina_p7</li>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre
-        >
-      </li>
-      <li>min_len: 24</li>
-      <li>max_len: 24</li>
-      <li>onlist: bc_onlist.txt (md5: None)</li>
-      <li> regions: 
-      </li>
-  </details>
-    
-    </li></ol>
-  <h6 style="text-align: center">ATAC</h6>
-  <pre
-    style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
-  >
-<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><i5>NNNNNNNN</i5><s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1><gDNA>X</gDNA><ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7><linker1>TCGGACGATCATGGG</linker1><bc1>NNNNNNNN</bc1><linker2>CAAGTATGCAGCGCGCTCAAGCACGTGGAT</linker2><bc2>NNNNNNNN</bc2><linker3>AGTCGTACGCCGATGCGAAACATCGGCCAC</linker3><bc3>NNNNNNNN</bc3><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
-    
-<ol><li>
-    <details>
-    <summary>illumina_p5</summary>
+      <ul><li>
+  <details>
+    <summary>index5</summary>
     <ul>
       <li>order: 0</li>
-      <li>region_type: illumina_p5</li>
-      <li>sequence_type: fixed</li>
-      <li>
-        sequence:
-        <pre
-        style="
-        overflow-x: auto;
-        text-align: left;
-        margin: 0;
-        display: inline;
-        "
-        >
-<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5></pre
-        >
-      </li>
-      <li>min_len: 29</li>
-      <li>max_len: 29</li>
-      <li>onlist: None</li>
-      <li> regions: 
-      </li>
-  </details>
-    </li><li><details>
-    <summary>i5</summary>
-    <ul>
-      <li>order: 1</li>
-      <li>region_type: i5</li>
+      <li>region_type: index5</li>
       <li>sequence_type: onlist</li>
       <li>
         sequence:
@@ -501,19 +104,48 @@
         display: inline;
         "
         >
-<i5>NNNNNNNN</i5></pre
+<index5>NNNNNNNN</index5></pre
         >
       </li>
-      <li>min_len: 10</li>
-      <li>max_len: 10</li>
-      <li>onlist: ATAC_i5_onlist.txt (md5: None)</li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: RNA_i5_onlist.txt (md5: null)</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
-    <summary>s5</summary>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>nextera_read1</summary>
     <ul>
       <li>order: 2</li>
+      <li>region_type: nextera_read1</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1></pre
+        >
+      </li>
+      <li>min_len: 33</li>
+      <li>max_len: 33</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>s5</summary>
+    <ul>
+      <li>order: 0</li>
       <li>region_type: s5</li>
       <li>sequence_type: fixed</li>
       <li>
@@ -531,14 +163,16 @@
       </li>
       <li>min_len: 14</li>
       <li>max_len: 14</li>
-      <li>onlist: None</li>
+      <li>onlist: null</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
+
+    
+  </details></li><li>
+  <details>
     <summary>ME1</summary>
     <ul>
-      <li>order: 3</li>
+      <li>order: 1</li>
       <li>region_type: ME1</li>
       <li>sequence_type: fixed</li>
       <li>
@@ -556,15 +190,44 @@
       </li>
       <li>min_len: 19</li>
       <li>max_len: 19</li>
-      <li>onlist: None</li>
+      <li>onlist: null</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
-    <summary>gDNA</summary>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>R1.fastq.gz</summary>
     <ul>
-      <li>order: 4</li>
-      <li>region_type: gDNA</li>
+      <li>order: 3</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: null</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<cDNA>X</cDNA></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 30</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>cDNA</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: cDNA</li>
       <li>sequence_type: random</li>
       <li>
         sequence:
@@ -576,19 +239,129 @@
         display: inline;
         "
         >
-<gDNA>X</gDNA></pre
+<cDNA>X</cDNA></pre
         >
       </li>
       <li>min_len: 1</li>
-      <li>max_len: 98</li>
-      <li>onlist: None</li>
+      <li>max_len: 30</li>
+      <li>onlist: null</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
-    <summary>ME2</summary>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>R2.fastq.gz</summary>
+    <ul>
+      <li>order: 4</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: null</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<poly_A>X</poly_A><UMI>NNNNNNNNNN</UMI></pre
+        >
+      </li>
+      <li>min_len: 11</li>
+      <li>max_len: 109</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>poly_A</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: poly_A</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<poly_A>X</poly_A></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 99</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>UMI</summary>
+    <ul>
+      <li>order: 1</li>
+      <li>region_type: UMI</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<UMI>NNNNNNNNNN</UMI></pre
+        >
+      </li>
+      <li>min_len: 10</li>
+      <li>max_len: 10</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>nextera_read2</summary>
     <ul>
       <li>order: 5</li>
+      <li>region_type: nextera_read2</li>
+      <li>sequence_type: joined</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7></pre
+        >
+      </li>
+      <li>min_len: 34</li>
+      <li>max_len: 34</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>ME2</summary>
+    <ul>
+      <li>order: 0</li>
       <li>region_type: ME2</li>
       <li>sequence_type: fixed</li>
       <li>
@@ -606,14 +379,16 @@
       </li>
       <li>min_len: 19</li>
       <li>max_len: 19</li>
-      <li>onlist: None</li>
+      <li>onlist: null</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
+
+    
+  </details></li><li>
+  <details>
     <summary>s7</summary>
     <ul>
-      <li>order: 6</li>
+      <li>order: 1</li>
       <li>region_type: s7</li>
       <li>sequence_type: fixed</li>
       <li>
@@ -631,14 +406,43 @@
       </li>
       <li>min_len: 15</li>
       <li>max_len: 15</li>
-      <li>onlist: None</li>
+      <li>onlist: null</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>I1.fastq.gz</summary>
+    <ul>
+      <li>order: 6</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: joined</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<linker1>TCGGACGATCATGGG</linker1><bc1>NNNNNNNN</bc1><linker2>CAAGTATGCAGCGCGCTCAAGCACGTGGAT</linker2><bc2>NNNNNNNN</bc2><linker3>AGTCGTACGCCGATGCGAAACATCGGCCAC</linker3><bc3>NNNNNNNN</bc3></pre
+        >
+      </li>
+      <li>min_len: 99</li>
+      <li>max_len: 99</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
     <summary>linker1</summary>
     <ul>
-      <li>order: 7</li>
+      <li>order: 0</li>
       <li>region_type: linker1</li>
       <li>sequence_type: fixed</li>
       <li>
@@ -656,14 +460,16 @@
       </li>
       <li>min_len: 15</li>
       <li>max_len: 15</li>
-      <li>onlist: None</li>
+      <li>onlist: null</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
+
+    
+  </details></li><li>
+  <details>
     <summary>bc1</summary>
     <ul>
-      <li>order: 8</li>
+      <li>order: 1</li>
       <li>region_type: bc1</li>
       <li>sequence_type: onlist</li>
       <li>
@@ -681,14 +487,16 @@
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: bc_onlist.txt (md5: None)</li>
+      <li>onlist: bc_onlist.txt (md5: null)</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
+
+    
+  </details></li><li>
+  <details>
     <summary>linker2</summary>
     <ul>
-      <li>order: 9</li>
+      <li>order: 2</li>
       <li>region_type: linker2</li>
       <li>sequence_type: fixed</li>
       <li>
@@ -706,14 +514,16 @@
       </li>
       <li>min_len: 30</li>
       <li>max_len: 30</li>
-      <li>onlist: None</li>
+      <li>onlist: null</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
+
+    
+  </details></li><li>
+  <details>
     <summary>bc2</summary>
     <ul>
-      <li>order: 10</li>
+      <li>order: 3</li>
       <li>region_type: bc2</li>
       <li>sequence_type: onlist</li>
       <li>
@@ -731,14 +541,16 @@
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: bc_onlist.txt (md5: None)</li>
+      <li>onlist: bc_onlist.txt (md5: null)</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
+
+    
+  </details></li><li>
+  <details>
     <summary>linker3</summary>
     <ul>
-      <li>order: 11</li>
+      <li>order: 4</li>
       <li>region_type: linker3</li>
       <li>sequence_type: fixed</li>
       <li>
@@ -756,14 +568,16 @@
       </li>
       <li>min_len: 30</li>
       <li>max_len: 30</li>
-      <li>onlist: None</li>
+      <li>onlist: null</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
+
+    
+  </details></li><li>
+  <details>
     <summary>bc3</summary>
     <ul>
-      <li>order: 12</li>
+      <li>order: 5</li>
       <li>region_type: bc3</li>
       <li>sequence_type: onlist</li>
       <li>
@@ -781,14 +595,19 @@
       </li>
       <li>min_len: 8</li>
       <li>max_len: 8</li>
-      <li>onlist: bc_onlist.txt (md5: None)</li>
+      <li>onlist: bc_onlist.txt (md5: null)</li>
       <li> regions: 
       </li>
-  </details>
-    </li><li><details>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
     <summary>illumina_p7</summary>
     <ul>
-      <li>order: 13</li>
+      <li>order: 7</li>
       <li>region_type: illumina_p7</li>
       <li>sequence_type: fixed</li>
       <li>
@@ -806,14 +625,595 @@
       </li>
       <li>min_len: 24</li>
       <li>max_len: 24</li>
-      <li>onlist: None</li>
+      <li>onlist: bc_onlist.txt (md5: null)</li>
       <li> regions: 
       </li>
-  </details>
+
     
-    </li></ol>
+  </details></li>
+  </ol>
+  
+  <h6 style="text-align: center">ATAC</h6>
+  <pre
+    style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
+  >
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5><index5>NNNNNNNN</index5><s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1><gDNA>X</gDNA><gDNA>X</gDNA><ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7><linker1>TCGGACGATCATGGG</linker1><bc1>NNNNNNNN</bc1><linker2>CAAGTATGCAGCGCGCTCAAGCACGTGGAT</linker2><bc2>NNNNNNNN</bc2><linker3>AGTCGTACGCCGATGCGAAACATCGGCCAC</linker3><bc3>NNNNNNNN</bc3><illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre>
+  
+  <ol>
+  <li>
+    
+  <details>
+    <summary>illumina_p5</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: illumina_p5</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<illumina_p5>AATGATACGGCGACCACCGAGATCTACAC</illumina_p5></pre
+        >
+      </li>
+      <li>min_len: 29</li>
+      <li>max_len: 29</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>I2.fastq.gz</summary>
+    <ul>
+      <li>order: 1</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: joined</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<index5>NNNNNNNN</index5></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>index5</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: index5</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<index5>NNNNNNNN</index5></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: ATAC_i5_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>nextera_read1</summary>
+    <ul>
+      <li>order: 2</li>
+      <li>region_type: nextera_read1</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<s5>TCGTCGGCAGCGTC</s5><ME1>AGATGTGTATAAGAGACAG</ME1></pre
+        >
+      </li>
+      <li>min_len: 33</li>
+      <li>max_len: 33</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>s5</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: s5</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<s5>TCGTCGGCAGCGTC</s5></pre
+        >
+      </li>
+      <li>min_len: 14</li>
+      <li>max_len: 14</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>ME1</summary>
+    <ul>
+      <li>order: 1</li>
+      <li>region_type: ME1</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<ME1>AGATGTGTATAAGAGACAG</ME1></pre
+        >
+      </li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>R1.fastq.gz</summary>
+    <ul>
+      <li>order: 3</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: null</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<gDNA>X</gDNA></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 30</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>gDNA</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: gDNA</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<gDNA>X</gDNA></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 30</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>R2.fastq.gz</summary>
+    <ul>
+      <li>order: 4</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: null</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<gDNA>X</gDNA></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 30</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>gDNA</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: gDNA</li>
+      <li>sequence_type: random</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<gDNA>X</gDNA></pre
+        >
+      </li>
+      <li>min_len: 1</li>
+      <li>max_len: 30</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>nextera_read2</summary>
+    <ul>
+      <li>order: 5</li>
+      <li>region_type: nextera_read2</li>
+      <li>sequence_type: joined</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<ME2>CTGTCTCTTATACACATCT</ME2><s7>CCGAGCCCACGAGAC</s7></pre
+        >
+      </li>
+      <li>min_len: 34</li>
+      <li>max_len: 34</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>ME2</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: ME2</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<ME2>CTGTCTCTTATACACATCT</ME2></pre
+        >
+      </li>
+      <li>min_len: 19</li>
+      <li>max_len: 19</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>s7</summary>
+    <ul>
+      <li>order: 1</li>
+      <li>region_type: s7</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<s7>CCGAGCCCACGAGAC</s7></pre
+        >
+      </li>
+      <li>min_len: 15</li>
+      <li>max_len: 15</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>I1.fastq.gz</summary>
+    <ul>
+      <li>order: 6</li>
+      <li>region_type: gz</li>
+      <li>sequence_type: joined</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<linker1>TCGGACGATCATGGG</linker1><bc1>NNNNNNNN</bc1><linker2>CAAGTATGCAGCGCGCTCAAGCACGTGGAT</linker2><bc2>NNNNNNNN</bc2><linker3>AGTCGTACGCCGATGCGAAACATCGGCCAC</linker3><bc3>NNNNNNNN</bc3></pre
+        >
+      </li>
+      <li>min_len: 99</li>
+      <li>max_len: 99</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      <ul><li>
+  <details>
+    <summary>linker1</summary>
+    <ul>
+      <li>order: 0</li>
+      <li>region_type: linker1</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<linker1>TCGGACGATCATGGG</linker1></pre
+        >
+      </li>
+      <li>min_len: 15</li>
+      <li>max_len: 15</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>bc1</summary>
+    <ul>
+      <li>order: 1</li>
+      <li>region_type: bc1</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<bc1>NNNNNNNN</bc1></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: bc_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>linker2</summary>
+    <ul>
+      <li>order: 2</li>
+      <li>region_type: linker2</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<linker2>CAAGTATGCAGCGCGCTCAAGCACGTGGAT</linker2></pre
+        >
+      </li>
+      <li>min_len: 30</li>
+      <li>max_len: 30</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>bc2</summary>
+    <ul>
+      <li>order: 3</li>
+      <li>region_type: bc2</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<bc2>NNNNNNNN</bc2></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: bc_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>linker3</summary>
+    <ul>
+      <li>order: 4</li>
+      <li>region_type: linker3</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<linker3>AGTCGTACGCCGATGCGAAACATCGGCCAC</linker3></pre
+        >
+      </li>
+      <li>min_len: 30</li>
+      <li>max_len: 30</li>
+      <li>onlist: null</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>bc3</summary>
+    <ul>
+      <li>order: 5</li>
+      <li>region_type: bc3</li>
+      <li>sequence_type: onlist</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<bc3>NNNNNNNN</bc3></pre
+        >
+      </li>
+      <li>min_len: 8</li>
+      <li>max_len: 8</li>
+      <li>onlist: bc_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li></ul></li>
+
+    
+  </details></li><li>
+  <details>
+    <summary>illumina_p7</summary>
+    <ul>
+      <li>order: 7</li>
+      <li>region_type: illumina_p7</li>
+      <li>sequence_type: fixed</li>
+      <li>
+        sequence:
+        <pre
+        style="
+        overflow-x: auto;
+        text-align: left;
+        margin: 0;
+        display: inline;
+        "
+        >
+<illumina_p7>ATCTCGTATGCCGTCTTCTGCTTG</illumina_p7></pre
+        >
+      </li>
+      <li>min_len: 24</li>
+      <li>max_len: 24</li>
+      <li>onlist: bc_onlist.txt (md5: null)</li>
+      <li> regions: 
+      </li>
+
+    
+  </details></li>
+  </ol>
+  
+  
         </div>
       </div>
     </body>
   </html>
-    
+  
