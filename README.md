@@ -14,18 +14,6 @@ pip install seqspec
 seqspec format --help
 ```
 
-## TODO
-
-- format check that every element in “order” is present in “regions”
-- format verify presence of onlist files
-- list onlist files
-- specify in each assay which sequencer is being used (dictates which strand is sequenced)
-- add `container_type` to assay, options are `well, cell, droplet`
-- add `region_type` to each region, make the `region_type`s standardized (make region_id free form)
-- `region_id` can now become the ordering of the regions
-- add `strand` to each region which states the strand the region is ordered in
-- add `sequencer` to assay
-
 ## Specification
 
 Each assay is described by two objects: the `Assay` object and the `Region` object. A library is described by one `Assay` object and multiple (possibly nested) `Region` objects. The `Region` objects are grouped with a `join` operation and an `order` on the sub`Region`s specified. A simple (but not fully specified example) looks like the following:
