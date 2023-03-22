@@ -134,7 +134,7 @@ def format_kallisto_bus(indices):
                 elif v == "cDNA":
                     cdna.append(f"{idx},{k[0]},{k[1]}")
 
-    x = "&".join(bcs) + ":" + "&".join(umi) + ":" + "&".join(cdna)
+    x = ",".join(bcs) + ":" + ",".join(umi) + ":" + ",".join(cdna)
     return x
 
 
