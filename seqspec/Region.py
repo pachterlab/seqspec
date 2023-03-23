@@ -21,7 +21,7 @@ class Region(yaml.YAMLObject):
         # join: Optional["Join"] = None,
     ) -> None:
         super().__init__()
-        self.parent = None
+        self.parent_id = None
         self.region_id = region_id
         self.region_type = region_type
         self.name = name
