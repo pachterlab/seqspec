@@ -35,7 +35,7 @@ def validate_check_args(parser, args):
 
     spec = load_spec(spec_fn)
 
-    run_check(schema, spec)  # , o)
+    return run_check(schema, spec)  # , o)
 
 
 def run_check(schema, spec):
@@ -45,3 +45,5 @@ def run_check(schema, spec):
         print(
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
         )
+
+    return idx
