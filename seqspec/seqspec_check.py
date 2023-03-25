@@ -41,6 +41,7 @@ def validate_check_args(parser, args):
 def run_check(schema, spec):
 
     v = Draft4Validator(schema)
+    idx = 0
     for idx, error in enumerate(v.iter_errors(spec), 1):
         print(
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
