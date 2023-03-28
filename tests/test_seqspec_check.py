@@ -40,8 +40,8 @@ class TestSeqspecCheck(TestCase):
     def test_validate_check_args(self):
         parser = create_stub_check_parser()
 
-        smart_seq3 = assay_dir / "Smart-seq3" / "spec.yaml"
-        cmdline = ["check", str(smart_seq3)]
+        spec = assay_dir / "Quartz-seq" / "spec.yaml"
+        cmdline = ["check", str(spec)]
         args = parser.parse_args(cmdline)
 
         errors = validate_check_args(None, args)
