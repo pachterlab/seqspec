@@ -18,7 +18,6 @@ assay_spec:
   onlist: null
   regions:
   - !Region
-    order: 0
     region_id: illumina_p5
     region_type: illumina_p5
     name: Illumina P5
@@ -30,7 +29,6 @@ assay_spec:
     regions: null
     parent_id: RNA
   - !Region
-    order: 1
     region_id: truseq_read1
     region_type: truseq_read1
     name: Truseq Read 1
@@ -42,7 +40,6 @@ assay_spec:
     regions: null
     parent_id: RNA
   - !Region
-    order: 2
     region_id: R1.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
@@ -53,7 +50,6 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      order: 0
       region_id: barcode
       region_type: barcode
       name: Cell Barcode
@@ -67,7 +63,6 @@ assay_spec:
       regions: null
       parent_id: R1.fastq.gz
     - !Region
-      order: 1
       region_id: umi
       region_type: umi
       name: UMI
@@ -79,7 +74,6 @@ assay_spec:
       regions: null
       parent_id: R1.fastq.gz
   - !Region
-    order: 3
     region_id: R2.fastq.gz
     region_type: fastq
     name: Read 2 FASTQ
@@ -90,7 +84,6 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      order: 0
       region_id: cDNA
       region_type: cDNA
       name: cDNA
@@ -113,9 +106,7 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 4
   - !Region
-    order: 5
     region_id: I1.fastq.gz
     region_type: fastq
     name: Index Read 2
@@ -126,7 +117,6 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      order: 0
       region_id: index7
       region_type: index7
       name: Truseq Read 2
@@ -140,7 +130,6 @@ assay_spec:
       regions: null
       parent_id: I1.fastq.gz
   - !Region
-    order: 6
     region_id: illumina_p7
     region_type: illumina_p7
     name: Illumina P7
@@ -151,4 +140,3 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-  order: 0

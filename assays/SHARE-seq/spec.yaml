@@ -30,7 +30,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 0
   - !Region
     region_id: I2.fastq.gz
     region_type: gz
@@ -54,8 +53,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I2.fastq.gz
-      order: 0
-    order: 1
   - !Region
     region_id: nextera_read1
     region_type: nextera_read1
@@ -77,7 +74,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read1
-      order: 0
     - !Region
       region_id: ME1
       region_type: ME1
@@ -89,8 +85,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read1
-      order: 1
-    order: 2
   - !Region
     region_id: R1.fastq.gz
     region_type: gz
@@ -112,8 +106,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: R1.fastq.gz
-      order: 0
-    order: 3
   - !Region
     region_id: R2.fastq.gz
     region_type: gz
@@ -135,7 +127,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: R2.fastq.gz
-      order: 0
     - !Region
       region_id: UMI
       region_type: UMI
@@ -147,8 +138,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: R2.fastq.gz
-      order: 1
-    order: 4
   - !Region
     region_id: nextera_read2
     region_type: nextera_read2
@@ -170,7 +159,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read2
-      order: 0
     - !Region
       region_id: s7
       region_type: s7
@@ -182,8 +170,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read2
-      order: 1
-    order: 5
   - !Region
     region_id: I1.fastq.gz
     region_type: gz
@@ -205,7 +191,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 0
     - !Region
       region_id: bc1
       region_type: bc1
@@ -219,7 +204,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 1
     - !Region
       region_id: linker2
       region_type: linker2
@@ -231,7 +215,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 2
     - !Region
       region_id: bc2
       region_type: bc2
@@ -245,7 +228,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 3
     - !Region
       region_id: linker3
       region_type: linker3
@@ -257,7 +239,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 4
     - !Region
       region_id: bc3
       region_type: bc3
@@ -271,8 +252,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 5
-    order: 6
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -286,8 +265,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA
-    order: 7
-  order: 0
 - !Region
   region_id: ATAC
   region_type: ATAC
@@ -309,7 +286,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: ATAC
-    order: 0
   - !Region
     region_id: I2.fastq.gz
     region_type: gz
@@ -333,8 +309,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I2.fastq.gz
-      order: 0
-    order: 1
   - !Region
     region_id: nextera_read1
     region_type: nextera_read1
@@ -356,7 +330,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read1
-      order: 0
     - !Region
       region_id: ME1
       region_type: ME1
@@ -368,8 +341,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read1
-      order: 1
-    order: 2
   - !Region
     region_id: R1.fastq.gz
     region_type: gz
@@ -391,8 +362,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: R1.fastq.gz
-      order: 0
-    order: 3
   - !Region
     region_id: R2.fastq.gz
     region_type: gz
@@ -414,8 +383,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: R2.fastq.gz
-      order: 0
-    order: 4
   - !Region
     region_id: nextera_read2
     region_type: nextera_read2
@@ -437,7 +404,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read2
-      order: 0
     - !Region
       region_id: s7
       region_type: s7
@@ -449,8 +415,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read2
-      order: 1
-    order: 5
   - !Region
     region_id: I1.fastq.gz
     region_type: gz
@@ -472,7 +436,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 0
     - !Region
       region_id: bc1
       region_type: bc1
@@ -486,7 +449,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 1
     - !Region
       region_id: linker2
       region_type: linker2
@@ -498,7 +460,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 2
     - !Region
       region_id: bc2
       region_type: bc2
@@ -512,7 +473,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 3
     - !Region
       region_id: linker3
       region_type: linker3
@@ -524,7 +484,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 4
     - !Region
       region_id: bc3
       region_type: bc3
@@ -538,8 +497,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 5
-    order: 6
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -553,5 +510,3 @@ assay_spec:
       md5: null
     regions: null
     parent_id: ATAC
-    order: 7
-  order: 0

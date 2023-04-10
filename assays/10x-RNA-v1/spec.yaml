@@ -28,7 +28,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 0
   - !Region
     region_id: I2.fastq.gz
     region_type: gz
@@ -52,8 +51,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I2.fastq.gz
-      order: 0
-    order: 1
   - !Region
     region_id: truseq_read1
     region_type: truseq_read1
@@ -65,7 +62,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 2
   - !Region
     region_id: R1.fastq.gz
     region_type: gz
@@ -87,8 +83,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: R1.fastq.gz
-      order: 0
-    order: 3
   - !Region
     region_id: R2.fastq.gz
     region_type: fastq
@@ -99,7 +93,6 @@ assay_spec:
     max_len: 10
     onlist: null
     parent_id: RNA
-    order: 4
     regions:
     - !Region
       region_id: umi
@@ -112,7 +105,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: R2.fastq.gz
-      order: 0
   - !Region
     region_id: truseq_read2
     region_type: truseq_read2
@@ -124,7 +116,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 5
   - !Region
     region_id: I1.fastq.gz
     region_type: fastq
@@ -135,7 +126,6 @@ assay_spec:
     max_len: 14
     onlist: null
     parent_id: RNA
-    order: 6
     regions:
     - !Region
       region_id: barcode
@@ -150,7 +140,6 @@ assay_spec:
         md5: null
       regions: null
       parent_id: I1.fastq.gz
-      order: 0
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -162,5 +151,3 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 7
-  order: 0

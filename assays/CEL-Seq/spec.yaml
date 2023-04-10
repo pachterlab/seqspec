@@ -28,7 +28,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 0
   - !Region
     region_id: RA5
     region_type: RA5
@@ -40,7 +39,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 1
   - !Region
     region_id: cell_bc
     region_type: cell_bc
@@ -52,7 +50,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 2
   - !Region
     region_id: poly_T
     region_type: poly_T
@@ -64,7 +61,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 3
   - !Region
     region_id: cDNA
     region_type: cDNA
@@ -76,7 +72,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 4
   - !Region
     region_id: RA3
     region_type: RA3
@@ -88,7 +83,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 5
   - !Region
     region_id: link_1
     region_type: link_1
@@ -100,7 +94,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 6
   - !Region
     region_id: sample_bc
     region_type: sample_bc
@@ -114,7 +107,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA
-    order: 7
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -126,5 +118,3 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 8
-  order: 0

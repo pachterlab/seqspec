@@ -29,7 +29,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: ATAC
-    order: 0
   - !Region
     region_id: i5
     region_type: i5
@@ -43,7 +42,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: ATAC
-    order: 1
   - !Region
     region_id: nextera_read1
     region_type: nextera_read1
@@ -65,7 +63,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read1
-      order: 0
     - !Region
       region_id: ME
       region_type: ME
@@ -77,8 +74,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read1
-      order: 1
-    order: 2
   - !Region
     region_id: gdna
     region_type: gdna
@@ -90,7 +85,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: ATAC
-    order: 3
   - !Region
     region_id: nextera_read2
     region_type: nextera_read2
@@ -112,7 +106,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read2
-      order: 0
     - !Region
       region_id: s5
       region_type: s5
@@ -124,8 +117,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: nextera_read2
-      order: 1
-    order: 4
   - !Region
     region_id: i7
     region_type: i7
@@ -139,7 +130,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: ATAC
-    order: 5
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -151,5 +141,3 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: ATAC
-    order: 6
-  order: 0

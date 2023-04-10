@@ -28,7 +28,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 0
   - !Region
     region_id: i5
     region_type: i5
@@ -42,7 +41,6 @@ assay_spec:
       md5: None
     regions: null
     parent_id: RNA
-    order: 1
   - !Region
     region_id: truseq_read_1_adapter
     region_type: truseq_read_1_adapter
@@ -54,7 +52,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 2
   - !Region
     region_id: read_1
     region_type: read_1
@@ -78,7 +75,6 @@ assay_spec:
         md5: None
       regions: null
       parent_id: read_1
-      order: 0
     - !Region
       region_id: hairpin_adapter
       region_type: hairpin_adapter
@@ -90,7 +86,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: read_1
-      order: 1
     - !Region
       region_id: umi
       region_type: umi
@@ -102,7 +97,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: read_1
-      order: 2
     - !Region
       region_id: cell_bc
       region_type: cell_bc
@@ -116,8 +110,6 @@ assay_spec:
         md5: None
       regions: null
       parent_id: read_1
-      order: 3
-    order: 3
   - !Region
     region_id: poly_T
     region_type: poly_T
@@ -129,7 +121,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 4
   - !Region
     region_id: read_2
     region_type: read_2
@@ -141,7 +132,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 5
   - !Region
     region_id: i7_primer
     region_type: i7_primer
@@ -163,7 +153,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: i7_primer
-      order: 0
     - !Region
       region_id: s7
       region_type: s7
@@ -175,8 +164,6 @@ assay_spec:
       onlist: null
       regions: null
       parent_id: i7_primer
-      order: 1
-    order: 6
   - !Region
     region_id: i7
     region_type: i7
@@ -190,7 +177,6 @@ assay_spec:
       md5: None
     regions: null
     parent_id: RNA
-    order: 7
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -202,5 +188,3 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 8
-  order: 0
