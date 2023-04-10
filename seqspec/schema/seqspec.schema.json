@@ -54,12 +54,6 @@
       "description": "A region of DNA",
       "type": "object",
       "properties": {
-        "order": {
-          "description": "order the region appears",
-          "type": "integer",
-          "minimum": 0,
-          "maximum": 2048
-        },
         "region_id": {
           "description": "identifier for the region",
           "type": "string"
@@ -111,7 +105,6 @@
         }
       },
       "required": [
-        "order",
         "region_id",
         "region_type",
         "sequence_type",
