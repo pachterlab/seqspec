@@ -29,7 +29,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 0
   - !Region
     region_id: i5
     region_type: i5
@@ -43,7 +42,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA_end
-    order: 1
   - !Region
     region_id: s5
     region_type: s5
@@ -55,7 +53,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 2
   - !Region
     region_id: ME1
     region_type: ME1
@@ -67,7 +64,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 3
   - !Region
     region_id: five_prime_fragment_tag
     region_type: five_prime_fragment_tag
@@ -79,7 +75,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 4
   - !Region
     region_id: umi
     region_type: umi
@@ -91,7 +86,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 5
   - !Region
     region_id: triple_G
     region_type: triple_G
@@ -103,7 +97,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 6
   - !Region
     region_id: cDNA
     region_type: cDNA
@@ -115,7 +108,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 7
   - !Region
     region_id: ME2
     region_type: ME2
@@ -127,7 +119,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 8
   - !Region
     region_id: s7
     region_type: s7
@@ -139,7 +130,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 9
   - !Region
     region_id: i7
     region_type: i7
@@ -153,7 +143,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA_end
-    order: 10
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -165,8 +154,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_end
-    order: 11
-  order: 0
 - !Region
   region_id: RNA_internal
   region_type: RNA_internal
@@ -188,7 +175,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_internal
-    order: 0
   - !Region
     region_id: i5
     region_type: i5
@@ -202,7 +188,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA_internal
-    order: 1
   - !Region
     region_id: s5
     region_type: s5
@@ -214,7 +199,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_internal
-    order: 2
   - !Region
     region_id: ME1
     region_type: ME1
@@ -226,7 +210,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_internal
-    order: 3
   - !Region
     region_id: cDNA
     region_type: cDNA
@@ -238,7 +221,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_internal
-    order: 4
   - !Region
     region_id: ME2
     region_type: ME2
@@ -250,7 +232,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_internal
-    order: 5
   - !Region
     region_id: s7
     region_type: s7
@@ -262,7 +243,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_internal
-    order: 6
   - !Region
     region_id: i7
     region_type: i7
@@ -276,7 +256,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA_internal
-    order: 7
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -288,5 +267,3 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA_internal
-    order: 8
-  order: 0

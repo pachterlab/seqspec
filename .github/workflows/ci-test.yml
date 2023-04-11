@@ -1,0 +1,26 @@
+name: "Run tests"
+on:
+  push:
+    paths:
+      - "seqspec/*"
+      - "assays/*"
+      - "tests/*"
+      - "setup.py"
+      - "setup.cfg"
+      - ".github/workflows/ci-test.yml"
+
+jobs:
+  run-tests:
+    runs-on: "ubuntu-latest"
+    steps:
+      - run: echo "This job is now running on ${{ runner.os }}"
+      - run: echo "The repository is ${{ github.repository }} on branch ${{ github.ref }}"
+      - name: "Check out repository"
+        uses: actions/checkout@v2
+      - run: echo "Checkout successful"
+      - name: Run tests
+        run: |
+          python --version
+          pip install tox
+          tox
+      - run: echo "The job status was ${{ job.status }}"

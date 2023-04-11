@@ -28,7 +28,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 0
   - !Region
     region_id: truseq_read_1
     region_type: truseq_read_1
@@ -40,7 +39,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 1
   - !Region
     region_id: cDNA
     region_type: cDNA
@@ -52,7 +50,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 2
   - !Region
     region_id: truseq_read_2
     region_type: truseq_read_2
@@ -64,7 +61,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 3
   - !Region
     region_id: cell_index
     region_type: cell_index
@@ -76,7 +72,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 4
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -88,5 +83,3 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 5
-  order: 0

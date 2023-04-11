@@ -28,7 +28,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 0
   - !Region
     region_id: link_1
     region_type: link_1
@@ -40,7 +39,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 1
   - !Region
     region_id: ispcr
     region_type: ispcr
@@ -52,7 +50,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 2
   - !Region
     region_id: link_2
     region_type: link_2
@@ -64,7 +61,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 3
   - !Region
     region_id: cell_bc
     region_type: cell_bc
@@ -76,7 +72,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 4
   - !Region
     region_id: triple_G
     region_type: triple_G
@@ -88,7 +83,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 5
   - !Region
     region_id: cDNA
     region_type: cDNA
@@ -100,7 +94,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 6
   - !Region
     region_id: link_3
     region_type: link_3
@@ -112,7 +105,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 7
   - !Region
     region_id: solexa_p2
     region_type: solexa_p2
@@ -124,5 +116,3 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 8
-  order: 0

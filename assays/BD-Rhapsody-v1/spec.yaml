@@ -29,7 +29,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 0
   - !Region
     region_id: truseq_r1
     region_type: truseq_r1
@@ -41,7 +40,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 1
   - !Region
     region_id: cls1
     region_type: cls1
@@ -55,7 +53,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA
-    order: 2
   - !Region
     region_id: linker1
     region_type: linker1
@@ -67,7 +64,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 3
   - !Region
     region_id: cls2
     region_type: cls2
@@ -81,7 +77,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA
-    order: 4
   - !Region
     region_id: linker2
     region_type: linker2
@@ -93,7 +88,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 5
   - !Region
     region_id: cls3
     region_type: cls3
@@ -107,7 +101,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA
-    order: 6
   - !Region
     region_id: umi
     region_type: umi
@@ -119,7 +112,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 7
   - !Region
     region_id: polyT
     region_type: polyT
@@ -131,7 +123,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 8
   - !Region
     region_id: cdna
     region_type: cdna
@@ -143,7 +134,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 9
   - !Region
     region_id: truseq_r2
     region_type: truseq_r2
@@ -155,7 +145,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 10
   - !Region
     region_id: sample_index
     region_type: sample_index
@@ -169,7 +158,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA
-    order: 11
   - !Region
     region_id: illumina_p7
     region_type: illumina_p7
@@ -181,5 +169,3 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 12
-  order: 0
