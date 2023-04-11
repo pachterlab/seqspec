@@ -21,7 +21,7 @@ class Region(yaml.YAMLObject):
         # join: Optional["Join"] = None,
     ) -> None:
         super().__init__()
-        self.parent = None
+        self.parent_id = None
         self.region_id = region_id
         self.region_type = region_type
         self.name = name
@@ -42,13 +42,11 @@ class Region(yaml.YAMLObject):
             self.sequence = self.get_sequence()
 
     def set_parent_id(self, parent_id):
+        self.parent_id = parent_id
         if self.regions:
             parent_id = self.region_id
             for r in self.regions:
                 r.set_parent_id(parent_id)
-        else:
-            self.parent_id = parent_id
-        return
 
     def get_sequence(self, s: str = "") -> str:
         # take into account "order" property
