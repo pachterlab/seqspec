@@ -40,8 +40,8 @@ assay_spec:
       name: ATAC Read 2 FASTQ
       sequence_type: joined
       sequence: x
-      min_len: 50
-      max_len: 50
+      min_len: 149
+      max_len: 149
       onlist: null
       regions:
         - !Region
@@ -54,6 +54,89 @@ assay_spec:
           max_len: 50
           onlist: null
           parent_id: ATAC-R2.fastq.gz
+       - !Region
+		  region_id: ATAC-raw-cell-barcode
+		  region_type: gz
+		  name: ATAC Raw Cell Barcode
+		  sequence_type: joined
+		  sequence: TCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
+		  min_len: 99
+		  max_len: 99
+		  onlist: null
+		  parent_id: ATAC-R2.fastq.gz
+          regions:
+       - !Region
+			  region_id: linker1
+			  region_type: linker1
+			  name: linker1
+			  sequence_type: fixed
+			  sequence: TCGGACGATCATGGG
+			  min_len: 15
+			  max_len: 15
+			  onlist: null
+			  regions: null
+			  parent_id: ATAC-raw-cell-barcode
+			- !Region
+			  region_id: atac-cell-barcode1
+			  region_type: atac-bc1
+			  name: ATAC Cell Barcode 1
+			  sequence_type: onlist
+			  sequence: NNNNNNNN
+			  min_len: 8
+			  max_len: 8
+			  onlist: !Onlist
+				filename: ??
+				md5: null
+			  regions: null
+			  parent_id: ATAC-raw-cell-barcode
+			- !Region
+			  region_id: linker2
+			  region_type: linker2
+			  name: linker2
+			  sequence_type: fixed
+			  sequence: CAAGTATGCAGCGCGCTCAAGCACGTGGAT
+			  min_len: 30
+			  max_len: 30
+			  onlist: null
+			  regions: null
+			  parent_id: ATAC-raw-cell-barcode
+			- !Region
+			  region_id: atac-cell-barcode2
+			  region_type: atac-bc2
+			  name: ATAC Cell Barcode 2
+			  sequence_type: onlist
+			  sequence: NNNNNNNN
+			  min_len: 8
+			  max_len: 8
+			  onlist: !Onlist
+				filename: ??
+				md5: null
+			  regions: null
+			  parent_id: ATAC-raw-cell-barcode
+			- !Region
+			  region_id: linker3
+			  region_type: linker3
+			  name: linker3
+			  sequence_type: fixed
+			  sequence: AGTCGTACGCCGATGCGAAACATCGGCCAC
+			  min_len: 30
+			  max_len: 30
+			  onlist: null
+			  regions: null
+			  parent_id: ATAC-raw-cell-barcode
+			- !Region
+			  region_id: atac-cell-barcode3
+			  region_type: atac-bc3
+			  name: ATAC Cell Barcode 3
+			  sequence_type: onlist
+			  sequence: NNNNNNNN
+			  min_len: 8
+			  max_len: 8
+			  onlist: !Onlist
+				filename: ??
+				md5: null
+			  regions: null
+			  parent_id: ATAC-raw-cell-barcode
     # RNA
     # Read 1 Fastq
     - !Region
@@ -83,57 +166,114 @@ assay_spec:
       name: RNA Read 2 FASTQ
       sequence_type: joined
       sequence: x
-      min_len: 34
-      max_len: 34
+      min_len: 149
+      max_len: 149
       onlist: null
       regions:
       # Cell Barcode
         - !Region
-          order: 0
-          region_id: barcode-round1
-          region_type: barcode
-          name: Round 1 barcode
-          sequence_type: onlist
-          sequence: x
-          min_len: 8
-          max_len: 8
-          parent_id: RNA-R2.fastq.gz
-          onlist: !Onlist
-            filename: "./192_PLATE1_PLATE2_cell_barcodes_onlist.txt"
-        - !Region
-          order: 1
-          region_id: barcode-round2
-          region_type: barcode
-          name: Round 2 barcode
-          sequence_type: onlist
-          sequence: x
-          min_len: 8
-          max_len: 8
-          parent_id: RNA-R2.fastq.gz
-          onlist: !Onlist
-            filename: "./192_PLATE1_PLATE2_cell_barcodes_onlist.txt"
-        - !Region
-          order: 2
-          region_id: barcode-round3
-          region_type: barcode
-          name: Round 3 barcode
-          sequence_type: onlist
-          sequence: x
-          min_len: 8
-          max_len: 8
-          parent_id: RNA-R2.fastq.gz
-          onlist: !Onlist
-            filename: "./192_PLATE1_PLATE2_cell_barcodes_onlist.txt"
-      # UMI
-        - !Region
-          order: 3
-          region_id: umi
-          region_type: umi
-          name: Unique Molecular Identifier
+          region_id: UMI
+          region_type: UMI
+          name: UMI
           sequence_type: random
           sequence: NNNNNNNNNN
           min_len: 10
           max_len: 10
           onlist: null
+          regions: null
           parent_id: RNA-R2.fastq.gz
-
+      # UMI
+        - !Region
+          region_id: poly_A
+          region_type: poly_A
+          name: poly_A
+          sequence_type: random
+          sequence: X
+          min_len: 40
+          max_len: 40
+          onlist: null
+          regions: null
+          parent_id: RNA-R2.fastq.gz
+        - !Region
+		  region_id: RNA-raw-cell-barcode
+		  region_type: gz
+		  name: RNA Raw Cell Barcode
+		  sequence_type: joined
+		  sequence: TCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
+		  min_len: 99
+		  max_len: 99
+		  onlist: null
+		  parent_id: RNA-R2.fastq.gz
+          regions:
+       - !Region
+		  region_id: linker1
+		  region_type: linker1
+		  name: linker1
+		  sequence_type: fixed
+		  sequence: TCGGACGATCATGGG
+		  min_len: 15
+		  max_len: 15
+		  onlist: null
+		  regions: null
+		  parent_id: RNA-raw-cell-barcode
+		- !Region
+		  region_id: rna-cell-barcode1
+		  region_type: rna-bc1
+		  name: RNA Cell Barcode 1
+		  sequence_type: onlist
+		  sequence: NNNNNNNN
+		  min_len: 8
+		  max_len: 8
+		  onlist: !Onlist
+			filename: ??
+			md5: null
+		  regions: null
+		  parent_id: RNA-raw-cell-barcode
+		- !Region
+		  region_id: linker2
+		  region_type: linker2
+		  name: linker2
+		  sequence_type: fixed
+		  sequence: CAAGTATGCAGCGCGCTCAAGCACGTGGAT
+		  min_len: 30
+		  max_len: 30
+		  onlist: null
+		  regions: null
+		  parent_id: RNA-raw-cell-barcode
+		- !Region
+		  region_id: rna-cell-barcode2
+		  region_type: rna-bc2
+		  name: RNA Cell Barcode 2
+		  sequence_type: onlist
+		  sequence: NNNNNNNN
+		  min_len: 8
+		  max_len: 8
+		  onlist: !Onlist
+			filename: ??
+			md5: null
+		  regions: null
+		  parent_id: RNA-raw-cell-barcode
+		- !Region
+		  region_id: linker3
+		  region_type: linker3
+		  name: linker3
+		  sequence_type: fixed
+		  sequence: AGTCGTACGCCGATGCGAAACATCGGCCAC
+		  min_len: 30
+		  max_len: 30
+		  onlist: null
+		  regions: null
+		  parent_id: RNA-raw-cell-barcode
+		- !Region
+		  region_id: rna-cell-barcode3
+		  region_type: rna-bc3
+		  name: RNA Cell Barcode 3
+		  sequence_type: onlist
+		  sequence: NNNNNNNN
+		  min_len: 8
+		  max_len: 8
+		  onlist: !Onlist
+			filename: ??
+			md5: null
+		  regions: null
+		  parent_id: RNA-raw-cell-barcode
