@@ -1,5 +1,6 @@
 from typing import Optional, List
 import yaml
+import newick
 
 
 # todo figure out how to do enums type options
@@ -106,6 +107,17 @@ class Region(yaml.YAMLObject):
             "regions": [i.to_dict() for i in (self.regions or [])],
         }
         return d
+
+    def to_newick(self, n=""):
+        if self.regions:
+            t = []
+            for r in self.regions:
+                t.append(f"{r.to_newick(n)}")
+                n = f"({','.join(t)}){r.parent_id}"
+        else:
+            n = f"'{self.region_id}:{self.max_len}'"
+
+        return n
 
     def get_region_by_id(self, region_id, found=[]):
         if not found:

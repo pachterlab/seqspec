@@ -1,4 +1,3 @@
-# from seqspec.Assay import Assay
 from jsonschema import Draft4Validator
 import yaml
 from os import path
@@ -39,7 +38,6 @@ def validate_check_args(parser, args):
 
 
 def run_check(schema, spec):
-
     v = Draft4Validator(schema)
     idx = 0
     for idx, error in enumerate(v.iter_errors(spec.to_dict()), 1):

@@ -1,5 +1,6 @@
 import io
 from seqspec.Assay import Assay
+from seqspec.Region import Region
 import yaml
 
 

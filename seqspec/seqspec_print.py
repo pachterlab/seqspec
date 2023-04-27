@@ -1,5 +1,6 @@
 from seqspec.utils import load_spec
 from seqspec.seqspec_print_html import run_print_html
+import newick
 
 
 def setup_print_args(parser):
@@ -16,7 +17,13 @@ def setup_print_args(parser):
         type=str,
         default=None,
     )
-    parser_print.add_argument("--html", help="print html", action="store_true")
+    parser_print.add_argument(
+        "-f",
+        metavar="FORMAT",
+        help=("Format"),
+        type=str,
+        default="tree",
+    )
     return parser_print
 
 
@@ -24,12 +31,13 @@ def validate_print_args(parser, args):
     # if everything is valid the run_print
     fn = args.yaml
     o = args.o
-    html = args.html
+    fmt = args.f
     spec = load_spec(fn)
-    if html:
-        s = run_print_html(spec)
-    else:
-        s = run_print(spec)
+    CMD = {
+        "tree": run_print_tree,
+        "html": run_print_html,
+    }
+    s = CMD[fmt](spec)
     if o:
         with open(o, "w") as f:
             print(s, file=f)
@@ -43,6 +51,15 @@ def run_print(data):
     assay_spec = multiModalTemplate(data.assay_spec)
     s = f"{header}\n{header2}\n{assay_spec}"
     return s
+
+
+def run_print_tree(spec):
+    t = []
+    for r in spec.assay_spec:
+        t.append(r.to_newick())
+    n = ",".join(t)
+    tree = newick.loads(n)
+    return tree[0].ascii_art()
 
 
 def headerTemplate(name, doi, description, modalities):
