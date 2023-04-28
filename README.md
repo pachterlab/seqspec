@@ -14,6 +14,63 @@ pip install seqspec
 seqspec format --help
 ```
 
+## Getting started
+To create a `seqspec` file for your own data, start by identifying the relevant sequenced elements in your FASTQ files. For example
+- `R1.fastq.gz` contains
+    - 16bp barcode from a predefined "onlist"
+    - 12bp umi randomly generated
+- `R2.fastq.gz` contains
+    - 150bp cDNA
+- `I1.fastq.gz` contains
+    - 8bp sample index from a predefined "onlist"
+
+Then, "initialize" a `seqspec` file with `seqspec init` which takes in a [newick](https://en.wikipedia.org/wiki/Newick_format) formatted string that specifies the information above. For more information about initializing a `seqspec` file, please see the section on `Initializing a seqspec`.
+```bash
+seqspec init -n myassay -m 1 -o spec.yaml "(((barcode:16,umi:12)R1.fastq.gz,(cDNA:150)R2.fastq.gz,(index7:8)I1.fastq.gz)rna)"
+```
+
+Next, add relevant information to the spec by hand. For example, add the "onlist" for the `R1.fastq.gz` barcode:
+```yaml
+    - !Region
+      parent_id: null
+      region_id: barcode
+      region_type: barcode
+      name: barcode
+      sequence_type: onlist
+      order: 0
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist:
+        filename: onlist_barcode.txt
+        md5: 131d3e81f7070402fa972d320f88449b
+      regions: null
+```
+
+Update the `seqspec` file with `seqspec format`:
+```bash
+seqspec format -o fmt.yaml spec.yaml
+```
+
+And lastly, check that the spec is properly formatted and manually correct errors as needed:
+```bash
+seqspec check fmt.yaml
+```
+
+To view the "ordered tree" representation of the `seqspec`, run
+```bash
+seqspec print fmt.yaml
+```
+which prints
+```bash
+                                             ┌─'barcode:16'
+                              ┌─R1.fastq.gz──┤
+                              │              └─'umi:12'
+────────────── ──rna──────────┤
+                              ├─R2.fastq.gz─ ──'cDNA:150'
+                              └─I1.fastq.gz─ ──'index7:8'
+```
+
 ## Specification
 
 Each assay is described by two objects: the `Assay` object and the `Region` object. A library is described by one `Assay` object and multiple (possibly nested) `Region` objects. The `Region` objects are grouped with a `join` operation and an `order` on the sub`Region`s specified. A simple (but not fully specified example) looks like the following:
@@ -404,6 +461,47 @@ assay_spec:
 # I1.fastq.gz "Index 1, i7 index"
 # I2.fastq.gz "Index 2, i5 index"
 ```
+
+## Initializing a `seqspec`
+To help users create a seqspec from their own data, the `seqspec` cli offers a simple tool `seqspec init` that autogenerates a `spec.yaml` from a string representation of the data. The input is a [newick file format](https://en.wikipedia.org/wiki/Newick_format) which naturally represents nested grouping of sequencing files and sequenced elements. By way of example, suppose we had the following sequencing data:
+
+- `R1.fastq.gz` contains
+    - 16bp barcode from a predefined "onlist"
+    - 12bp umi randomly generated
+- `R2.fastq.gz` contains
+    - 150bp cDNA
+- `I1.fastq.gz` contains
+    - 8bp sample index from a predefined "onlist"
+    
+A compatible `newick` string would be 
+```bash
+(((barcode:16,umi:12)R1.fastq.gz,(cDNA:150)R2.fastq.gz,(index7:8)I1.fastq.gz)rna)
+```
+
+Breaking the string we see the nested structure of the data
+```bash
+(
+    (
+        (
+            barcode:16,
+            umi:12
+        )R1.fastq.gz,
+        (
+            cDNA:150
+        )R2.fastq.gz,
+        (
+            index7:8
+        )I1.fastq.gz
+    )rna
+)
+```
+
+Initializing a `seqspec` specification is as simple as 
+```bash
+seqspec init -n myassay -m 1 -o spec.yaml "(((barcode:16,umi:12)R1.fastq.gz,(cDNA:150)R2.fastq.gz,(index7:8)I1.fastq.gz)rna)"
+```
+
+Note that the newick string must be enclosed in quotes.
 
 ## Contributing
 
