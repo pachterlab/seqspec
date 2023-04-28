@@ -170,7 +170,7 @@ assay_spec:
       max_len: 149
       onlist: null
       regions:
-      # Cell Barcode
+      # UMI
         - !Region
           region_id: UMI
           region_type: UMI
@@ -182,7 +182,7 @@ assay_spec:
           onlist: null
           regions: null
           parent_id: RNA-R2.fastq.gz
-      # UMI
+      # poly_A
         - !Region
           region_id: poly_A
           region_type: poly_A
@@ -195,17 +195,17 @@ assay_spec:
           regions: null
           parent_id: RNA-R2.fastq.gz
         - !Region
-		  region_id: RNA-raw-cell-barcode
-		  region_type: gz
-		  name: RNA Raw Cell Barcode
-		  sequence_type: joined
-		  sequence: TCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
-		  min_len: 99
-		  max_len: 99
-		  onlist: null
-		  parent_id: RNA-R2.fastq.gz
+	  region_id: RNA-raw-cell-barcode
+	  region_type: gz
+	  name: RNA Raw Cell Barcode
+	  sequence_type: joined
+	  sequence: TCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
+	  min_len: 99
+	  max_len: 99
+	  onlist: null
+	  parent_id: RNA-R2.fastq.gz
           regions:
-       - !Region
+       		- !Region
 		  region_id: linker1
 		  region_type: linker1
 		  name: linker1
