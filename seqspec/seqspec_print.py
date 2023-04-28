@@ -58,7 +58,8 @@ def run_print_tree(spec):
     for r in spec.assay_spec:
         t.append(r.to_newick())
     n = ",".join(t)
-    tree = newick.loads(n)
+    # print(n)
+    tree = newick.loads(f"({n})")
     return tree[0].ascii_art()
 
 
