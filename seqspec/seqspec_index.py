@@ -48,7 +48,7 @@ def setup_index_args(parser):
 
 
 def validate_index_args(parser, args):
-    # if everything is valid the run_index
+    # if everything is valid the get_index
     # get paramters
     fn = args.yaml
     m = args.m
@@ -60,12 +60,18 @@ def validate_index_args(parser, args):
     # load spec
     spec = load_spec(fn)
     rgns = r.split(",")
+    x = run_index(spec, m, rgns, fmt=t, rev=rev)
 
-    indices = []
-    for r in rgns:
-        index = run_index(spec, m, r, rev=rev)
-        indices.append({r: index})
+    # post processing
+    if o:
+        with open(o, "w") as f:
+            print(x, file=f)
+    else:
+        print(x)
+    return
 
+
+def run_index(spec, modality, regions, fmt="tab", rev=False):
     FORMAT = {
         "kb": format_kallisto_bus,
         "starsolo": format_starsolo,
@@ -73,15 +79,14 @@ def validate_index_args(parser, args):
         "simpleaf": format_simpleaf,
         "zumis": format_zumis,
     }
-    # post processing
-    if o:
-        with open(o, "w") as f:
-            print(FORMAT[t](indices), file=f)
-    else:
-        print(FORMAT[t](indices))
+    indices = []
+    for r in regions:
+        index = get_index(spec, modality, r, rev=rev)
+        indices.append({r: index})
+    return FORMAT[fmt](indices)
 
 
-def run_index_by_type(
+def get_index_by_type(
     spec, modality, region_id, rev=False
 ) -> Dict[str, List[Tuple[int, int]]]:
     rid = region_id
@@ -102,7 +107,7 @@ def run_index_by_type(
     return index
 
 
-def run_index(spec, modality, region_id, rev=False) -> Dict[Tuple[int, int], str]:
+def get_index(spec, modality, region_id, rev=False) -> Dict[Tuple[int, int], str]:
     rid = region_id
     # run function
     index = defaultdict()
@@ -123,7 +128,7 @@ def run_index(spec, modality, region_id, rev=False) -> Dict[Tuple[int, int], str
 def format_kallisto_bus(indices):
     bcs = []
     umi = []
-    cdna = []
+    feature = []
     for idx, region in enumerate(indices):
         for rgn, index in region.items():
             for k, v in index.items():
@@ -131,10 +136,14 @@ def format_kallisto_bus(indices):
                     bcs.append(f"{idx},{k[0]},{k[1]}")
                 elif v == "umi":
                     umi.append(f"{idx},{k[0]},{k[1]}")
-                elif v == "cDNA":
-                    cdna.append(f"{idx},{k[0]},{k[1]}")
+                elif v == "cDNA" or v == "gDNA":
+                    feature.append(f"{idx},{k[0]},{k[1]}")
+    if len(umi) == 0:
+        umi.append("-1,-1,-1")
+    if len(bcs) == 0:
+        bcs.append("-1,-1,-1")
 
-    x = ",".join(bcs) + ":" + ",".join(umi) + ":" + ",".join(cdna)
+    x = ",".join(bcs) + ":" + ",".join(umi) + ":" + ",".join(feature)
     return x
 
 

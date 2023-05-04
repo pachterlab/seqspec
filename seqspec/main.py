@@ -10,6 +10,7 @@ from .seqspec_find import setup_find_args, validate_find_args
 from .seqspec_index import setup_index_args, validate_index_args
 from .seqspec_split import setup_split_args, validate_split_args
 from .seqspec_init import setup_init_args, validate_init_args
+from .seqspec_onlist import setup_onlist_args, validate_onlist_args
 
 # Steps to add new subcommands
 # Create seqspec_subcommand.py (create setup_subcmd_args, validate_subcmd_args, run_subcmd in that file)
@@ -31,11 +32,11 @@ def main():
     # Setup the arguments for all subcommands
     command_to_parser = {
         "check": setup_check_args(subparsers),
-        # "convert": setup_convert_args(subparsers),
         "find": setup_find_args(subparsers),
         "format": setup_format_args(subparsers),
         "index": setup_index_args(subparsers),
         "init": setup_init_args(subparsers),
+        "onlist": setup_onlist_args(subparsers),
         "print": setup_print_args(subparsers),
         "split": setup_split_args(subparsers),
     }
@@ -56,12 +57,12 @@ def main():
     # Setup validator and runner for all subcommands (validate and run if valid)
     COMMAND_TO_FUNCTION = {
         "format": validate_format_args,
-        # "convert": validate_convert_args,
         "print": validate_print_args,
         "check": validate_check_args,
         "find": validate_find_args,
         "index": validate_index_args,
         "init": validate_init_args,
+        "onlist": validate_onlist_args,
         "split": validate_split_args,
     }
     COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)

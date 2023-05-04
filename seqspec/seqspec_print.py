@@ -4,27 +4,27 @@ import newick
 
 
 def setup_print_args(parser):
-    parser_print = parser.add_parser(
+    subparser = parser.add_parser(
         "print",
         description="print seqspec file",
         help="print seqspec file",
     )
-    parser_print.add_argument("yaml", help="Sequencing specification yaml file")
-    parser_print.add_argument(
+    subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    subparser.add_argument(
         "-o",
         metavar="OUT",
         help=("Path to output file"),
         type=str,
         default=None,
     )
-    parser_print.add_argument(
+    subparser.add_argument(
         "-f",
         metavar="FORMAT",
         help=("Format"),
         type=str,
         default="tree",
     )
-    return parser_print
+    return subparser
 
 
 def validate_print_args(parser, args):

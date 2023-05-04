@@ -3,9 +3,7 @@ import os
 from unittest import TestCase
 
 from seqspec.Region import Region
-from seqspec.utils import (
-    load_spec_stream, get_cuts, write_read
-)
+from seqspec.utils import load_spec_stream, get_cuts, write_read
 
 from .test_region import (
     region_rna_joined_dict,
@@ -43,7 +41,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 0
   - !Region
     region_id: cDNA
     region_type: cDNA
@@ -55,7 +52,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 1
   - !Region
     region_id: SOLiD_bc_adapter
     region_type: SOLiD_bc_adapter
@@ -67,7 +63,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 2
   - !Region
     region_id: index
     region_type: index
@@ -81,7 +76,6 @@ assay_spec:
       md5: null
     regions: null
     parent_id: RNA
-    order: 3
   - !Region
     region_id: p2_adapter
     region_type: p2_adapter
@@ -93,8 +87,6 @@ assay_spec:
     onlist: null
     regions: null
     parent_id: RNA
-    order: 4
-  order: 0
 """
 
 
