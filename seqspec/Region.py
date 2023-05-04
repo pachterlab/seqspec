@@ -13,13 +13,11 @@ class Region(yaml.YAMLObject):
         region_type: str,
         name: str,
         sequence_type: str,
-        order: int = 0,
         sequence: str = "",
         min_len: int = 0,
         max_len: int = 1024,
         onlist: Optional["Onlist"] = None,
-        regions: Optional[List["Region"]] = None
-        # join: Optional["Join"] = None,
+        regions: Optional[List["Region"]] = None,
     ) -> None:
         super().__init__()
         self.parent_id = None
@@ -27,7 +25,6 @@ class Region(yaml.YAMLObject):
         self.region_type = region_type
         self.name = name
         self.sequence_type = sequence_type
-        self.order = order
         self.sequence = sequence
 
         self.min_len = min_len
@@ -35,7 +32,6 @@ class Region(yaml.YAMLObject):
 
         self.onlist = onlist
         self.regions = regions
-        # self.join = join
 
         if self.regions:
             self.min_len, self.max_len = self.get_len()
@@ -50,7 +46,6 @@ class Region(yaml.YAMLObject):
                 r.set_parent_id(parent_id)
 
     def get_sequence(self, s: str = "") -> str:
-        # take into account "order" property
         if self.regions:
             for r in self.regions:
                 s = r.get_sequence(s)
@@ -70,14 +65,16 @@ class Region(yaml.YAMLObject):
             max_l += self.max_len
         return (min_l, max_l)
 
-    def update_attr(self, order=0):
+    def get_onlist(self):
+        return self.onlist
+
+    def update_attr(self):
         if self.regions:
             for idx, r in enumerate(self.regions):
-                r.update_attr(idx)
+                r.update_attr()
 
         self.sequence = self.get_sequence()
         self.min_len, self.max_len = self.get_len()
-        self.order = order
         return
 
     def __repr__(self) -> str:

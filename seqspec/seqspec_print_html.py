@@ -66,7 +66,6 @@ def colorSeq(regions):
 def atomicRegionTemplate(
     region: Region,
     name,
-    order,
     region_type,
     sequence_type,
     sequence,
@@ -83,11 +82,10 @@ def atomicRegionTemplate(
     onlist = f"{onlist.filename} (md5: {onlist.md5})" if onlist else None
     lst = []
     if regions:
-        for r in regions:
+        for idx, r in enumerate(regions):
             s = atomicRegionTemplate(
                 r,
                 r.region_id,
-                r.order,
                 r.region_type,
                 r.sequence_type,
                 r.sequence,
@@ -106,7 +104,6 @@ def atomicRegionTemplate(
     s = f"""<details>
     <summary>{name}</summary>
     <ul>
-      <li>order: {order}</li>
       <li>region_type: {region_type}</li>
       <li>sequence_type: {sequence_type}</li>
       <li>
@@ -137,7 +134,6 @@ def regionsTemplate(regions):
     {'</li><li>'.join([atomicRegionTemplate(
                 r,
                 r.region_id,
-                r.order,
                 r.region_type,
                 r.sequence_type,
                 r.sequence,
@@ -145,7 +141,7 @@ def regionsTemplate(regions):
                 r.max_len,
                 r.onlist,
                 r.regions,
-    ) for r in regions])}
+    ) for idx, r in enumerate(regions)])}
     </li></ol>"""
     return s
 

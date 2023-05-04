@@ -59,7 +59,6 @@ class TestRegion(TestCase):
         self.assertEqual(r.region_type, expected["region_type"])
         self.assertEqual(r.name, expected["name"])
         self.assertEqual(r.sequence_type, expected["sequence_type"])
-        self.assertEqual(r.order, 0)
         self.assertEqual(r.sequence, "")
         self.assertEqual(r.min_len, 0)
         self.assertEqual(r.max_len, 1024)
