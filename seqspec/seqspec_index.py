@@ -136,7 +136,7 @@ def format_kallisto_bus(indices):
                     bcs.append(f"{idx},{k[0]},{k[1]}")
                 elif v == "umi":
                     umi.append(f"{idx},{k[0]},{k[1]}")
-                elif v == "cDNA" or v == "gDNA":
+                elif v == "cDNA" or v == "gDNA" or v == "protein" or v == "tag":
                     feature.append(f"{idx},{k[0]},{k[1]}")
     if len(umi) == 0:
         umi.append("-1,-1,-1")
