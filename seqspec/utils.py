@@ -31,3 +31,8 @@ def get_cuts(regions, cuts=[]):
 
 def write_read(header, seq, qual, f):
     f.write(f"{header}\n{seq}\n+\n{qual}\n")
+
+
+def read_list(fname):
+    with open(fname, "r") as f:
+        return [l.strip() for l in f.readlines()]
