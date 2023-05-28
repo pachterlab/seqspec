@@ -2,6 +2,8 @@
 
 `seqspec` is a machine-readable YAML file format for genomic library sequence and structure. It was inspired by and builds off of the Teichmann Lab [Single Cell Genomics Library Structure](https://github.com/Teichlab/scg_lib_structs) by [Xi Chen](https://github.com/dbrg77).
 
+Genomic library structure depends on the assay used, and read structure depends additionally on the sequencer used to sequence the library. Therefore, a `seqspec` is specific to both a single-cell genomics assay and sequencer. 
+
 A list of `seqspec` examples for multiple assays can be found in the `assays/` folder. Each `spec.yaml` describes the 5'->3' "Final library structure" for the assay. Sequence specification files can be formatted with the `seqspec` command line tool.
 
 <img alt="image" src="https://github.com/IGVF/seqspec/assets/10369156/c314d7ee-c517-4137-ab48-b10d5ad08304">
