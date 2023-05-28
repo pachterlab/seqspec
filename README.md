@@ -18,6 +18,6 @@ seqspec format --help
 
 Documentation:
 
-- [`TUTORIAL.md` : Write a `seqspec`](TUTORIAL.md)
-- [`CONTRIBUTING.md` : Contribute a `seqspec`](CONTRIBUTING.md)
-- [`SPECIFICATION.md`: The `seqspec` specification](SPECIFICATION.md)
+- [`docs/TUTORIAL.md` : Write a `seqspec`](docs/TUTORIAL.md)
+- [`docs/CONTRIBUTING.md` : Contribute a `seqspec`](docs/CONTRIBUTING.md)
+- [`docs/SPECIFICATION.md`: The `seqspec` specification](docs/SPECIFICATION.md)
