@@ -13,7 +13,8 @@ pip install git+https://github.com/IGVF/seqspec.git
 # released
 pip install seqspec
 
-seqspec format --help
+# verify install
+seqspec --help
 ```
 
 Documentation:
