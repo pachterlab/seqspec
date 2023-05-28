@@ -16,7 +16,6 @@ pip install seqspec
 seqspec format --help
 ```
 
-
 ## Getting started
 
 To create a `seqspec` file for your own data, start by identifying the relevant sequenced elements in your FASTQ files. For example
@@ -518,11 +517,17 @@ Note that the newick string must be enclosed in quotes.
 
 ## Contributing
 
-Thank you for wanting to improve `seqspec`. If you have a bug that is related to `seqspec` please create an issue. The issue should contain
+Thank you for wanting to add a spec or improve `seqspec`. If you have a bug that is related to `seqspec` please create an issue.
+
+### Issues
+
+The issue should contain
 
 - the `seqspec` command ran,
 - the error message, and
 - the `seqspec` and python version.
+
+### Specs and code changes
 
 If you'd like to add assays sequence specifications or make modifications to the `seqspec` tool please do the following:
 
@@ -542,9 +547,37 @@ git checkout -b cool-new-feature
 
 3. Make changes, add files, and commit
 
+This means creating a `seqspec` for the assay and including one million reads for the FASTQ files pointed to in the spec. Assay specs should be located in `assays/MYASSAY/`. File structure should look like:
+
+```bash
+MYASSAY
+├── onlist.txt.gz
+├── ...
+├── spec.yaml
+└── fastqs
+    ├── R1.fastq.gz
+    ├── R2.fastq.gz
+    └── ...
+```
+
+To generate one million reads from the FASTQ files associated with your spec, the following cna be run:
+
+```bash
+zcat allreads_R1.fastq.gz | head -4000000 | gzip > R1.fastq.gz # fastq files has 4 lines per record so 1 million records = 4 milllion lines
+```
+
+Before committing the spec, make sure to run:
+
+```bash
+seqspec print spec.yaml # make sure the structure matches expected
+secspec check spec.yaml # checks the seqspec against the defined specification
+seqspec format -o fmt.yaml spec.yaml  # formats many of the empty fields
+mv fmt.yaml spec.yaml # move the formatted spec to the spec.yaml
+```
+
 ```bash
 # make changes, add files, and commit them
-git add path/to/file1.yaml path/to/file2.yaml
+git add onlist.txt.gz spec.yaml fastq/R1.fastq.gz fastq/R2.fastq.gz
 git commit -m "I made these changes"
 ```
 
