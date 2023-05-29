@@ -64,6 +64,8 @@ def run_init(name: str, tree: List[newick.Node]):
         mnames.append(t.name)
 
     assay = Assay(
+        assay="",
+        sequencer="",
         name=name,
         doi="",
         publication_date="",

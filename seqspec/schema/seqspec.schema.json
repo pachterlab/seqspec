@@ -5,6 +5,18 @@
   "description": "A Assay of DNA",
   "type": "object",
   "properties": {
+    "seqspec_version": {
+      "description": "Version of the seqspec specification used",
+      "type": "string"
+    },
+    "assay": {
+      "description": "The name of the assay",
+      "type": "string"
+    },
+    "sequencer": {
+      "description": "The sequencer used to sequence the library",
+      "type": "string"
+    },
     "name": {
       "description": "The name of the assay",
       "type": "string"
@@ -41,6 +53,9 @@
     }
   },
   "required": [
+    "seqspec_version",
+    "sequencer",
+    "assay",
     "name",
     "doi",
     "publication_date",

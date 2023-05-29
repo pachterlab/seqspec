@@ -2,6 +2,7 @@ import yaml
 from seqspec.Region import Region
 from typing import List
 import json
+from . import __version__
 
 
 class Assay(yaml.YAMLObject):
@@ -9,6 +10,8 @@ class Assay(yaml.YAMLObject):
 
     def __init__(
         self,
+        assay: str,
+        sequencer: str,
         name: str,
         doi: str,
         publication_date: str,
@@ -16,8 +19,12 @@ class Assay(yaml.YAMLObject):
         modalities: List[str],
         lib_struct: str,
         assay_spec: List[Region],
+        seqspec_version: str = __version__,
     ) -> None:
         super().__init__()
+        self.assay = assay
+        self.sequencer = sequencer
+        self.seqspec_version = seqspec_version
         self.name = name
         self.doi = doi
         self.publication_date = publication_date
@@ -28,6 +35,9 @@ class Assay(yaml.YAMLObject):
 
     def __repr__(self) -> str:
         d = {
+            "seqspec_version": self.seqspec_version,
+            "assay": self.assay,
+            "sequencer": self.sequencer,
             "name": self.name,
             "doi": self.doi,
             "publication_date": self.publication_date,
@@ -40,6 +50,9 @@ class Assay(yaml.YAMLObject):
 
     def to_dict(self):
         d = {
+            "seqspec_version": self.seqspec_version,
+            "assay": self.assay,
+            "sequencer": self.sequencer,
             "name": self.name,
             "doi": self.doi,
             "publication_date": self.publication_date,

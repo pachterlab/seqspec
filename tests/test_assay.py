@@ -12,6 +12,8 @@ from .test_region import (
 
 def assay_dict(regions=[]):
     return {
+        "assay": "My assay",
+        "sequencer": "My sequencing machine",
         "name": "A machine-readable specification for genomics assays",
         "doi": "https://doi.org/10.1101/2023.03.17.533215",
         "publication_date": "20230317",
