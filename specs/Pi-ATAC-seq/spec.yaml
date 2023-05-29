@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: Pi-ATAC-seq
 doi: https://doi.org/10.1038/s41467-018-07115-y
 publication_date: 02 November 2018

@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: 10x-RNA-v3
 doi: https://doi.org/10.1038/ncomms14049
 publication_date: null

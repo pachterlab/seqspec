@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: STRT-seq-C1
 doi: https://doi.org/10.1007/978-1-4939-9240-9_9
 publication_date: 27 April 2019

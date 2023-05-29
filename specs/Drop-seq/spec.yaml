@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: Drop-seq
 doi: https://doi.org/10.1016/j.cell.2015.05.002
 publication_date: 21 May 2015

@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: Quartz-seq
 doi: https://doi.org/10.1186/gb-2013-14-4-r31
 publication_date: 17 April 2013

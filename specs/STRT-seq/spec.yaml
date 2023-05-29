@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: STRT-seq
 doi: https://doi.org/10.1038/nprot.2012.022
 publication_date: 05 April 2012

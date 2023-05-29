@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: 10xFB protein and RNA assay 5'
 doi: https://doi.org/10.1038/ncomms14049
 publication_date: null

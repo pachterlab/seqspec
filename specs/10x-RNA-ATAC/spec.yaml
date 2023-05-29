@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: 10x-ATAC-RNA
 doi: https://www.globenewswire.com/en/news-release/2020/09/15/2093690/0/en/10x-Genomics-First-to-Market-With-Product-to-Simultaneously-Capture-Epigenome-and-Transcriptome.html
 publication_date: 15 September 2020

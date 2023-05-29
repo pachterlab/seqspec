@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: STRT-seq-2i
 doi: https://doi.org/10.1038/s41598-017-16546-4
 publication_date: 27 November 2017

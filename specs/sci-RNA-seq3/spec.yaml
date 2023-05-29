@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: sci-RNA-seq3
 doi: https://doi.org/10.1038/s41586-019-0969-x
 publication_date: 20 February 2019

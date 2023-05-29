@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: 10xFB-3prime
 doi: https://www.10xgenomics.com/blog/san-diego-user-group-meeting-2018-recap
 publication_date: 12 February 2018

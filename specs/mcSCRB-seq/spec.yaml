@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: mcSCRB-seq
 doi: https://doi.org/10.1038/s41467-018-05347-6
 publication_date: 26 July 2018

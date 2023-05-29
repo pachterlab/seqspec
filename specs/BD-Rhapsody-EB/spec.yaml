@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: BD-Rhapsody-EB
 doi: https://scomix.bd.com/hc/en-us/articles/6990647359501-Rhapsody-WTA-Demo-Datasets-with-Enhanced-Cell-Capture-Beads
 publication_date: 31 August 2022

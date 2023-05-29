@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: 10xFB-VDJ-5prime
 doi: https://www.10xgenomics.com/blog/ashg-2016-round-up
 description: 10x single-cell RNA-seq and VDJ 5'

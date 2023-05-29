@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: Microwell-seq
 doi: https://doi.org/10.1016/j.cell.2018.02.001
 publication_date: 22 February 2018

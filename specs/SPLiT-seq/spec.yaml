@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: SPLiT-seq
 doi: https://doi.org/10.1126/science.aam8999
 publication_date: 15 March 2018

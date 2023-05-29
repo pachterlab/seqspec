@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: Smart-seq2
 doi: https://doi.org/10.1038/nprot.2014.006
 publication_date: 02 January 2014

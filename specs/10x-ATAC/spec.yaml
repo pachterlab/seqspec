@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: 10x-ATAC
 doi: https://www.10xgenomics.com/blog/demonstrated-protocol-for-nuclei-isolation-for-single-cell-atac-solution
 publication_date: 19 October 2018

@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: CEL-Seq
 doi: https://doi.org/10.1016/j.celrep.2012.08.003
 publication_date: 30 August 2012

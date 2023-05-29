@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: SHARE-seq
 doi: https://doi.org/10.1016/j.cell.2020.09.056
 publication_date: 23 October 2020

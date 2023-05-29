@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: Seq-Well-S3
 doi: https://doi.org/10.1101/689273
 publication_date: 02 July 2019

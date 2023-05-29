@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: BD-Rhapsody-v1
 doi: https://doi.org/10.1038/s41592-018-0255-0
 publication_date: 20 December 2018
