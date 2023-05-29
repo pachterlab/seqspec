@@ -149,7 +149,9 @@ RNA = Region(
 )
 
 assay = Assay(
-    name="sci-RNA-sequence",
+    assay="sci-RNA-sequence",
+    sequencer="Illumina HiSeq 2500",
+    name="sci-RNA-sequence/Illumina HiSeq 2500",
     doi="https://doi.org/10.1126/science.aam8940",
     description="combinatorial single-cell RNA-sequence",
     modalities=["RNA"],
