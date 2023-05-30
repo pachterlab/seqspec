@@ -42,7 +42,7 @@ assay_spec:
     max_len: 16
     onlist: null
     regions:
-      - !Region
+    - !Region
       parent_id: RNA-I2.fastq.gz
       region_id: RNA-cell_bc
       region_type: barcode
