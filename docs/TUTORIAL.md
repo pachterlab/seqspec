@@ -1,6 +1,7 @@
+
 # Getting started
 
-To create a `seqspec` file for your own data, start by identifying the relevant sequenced elements in your FASTQ files. For example
+To help users create a seqspec from their own data, the `seqspec` cli offers a simple tool `seqspec init` that autogenerates a `spec.yaml` from a string representation of the data. The input is a [newick file format](https://en.wikipedia.org/wiki/Newick_format) which naturally represents nested grouping of sequencing files and sequenced elements. By way of example, suppose we had the following sequencing data:
 
 - `R1.fastq.gz` contains
   - 16bp barcode from a predefined "onlist"
@@ -10,13 +11,58 @@ To create a `seqspec` file for your own data, start by identifying the relevant 
 - `I1.fastq.gz` contains
   - 8bp sample index from a predefined "onlist"
 
-Then, "initialize" a `seqspec` file with `seqspec init` which takes in a [newick](https://en.wikipedia.org/wiki/Newick_format) formatted string that specifies the information above. For more information about initializing a `seqspec` file, please see the section on `Initializing a seqspec`.
+A compatible `newick` string would be
+
+```bash
+(((barcode:16,umi:12)R1.fastq.gz,(cDNA:150)R2.fastq.gz,(index7:8)I1.fastq.gz)rna)
+```
+
+Breaking the string we see the nested structure of the data
+
+```bash
+(
+    (
+        (
+            barcode:16,
+            umi:12
+        )R1.fastq.gz,
+        (
+            cDNA:150
+        )R2.fastq.gz,
+        (
+            index7:8
+        )I1.fastq.gz
+    )rna
+)
+```
+
+Initializing a `seqspec` specification is as simple as
 
 ```bash
 seqspec init -n myassay -m 1 -o spec.yaml "(((barcode:16,umi:12)R1.fastq.gz,(cDNA:150)R2.fastq.gz,(index7:8)I1.fastq.gz)rna)"
 ```
 
-Next, add relevant information to the spec by hand. For example, add the "onlist" for the `R1.fastq.gz` barcode:
+Note that the newick string must be enclosed in quotes.
+
+Next, add relevant information to the spec by hand- add information about the assay to the spec:
+
+```yaml
+!Assay
+seqspec_version: 0.0.0
+assay: My Assay
+sequencer: My Sequencer
+name: MyAssay/Myseq
+doi: doi-to-assay-release.org
+publication_date: 01 January 1970
+description: My awesome assay
+modalities:
+  - RNA
+lib_struct: www.link-to-lib-structs.com
+assay_spec:
+	...
+```
+
+and add information to the regions you've identified. For example, add the "onlist" for the `R1.fastq.gz` barcode:
 
 ```yaml
 - !Region
@@ -63,52 +109,10 @@ which prints
                               └─I1.fastq.gz─ ──'index7:8'
 ```
 
-# Initializing a `seqspec`
 
-To help users create a seqspec from their own data, the `seqspec` cli offers a simple tool `seqspec init` that autogenerates a `spec.yaml` from a string representation of the data. The input is a [newick file format](https://en.wikipedia.org/wiki/Newick_format) which naturally represents nested grouping of sequencing files and sequenced elements. By way of example, suppose we had the following sequencing data:
 
-- `R1.fastq.gz` contains
-  - 16bp barcode from a predefined "onlist"
-  - 12bp umi randomly generated
-- `R2.fastq.gz` contains
-  - 150bp cDNA
-- `I1.fastq.gz` contains
-  - 8bp sample index from a predefined "onlist"
 
-A compatible `newick` string would be
-
-```bash
-(((barcode:16,umi:12)R1.fastq.gz,(cDNA:150)R2.fastq.gz,(index7:8)I1.fastq.gz)rna)
-```
-
-Breaking the string we see the nested structure of the data
-
-```bash
-(
-    (
-        (
-            barcode:16,
-            umi:12
-        )R1.fastq.gz,
-        (
-            cDNA:150
-        )R2.fastq.gz,
-        (
-            index7:8
-        )I1.fastq.gz
-    )rna
-)
-```
-
-Initializing a `seqspec` specification is as simple as
-
-```bash
-seqspec init -n myassay -m 1 -o spec.yaml "(((barcode:16,umi:12)R1.fastq.gz,(cDNA:150)R2.fastq.gz,(index7:8)I1.fastq.gz)rna)"
-```
-
-Note that the newick string must be enclosed in quotes.
-
-# Example
+# A worked example
 
 We are going to walk through the process of writing a `seqspec` sequencing specification. We will
 
@@ -153,7 +157,7 @@ Regions of template molecules are encoded as "Regions" in our `seqspec`. Each "R
   regions: null
 ```
 
-# Nesting Regions
+## Nesting Regions
 
 Regions can also contain Regions. Supposed that we wanted to annotate `Barcode1` and `SyntheticSeq` as being derived from the "read". Then we can group both of those Regions into "parent" Region under the "regions" parameter.
 
@@ -194,7 +198,10 @@ To illustrate the mechanics of a `seqspec`, we will construct one for the [ISSAA
 
 ```yaml
 !Assay
-name: ISSAAC-seq
+seqspec_version: 0.0.0
+assay: ISSAAC-seq
+sequencer: Illumina MiSeq
+name: ISSAAC-seq/Miseq
 doi: https://doi.org/10.1038/s41592-022-01601-4
 description: single-cell RNAseq and ATACseq
 modalities: [RNA, ATAC]
@@ -202,31 +209,35 @@ lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/ISSAAC-seq.h
 assay_spec:
 ```
 
-Since the assay is "multi-modal" we specify two modalities "RNA" and "ATAC". These will be the first two "parent" regions in the "assay_spec" group:
+Since the assay is "multi-modal" we specify two modalities "RNA" and "ATAC". These will be the first two "parent" regions in the `assay_spec` group:
 
 ```yaml
 assay_spec:
   - !Region
     region_id: RNA
+    region_type: RNA
     name: RNA
     sequence_type: joined
     sequence:
     min_len:
     max_len:
     onlist:
-    regions: ...
+    regions: 
+	    ...
   - !Region
     region_id: ATAC
+    region_type: ATAC
     name: ATAC
     sequence_type: joined
     sequence:
     min_len:
     max_len:
     onlist:
-    regions: ...
+    regions: 
+	    ...
 ```
 
-We'll leave most parameters empty for since, they will get auto populated once we fill out the "atomic" regions and run the `seqspec` command line tool. Now we list out all of the possible RNA regions and all of the possible ATAC regions. Note that these names come from the "(8) Final library structure:" section from the Teichmann lab website for ISSAAC-seq and are listed in the 5'->3' order.
+We'll leave most parameters empty since they will get auto populated once we fill out the "atomic" regions and run the `seqspec` command line tool. Now we list out all of the possible RNA regions and all of the possible ATAC regions. Note that these names come from the "(8) Final library structure:" section from the Teichmann lab website for ISSAAC-seq and are listed in the 5'->3' order.
 
 For the RNA:
 
@@ -255,4 +266,4 @@ For the ATAC
 9. Illumina P7
 ```
 
-Now that we have the atomic Region names, we can simply start to create atomic "Region" objects as described above using `seqspec init`.
+Now that we have the atomic Region names, we can simply start to create atomic "Region" objects as described above using `seqspec init` or the named regions identified in [SPECIFICATION.md](SPECIFICATION.md).
