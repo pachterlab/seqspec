@@ -1,6 +1,11 @@
+
 # Specification
 
-Each assay is described by two objects: the `Assay` object and the `Region` object. A library is described by one `Assay` object and multiple (possibly nested) `Region` objects. The `Region` objects are grouped with a `join` operation and an `order` on the sub`Region`s specified. A simple (but not fully specified example) looks like the following:
+`seqspec` stands for "Sequence Specification" and is a file format for annotating sequencing reads. The file is written in YAML and can be manipulated with the `seqspec` command line tool.
+
+## Terminology and Concepts
+
+Each `spec` is described by two objects: the `Assay` object and the `Region` object. A library is described by one `Assay` object and multiple (possibly nested) `Region` objects. The `Region` objects are grouped with a `join` operation and an `order` on the sub`Region`s specified. A simple (but not fully specified example) looks like the following:
 
 ```
 modalities:
@@ -19,13 +24,16 @@ assay_spec:
 
 In order to catalogue relevant information for each library structure, multiple properties are specified for each `Assay` and each `Region`. A description of the `Assay` and `Region` schema can be found in `seqspec/schema/seqspec.schema.json`.
 
-## `Assay` Parameters
+### `Assay` parameters
 
 Below is an example of an `Assay`.
 
 ```yaml
 !Assay
-name: SPLiT-seq
+seqspec_version: 0.0.0
+assay: SPLiT-seq
+sequencer: Illumina NextSeq500
+name: SPLiT-seq/Illumina
 doi: https://doi.org/10.1126/science.aam8999
 publication_date: 15 March 2018
 description: split-pool ligation-based transcriptome sequencing
@@ -33,9 +41,14 @@ modalities:
   - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SPLiT-seq.html
 assay_spec:
+	...
 ```
+The following terms fully specify an `Assay`
 
-- `name` is a free-form string that labels the assay
+- `seqspec_version`: a [semver](https://semver.org/) string that specifies the specification version
+- `assay`: is a free-form string that labels the assay
+- `sequencer`: is a free-form string that labels sequencer
+- `name` is a string that identifies the assay/sequencer combination that produces reads
 - `doi` is the doi link to the paper/protocol that describes the assay (if it exists)
 - `publication_date` is the date the assay was published (linked to by the `doi`). Must be in DD Month Year format.
 - `description` is a free-form string that describes the assay
@@ -43,7 +56,7 @@ assay_spec:
 - `lib_struct` is a link to the manually annotated library structure developed by Xi Chen in Sarah Teichmann's lab.
 - `assay_spec` is a list of `Regions`.
 
-## `Region` Parameters
+### `Region` parameters
 
 Below is an example of a `Region`.
 
@@ -68,6 +81,8 @@ regions: null
   - RNA
   - ATAC
   - CRISPR
+  - HIC
+  - METHYL
   - Protein
   - illumina_p5
   - illumina_p7
@@ -96,7 +111,7 @@ regions: null
   - if the `sequence_type` is `fixed` then the actual sequence string is provided
   - if the `sequence_type` is `joined` then field must be the concatenation of the nested regions
   - if the `sequence_type` is `onlist` then field must an `N` string of length of the shortest sequence on the onlist
-  - if the `sequence_type` is `random` then the field must be an `X`
+  - if the `sequence_type` is `random` then the field must be an `X` string
 - `min_len` is an integer greater than or equal to zero. It represents the minimum possible length of the `sequence`
 - `max_len` is an integer greater than or equal to the `min_len`. It represents the maximum length of the `sequence`
 - `onlist` can be `null` or contain
@@ -106,7 +121,7 @@ regions: null
 
 For more information about the specification of the various fields, please see `seqspec.schema.json` which is the JSON schema representation of the various fields described above.
 
-## YAML Tags
+### YAML Tags
 
 The YAML file contains tags (strings prepended with an exclamation point `!`) to describe the various objects (`Assay`, `Region`, `Onlist`). The purpose of these tags is to make it easy to load the `seqspec` into python as a python object. This makes it possibe to access the various attrbiutes of the `seqspec` file with "dot notation" as follows:
 
@@ -119,14 +134,17 @@ print(specA.get_modality("RNA").sequence)
 # AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
 ```
 
-# Named `Regions`
+## Named `Regions`
 
 For consistency across assays I suggest the following naming conventions for standard regions. Note that the `region_id` for all atomic regions should be unique.
 
 ```yaml
 # Assay region
 !Assay
-name: My-RNA-Assay
+seqspec_version: 0.0.0
+assay: My-RNA-Assay
+sequencer: MySequencr
+name: My-RNA-Assay/MySeq
 doi: mydoi.org
 publication_date: 01 January 2001
 description: My custom assay
@@ -144,7 +162,8 @@ assay_spec:
     max_len: 0
     onlist:
     regions:
-
+```
+```yaml
   # illumina_p5
   - !Region
     region_id: illumina_p5
