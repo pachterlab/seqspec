@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: ISSAAC-seq
 doi: https://doi.org/10.1038/s41592-022-01601-4
 publication_date: 15 September 2020

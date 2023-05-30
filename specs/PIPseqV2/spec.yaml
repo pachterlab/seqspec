@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: null
+sequencer: null
 name: PIPseq V2
 doi: https://doi.org/10.1038/s41587-023-01685-z
 publication_date: 06 March 2023
