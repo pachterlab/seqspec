@@ -12,9 +12,6 @@ A list of `seqspec` examples for multiple assays and sequencers can be found in 
 # development
 pip install git+https://github.com/IGVF/seqspec.git
 
-# released
-pip install seqspec
-
 # verify install
 seqspec --help
 ```
