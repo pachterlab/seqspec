@@ -31,6 +31,8 @@ def setup_find_args(parser):
         type=str,
         default=None,
     )
+    parser_find.add_argument("--rtype", help="Find by region type", action="store_true")
+
     return parser_find
 
 
@@ -42,11 +44,16 @@ def validate_find_args(parser, args):
     r = args.r
     o = args.o
 
+    rt = args.rtype
+
     # load spec
     spec = load_spec(fn)
 
     # run function
-    regions = run_find(spec, m, r)
+    if rt:
+        regions = run_find_by_type(spec, m, r)
+    else:
+        regions = run_find(spec, m, r)
 
     # post processing
     if o:

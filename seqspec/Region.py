@@ -136,6 +136,16 @@ class Region(yaml.YAMLObject):
                 found = r.get_region_by_type(region_type, found)
         return found
 
+    def get_onlist_regions(self, found=[]):
+        if not found:
+            found = []
+        if self.onlist is not None:
+            found.append(self)
+        if self.regions:
+            for r in self.regions:
+                found = r.get_onlist_regions(found)
+        return found
+
     def get_leaves(self, leaves=[]):
         if not leaves:
             leaves = []
