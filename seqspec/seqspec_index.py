@@ -132,11 +132,16 @@ def format_kallisto_bus(indices):
     for idx, region in enumerate(indices):
         for rgn, index in region.items():
             for k, v in index.items():
-                if v == "barcode":
+                if v.upper() == "BARCODE":
                     bcs.append(f"{idx},{k[0]},{k[1]}")
-                elif v == "umi":
+                elif v.upper() == "UMI":
                     umi.append(f"{idx},{k[0]},{k[1]}")
-                elif v == "cDNA" or v == "gDNA" or v == "protein" or v == "tag":
+                elif (
+                    v.upper() == "CDNA"
+                    or v.upper() == "GDNA"
+                    or v.upper() == "PROTEIN"
+                    or v.upper() == "TAG"
+                ):
                     feature.append(f"{idx},{k[0]},{k[1]}")
     if len(umi) == 0:
         umi.append("-1,-1,-1")
@@ -164,11 +169,11 @@ def format_starsolo(indices):
     for idx, region in enumerate(indices):
         for rgn, index in region.items():
             for k, v in index.items():
-                if v == "barcode":
+                if v.upper() == "BARCODE":
                     bcs.append(f"--soloCBstart {k[0] + 1} --soloCBlen {k[1]}")
-                elif v == "umi":
+                elif v.upper() == "UMI":
                     umi.append(f"--soloUMIstart {k[0] + 1} --soloUMIlen {k[1] - k[0]}")
-                elif v == "cDNA":
+                elif v.upper() == "CDNA":
                     cdna.append(f"{k[0]},{k[1]}")
     x = f"--soloType CB_UMI_Simple {bcs[0]} {umi[0]}"
     return x
@@ -182,11 +187,11 @@ def format_simpleaf(indices):
         x = f"{fn+1}{{"
         for rgn, index in region.items():
             for k, v in index.items():
-                if v == "barcode":
+                if v.upper() == "BARCODE":
                     x += f"b[{k[1]-k[0]}]"
-                elif v == "umi":
+                elif v.upper() == "UMI":
                     x += f"u[{k[1]-k[0]}]"
-                elif v == "cDNA":
+                elif v.upper() == "CDNA":
                     x += f"r[{k[1] - k[0]}]"
             x += "x:}"
         xl.append(x)
@@ -199,11 +204,11 @@ def format_zumis(indices):
         x = ""
         for rgn, index in region.items():
             for k, v in index.items():
-                if v == "barcode":
+                if v.upper() == "BARCODE":
                     x += f"- BCS({k[0] + 1}-{k[1]})\n"
-                elif v == "umi":
+                elif v.upper() == "UMI":
                     x += f"- UMI({k[0] + 1}-{k[1]})\n"
-                elif v == "cDNA":
+                elif v.upper() == "CDNA":
                     x += f"- cDNA({k[0] + 1}-{k[1]})\n"
         xl.append(x)
 
