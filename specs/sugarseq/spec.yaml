@@ -150,7 +150,7 @@ assay_spec:
     - !Region
       parent_id: tag_1-24_Barcodes_Rep1_S4_R2_001.fastq.gz
       region_id: mtag
-      region_type: mtag
+      region_type: tag
       name: mtag
       sequence_type: onlist
       sequence: NNNNNNNNNN
