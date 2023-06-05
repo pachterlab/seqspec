@@ -1,14 +1,15 @@
 !Assay
 assay: ''
-sequencer: ''
+sequencer: NextSeq2000 p3 kit
 seqspec_version: 0.0.0
 name: CRISPRa_screening
-doi: ''
-publication_date: ''
+doi: https://doi.org/10.1101/2023.03.28.534017
+publication_date: 28 March 2023
 description: Multiplex, single-cell CRISPRa screening for cell type specific regulatory
   elements
 modalities:
 - rna
+- crispr
 lib_struct: 28/10/10/90
 assay_spec:
 - !Region
@@ -17,16 +18,16 @@ assay_spec:
   region_type: rna
   name: rna
   sequence_type: joined
-  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNXNNNNNNNNNNNNNNNNNNNN
-  min_len: 138
-  max_len: 138
+  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNXNNNNNNNNNN
+  min_len: 128
+  max_len: 128
   onlist: null
   regions:
   - !Region
     parent_id: rna
-    region_id: R1_001.fastq.gz
+    region_id: rna_R1_001.fastq.gz
     region_type: fastq
-    name: R1_001.fastq.gz
+    name: rna_R1_001.fastq.gz
     sequence_type: joined
     sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
     min_len: 28
@@ -34,7 +35,7 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      parent_id: R1_001.fastq.gz
+      parent_id: rna_R1_001.fastq.gz
       region_id: barcode
       region_type: barcode
       name: barcode
@@ -42,10 +43,12 @@ assay_spec:
       sequence: NNNNNNNNNNNNNNNN
       min_len: 16
       max_len: 16
-      onlist: null
+      onlist: !Onlist
+        filename: 737K-august-2016.txt
+        md5: f62a276e262fdd85262a889d0f48556b
       regions: null
     - !Region
-      parent_id: R1_001.fastq.gz
+      parent_id: rna_R1_001.fastq.gz
       region_id: umi
       region_type: umi
       name: umi
@@ -57,9 +60,9 @@ assay_spec:
       regions: null
   - !Region
     parent_id: rna
-    region_id: R2_001.fastq.gz
+    region_id: rna_R2_001.fastq.gz
     region_type: fastq
-    name: R2_001.fastq.gz
+    name: rna_R2_001.fastq.gz
     sequence_type: joined
     sequence: X
     min_len: 90
@@ -67,7 +70,7 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      parent_id: R2_001.fastq.gz
+      parent_id: rna_R2_001.fastq.gz
       region_id: cDNA
       region_type: cdna
       name: cDNA
@@ -79,9 +82,9 @@ assay_spec:
       regions: null
   - !Region
     parent_id: rna
-    region_id: I1_001.fastq.gz
+    region_id: rna_I1_001.fastq.gz
     region_type: fastq
-    name: I1_001.fastq.gz
+    name: rna_I1_001.fastq.gz
     sequence_type: joined
     sequence: NNNNNNNNNN
     min_len: 10
@@ -89,7 +92,7 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      parent_id: I1_001.fastq.gz
+      parent_id: rna_I1_001.fastq.gz
       region_id: index7
       region_type: index7
       name: index7
@@ -99,11 +102,103 @@ assay_spec:
       max_len: 10
       onlist: null
       regions: null
+- !Region
+  parent_id: null
+  region_id: crispr
+  region_type: crispr
+  name: crispr
+  sequence_type: joined
+  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNAAGCAGTGGTATCAACGCAGAGTACATGGGNNNNNNNNNNNNNNNNNNNNGTTTAAGAGCTATGCTGGAAACAGCATAGCAAGTTTAAATNNNNNNNNNN
+  min_len: 128
+  max_len: 128
+  onlist: null
+  regions:
   - !Region
-    parent_id: rna
-    region_id: I2_001.fastq.gz
+    parent_id: crispr
+    region_id: crispr_R1_001.fastq.gz
     region_type: fastq
-    name: I2_001.fastq.gz
+    name: crispr_R1_001.fastq.gz
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    min_len: 28
+    max_len: 28
+    onlist: null
+    regions:
+    - !Region
+      parent_id: crispr_R1_001.fastq.gz
+      region_id: barcode
+      region_type: barcode
+      name: barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: 737K-august-2016.txt
+        md5: f62a276e262fdd85262a889d0f48556b
+      regions: null
+    - !Region
+      parent_id: crispr_R1_001.fastq.gz
+      region_id: umi
+      region_type: umi
+      name: umi
+      sequence_type: random
+      sequence: NNNNNNNNNNNN
+      min_len: 12
+      max_len: 12
+      onlist: null
+      regions: null
+  - !Region
+    parent_id: crispr
+    region_id: crispr_R2_001.fastq.gz
+    region_type: fastq
+    name: crispr_R2_001.fastq.gz
+    sequence_type: joined
+    sequence: AAGCAGTGGTATCAACGCAGAGTACATGGGNNNNNNNNNNNNNNNNNNNNGTTTAAGAGCTATGCTGGAAACAGCATAGCAAGTTTAAAT
+    min_len: 90
+    max_len: 90
+    onlist: null
+    regions:
+    - !Region
+      parent_id: crispr_R2_001.fastq.gz
+      region_id: tso
+      region_type: linker
+      name: Template switch oligo
+      sequence_type: fixed
+      sequence: AAGCAGTGGTATCAACGCAGAGTACATGGG
+      min_len: 30
+      max_len: 30
+      onlist: null
+      regions: null
+    - !Region
+      parent_id: crispr_R2_001.fastq.gz
+      region_id: gRNA
+      region_type: gRNA
+      name: Guide RNAs
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNNNNNN
+      min_len: 20
+      max_len: 20
+      onlist: !Onlist
+        filename: onlist_gRNA_revcomp.txt
+        md5: 7996ff579579b15a1581ae62f53f8e2b
+      regions: null
+    - !Region
+      parent_id: crispr_R2_001.fastq.gz
+      region_id: gRNA_backbone
+      region_type: linker
+      name: Guide RNA backbone
+      sequence_type: fixed
+      sequence: GTTTAAGAGCTATGCTGGAAACAGCATAGCAAGTTTAAAT
+      min_len: 40
+      max_len: 40
+      onlist: null
+      regions: null
+  - !Region
+    parent_id: crispr
+    region_id: crispr_I1_001.fastq.gz
+    region_type: fastq
+    name: crispr_I1_001.fastq.gz
     sequence_type: joined
     sequence: NNNNNNNNNN
     min_len: 10
@@ -111,10 +206,10 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      parent_id: I2_001.fastq.gz
-      region_id: index5
-      region_type: index5
-      name: index5
+      parent_id: crispr_I1_001.fastq.gz
+      region_id: index7
+      region_type: index7
+      name: index7
       sequence_type: onlist
       sequence: NNNNNNNNNN
       min_len: 10
