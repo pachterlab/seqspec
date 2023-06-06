@@ -1,7 +1,7 @@
 !Assay
 seqspec_version: 0.0.0
 assay: SugarSeq
-sequencer: Illumina
+sequencer: Illumina NextSeq
 name: SugarSeq/Illumina
 doi: ''
 publication_date: ''
