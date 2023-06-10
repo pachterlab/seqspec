@@ -44,6 +44,7 @@ def run_check(schema, spec, spec_fn):
         print(
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
         )
+
     # get all of the onlist files in the spec and check that they exist relative to the path of the spec
     modes = spec.modalities
     olrgns = []
@@ -65,5 +66,17 @@ def run_check(schema, spec, spec_fn):
                 idx += 1
 
     # TODO add option to check md5sum
+
+    # check that the region_id is unique across all regions
+    rgn_ids = set()
+    for m in modes:
+        for rgn in spec.get_modality(m).get_leaves():
+            if rgn.region_id in rgn_ids:
+                print(
+                    f"[error {idx}] region_id '{rgn.region_id}' is not unique across all regions"
+                )
+                idx += 1
+            else:
+                rgn_ids.add(rgn.region_id)
 
     return idx
