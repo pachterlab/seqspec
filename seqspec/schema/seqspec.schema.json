@@ -7,7 +7,8 @@
   "properties": {
     "seqspec_version": {
       "description": "Version of the seqspec specification used",
-      "type": "string"
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
     },
     "assay": {
       "description": "The name of the assay",
@@ -37,7 +38,8 @@
       "description": "The modalities the assay targets",
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": ["rna", "tag", "protein", "atac", "crispr"]
       }
     },
     "lib_struct": {
@@ -75,15 +77,48 @@
         },
         "region_type": {
           "description": "the type of region",
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "atac",
+            "barcode",
+            "cdna",
+            "crispr",
+            "fastq",
+            "gdna",
+            "hic",
+            "illumina_p5",
+            "illumina_p7",
+            "index5",
+            "index7",
+            "linker",
+            "ME1",
+            "ME2",
+            "methyl",
+            "nextera_read1",
+            "nextera_read2",
+            "poly_A",
+            "poly_G",
+            "poly_T",
+            "poly_C",
+            "protein",
+            "rna",
+            "s5",
+            "s7",
+            "tag",
+            "truseq_read1",
+            "truseq_read2",
+            "umi"
+          ]
         },
         "sequence_type": {
           "description": "The type of the sequence",
-          "type": "string"
+          "type": "string",
+          "enum": ["fixed", "random", "onlist", "joined"]
         },
         "sequence": {
           "description": "The sequence",
-          "type": "string"
+          "type": "string",
+          "pattern": "^[ACGTNX]+$"
         },
         "min_len": {
           "description": "The minimum length of the sequence",
@@ -107,7 +142,8 @@
             },
             "md5": {
               "description": "md5sum for the file pointed to by filename",
-              "type": "string"
+              "type": "string",
+              "pattern": "^[a-f0-9]{32}$"
             }
           }
         },

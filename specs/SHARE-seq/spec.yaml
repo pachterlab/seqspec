@@ -8,14 +8,14 @@ publication_date: 23 October 2020
 description: The SHARE-seq method is developed based on the idea of combinatorial
   indexing stratgy that is used in sci-RNA-seq and SPLiT-seq
 modalities:
-- RNA
-- ATAC
+- rna
+- atac
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SHARE-seq.html
 assay_spec:
 - !Region
-  region_id: RNA
-  region_type: RNA
-  name: RNA
+  region_id: rna
+  region_type: rna
+  name: rna
   sequence_type: joined
   sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXXNNNNNNNNNNCTGTCTCTTATACACATCTCCGAGCCCACGAGACTCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 239
@@ -23,7 +23,7 @@ assay_spec:
   onlist: null
   regions:
   - !Region
-    region_id: illumina_p5
+    region_id: rna_illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -32,10 +32,10 @@ assay_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: RNA
+    parent_id: rna
   - !Region
-    region_id: I2.fastq.gz
-    region_type: gz
+    region_id: rna_I2.fastq.gz
+    region_type: fastq
     name: Index 2 FASTQ
     sequence_type: joined
     sequence: NNNNNNNN
@@ -44,7 +44,7 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      region_id: index5
+      region_id: rna_index5
       region_type: index5
       name: index5
       sequence_type: onlist
@@ -52,22 +52,23 @@ assay_spec:
       min_len: 8
       max_len: 8
       onlist: !Onlist
-        filename: RNA_i5_onlist.txt
-        md5: null
+        filename: rna_i5_onlist.txt
+        md5: 9957d3d5ad74420f7309b8897f02c3de
       regions: null
-      parent_id: I2.fastq.gz
+      parent_id: rna_I2.fastq.gz
+    parent_id: rna
   - !Region
-    region_id: nextera_read1
+    region_id: rna_nextera_read1
     region_type: nextera_read1
     name: nextera_read1
-    sequence_type: fixed
+    sequence_type: joined
     sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
     min_len: 33
     max_len: 33
     onlist: null
     regions:
     - !Region
-      region_id: s5
+      region_id: rna_s5
       region_type: s5
       name: s5
       sequence_type: fixed
@@ -76,9 +77,9 @@ assay_spec:
       max_len: 14
       onlist: null
       regions: null
-      parent_id: nextera_read1
+      parent_id: rna_nextera_read1
     - !Region
-      region_id: ME1
+      region_id: rna_ME1
       region_type: ME1
       name: ME1
       sequence_type: fixed
@@ -87,20 +88,21 @@ assay_spec:
       max_len: 19
       onlist: null
       regions: null
-      parent_id: nextera_read1
+      parent_id: rna_nextera_read1
+    parent_id: rna
   - !Region
-    region_id: R1.fastq.gz
-    region_type: gz
+    region_id: rna_R1.fastq.gz
+    region_type: fastq
     name: Read 1 FASTQ
-    sequence_type: null
+    sequence_type: joined
     sequence: X
     min_len: 1
     max_len: 30
     onlist: null
     regions:
     - !Region
-      region_id: cDNA
-      region_type: cDNA
+      region_id: rna_cDNA
+      region_type: cdna
       name: cDNA
       sequence_type: random
       sequence: X
@@ -108,19 +110,20 @@ assay_spec:
       max_len: 30
       onlist: null
       regions: null
-      parent_id: R1.fastq.gz
+      parent_id: rna_R1.fastq.gz
+    parent_id: rna
   - !Region
-    region_id: R2.fastq.gz
-    region_type: gz
+    region_id: rna_R2.fastq.gz
+    region_type: fastq
     name: Read 2 FASTQ
-    sequence_type: null
+    sequence_type: joined
     sequence: XNNNNNNNNNN
     min_len: 11
     max_len: 109
     onlist: null
     regions:
     - !Region
-      region_id: poly_A
+      region_id: rna_poly_A
       region_type: poly_A
       name: poly_A
       sequence_type: random
@@ -129,20 +132,21 @@ assay_spec:
       max_len: 99
       onlist: null
       regions: null
-      parent_id: R2.fastq.gz
+      parent_id: rna_R2.fastq.gz
     - !Region
-      region_id: UMI
-      region_type: UMI
-      name: UMI
+      region_id: rna_umi
+      region_type: umi
+      name: umi
       sequence_type: random
       sequence: NNNNNNNNNN
       min_len: 10
       max_len: 10
       onlist: null
       regions: null
-      parent_id: R2.fastq.gz
+      parent_id: rna_R2.fastq.gz
+    parent_id: rna
   - !Region
-    region_id: nextera_read2
+    region_id: rna_nextera_read2
     region_type: nextera_read2
     name: nextera_read2
     sequence_type: joined
@@ -152,7 +156,7 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      region_id: ME2
+      region_id: rna_ME2
       region_type: ME2
       name: ME2
       sequence_type: fixed
@@ -161,9 +165,9 @@ assay_spec:
       max_len: 19
       onlist: null
       regions: null
-      parent_id: nextera_read2
+      parent_id: rna_nextera_read2
     - !Region
-      region_id: s7
+      region_id: rna_s7
       region_type: s7
       name: s7
       sequence_type: fixed
@@ -172,10 +176,11 @@ assay_spec:
       max_len: 15
       onlist: null
       regions: null
-      parent_id: nextera_read2
+      parent_id: rna_nextera_read2
+    parent_id: rna
   - !Region
-    region_id: I1.fastq.gz
-    region_type: gz
+    region_id: rna_I1.fastq.gz
+    region_type: fastq
     name: Index 1 FASTQ
     sequence_type: joined
     sequence: TCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
@@ -184,8 +189,8 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      region_id: linker1
-      region_type: linker1
+      region_id: rna_linker1
+      region_type: linker
       name: linker1
       sequence_type: fixed
       sequence: TCGGACGATCATGGG
@@ -193,10 +198,10 @@ assay_spec:
       max_len: 15
       onlist: null
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: rna_I1.fastq.gz
     - !Region
-      region_id: bc1
-      region_type: bc1
+      region_id: rna_bc1
+      region_type: barcode
       name: bc1
       sequence_type: onlist
       sequence: NNNNNNNN
@@ -204,12 +209,12 @@ assay_spec:
       max_len: 8
       onlist: !Onlist
         filename: bc_onlist.txt
-        md5: null
+        md5: 1452e8ef104e6edf686fab8956172072
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: rna_I1.fastq.gz
     - !Region
-      region_id: linker2
-      region_type: linker2
+      region_id: rna_linker2
+      region_type: linker
       name: linker2
       sequence_type: fixed
       sequence: CAAGTATGCAGCGCGCTCAAGCACGTGGAT
@@ -217,10 +222,10 @@ assay_spec:
       max_len: 30
       onlist: null
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: rna_I1.fastq.gz
     - !Region
-      region_id: bc2
-      region_type: bc2
+      region_id: rna_bc2
+      region_type: barcode
       name: bc2
       sequence_type: onlist
       sequence: NNNNNNNN
@@ -228,12 +233,12 @@ assay_spec:
       max_len: 8
       onlist: !Onlist
         filename: bc_onlist.txt
-        md5: null
+        md5: 1452e8ef104e6edf686fab8956172072
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: rna_I1.fastq.gz
     - !Region
-      region_id: linker3
-      region_type: linker3
+      region_id: rna_linker3
+      region_type: linker
       name: linker3
       sequence_type: fixed
       sequence: AGTCGTACGCCGATGCGAAACATCGGCCAC
@@ -241,10 +246,10 @@ assay_spec:
       max_len: 30
       onlist: null
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: rna_I1.fastq.gz
     - !Region
-      region_id: bc3
-      region_type: bc3
+      region_id: rna_bc3
+      region_type: barcode
       name: bc3
       sequence_type: onlist
       sequence: NNNNNNNN
@@ -252,11 +257,12 @@ assay_spec:
       max_len: 8
       onlist: !Onlist
         filename: bc_onlist.txt
-        md5: null
+        md5: 1452e8ef104e6edf686fab8956172072
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: rna_I1.fastq.gz
+    parent_id: rna
   - !Region
-    region_id: illumina_p7
+    region_id: rna_illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -265,13 +271,14 @@ assay_spec:
     max_len: 24
     onlist: !Onlist
       filename: bc_onlist.txt
-      md5: null
+      md5: 1452e8ef104e6edf686fab8956172072
     regions: null
-    parent_id: RNA
+    parent_id: rna
+  parent_id: null
 - !Region
-  region_id: ATAC
-  region_type: ATAC
-  name: ATAC
+  region_id: atac
+  region_type: atac
+  name: atac
   sequence_type: joined
   sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACTCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 229
@@ -279,7 +286,7 @@ assay_spec:
   onlist: null
   regions:
   - !Region
-    region_id: illumina_p5
+    region_id: atac_illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -288,10 +295,10 @@ assay_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: ATAC
+    parent_id: atac
   - !Region
-    region_id: I2.fastq.gz
-    region_type: gz
+    region_id: atac_I2.fastq.gz
+    region_type: fastq
     name: Index 2 FASTQ
     sequence_type: joined
     sequence: NNNNNNNN
@@ -300,7 +307,7 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      region_id: index5
+      region_id: atac_index5
       region_type: index5
       name: index5
       sequence_type: onlist
@@ -309,21 +316,22 @@ assay_spec:
       max_len: 8
       onlist: !Onlist
         filename: ATAC_i5_onlist.txt
-        md5: null
+        md5: 958750f6761751968b606855e8cd66e4
       regions: null
-      parent_id: I2.fastq.gz
+      parent_id: atac_I2.fastq.gz
+    parent_id: atac
   - !Region
-    region_id: nextera_read1
+    region_id: atac_nextera_read1
     region_type: nextera_read1
     name: nextera_read1
-    sequence_type: fixed
+    sequence_type: joined
     sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
     min_len: 33
     max_len: 33
     onlist: null
     regions:
     - !Region
-      region_id: s5
+      region_id: atac_s5
       region_type: s5
       name: s5
       sequence_type: fixed
@@ -332,9 +340,9 @@ assay_spec:
       max_len: 14
       onlist: null
       regions: null
-      parent_id: nextera_read1
+      parent_id: atac_nextera_read1
     - !Region
-      region_id: ME1
+      region_id: atac_ME1
       region_type: ME1
       name: ME1
       sequence_type: fixed
@@ -343,20 +351,21 @@ assay_spec:
       max_len: 19
       onlist: null
       regions: null
-      parent_id: nextera_read1
+      parent_id: atac_nextera_read1
+    parent_id: atac
   - !Region
-    region_id: R1.fastq.gz
-    region_type: gz
+    region_id: atac_R1.fastq.gz
+    region_type: fastq
     name: Read 1 FASTQ
-    sequence_type: null
+    sequence_type: joined
     sequence: X
     min_len: 1
     max_len: 30
     onlist: null
     regions:
     - !Region
-      region_id: gDNA
-      region_type: gDNA
+      region_id: atac_gDNA-1
+      region_type: gdna
       name: gDNA
       sequence_type: random
       sequence: X
@@ -364,20 +373,21 @@ assay_spec:
       max_len: 30
       onlist: null
       regions: null
-      parent_id: R1.fastq.gz
+      parent_id: atac_R1.fastq.gz
+    parent_id: atac
   - !Region
-    region_id: R2.fastq.gz
-    region_type: gz
+    region_id: atac_R2.fastq.gz
+    region_type: fastq
     name: Read 2 FASTQ
-    sequence_type: null
+    sequence_type: joined
     sequence: X
     min_len: 1
     max_len: 30
     onlist: null
     regions:
     - !Region
-      region_id: gDNA
-      region_type: gDNA
+      region_id: atac_gDNA-2
+      region_type: gdna
       name: gDNA
       sequence_type: random
       sequence: X
@@ -385,9 +395,10 @@ assay_spec:
       max_len: 30
       onlist: null
       regions: null
-      parent_id: R2.fastq.gz
+      parent_id: atac_R2.fastq.gz
+    parent_id: atac
   - !Region
-    region_id: nextera_read2
+    region_id: atac_nextera_read2
     region_type: nextera_read2
     name: nextera_read2
     sequence_type: joined
@@ -397,7 +408,7 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      region_id: ME2
+      region_id: atac_ME2
       region_type: ME2
       name: ME2
       sequence_type: fixed
@@ -406,9 +417,9 @@ assay_spec:
       max_len: 19
       onlist: null
       regions: null
-      parent_id: nextera_read2
+      parent_id: atac_nextera_read2
     - !Region
-      region_id: s7
+      region_id: atac_s7
       region_type: s7
       name: s7
       sequence_type: fixed
@@ -417,10 +428,11 @@ assay_spec:
       max_len: 15
       onlist: null
       regions: null
-      parent_id: nextera_read2
+      parent_id: atac_nextera_read2
+    parent_id: atac
   - !Region
-    region_id: I1.fastq.gz
-    region_type: gz
+    region_id: atac_I1.fastq.gz
+    region_type: fastq
     name: Index 1 FASTQ
     sequence_type: joined
     sequence: TCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
@@ -429,8 +441,8 @@ assay_spec:
     onlist: null
     regions:
     - !Region
-      region_id: linker1
-      region_type: linker1
+      region_id: atac_linker1
+      region_type: linker
       name: linker1
       sequence_type: fixed
       sequence: TCGGACGATCATGGG
@@ -438,10 +450,10 @@ assay_spec:
       max_len: 15
       onlist: null
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: atac_I1.fastq.gz
     - !Region
-      region_id: bc1
-      region_type: bc1
+      region_id: atac_bc1
+      region_type: barcode
       name: bc1
       sequence_type: onlist
       sequence: NNNNNNNN
@@ -449,12 +461,12 @@ assay_spec:
       max_len: 8
       onlist: !Onlist
         filename: bc_onlist.txt
-        md5: null
+        md5: 1452e8ef104e6edf686fab8956172072
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: atac_I1.fastq.gz
     - !Region
-      region_id: linker2
-      region_type: linker2
+      region_id: atac_linker2
+      region_type: linker
       name: linker2
       sequence_type: fixed
       sequence: CAAGTATGCAGCGCGCTCAAGCACGTGGAT
@@ -462,10 +474,10 @@ assay_spec:
       max_len: 30
       onlist: null
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: atac_I1.fastq.gz
     - !Region
-      region_id: bc2
-      region_type: bc2
+      region_id: atac_bc2
+      region_type: barcode
       name: bc2
       sequence_type: onlist
       sequence: NNNNNNNN
@@ -473,12 +485,12 @@ assay_spec:
       max_len: 8
       onlist: !Onlist
         filename: bc_onlist.txt
-        md5: null
+        md5: 1452e8ef104e6edf686fab8956172072
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: atac_I1.fastq.gz
     - !Region
-      region_id: linker3
-      region_type: linker3
+      region_id: atac_linker3
+      region_type: linker
       name: linker3
       sequence_type: fixed
       sequence: AGTCGTACGCCGATGCGAAACATCGGCCAC
@@ -486,10 +498,10 @@ assay_spec:
       max_len: 30
       onlist: null
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: atac_I1.fastq.gz
     - !Region
-      region_id: bc3
-      region_type: bc3
+      region_id: atac_bc3
+      region_type: barcode
       name: bc3
       sequence_type: onlist
       sequence: NNNNNNNN
@@ -497,11 +509,12 @@ assay_spec:
       max_len: 8
       onlist: !Onlist
         filename: bc_onlist.txt
-        md5: null
+        md5: 1452e8ef104e6edf686fab8956172072
       regions: null
-      parent_id: I1.fastq.gz
+      parent_id: atac_I1.fastq.gz
+    parent_id: atac
   - !Region
-    region_id: illumina_p7
+    region_id: atac_illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -510,6 +523,7 @@ assay_spec:
     max_len: 24
     onlist: !Onlist
       filename: bc_onlist.txt
-      md5: null
+      md5: 1452e8ef104e6edf686fab8956172072
     regions: null
-    parent_id: ATAC
+    parent_id: atac
+  parent_id: null
