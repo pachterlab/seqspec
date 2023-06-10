@@ -79,4 +79,13 @@ def run_check(schema, spec, spec_fn):
             else:
                 rgn_ids.add(rgn.region_id)
 
+    # check that sequence length is the same as min_length
+    for m in modes:
+        for rgn in spec.get_modality(m).get_leaves():
+            if rgn.sequence and len(rgn.sequence) < rgn.min_len:
+                print(
+                    f"[error {idx}] '{rgn.region_id}' sequence '{rgn.sequence}' length '{len(rgn.sequence)}' is less than min_len '{rgn.min_len}'"
+                )
+                idx += 1
+
     return idx
