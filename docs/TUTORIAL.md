@@ -295,7 +295,7 @@ The `seqspec` CLI comes with the capabilities to check the correctness of your `
 [error 7] i5_index_onlist.txt does not exist
 
 # The provided "sequence" contains invalid characters (only A, C, G, T, N, and X are permitted)
-[error 11] 'NNNNNNNNZN' does not match '^[ACGTNX]+$' in spec['assay_spec'][0]['regions'][4]['sequence']
+[error 8] 'NNNNNNNNZN' does not match '^[ACGTNX]+$' in spec['assay_spec'][0]['regions'][4]['sequence']
 ```
 
 `seqspec check spec.yaml` can be run again after fixing these errors to ensure that the spec fully conforms to the formal specification.
