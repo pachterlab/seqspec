@@ -296,6 +296,9 @@ The `seqspec` CLI comes with the capabilities to check the correctness of your `
 
 # The provided "sequence" contains invalid characters (only A, C, G, T, N, and X are permitted)
 [error 8] 'NNNNNNNNZN' does not match '^[ACGTNX]+$' in spec['assay_spec'][0]['regions'][4]['sequence']
+
+# The "md5" for the given "onlist" file is not a valid md5sum
+[error 9] '7asddd7asd7' does not match '^[a-f0-9]{32}$' in spec['assay_spec'][0]['regions'][8]['onlist']['md5']
 ```
 
 `seqspec check spec.yaml` can be run again after fixing these errors to ensure that the spec fully conforms to the formal specification.
