@@ -1,0 +1,490 @@
+!Assay
+seqspec_version: 0.0.0
+assay: 10x-ATAC-RNA-MULTI
+sequencer: Illumina NovaSeq X
+name: 10x-ATAC-RNA-MULTI/Illumina
+doi: https://doi.org/10.1038/s41592-019-0433-8
+publication_date: 17 June 2019
+description: Single Cell Multiome ATAC + Gene Expression + MULTI-seq
+modalities:
+- rna
+- atac
+- tag
+lib_struct: null
+assay_spec:
+- !Region
+  region_id: RNA
+  region_type: rna
+  name: 10x-ATAC-RNA-MULTI-seq RNA
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 153
+  max_len: 250
+  onlist: null
+  regions:
+  - !Region
+    parent_id: RNA
+    region_id: RNA-illumina_p5
+    region_type: illumina_p5
+    name: Illumina P5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: RNA
+    region_id: RNA-truseq_read1
+    region_type: truseq_read1
+    name: RNA Truseq Read 1
+    sequence_type: fixed
+    sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: RNA
+    region_id: RNA-R1.fastq.gz
+    region_type: fastq
+    name: Read 1 FASTQ
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    min_len: 28
+    max_len: 28
+    onlist: null
+    regions:
+    - !Region
+      parent_id: RNA-R1.fastq.gz
+      region_id: RNA-cell_barcode
+      region_type: barcode
+      name: Cell Barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: 737K-august-2016.txt
+        md5: f62a276e262fdd85262a889d0f48556b
+      regions: null
+    - !Region
+      region_id: RNA-umi
+      region_type: umi
+      name: GEX UMI
+      sequence_type: random
+      sequence: NNNNNNNNNNNN
+      min_len: 12
+      max_len: 12
+      onlist: null
+      regions: null
+      parent_id: RNA-R1.fastq.gz
+  - !Region
+    region_id: RNA-R2.fastq.gz
+    region_type: fastq
+    name: Read 2 FASTQ
+    sequence_type: joined
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions:
+    - !Region
+      parent_id: RNA-R2.fastq.gz
+      region_id: RNA-cDNA
+      region_type: cdna
+      name: RNA-cDNA
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      regions: null
+    parent_id: RNA
+  - !Region
+    parent_id: RNA
+    region_id: RNA-truseq_read2
+    region_type: truseq_read2
+    name: Truseq Read 2
+    sequence_type: fixed
+    sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: RNA
+    region_id: RNA-I1.fastq.gz
+    region_type: fastq
+    name: Index Read 2
+    sequence_type: joined
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+    - !Region
+      parent_id: RNA-I1.fastq.gz
+      region_id: RNA-index7
+      region_type: index7
+      name: Truseq Read 2
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: index7_onlist_RNA-ATAC.txt
+        md5: fcb5fe7d14ffc9984cd5450413c7a742
+      regions: null
+  - !Region
+    parent_id: RNA
+    region_id: RNA-illumina_p7
+    region_type: illumina_p7
+    name: Illumina P7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+  parent_id: null
+- !Region
+  region_id: ATAC
+  region_type: atac
+  name: ATAC
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNCGCGTCTGTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 154
+  max_len: 348
+  onlist: null
+  regions:
+  - !Region
+    parent_id: ATAC
+    region_id: ATAC-illumina_p5
+    region_type: illumina_p5
+    name: Illumina P5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: ATAC
+    region_id: ATAC-I2.fastq.gz
+    region_type: fastq
+    name: Index 2
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNN
+    min_len: 16
+    max_len: 16
+    onlist: null
+    regions:
+    - !Region
+      parent_id: ATAC-I2.fastq.gz
+      region_id: ATAC-cell_barcode
+      region_type: barcode
+      name: R2 Cell Barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: 737K-cratac-v1.txt
+        md5: ab645450cf30cc51077f6c030b665297
+      regions: null
+  - !Region
+    parent_id: ATAC
+    region_id: ATAC-spacer
+    region_type: fastq
+    name: spacer
+    sequence_type: fixed
+    sequence: CGCGTCTG
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: ATAC
+    region_id: ATAC-nextera_read1
+    region_type: nextera_read1
+    name: nextera_read1
+    sequence_type: joined
+    sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions:
+    - !Region
+      parent_id: ATAC-nextera_read1
+      region_id: s5
+      region_type: s5
+      name: s5
+      sequence_type: fixed
+      sequence: TCGTCGGCAGCGTC
+      min_len: 14
+      max_len: 14
+      onlist: null
+      regions: null
+    - !Region
+      parent_id: ATAC-nextera_read1
+      region_id: ME1
+      region_type: ME1
+      name: ME1
+      sequence_type: fixed
+      sequence: AGATGTGTATAAGAGACAG
+      min_len: 19
+      max_len: 19
+      onlist: null
+      regions: null
+  - !Region
+    parent_id: ATAC
+    region_id: ATAC-R1.fastq.gz
+    region_type: fastq
+    name: Read 1 FASTQ
+    sequence_type: joined
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions:
+    - !Region
+      parent_id: ATAC-R1.fastq.gz
+      region_id: gDNA-1
+      region_type: gdna
+      name: gDNA-1
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      regions: null
+  - !Region
+    parent_id: ATAC
+    region_id: ATAC-R2.fastq.gz
+    region_type: gdna
+    name: Read 2 FASTQ
+    sequence_type: joined
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions:
+    - !Region
+      parent_id: ATAC-R2.fastq.gz
+      region_id: gDNA-2
+      region_type: gdna
+      name: gDNA-2
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      regions: null
+  - !Region
+    region_id: ATAC-nextera_read2
+    region_type: nextera_read2
+    name: nextera_read2
+    sequence_type: joined
+    sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions:
+    - !Region
+      parent_id: ATAC-nextera_read2
+      region_id: ME2
+      region_type: ME2
+      name: ME2
+      sequence_type: fixed
+      sequence: CTGTCTCTTATACACATCT
+      min_len: 19
+      max_len: 19
+      onlist: null
+      regions: null
+    - !Region
+      parent_id: ATAC-nextera_read2
+      region_id: s7
+      region_type: s7
+      name: s7
+      sequence_type: fixed
+      sequence: CCGAGCCCACGAGAC
+      min_len: 15
+      max_len: 15
+      onlist: null
+      regions: null
+    parent_id: ATAC
+  - !Region
+    parent_id: ATAC
+    region_id: ATAC-I1.fastq.gz
+    region_type: fastq
+    name: Index 2 i7 index FASTQ
+    sequence_type: joined
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+    - !Region
+      parent_id: ATAC-I1.fastq.gz
+      region_id: ATAC-index7
+      region_type: index7
+      name: ATAC index7
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: index7_onlist_RNA-ATAC.txt
+        md5: fcb5fe7d14ffc9984cd5450413c7a742
+      regions: null
+  - !Region
+    parent_id: ATAC
+    region_id: ATAC-illumina_p7
+    region_type: illumina_p7
+    name: Illumina P7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+  parent_id: null
+- !Region
+  region_id: MULTI
+  region_type: tag
+  name: MULTI sample barcode
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 159
+  max_len: 159
+  onlist: null
+  regions:
+  - !Region
+    region_id: MULTI-illumina_p5
+    region_type: illumina_p5
+    name: Illumina P5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: MULTI
+  - !Region
+    region_id: MULTI-truseq_read1
+    region_type: truseq_read1
+    name: Truseq Read 1
+    sequence_type: fixed
+    sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: MULTI
+  - !Region
+    region_id: MULTI-R1.fastq.gz
+    region_type: fastq
+    name: Read 1 BC + UMI
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    min_len: 28
+    max_len: 28
+    onlist: null
+    regions:
+    - !Region
+      region_id: barcode
+      region_type: barcode
+      name: Cell Barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: 737K-august-2016.txt
+        md5: f62a276e262fdd85262a889d0f48556b
+      regions: null
+      parent_id: MULTI-R1.fastq.gz
+    - !Region
+      region_id: umi
+      region_type: umi
+      name: UMI
+      sequence_type: random
+      sequence: NNNNNNNNNNNN
+      min_len: 12
+      max_len: 12
+      onlist: null
+      regions: null
+      parent_id: MULTI-R1.fastq.gz
+    parent_id: MULTI
+  - !Region
+    region_id: MULTI-R2.fastq.gz
+    region_type: fastq
+    name: Read 2 FASTQ
+    sequence_type: joined
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+    - !Region
+      region_id: MULTI-seq barcode
+      region_type: barcode
+      name: MULTI-seq barcode
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: MULTIbc_onlist.txt
+        md5: 66d841ec290d6c93e4b02638f97f3c23
+      regions: null
+      parent_id: MULTI-R2.fastq.gz
+    parent_id: MULTI
+  - !Region
+    region_id: MULTI-smallrna truseq_read2
+    region_type: truseq_read2
+    name: Truseq Small RNA Read 2
+    sequence_type: fixed
+    sequence: TGGAATTCTCGGGTGCCAAGGAACTCCAGTCAC
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: null
+    parent_id: MULTI
+  - !Region
+    region_id: MULTI-I1.fastq.gz
+    region_type: fastq
+    name: Index Read 2
+    sequence_type: joined
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+    - !Region
+      region_id: MULTI-index7
+      region_type: index7
+      name: index7
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: index7_onlist_MULTI.txt
+        md5: dea9fa960eb2f11b18d47f978c596a79
+      regions: null
+      parent_id: MULTI-I1.fastq.gz
+    parent_id: MULTI
+  - !Region
+    region_id: MULTI-illumina_p7
+    region_type: illumina_p7
+    name: Illumina P7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: MULTI
+  parent_id: null
