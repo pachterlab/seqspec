@@ -1,0 +1,113 @@
+!Assay
+seqspec_version: 0.0.0
+assay: Bulk_CRISPR
+sequencer: null
+name: Bulk_CRISPR_Gersbach
+doi: null
+publication_date: 10 June 2020
+description: bulk CRISPR screen
+modalities:
+- CRISPR
+lib_struct: null
+assay_spec:
+- !Region
+  region_id: CRISPR
+  region_type: CRISPR
+  name: CRISPR
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACAATTTCTTGGGTAGTTTGCAGTTTTAAAATTATGTTTTAAAATGGACTATCATATGCTTACCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCTTGTGGAAAGGACGAAACACCGNNNNNNNNNNNNNNNNNXXXXXXGTTTAAGAGCTATGCTGGAAACAGCATAGCAAGTTTAAATAAGGCTAGTCCGTTATCAACTTGAAAAAGTGGCACCGAGTCNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 280
+  max_len: 286
+  onlist: null
+  regions:
+  - !Region
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: illumina_p5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: CRISPR
+  - !Region
+    region_id: primer_fwd
+    region_type: primer_binding
+    name: primer_fwd
+    sequence_type: fixed
+    sequence: AATTTCTTGGGTAGTTTGCAGTT
+    min_len: 23
+    max_len: 23
+    onlist: null
+    regions: null
+    parent_id: CRISPR
+    - !Region
+      region_id: U6_promoter_partial
+      region_type: U6_promoter_partial
+      name: U6_promoter_partial
+      sequence_type: onlist
+      sequence: fixed
+    sequence: TTAAAATTATGTTTTAAAATGGACTATCATATGCTTACCGTAACTTGAAAGTATTTCGATTTCTTGGCTTTATATATCTTGTGGAAAGGACGAAACACCG
+    min_len: 100
+    max_len: 100
+    onlist: None
+    regions: null
+    parent_id: CRISPR
+  - !Region
+    region_id: sgRNA_target
+    region_type: sgRNA_target
+    name: sgRNA_target
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNNNNNNNXXXXXX
+    min_len: 17
+    max_len: 23
+    onlist: !Onlist
+      filename: sgRNA_target_onlist.txt
+      md5: null
+    regions: null
+    parent_id: CRISPR
+  - !Region
+    region_id: sgRNA_scaffold
+    region_type: sgRNA_scaffold
+    name: sgRNA_scaffold
+    sequence_type: fixed
+    sequence: GTTTAAGAGCTATGCTGGAAACAGCATAGCAAGTTTAAATAAGGCTAGTCCGTTATCAAC
+    min_len: 60
+    max_len: 60
+    onlist: null
+    regions: null
+    parent_id: CRISPR
+  - !Region
+    region_id: primer_rev
+    region_type: primer_binding
+    name: primer_rev
+    sequence_type: fixed
+    sequence: TTGAAAAAGTGGCACCGAGTC
+    min_len: 21
+    max_len: 21
+    onlist: null
+    regions: null
+    parent_id: CRISPR
+  - !Region
+    region_id: sample_index
+    region_type: sample_index
+    name: sample_index
+    sequence_type: random
+    sequence: NNNNNN
+    min_len: 6
+    max_len: 6
+    onlist: null
+    regions: null
+    parent_id: CRISPR
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: illumina_p7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: CRISPR
