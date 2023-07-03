@@ -75,6 +75,8 @@ def argsort(arr):
 
 
 def run_print_png(spec):
+    # builds directly off of https://colab.research.google.com/drive/1ZCIGrwLEIfE0yo33bP8uscUNPEn1p1DH developed by https://github.com/LucasSilvaFerreira
+
     # modality
     modalities = spec.list_modalities()
     modes = [spec.get_modality(m) for m in modalities]
