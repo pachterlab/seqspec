@@ -36,3 +36,36 @@ def write_read(header, seq, qual, f):
 def read_list(fname):
     with open(fname, "r") as f:
         return [l.strip() for l in f.readlines()]
+
+
+REGION_TYPE_COLORS = {
+    "barcode": "#2980B9",
+    "cdna": "#8E44AD",
+    "fastq": "#F1C40F",
+    "gdna": "#E67E22",
+    "illumina_p5": "#E17A47",
+    "illumina_p7": "#E17A47",
+    "index5": "#4AB19D",
+    "index7": "#4AB19D",
+    "linker": "#1ABC9C",
+    "ME1": "#E74C3C",
+    "ME2": "#E74C3C",
+    "nextera_read1": "#FF8000",
+    "nextera_read2": "#FF8000",
+    "poly_A": "#FF0000",
+    "poly_G": "#C0C0C0",
+    "poly_T": "#7F8C8D",
+    "poly_C": "#2C3E50",
+    "s5": "#EF3D59",
+    "s7": "#EF3D59",
+    "truseq_read1": "#EFC958",
+    "truseq_read2": "#EFC958",
+    "umi": "#16A085",
+    "tag": "#344E5C",
+    "protein": "#ECF0F1",
+}
+
+
+# unused
+# '#FF8C00'
+# '#95A5A6'
