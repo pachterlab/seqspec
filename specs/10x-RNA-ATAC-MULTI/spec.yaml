@@ -10,7 +10,7 @@ modalities:
 - rna
 - atac
 - tag
-lib_struct: null
+lib_struct: https://igvf.github.io/seqspec/
 assay_spec:
 - !Region
   region_id: RNA
