@@ -7,7 +7,7 @@ publication_date: ""
 name: WT Mega v2
 description: split-pool ligation-based transcriptome sequencing
 modalities:
-- RNA
+- rna
 lib_struct: ""
 assay_spec:
 - !Region
@@ -22,7 +22,7 @@ assay_spec:
   regions:
   - !Region
     region_id: cDNA
-    region_type: cDNA
+    region_type: cdna
     name: cDNA
     sequence_type: random
     sequence: X
