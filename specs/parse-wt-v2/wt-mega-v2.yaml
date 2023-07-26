@@ -1,4 +1,7 @@
 !Assay
+seqspec_version: 0.0.0
+assay: WT-Mega-v2
+sequencer: Illumina
 doi: ""
 publication_date: ""
 name: WT Mega v2
