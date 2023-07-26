@@ -8,7 +8,6 @@ modalities:
 lib_struct: ""
 assay_spec:
 - !Region
-  order: 0
   region_id: R1.fastq.gz
   region_type: fastq
   name: Read 1 sequence Fastq
@@ -19,7 +18,6 @@ assay_spec:
   onlist: null
   regions:
   - !Region
-    order: 0
     region_id: cDNA
     region_type: cDNA
     name: cDNA
@@ -31,7 +29,6 @@ assay_spec:
     regions: null
     parent_id: R1.fastq.gz
 - !Region
-  order: 1
   region_id: R2.fastq.gz
   region_type: fastq
   name: Read 2 umi and barcode FASTQ
@@ -42,7 +39,6 @@ assay_spec:
   onlist: null
   regions:
   - !Region
-    order: 0
     region_id: umi
     region_type: umi
     name: umi
@@ -54,7 +50,6 @@ assay_spec:
     regions: null
     parent_id: R2.fastq.gz
   - !Region
-    order: 1
     region_id: barcode-1
     region_type: barcode
     name: barcode-1
@@ -68,7 +63,6 @@ assay_spec:
     regions: null
     parent_id: R2.fastq.gz
   - !Region
-    order: 2
     region_id: linker-1
     region_type: linker
     name: linker-1
@@ -80,7 +74,6 @@ assay_spec:
     regions: null
     parent_id: R2.fastq.gz
   - !Region
-    order: 3
     region_id: barcode-2
     region_type: barcode
     name: barcode-2
@@ -94,7 +87,6 @@ assay_spec:
     regions: null
     parent_id: R2.fastq.gz
   - !Region
-    order: 4
     region_id: linker-3
     region_type: linker
     name: linker-3
@@ -106,7 +98,6 @@ assay_spec:
     regions: null
     parent_id: R2.fastq.gz
   - !Region
-    order: 5
     region_id: barcode-3
     region_type: barcode
     name: barcode-3
