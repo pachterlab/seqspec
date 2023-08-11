@@ -57,7 +57,7 @@ assay_spec:
     region_id: link_1
     region_type: link_1
     name: link_1
-    sequence_type: fixed
+    sequence_type: linker
     sequence: AC
     min_len: 2
     max_len: 2

@@ -82,3 +82,6 @@ class Assay(yaml.YAMLObject):
 
     def get_modality(self, modality):
         return self.assay_spec[self.modalities.index(modality)]
+
+    def list_modalities(self):
+        return self.modalities

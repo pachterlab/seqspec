@@ -1,0 +1,236 @@
+!Assay
+seqspec_version: 0.0.0
+assay: DOGMAseq-LLL
+sequencer: Illumina NovaSeq 6000 (S2 Reagent Kit v1.5)
+name: DOGMAseq-LLL/Illumina
+doi: https://doi.org/10.1186/s13059-022-02698-8
+publication_date: 23 June 2022
+description: DOGMAseq Low Loss Lysis (LLL) is a single-cell multi-omics assay that
+  simultaneously measures protein, RNA, and chromatin accessibility in single cells.
+  The assay is based on the DOGMAseq technology, which uses a DNA-barcoded antibody
+  library to capture proteins of interest, followed by a single-cell RNA-seq protocol
+  and a single-cell ATAC-seq protocol. The DOGMAseq-LLL assay is designed to be
+  compatible with the 10x Genomics Chromium platform.
+modalities:
+- protein
+- rna
+- atac
+lib_struct: ""
+assay_spec:
+- !Region
+  region_id: protein
+  region_type: protein
+  name: protein
+  sequence_type: joined
+  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+  min_len: 43
+  max_len: 43
+  onlist: null
+  regions:
+  - !Region
+    region_id: protein_R1_SRR18677632.fastq.gz
+    region_type: fastq
+    name: Read 1
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    min_len: 28
+    max_len: 28
+    onlist: null
+    parent_id: protein
+    regions:
+    - !Region
+      region_id: protein_cell_bc
+      region_type: barcode
+      name: Cell Barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: RNA-737K-arc-v1.txt
+        md5: a88cd21e801ae6f9a7d9a48b67ccf693
+      regions: null
+      parent_id: protein_R1_SRR18677632.fastq.gz
+    - !Region
+      region_id: protein_umi
+      region_type: umi
+      name: umi
+      sequence_type: random
+      sequence: NNNNNNNNNNNN
+      min_len: 12
+      max_len: 12
+      onlist: null
+      regions: null
+      parent_id: protein_R1_SRR18677632.fastq.gz
+  - !Region
+    region_id: protein_R2_SRR18677632.fastq.gz
+    region_type: fastq
+    name: Read 1 FASTQ
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNN
+    min_len: 15
+    max_len: 15
+    onlist: null
+    regions:
+    - !Region
+      region_id: protein
+      region_type: protein
+      name: protein
+      sequence_type: random
+      sequence: NNNNNNNNNNNNNNN
+      min_len: 15
+      max_len: 15
+      onlist: !Onlist
+        filename: protein_feature_barcodes.txt
+        md5: b5920c1fc1d22927607c31c96f5cf03e
+      regions: null
+      parent_id: protein_R2_SRR18677632.fastq.gz
+    parent_id: protein
+  parent_id: null
+- !Region
+  region_id: rna
+  region_type: rna
+  name: rna
+  sequence_type: joined
+  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+  min_len: 130
+  max_len: 130
+  onlist: null
+  regions:
+  - !Region
+    region_id: rna_R1_SRR18677629.fastq.gz
+    region_type: fastq
+    name: Read 1 fastq
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    min_len: 28
+    max_len: 28
+    onlist: null
+    parent_id: rna
+    regions:
+    - !Region
+      region_id: rna_cell_bc
+      region_type: barcode
+      name: Cell Barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: RNA-737K-arc-v1.txt
+        md5: a88cd21e801ae6f9a7d9a48b67ccf693
+      regions: null
+      parent_id: rna_R1_SRR18677629.fastq.gz
+    - !Region
+      region_id: rna_umi
+      region_type: umi
+      name: umi
+      sequence_type: random
+      sequence: NNNNNNNNNNNN
+      min_len: 12
+      max_len: 12
+      onlist: null
+      regions: null
+      parent_id: rna_R1_SRR18677629.fastq.gz
+  - !Region
+    region_id: rna_R2_SRR18677629.fastq.gz
+    region_type: fastq
+    name: Read 2 FASTQ
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    min_len: 102
+    max_len: 102
+    onlist: null
+    regions:
+    - !Region
+      region_id: cdna
+      region_type: cdna
+      name: cdna
+      sequence_type: random
+      sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+      min_len: 102
+      max_len: 102
+      onlist: null
+      regions: null
+      parent_id: rna_R2_SRR18677629.fastq.gz
+    parent_id: rna
+  parent_id: null
+- !Region
+  region_id: atac
+  region_type: atac
+  name: atac
+  sequence_type: joined
+  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+  min_len: 120
+  max_len: 120
+  onlist: null
+  regions:
+  - !Region
+    region_id: atac_R1_SRR18677633.fastq.gz
+    region_type: fastq
+    name: Read 1 fastq
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    min_len: 52
+    max_len: 52
+    onlist: null
+    parent_id: atac
+    regions:
+    - !Region
+      region_id: gDNA-1
+      region_type: gdna
+      name: gdna
+      sequence_type: random
+      sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+      min_len: 52
+      max_len: 52
+      onlist: null
+      regions: null
+      parent_id: atac_R1_SRR18677633.fastq.gz
+  - !Region
+    region_id: atac_R2_SRR18677633.fastq.gz
+    region_type: fastq
+    name: Read 2 fastq
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNN
+    min_len: 16
+    max_len: 16
+    onlist: null
+    parent_id: atac
+    regions:
+    - !Region
+      region_id: atac_cell_bc
+      region_type: barcode
+      name: Cell Barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNNNN
+      min_len: 16
+      max_len: 16
+      onlist: !Onlist
+        filename: ATA-737K-arc-v1.txt
+        md5: 3f9fc0f6ef9d72540ab010d0b5348aa1
+      regions: null
+      parent_id: atac_R2_SRR18677633.fastq.gz
+  - !Region
+    region_id: atac_R3_SRR18677633.fastq.gz
+    region_type: fastq
+    name: Read 3 FASTQ
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    min_len: 52
+    max_len: 52
+    onlist: null
+    regions:
+    - !Region
+      region_id: gDNA-2
+      region_type: gdna
+      name: gdna
+      sequence_type: random
+      sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+      min_len: 52
+      max_len: 52
+      onlist: null
+      regions: null
+      parent_id: atac_R3_SRR18677633.fastq.gz
+    parent_id: atac
+  parent_id: null

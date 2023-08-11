@@ -123,7 +123,7 @@ assay_spec:
     max_len: 10
     onlist: !Onlist
       filename: sample_bc_onlist.txt
-      md5: null
+      md5: 7asddd7asd7
     regions: null
     parent_id: RNA
   - !Region
