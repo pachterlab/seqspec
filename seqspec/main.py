@@ -7,6 +7,7 @@ from .seqspec_check import setup_check_args, validate_check_args
 from .seqspec_find import setup_find_args, validate_find_args
 
 # from .seqspec_convert import setup_convert_args, validate_convert_args
+from .seqspec_modify import setup_modify_args, validate_modify_args
 from .seqspec_index import setup_index_args, validate_index_args
 from .seqspec_split import setup_split_args, validate_split_args
 from .seqspec_init import setup_init_args, validate_init_args
@@ -36,6 +37,7 @@ def main():
         "format": setup_format_args(subparsers),
         "index": setup_index_args(subparsers),
         "init": setup_init_args(subparsers),
+        "modify": setup_modify_args(subparsers),
         "onlist": setup_onlist_args(subparsers),
         "print": setup_print_args(subparsers),
         "split": setup_split_args(subparsers),
@@ -62,6 +64,7 @@ def main():
         "find": validate_find_args,
         "index": validate_index_args,
         "init": validate_init_args,
+        "modify": validate_modify_args,
         "onlist": validate_onlist_args,
         "split": validate_split_args,
     }
