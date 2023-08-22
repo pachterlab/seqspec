@@ -1,6 +1,5 @@
 from typing import Optional, List
 import yaml
-import newick
 
 
 # todo figure out how to do enums type options
@@ -162,6 +161,62 @@ class Region(yaml.YAMLObject):
         for r in leaves:
             rtypes.add(r.region_type)
         return rtypes
+
+    # how do I make sure this updates the spec in place?
+
+    def update_region(
+        self,
+        region_id,
+        region_type,
+        name,
+        sequence_type,
+        sequence,
+        min_len,
+        max_len,
+        onlist,
+    ):
+        self.region_id = region_id
+        self.region_type = region_type
+        self.name = name
+        self.sequence_type = sequence_type
+        self.sequence = sequence
+        self.min_len = min_len
+        self.max_len = max_len
+        self.onlist = onlist
+        return
+
+    def update_region_by_id(
+        self,
+        target_region_id,
+        region_id,
+        region_type,
+        name,
+        sequence_type,
+        sequence,
+        min_len,
+        max_len,
+    ):
+        # Identify the target subregion
+        target_region = self.get_region_by_id(target_region_id)
+        if target_region:
+            target_region = target_region[0]  # Assuming region_id is unique
+            # Update the properties of the target subregion
+            # check if not none
+            if region_id:
+                target_region.region_id = region_id
+            if region_type:
+                target_region.region_type = region_type
+            if name:
+                target_region.name = name
+            if sequence_type:
+                target_region.sequence_type = sequence_type
+            if sequence:
+                target_region.sequence = sequence
+            if min_len:
+                target_region.min_len = min_len
+            if max_len:
+                target_region.max_len = max_len
+        return
 
 
 class Onlist(yaml.YAMLObject):
