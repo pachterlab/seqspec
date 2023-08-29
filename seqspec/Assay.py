@@ -22,9 +22,9 @@ class Assay(yaml.YAMLObject):
         seqspec_version: str = __version__,
     ) -> None:
         super().__init__()
+        self.seqspec_version = seqspec_version
         self.assay = assay
         self.sequencer = sequencer
-        self.seqspec_version = seqspec_version
         self.name = name
         self.doi = doi
         self.publication_date = publication_date
