@@ -2,6 +2,7 @@ from seqspec.utils import load_spec, get_cuts
 from seqspec.seqspec_find import run_find
 from collections import defaultdict
 from typing import Dict, List, Tuple
+from argparse import SUPPRESS
 
 
 def setup_index_args(parser):
@@ -34,6 +35,14 @@ def setup_index_args(parser):
     )
 
     parser_index.add_argument(
+        "-s",
+        metavar="SUBREGIONTYPE",
+        help=SUPPRESS,
+        type=str,
+        default=None,
+    )
+
+    parser_index.add_argument(
         "-t",
         metavar="TOOL",
         help=("Tool"),
@@ -55,12 +64,13 @@ def validate_index_args(parser, args):
     r = args.r
     t = args.t
     o = args.o
+    s = args.s
     rev = args.rev
 
     # load spec
     spec = load_spec(fn)
     rgns = r.split(",")
-    x = run_index(spec, m, rgns, fmt=t, rev=rev)
+    x = run_index(spec, m, rgns, fmt=t, rev=rev, subregion_type=s)
 
     # post processing
     if o:
@@ -71,19 +81,20 @@ def validate_index_args(parser, args):
     return
 
 
-def run_index(spec, modality, regions, fmt="tab", rev=False):
+def run_index(spec, modality, regions, fmt="tab", rev=False, subregion_type=None):
     FORMAT = {
         "kb": format_kallisto_bus,
+        "seqkit": format_seqkit_subseq,
+        "simpleaf": format_simpleaf,
         "starsolo": format_starsolo,
         "tab": format_tab,
-        "simpleaf": format_simpleaf,
         "zumis": format_zumis,
     }
     indices = []
     for r in regions:
         index = get_index(spec, modality, r, rev=rev)
         indices.append({r: index})
-    return FORMAT[fmt](indices)
+    return FORMAT[fmt](indices, subregion_type)
 
 
 def get_index_by_type(
@@ -125,7 +136,7 @@ def get_index(spec, modality, region_id, rev=False) -> Dict[Tuple[int, int], str
     return index
 
 
-def format_kallisto_bus(indices):
+def format_kallisto_bus(indices, subregion_type=None):
     bcs = []
     umi = []
     feature = []
@@ -152,7 +163,23 @@ def format_kallisto_bus(indices):
     return x
 
 
-def format_tab(indices):
+# this one should only return one string
+def format_seqkit_subseq(indices, subregion_type=None):
+    # The x string format is start:stop (1-indexed)
+    # x = ""
+    # region = indices[0]
+    # # need to get the right start position
+    x = ""
+    region = indices[0]
+    for rgn, index in region.items():
+        for k, v in index.items():
+            if v == subregion_type:
+                x = f"{k[0]+1}:{k[1]}\n"
+
+    return x
+
+
+def format_tab(indices, subregion_type=None):
     x = ""
     for idx, region in enumerate(indices):
         for rgn, index in region.items():
@@ -162,7 +189,7 @@ def format_tab(indices):
     return x[:-1]
 
 
-def format_starsolo(indices):
+def format_starsolo(indices, subregion_type=None):
     bcs = []
     umi = []
     cdna = []
@@ -179,7 +206,7 @@ def format_starsolo(indices):
     return x
 
 
-def format_simpleaf(indices):
+def format_simpleaf(indices, subregion_type=None):
     x = ""
     xl = []
     for idx, region in enumerate(indices):
@@ -198,7 +225,7 @@ def format_simpleaf(indices):
     return "".join(xl)
 
 
-def format_zumis(indices):
+def format_zumis(indices, subregion_type=None):
     xl = []
     for idx, region in enumerate(indices):
         x = ""
