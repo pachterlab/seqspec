@@ -12,6 +12,7 @@ from .test_region import (
 
 def assay_dict(regions=[]):
     return {
+        "seqspec_version": "0.0.0",
         "assay": "My assay",
         "sequencer": "My sequencing machine",
         "name": "A machine-readable specification for genomics assays",
