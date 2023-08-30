@@ -38,6 +38,15 @@ def read_list(fname):
         return [l.strip() for l in f.readlines()]
 
 
+def region_ids_in_spec(seqspec, modality, region_ids):
+    # return True if all region_ids are in seqspec
+    spec = seqspec.get_modality(modality)
+    found = []
+    for region_id in region_ids:
+        found += [r.region_id for r in spec.get_region_by_id(region_id)]
+    return found
+
+
 REGION_TYPE_COLORS = {
     "barcode": "#2980B9",
     "cdna": "#8E44AD",
