@@ -84,6 +84,7 @@
             "cdna",
             "crispr",
             "fastq",
+            "fastq_link",
             "gdna",
             "hic",
             "illumina_p5",

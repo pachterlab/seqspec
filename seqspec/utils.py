@@ -2,6 +2,7 @@ import io
 from seqspec.Assay import Assay
 from seqspec.Region import Region
 import yaml
+import requests
 
 
 def load_spec(spec_fn: str):
@@ -45,6 +46,14 @@ def region_ids_in_spec(seqspec, modality, region_ids):
     for region_id in region_ids:
         found += [r.region_id for r in spec.get_region_by_id(region_id)]
     return found
+
+
+def file_exists(uri):
+    try:
+        r = requests.head(uri)
+        return r.status_code == 200
+    except requests.ConnectionError:
+        return False
 
 
 REGION_TYPE_COLORS = {

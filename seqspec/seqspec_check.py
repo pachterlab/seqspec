@@ -2,7 +2,7 @@ from jsonschema import Draft4Validator
 import yaml
 from os import path
 
-from seqspec.utils import load_spec
+from seqspec.utils import load_spec, file_exists
 
 
 def setup_check_args(parser):
@@ -63,6 +63,23 @@ def run_check(schema, spec, spec_fn):
             check_gz = path.join(path.dirname(spec_fn), ol.filename + ".gz")
             if not path.exists(check) and not path.exists(check_gz):
                 print(f"[error {idx}] {ol.filename} does not exist")
+                idx += 1
+
+    # get all of the regions with type fastq in the spec and check that those files exist relative to the path of the spec
+    fqrgns = []
+    for m in modes:
+        fqrgns += [i for i in spec.get_modality(m).get_regions_by_type("fastq")]
+        fqrgns += [i for i in spec.get_modality(m).get_regions_by_type("fastq_link")]
+    for fqrgn in fqrgns:
+        if fqrgn.region_type == "fastq":
+            check = path.join(path.dirname(spec_fn), fqrgn.region_id)
+            if not path.exists(check):
+                print(f"[error {idx}] {fqrgn.region_id} does not exist")
+                idx += 1
+        elif fqrgn.region_type == "fastq_link":
+            # ping the link with a simple http request to check if the file exists at that URI
+            if not file_exists(fqrgn.region_id):
+                print(f"[error {idx}] {fqrgn.region_id} does not exist")
                 idx += 1
 
     # TODO add option to check md5sum
