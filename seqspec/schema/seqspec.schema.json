@@ -119,7 +119,7 @@
         "sequence": {
           "description": "The sequence",
           "type": "string",
-          "pattern": "^[ACGTNX]+$"
+          "pattern": "^[ACGTRYMKSWHBVDNX]+$"
         },
         "min_len": {
           "description": "The minimum length of the sequence",
