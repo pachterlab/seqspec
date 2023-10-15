@@ -3,6 +3,7 @@ from seqspec.seqspec_find import run_find
 from collections import defaultdict
 from typing import Dict, List, Tuple
 from argparse import SUPPRESS
+import os
 
 
 def setup_index_args(parser):
@@ -70,6 +71,10 @@ def validate_index_args(parser, args):
     # load spec
     spec = load_spec(fn)
     rgns = r.split(",")
+    # regions can be paths, take the basename of the path, use os
+
+    rgns = [os.path.basename(r) for r in rgns]
+
     x = run_index(spec, m, rgns, fmt=t, rev=rev, subregion_type=s)
 
     # post processing
