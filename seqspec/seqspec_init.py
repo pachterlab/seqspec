@@ -14,17 +14,21 @@ def setup_init_args(parser):
         description="init a seqspec file",
         help="init a seqspec file",
     )
-    subparser.add_argument("-n", metavar="name", type=str, help="assay name")
-    subparser.add_argument(
-        "-m", metavar="modalities", type=int, help="number of modalities"
+    subparser_required = subparser.add_argument_group("required arguments")
+    subparser_required.add_argument(
+        "-n", metavar="NAME", type=str, help="assay name", required=True
+    )
+    subparser_required.add_argument(
+        "-m", metavar="MODALITIES", type=int, help="number of modalities", required=True
     )
 
-    subparser.add_argument(
+    subparser_required.add_argument(
         "-o",
         metavar="OUT",
         help=("Path to output file"),
         type=str,
         default=None,
+        required=True,
     )
     subparser.add_argument("newick", help=("tree in newick format"))
     return subparser

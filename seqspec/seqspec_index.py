@@ -7,35 +7,22 @@ import os
 
 
 def setup_index_args(parser):
-    parser_index = parser.add_parser(
+    subparser = parser.add_parser(
         "index",
         description="index regions in a seqspec file",
         help="index regions in a seqspec file",
     )
-    parser_index.add_argument("yaml", help="Sequencing specification yaml file")
-    parser_index.add_argument(
+    subparser_required = subparser.add_argument_group("required arguments")
+    subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    subparser.add_argument(
         "-o",
         metavar="OUT",
         help=("Path to output file"),
         type=str,
         default=None,
     )
-    parser_index.add_argument(
-        "-m",
-        metavar="MODALITY",
-        help=("Modality"),
-        type=str,
-        default=None,
-    )
-    parser_index.add_argument(
-        "-r",
-        metavar="REGION",
-        help=("Region"),
-        type=str,
-        default=None,
-    )
 
-    parser_index.add_argument(
+    subparser.add_argument(
         "-s",
         metavar="SUBREGIONTYPE",
         help=SUPPRESS,
@@ -43,18 +30,32 @@ def setup_index_args(parser):
         default=None,
     )
 
-    parser_index.add_argument(
+    subparser.add_argument(
         "-t",
         metavar="TOOL",
         help=("Tool"),
-        type=str,
         default="tab",
+        type=str,
+        choices=["kb", "seqkit", "simpleaf", "starsolo", "tab", "zumis"],
     )
 
-    parser_index.add_argument(
+    subparser.add_argument(
         "--rev", help="Returns 3'->5' region order", action="store_true"
     )
-    return parser_index
+
+    subparser_required.add_argument(
+        "-m",
+        metavar="MODALITY",
+        help=("Modality"),
+        type=str,
+        default=None,
+        required=True,
+    )
+    subparser_required.add_argument(
+        "-r", metavar="REGION", help=("Region"), type=str, default=None, required=True
+    )
+
+    return subparser
 
 
 def validate_index_args(parser, args):
