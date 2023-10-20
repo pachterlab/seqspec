@@ -18,6 +18,7 @@ seqspec --help
 
 Documentation:
 
+- [`docs/DOCUMENTATION.md` : Learn about `seqspec`](docs/DOCUMENTATION.md)
 - [`docs/TUTORIAL.md` : Write a `seqspec`](docs/TUTORIAL.md)
 - [`docs/CONTRIBUTING.md` : Contribute a `seqspec`](docs/CONTRIBUTING.md)
 - [`docs/SPECIFICATION.md`: The `seqspec` specification](docs/SPECIFICATION.md)
