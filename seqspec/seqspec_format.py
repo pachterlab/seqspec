@@ -2,20 +2,23 @@ from seqspec.utils import load_spec
 
 
 def setup_format_args(parser):
-    parser_format = parser.add_parser(
+    subparser = parser.add_parser(
         "format",
         description="format seqspec file",
         help="format seqspec file",
     )
-    parser_format.add_argument("yaml", help="Sequencing specification yaml file")
-    parser_format.add_argument(
+    subparser_required = subparser.add_argument_group("required arguments")
+
+    subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    subparser_required.add_argument(
         "-o",
         metavar="OUT",
         help=("Path to output file"),
         type=str,
         default=None,
+        required=True,
     )
-    return parser_format
+    return subparser
 
 
 def validate_format_args(parser, args):
