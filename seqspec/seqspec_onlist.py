@@ -12,6 +12,7 @@ def setup_onlist_args(parser):
         description="get onlist file for specific region",
         help="get onlist file for specific regions",
     )
+    subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
     subparser.add_argument(
         "-o",
@@ -20,26 +21,16 @@ def setup_onlist_args(parser):
         type=str,
         default=None,
     )
-    subparser.add_argument(
+    subparser_required.add_argument(
         "-m",
         metavar="MODALITY",
         help=("Modality"),
         type=str,
         default=None,
+        required=True,
     )
-    subparser.add_argument(
-        "-r",
-        metavar="REGION",
-        help=("Region"),
-        type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "-j",
-        metavar="JOIN",
-        help=("Join"),
-        type=str,
-        default=None,
+    subparser_required.add_argument(
+        "-r", metavar="REGION", help=("Region"), type=str, default=None, required=True
     )
     return subparser
 
@@ -50,7 +41,6 @@ def validate_onlist_args(parser, args):
     m = args.m
     r = args.r
     o = args.o
-    j = args.j
     # load spec
     spec = load_spec(fn)
     # if number of barcodes > 1 then we need to join them
