@@ -9,7 +9,8 @@ from .seqspec_find import setup_find_args, validate_find_args
 # from .seqspec_convert import setup_convert_args, validate_convert_args
 from .seqspec_modify import setup_modify_args, validate_modify_args
 from .seqspec_index import setup_index_args, validate_index_args
-from .seqspec_split import setup_split_args, validate_split_args
+
+# from .seqspec_split import setup_split_args, validate_split_args
 from .seqspec_init import setup_init_args, validate_init_args
 from .seqspec_onlist import setup_onlist_args, validate_onlist_args
 
@@ -40,7 +41,7 @@ def main():
         "modify": setup_modify_args(subparsers),
         "onlist": setup_onlist_args(subparsers),
         "print": setup_print_args(subparsers),
-        "split": setup_split_args(subparsers),
+        # "split": setup_split_args(subparsers),
     }
 
     # Show help when no arguments are given
@@ -66,7 +67,7 @@ def main():
         "init": validate_init_args,
         "modify": validate_modify_args,
         "onlist": validate_onlist_args,
-        "split": validate_split_args,
+        # "split": validate_split_args,
     }
     COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)
 

@@ -4,36 +4,40 @@ import yaml
 
 
 def setup_find_args(parser):
-    parser_find = parser.add_parser(
+    subparser = parser.add_parser(
         "find",
         description="find regions in a seqspec file",
         help="find regions in a seqspec file",
     )
-    parser_find.add_argument("yaml", help="Sequencing specification yaml file")
-    parser_find.add_argument(
+    subparser_required = subparser.add_argument_group("required arguments")
+
+    subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    subparser.add_argument(
         "-o",
         metavar="OUT",
         help=("Path to output file"),
         type=str,
         default=None,
     )
-    parser_find.add_argument(
+    subparser.add_argument("--rtype", help="Find by region type", action="store_true")
+    subparser_required.add_argument(
         "-m",
         metavar="MODALITY",
         help=("Modality"),
         type=str,
         default=None,
+        required=True,
     )
-    parser_find.add_argument(
+    subparser_required.add_argument(
         "-r",
         metavar="REGION",
         help=("Region"),
         type=str,
         default=None,
+        required=True,
     )
-    parser_find.add_argument("--rtype", help="Find by region type", action="store_true")
 
-    return parser_find
+    return subparser
 
 
 def validate_find_args(parser, args):
