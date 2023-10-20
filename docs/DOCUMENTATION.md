@@ -1,11 +1,13 @@
 ## Installation
 
 The development version can be installed with
+
 ```bash
 pip install git+https://github.com/IGVF/seqspec
 ```
 
 ## Usage
+
 `seqspec` consists of eight subcommands:
 
 ```
@@ -31,9 +33,12 @@ optional arguments:
 
 `seqspec` operates on `seqspec` compatible YAML files that follow the specification. All of the following examples will use the `seqspec` specification for the DOGMAseq-DIG assay which can be found here: `seqspec/specs/dogmaseq-dig/spec.yaml`.
 
+**IMPORTANT**: Many `seqspec` commands require that the specification be properly formatted and error-corrected. Errors in the spec can be found with `seqspec check` (see below for instructions). The spec can be properly formatted (or "filled in") with `seqspec format`. It is recommended to run `seqspec format` followed by `seqspec check` after writing a `seqspec` (or correcting errors in one).
+
 ### `seqspec check`: validate seqspec file
 
 Check that the `seqspec` file is correctly formatted and consistent with the [specification](https://github.com/IGVF/seqspec/blob/main/docs/SPECIFICATION.md).
+
 ```
 seqspec check [-o OUT] yaml
 ```
@@ -44,6 +49,7 @@ seqspec check [-o OUT] yaml
 For an explanation of possible errors, see the [TUTORIAL.md](https://github.com/IGVF/seqspec/blob/main/docs/TUTORIAL.md).
 
 #### Examples
+
 ```bash
 # check the spec against the formal specification
 $ seqspec check spec.yaml
@@ -56,6 +62,7 @@ $ seqspec check spec.yaml
 ```
 seqspec find [-o OUT] [--rtype] -m MODALITY -r REGION  yaml
 ```
+
 - optionally, `-o OUT` can be used to write the output to a file.
 - optionally, `--rtype` is set to search by `region_type` (where `-r` is from`region_type` vocabulary)
 - `-m MODALITY` is the modality in which you are searching for the region.
@@ -63,6 +70,7 @@ seqspec find [-o OUT] [--rtype] -m MODALITY -r REGION  yaml
 - `yaml` corresponds to the `seqspec` file.
 
 #### Examples
+
 ```bash
 $ seqspec find -m rna -r barcode --rtype spec.yaml
 - !Region
@@ -81,13 +89,16 @@ $ seqspec find -m rna -r barcode --rtype spec.yaml
 ```
 
 ### `seqspec format`: format seqspec file
+
 ```
 seqspec format -o OUT yaml
 ```
+
 - `-o OUT` the path to create the formatted `seqspec` file.
 - `yaml` corresponds to the `seqspec` file.
 
 #### Examples
+
 ```bash
 # format the spec into a file called fmt.yaml
 $ seqspec format -o fmt.yaml spec.yaml
@@ -97,24 +108,28 @@ $ seqspec format -o spec.yaml spec.yaml
 ```
 
 ### `seqspec index`: index regions in a seqspec file
+
 Returns the 0-indexed position of elements contained in a given region in the 5'->3' direction.
+
 ```
 seqspec index [-o OUT] [-t TOOL] [--rev] -m MODALITY -r REGION yaml
 ```
+
 - optionally, `-o OUT` can be used to write the output to a file.
 - optionally, `--rev` can be set to return the 3'->5' index.
 - optionally, `-t TOOL` returns the indices in the format specified by the tool. One of:
-	- `kb`: `kallisto`/`kb count` `-x TECHNOLOGY` ([format](https://pachterlab.github.io/kallisto/manual#:~:text=will%20accept%20a-,string,-specifying%20a%20new))
-	- `seqkit`: `seqkit subseq` `-r, --region string`  ([format](https://bioinf.shenwei.me/seqkit/usage/#subseq))
-	- `simpleaf`: `simpleaf quant` `-c, --chemistry` ([format](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag))
-	- `starsolo`: `--soloCBstart`, `--soloCBlen`, `--soloUMIstart`, `--soloUMIlen` ([format](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md#barcode-geometry)
-	-  `tab`: tab delimited file (`region<\t>element<\t>start<t>end`)
-	- `zumis`: yaml ([format](https://github.com/sdparekh/zUMIs/blob/main/zUMIs.yaml))
+  - `kb`: `kallisto`/`kb count` `-x TECHNOLOGY` ([format](https://pachterlab.github.io/kallisto/manual#:~:text=will%20accept%20a-,string,-specifying%20a%20new))
+  - `seqkit`: `seqkit subseq` `-r, --region string` ([format](https://bioinf.shenwei.me/seqkit/usage/#subseq))
+  - `simpleaf`: `simpleaf quant` `-c, --chemistry` ([format](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag))
+  - `starsolo`: `--soloCBstart`, `--soloCBlen`, `--soloUMIstart`, `--soloUMIlen` ([format](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md#barcode-geometry)
+  - `tab`: tab delimited file (`region<\t>element<\t>start<t>end`)
+  - `zumis`: yaml ([format](https://github.com/sdparekh/zUMIs/blob/main/zUMIs.yaml))
 - `-m MODALITY` is the modality that the `-r REGION`region resides in.
 - `-r REGION` is the `region_id` you are indexing.
 - `yaml` corresponds to the `seqspec` file.
 
 #### Examples
+
 ```bash
 # get the indices of the elements contained within the FASTQs specified in the spec in tab format
 $ seqspec index -m atac -r fastqs/atac_R1_SRR18677642.fastq.gz,fastqs/atac_R2_SRR18677642.fastq.gz,fastqs/atac_R3_SRR18677642.fastq.gz  spec.yaml
@@ -158,19 +173,19 @@ $ seqspec init -n myassay -m 2 -o spec.yaml "(((barcode:16,umi:12)rna_r1.fastq.g
 seqspec modify [--region-id REGIONID] [--region-type REGIONTYPE] [--region-name REGIONNAME] [--sequence-type SEQUENCETYPE] [--sequence SEQUENCE] [--min-len MINLEN] [--max-len MAXLEN] -o OUT -r REGIONID -m MODALITY yaml
 ```
 
--   optionally, `--region-id REGIONID` specifies the new `region_id`.
--   optionally, `--region-type REGIONTYPE` specifies the new `region_type`, must come from controlled vocabulary.
--   optionally, `--region-name REGIONNAME` specifies the new name for the region.
--   optionally, `--sequence-type SEQUENCETYPE` specifies the new sequence type, must come from the controlled vocabulary.
--   optionally, `--sequence SEQUENCE` specifies the new sequence for the region.
--   optionally, `--min-len MINLEN` sets the new minimum length that the sequence should have.
--   optionally, `--max-len MAXLEN` sets the new maximum length that the sequence can have.
--   `-o OUT` path to create or overwrite the `seqspec` file.
--   `-r REGIONID` is the `region_id` you are specifically targeting for modification.
--   `-m MODALITY` is the `modality` containing the `region_id` you are modifying.
+- optionally, `--region-id REGIONID` specifies the new `region_id`.
+- optionally, `--region-type REGIONTYPE` specifies the new `region_type`, must come from controlled vocabulary.
+- optionally, `--region-name REGIONNAME` specifies the new name for the region.
+- optionally, `--sequence-type SEQUENCETYPE` specifies the new sequence type, must come from the controlled vocabulary.
+- optionally, `--sequence SEQUENCE` specifies the new sequence for the region.
+- optionally, `--min-len MINLEN` sets the new minimum length that the sequence should have.
+- optionally, `--max-len MAXLEN` sets the new maximum length that the sequence can have.
+- `-o OUT` path to create or overwrite the `seqspec` file.
+- `-r REGIONID` is the `region_id` you are specifically targeting for modification.
+- `-m MODALITY` is the `modality` containing the `region_id` you are modifying.
 - `yaml` corresponds to the `seqspec` file.
 
-*Note*: modifying multiple attributes at one time is currently not supported.
+_Note_: modifying multiple attributes at one time is currently not supported.
 
 #### Examples
 
@@ -190,7 +205,7 @@ seqspec onlist [-o OUT] -m MODALITY -r REGION yaml
 - `-r REGION` is the `region_type` for which you want the onlist.
 - `yaml` corresponds to the `seqspec` file.
 
-*Note*: If, for example, there are multiple regions with the specified `region_type` in the modality (e.g. multiple barcodes), then `seqspec onlist` will return a path to an onlist that it generates where the entries in that onlist are the cartesian product of the onlists for all of the regions found.
+_Note_: If, for example, there are multiple regions with the specified `region_type` in the modality (e.g. multiple barcodes), then `seqspec onlist` will return a path to an onlist that it generates where the entries in that onlist are the cartesian product of the onlists for all of the regions found.
 
 #### Examples
 
@@ -205,11 +220,12 @@ $ seqspec onlist -m atac -r barcode spec.yaml
 ```
 seqspec print [-o OUT] [-f FORMAT] yaml
 ```
+
 - optionally, `-o OUT` to set the path of printed file.
 - optionally, `-f FORMAT` is the format of the printed file. Can be one of:
-	- `tree`: prints an ascii tree of the seqspec
-	- `html`: prints html of the seqspec
-	- `png`: prints a formal diagram of the seqspec
+  - `tree`: prints an ascii tree of the seqspec
+  - `html`: prints html of the seqspec
+  - `png`: prints a formal diagram of the seqspec
 - `yaml` corresponds to the `seqspec` file.
 
 #### Examples
