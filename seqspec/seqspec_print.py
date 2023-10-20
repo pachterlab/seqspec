@@ -24,6 +24,7 @@ def setup_print_args(parser):
         help=("Format"),
         type=str,
         default="tree",
+        choices=["tree", "html", "png"],
     )
     return subparser
 
