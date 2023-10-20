@@ -5,31 +5,11 @@ def setup_modify_args(parser):
     # given a spec, a region id and a list of key value property pairs, modify the spec
     subparser = parser.add_parser(
         "modify",
-        description="format seqspec file",
-        help="format seqspec file",
+        description="modify region attributes",
+        help="modify region attributes",
     )
+    subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
-    subparser.add_argument(
-        "-o",
-        metavar="OUT",
-        help=("Path to output file"),
-        type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "-r",
-        metavar="REGIONID",
-        help=("ID of region to modify"),
-        type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "-m",
-        metavar="modality",
-        help=("Modality of the assay"),
-        type=str,
-        default=None,
-    )
 
     # Region properties
 
@@ -81,6 +61,31 @@ def setup_modify_args(parser):
         help=("Max region length"),
         type=int,
         default=None,
+    )
+
+    subparser_required.add_argument(
+        "-o",
+        metavar="OUT",
+        help=("Path to output file"),
+        type=str,
+        default=None,
+        required=True,
+    )
+    subparser_required.add_argument(
+        "-r",
+        metavar="REGIONID",
+        help=("ID of region to modify"),
+        type=str,
+        default=None,
+        required=True,
+    )
+    subparser_required.add_argument(
+        "-m",
+        metavar="MODALITY",
+        help=("Modality of the assay"),
+        type=str,
+        default=None,
+        required=True,
     )
 
     return subparser
