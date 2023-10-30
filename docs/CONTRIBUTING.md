@@ -26,6 +26,8 @@ If you'd like to add assays sequence specifications or make modifications to the
 git clone https://github.com/<USERNAME>/seqspec.git
 cd seqspec
 git checkout -b cool-new-feature
+pip install -r dev-requirements.txt
+pre-commit install
 ```
 
 3. Make changes, add files, and commit
@@ -46,7 +48,7 @@ MYASSAY
 To generate one million reads from the FASTQ files associated with your spec, the following cna be run:
 
 ```bash
-zcat allreads_R1.fastq.gz | head -4000000 | gzip > R1.fastq.gz # fastq files has 4 lines per record so 1 million records = 4 milllion lines
+zcat allreads_R1.fastq.gz | head -4000000 | gzip > R1.fastq.gz # fastq files has 4 lines per record so 1 million records = 4 million lines
 ```
 
 Before committing the spec, make sure to run:
@@ -72,4 +74,4 @@ git push origin cool-new-feature
 
 5. Submit a pull request
 
-If you are unfamilar with pull requests, you can find more information on the [GitHub help page.](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests)
+If you are unfamiliar with pull requests, you can find more information on the [GitHub help page.](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests)
