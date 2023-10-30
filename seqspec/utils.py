@@ -1,6 +1,5 @@
 import io
 from seqspec.Assay import Assay
-from seqspec.Region import Region
 import yaml
 import requests
 
@@ -36,7 +35,7 @@ def write_read(header, seq, qual, f):
 
 def read_list(fname):
     with open(fname, "r") as f:
-        return [l.strip() for l in f.readlines()]
+        return [line.strip() for line in f.readlines()]
 
 
 def region_ids_in_spec(seqspec, modality, region_ids):

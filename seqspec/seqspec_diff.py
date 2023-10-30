@@ -25,7 +25,7 @@ def validate_diff_args(parser, args):
     # if everything is valid the run_diff
     A_fn = args.yamlA
     B_fn = args.yamlB
-    o = args.o
+    # o = args.o
     A = load_spec(A_fn)
     B = load_spec(B_fn)
 

@@ -2,3 +2,4 @@ pytest
 pytest-cov
 tox
 pre-commit
+flake8

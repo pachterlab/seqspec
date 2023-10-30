@@ -40,7 +40,8 @@ def validate_onlist_args(parser, args):
     fn = args.yaml
     m = args.m
     r = args.r
-    o = args.o
+    # TODO: if onlist is a link, download. also fix output path
+    # o = args.o
     # load spec
     spec = load_spec(fn)
     # if number of barcodes > 1 then we need to join them

@@ -15,49 +15,49 @@ def setup_modify_args(parser):
 
     subparser.add_argument(
         "--region-id",
-        metavar=f"REGIONID",
+        metavar="REGIONID",
         help=("New ID of region"),
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--region-type",
-        metavar=f"REGIONTYPE",
+        metavar="REGIONTYPE",
         help=("New type of region"),
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--region-name",
-        metavar=f"REGIONNAME",
+        metavar="REGIONNAME",
         help=("New name of region"),
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--sequence-type",
-        metavar=f"SEQUENCETYPE",
+        metavar="SEQUENCETYPE",
         help=("New type of sequence"),
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--sequence",
-        metavar=f"SEQUENCE",
+        metavar="SEQUENCE",
         help=("New sequence"),
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--min-len",
-        metavar=f"MINLEN",
+        metavar="MINLEN",
         help=("Min region length"),
         type=int,
         default=None,
     )
     subparser.add_argument(
         "--max-len",
-        metavar=f"MAXLEN",
+        metavar="MAXLEN",
         help=("Max region length"),
         type=int,
         default=None,
