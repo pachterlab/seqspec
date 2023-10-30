@@ -246,3 +246,7 @@ def format_zumis(indices, subregion_type=None):
         xl.append(x)
 
     return "\n".join(xl)[:-1]
+
+
+def format_chromap(indices):
+    pass
