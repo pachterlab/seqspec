@@ -10,7 +10,7 @@ from seqspec.seqspec_check import (
 
 
 test_dir = Path(__file__).parent
-default_assay_dir = test_dir / '..' / 'assays'
+default_assay_dir = test_dir / ".." / "assays"
 assay_dir = os.environ.get("SEQSPEC_ASSAY_DIR", default_assay_dir)
 
 

@@ -1,6 +1,5 @@
 import os
 from seqspec.utils import load_spec
-from copy import deepcopy
 from seqspec.Assay import Assay
 
 
