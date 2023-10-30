@@ -138,6 +138,11 @@
           "description": "The file containing the sequence if seq_type = onlist",
           "type": ["object", "null"],
           "properties": {
+            "location": {
+              "description": "location of onlist",
+              "type": "string",
+              "enum": ["local", "remote"]
+            },
             "filename": {
               "description": "filename for the onlist",
               "type": "string"

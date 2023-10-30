@@ -222,14 +222,16 @@ class Region(yaml.YAMLObject):
 class Onlist(yaml.YAMLObject):
     yaml_tag = "!Onlist"
 
-    def __init__(self, filename: str, md5: str) -> None:
+    def __init__(self, filename: str, md5: str, location: str) -> None:
         super().__init__()
         self.filename = filename
         self.md5 = md5
+        self.location = location
 
     def __repr__(self) -> str:
         d = {
             "filename": self.filename,
+            "location": self.location,
             "md5": self.md5,
         }
         return f"{d}"
@@ -237,6 +239,7 @@ class Onlist(yaml.YAMLObject):
     def to_dict(self):
         d = {
             "filename": self.filename,
+            "location": self.location,
             "md5": self.md5,
         }
         return d

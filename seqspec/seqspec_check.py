@@ -63,15 +63,21 @@ def run_check(schema, spec, spec_fn):
 
     # check paths relative to spec_fn
     for ol in olrgns:
-        if ol.filename[:-3] == ".gz":
-            check = path.join(path.dirname(spec_fn), ol.filename[:-3])
-            if not path.exists(check):
-                errors.append(f"[error {idx}] {ol.filename[:-3]} does not exist")
-                idx += 1
-        else:
-            check = path.join(path.dirname(spec_fn), ol.filename)
-            check_gz = path.join(path.dirname(spec_fn), ol.filename + ".gz")
-            if not path.exists(check) and not path.exists(check_gz):
+        if ol.location == "local":
+            if ol.filename[:-3] == ".gz":
+                check = path.join(path.dirname(spec_fn), ol.filename[:-3])
+                if not path.exists(check):
+                    errors.append(f"[error {idx}] {ol.filename[:-3]} does not exist")
+                    idx += 1
+            else:
+                check = path.join(path.dirname(spec_fn), ol.filename)
+                check_gz = path.join(path.dirname(spec_fn), ol.filename + ".gz")
+                if not path.exists(check) and not path.exists(check_gz):
+                    errors.append(f"[error {idx}] {ol.filename} does not exist")
+                    idx += 1
+        elif ol.location == "remote":
+            # ping the link with a simple http request to check if the file exists at that URI
+            if not file_exists(ol.filename):
                 errors.append(f"[error {idx}] {ol.filename} does not exist")
                 idx += 1
 
