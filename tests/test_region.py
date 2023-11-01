@@ -42,12 +42,13 @@ class TestOnlist(TestCase):
     def test_simple_onlist(self):
         name = "barcodes.txt"
         md5sum = "d41d8cd98f00b204e9800998ecf8427e"
+        location = "local"
 
-        permit = Onlist(name, md5sum)
+        permit = Onlist(name, md5sum, location)
 
         self.assertEqual(
             permit.to_dict(),
-            {"filename": name, "md5": md5sum},
+            {"filename": name, "md5": md5sum, "location": location},
         )
 
 
@@ -163,8 +164,9 @@ class TestRegion(TestCase):
 
         list_name = "barcodes.txt"
         list_md5sum = "d41d8cd98f00b204e9800998ecf8427e"
+        list_location = "local"
 
-        permited = Onlist(list_name, list_md5sum)
+        permited = Onlist(list_name, list_md5sum, list_location)
 
         r = Region(
             region_name,
@@ -180,7 +182,11 @@ class TestRegion(TestCase):
             "region_type": region_type,
             "name": region_name,
             "sequence_type": sequence_type,
-            "onlist": {"filename": list_name, "md5": list_md5sum},
+            "onlist": {
+                "filename": list_name,
+                "location": list_location,
+                "md5": list_md5sum,
+            },
             "sequence": sequence,
             "min_len": 0,
             "max_len": 1024,

@@ -74,6 +74,7 @@ assay_spec:
     onlist: !Onlist
       filename: index_onlist.txt
       md5: null
+      location: local
     regions: null
     parent_id: RNA
   - !Region
