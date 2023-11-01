@@ -8,7 +8,7 @@ pip install git+https://github.com/IGVF/seqspec
 
 ## Usage
 
-`seqspec` consists of eight subcommands:
+`seqspec` consists of eleven subcommands:
 
 ```
 $ seqspec
@@ -22,10 +22,13 @@ positional arguments:
     find      find regions in a seqspec file
     format    format seqspec file
     index     index regions in a seqspec file
+    info      get info about seqspec file
     init      init a seqspec file
-    modify    format seqspec file
+    modify    modify region attributes
     onlist    get onlist file for specific regions
     print     print seqspec file
+    split     split seqspec into modalities
+    version   Get seqspec version and seqspec file version
 
 optional arguments:
   -h, --help  show this help message and exit
@@ -143,6 +146,37 @@ $ seqspec index -t kb -m atac -r fastqs/atac_R1_SRR18677642.fastq.gz,fastqs/atac
 1,8,24:-1,-1,-1:0,0,52,2,0,52
 ```
 
+### `seqspec info`: get info about seqspec file
+
+```bash
+seqspec info -o OUT yaml
+```
+
+- optionally, `-o OUT` path to create info json file.
+- `yaml` corresponds to the `seqspec` file.
+
+#### Examples
+
+```bash
+$ seqspec info spec.yaml
+{
+    "seqspec_version": "0.0.0",
+    "assay": "DOGMAseq-DIG",
+    "sequencer": "Illumina NovaSeq 6000 (S2 Reagent Kit v1.5)",
+    "name": "DOGMAseq-DIG/Illumina",
+    "doi": "https://doi.org/10.1186/s13059-022-02698-8",
+    "publication_date": "23 June 2022",
+    "description": "DOGMAseq with digitonin (DIG) is a single-cell multi-omics assay that simultaneously measures protein, RNA, and chromatin accessibility in single cells. The assay is based on the DOGMAseq technology, which uses a DNA-barcoded antibody library to capture proteins of interest, followed by a single-cell RNA-seq protocol and a single-cell ATAC-seq protocol. The DOGMAseq-LLL assay is designed to be compatible with the 10x Genomics Chromium platform.",
+    "modalities": [
+        "protein",
+        "tag",
+        "rna",
+        "atac"
+    ],
+    "lib_struct": ""
+}
+```
+
 ### `seqspec init`: init a seqspec file
 
 ```bash
@@ -232,4 +266,42 @@ seqspec print [-o OUT] [-f FORMAT] yaml
 
 ```
 $ seqspec print -f png spec.yaml
+```
+
+### `seqspec split`: split seqspec into modalities
+
+```bash
+seqspec split -o OUT yaml
+```
+
+- optionally, `-o OUT` name prepended to split specs.
+- `yaml` corresponds to the `seqspec` file.
+
+#### Examples
+
+```bash
+$ seqspec split -o split spec.yaml
+$ ls -1
+spec.yaml
+split.atac.yaml
+split.protein.yaml
+split.rna.yaml
+split.tag.yaml
+```
+
+### `seqspec version`: Get seqspec version and seqspec file version
+
+```bash
+seqspec version [-o OUT] yaml
+```
+
+- optionally, `-o OUT` path to file to write output.
+- `yaml` corresponds to the `seqspec` file.
+
+#### Examples
+
+```bash
+$ seqspec version spec.yaml
+seqspec version: 0.0.0
+seqspec file version: 0.0.0
 ```
