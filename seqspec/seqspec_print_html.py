@@ -1,36 +1,6 @@
 from seqspec.Region import Region
 
 
-# def setup_print_args(parser):
-#     parser_print = parser.add_parser(
-#         "print",
-#         description="print seqspec file",
-#         help="print seqspec file",
-#     )
-#     parser_print.add_argument("yaml", help="Sequencing specification yaml file")
-#     parser_print.add_argument(
-#         "-o",
-#         metavar="OUT",
-#         help=("Path to output file"),
-#         type=str,
-#         default=None,
-#     )
-#     return parser_print
-
-
-# def validate_print_args(parser, args):
-#     # if everything is valid the run_print
-#     fn = args.yaml
-#     o = args.o
-#     spec = load_spec(fn)
-#     s = run_print(spec)
-#     if o:
-#         with open(o, "w") as f:
-#             print(s, file=f)
-#     else:
-#         print(s)
-
-
 def run_print_html(spec):
     # header = headerTemplate(spec.name, spec.doi, spec.description, spec.modalities)
     # header2 = "## Final Library"
@@ -192,7 +162,7 @@ def htmlTemplate(spec):
     </head>
     <body>
       <div style="width: 75%; margin: 0 auto">
-        <h6><a href="../index.html">Back</a></h6>
+        <h6><a href="../../index.html">Back</a></h6>
         <div id="assay">
           {headerTemplate(
             spec.name,
