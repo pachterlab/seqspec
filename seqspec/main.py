@@ -14,6 +14,7 @@ from .seqspec_info import setup_info_args, validate_info_args
 from .seqspec_split import setup_split_args, validate_split_args
 from .seqspec_init import setup_init_args, validate_init_args
 from .seqspec_onlist import setup_onlist_args, validate_onlist_args
+from .seqspec_version import setup_version_args, validate_version_args
 
 # Steps to add new subcommands
 # Create seqspec_subcommand.py (create setup_subcmd_args, validate_subcmd_args, run_subcmd in that file)
@@ -27,6 +28,7 @@ def main():
     parser = argparse.ArgumentParser(
         description=f"seqspec {__version__}: Format sequence specification files"
     )
+
     subparsers = parser.add_subparsers(
         dest="command",
         metavar="<CMD>",
@@ -44,8 +46,8 @@ def main():
         "onlist": setup_onlist_args(subparsers),
         "print": setup_print_args(subparsers),
         "split": setup_split_args(subparsers),
+        "version": setup_version_args(subparsers),
     }
-
     # Show help when no arguments are given
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -53,6 +55,8 @@ def main():
     if len(sys.argv) == 2:
         if sys.argv[1] in command_to_parser:
             command_to_parser[sys.argv[1]].print_help(sys.stderr)
+        elif sys.argv[1] == "--version":
+            print(f"seqspec {__version__}")
         else:
             parser.print_help(sys.stderr)
         sys.exit(1)
@@ -71,6 +75,7 @@ def main():
         "modify": validate_modify_args,
         "onlist": validate_onlist_args,
         "split": validate_split_args,
+        "version": validate_version_args,
     }
     COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)
 
