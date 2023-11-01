@@ -71,6 +71,7 @@ min_len: 8
 max_len: 8
 onlist: !Onlist
   filename: barcode-1_onlist.txt
+  location: local
   md5: null
 regions: null
 ```
@@ -116,6 +117,7 @@ regions: null
 - `max_len` is an integer greater than or equal to the `min_len`. It represents the maximum length of the `sequence`
 - `onlist` can be `null` or contain
   - `filename` which is a path (relative to the `seqspec` file containing a list of sequences
+  - `location` denotes whether the filename is a local path to a file or a URI to a file.
   - `md5` is the md5sum of the uncompressed file in `filename`
 - `regions` can either be `null` or contain a list of `regions` as specified above.
 
@@ -298,6 +300,7 @@ assay_spec:
       max_len: 8
       onlist: !Onlist
         filename: index5_onlist.txt
+        location: local
         md5: null
       regions:
 
@@ -322,6 +325,7 @@ assay_spec:
       max_len: 8
       onlist: !Onlist
         filename: index7_onlist.txt
+        location: local
         md5: null
       regions:
 
@@ -362,6 +366,7 @@ assay_spec:
   max_len: 16
   onlist: !Onlist
     filename: barcode_onlist.txt
+    location: local
     md5: null
   regions:
 
