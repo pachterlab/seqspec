@@ -36,7 +36,7 @@ def setup_index_args(parser):
         help=("Tool"),
         default="tab",
         type=str,
-        choices=["kb", "seqkit", "simpleaf", "starsolo", "tab", "zumis"],
+        choices=["chromap", "kb", "seqkit", "simpleaf", "starsolo", "tab", "zumis"],
     )
 
     subparser.add_argument(
@@ -89,6 +89,7 @@ def validate_index_args(parser, args):
 
 def run_index(spec, modality, regions, fmt="tab", rev=False, subregion_type=None):
     FORMAT = {
+        "chromap": format_chromap,
         "kb": format_kallisto_bus,
         "seqkit": format_seqkit_subseq,
         "simpleaf": format_simpleaf,
@@ -248,5 +249,32 @@ def format_zumis(indices, subregion_type=None):
     return "\n".join(xl)[:-1]
 
 
-def format_chromap(indices):
-    pass
+def format_chromap(indices, subregion_type=None):
+    bc_fqs = []
+    bc_str = []
+    gdna_fqs = []
+    gdna_str = []
+    for idx, region in enumerate(indices):
+        for rgn, index in region.items():
+            for k, v in index.items():
+                if v.upper() == "BARCODE":
+                    bc_fqs.append(rgn)
+                    bc_str.append(f"bc:{k[0]}:{k[1]}")
+                    pass
+                elif v.upper() == "GDNA":
+                    gdna_fqs.append(rgn)
+                    gdna_str.append(f"{k[0]}:{k[1]}")
+    if len(set(bc_fqs)) > 1:
+        raise "chromap only supports barcodes from one fastq"
+    if len(set(gdna_fqs)) > 2:
+        raise "chromap only supports genomic dna from two fastqs"
+
+    barcode_fq = bc_fqs[0]
+    read1_fq = list(set(gdna_fqs))[0]
+    read2_fq = list(set(gdna_fqs))[1]
+    read_str = ",".join([f"r{idx}:{ele}" for idx, ele in enumerate(gdna_str, 1)])
+    bc_str = ",".join(bc_str)
+
+    cmap_str = f"-1 {read1_fq} -2 {read2_fq} --barcode {barcode_fq} --read-format {bc_str},{read_str}"
+
+    return cmap_str
