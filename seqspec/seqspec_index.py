@@ -278,3 +278,7 @@ def format_chromap(indices, subregion_type=None):
     cmap_str = f"-1 {read1_fq} -2 {read2_fq} --barcode {barcode_fq} --read-format {bc_str},{read_str}"
 
     return cmap_str
+
+
+def format_splitcode(indices, subregion_type=None):
+    pass
