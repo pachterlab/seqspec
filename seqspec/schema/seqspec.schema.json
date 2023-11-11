@@ -39,7 +39,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["rna", "tag", "protein", "atac", "crispr"]
+        "enum": ["dna", "rna", "tag", "protein", "atac", "crispr"]
       }
     },
     "lib_struct": {
@@ -83,6 +83,8 @@
             "barcode",
             "cdna",
             "crispr",
+            "custom_primer",
+            "dna",
             "fastq",
             "fastq_link",
             "gdna",
