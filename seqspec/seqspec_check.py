@@ -55,6 +55,25 @@ def run_check(schema, spec, spec_fn):
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
         )
 
+    # check that the modalities are unique
+    if len(spec.modalities) != len(set(spec.modalities)):
+        errors.append(
+            f"[error {idx}] modalities [{', '.join(spec.modalities)}] are not unique"
+        )
+        idx += 1
+
+    # check that region_ids of the first level of the spec correspond to the modalities
+    # one for each modality
+    modes = spec.modalities
+    rgns = spec.assay_spec
+    for r in rgns:
+        rid = r.region_id
+        if rid not in modes:
+            errors.append(
+                f"[error {idx}] region_id '{rid}' of the first level of the spec does not correspond to a modality [{', '.join(modes)}]"
+            )
+            idx += 1
+
     # get all of the onlist files in the spec and check that they exist relative to the path of the spec
     modes = spec.modalities
     olrgns = []
