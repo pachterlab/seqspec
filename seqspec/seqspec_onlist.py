@@ -30,8 +30,9 @@ def setup_onlist_args(parser):
         required=True,
     )
     subparser_required.add_argument(
-        "-r", metavar="REGION", help=("Region"), type=str, default=None, required=True
+        "-r", metavar="REGION", help=("Region"), type=str, default=None, required=False
     )
+    subparser.add_argument("--list", action="store_true", help=("List onlists"))
     return subparser
 
 
@@ -45,6 +46,13 @@ def validate_onlist_args(parser, args):
     # load spec
     spec = load_spec(fn)
     # if number of barcodes > 1 then we need to join them
+    # note that in order to enable --list as an option we make regions optional but its
+    # required for the standard onlist function
+    if args.list:
+        onlists = run_list_onlists(spec, m)
+        for ol in onlists:
+            print(f"{ol['region_id']}\t{ol['filename']}\t{ol['location']}\t{ol['md5']}")
+        return
 
     olist = run_onlist(spec, m, r)
     print(os.path.join(os.path.dirname(os.path.abspath(fn)), olist))
@@ -61,6 +69,21 @@ def run_onlist(spec: Assay, modality: str, region_id: str):
         onlists.append(r.get_onlist().filename)
 
     return join_onlists(onlists)
+
+
+def run_list_onlists(spec: Assay, modality: str):
+    regions = spec.get_modality(modality).get_onlist_regions()
+    olsts = []
+    for r in regions:
+        olsts.append(
+            {
+                "region_id": r.region_id,
+                "filename": r.onlist.filename,
+                "location": r.onlist.location,
+                "md5": r.onlist.md5,
+            }
+        )
+    return olsts
 
 
 def join_onlists(onlists):
