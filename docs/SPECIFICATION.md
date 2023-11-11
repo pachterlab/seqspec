@@ -411,3 +411,53 @@ assay_spec:
 # I1.fastq.gz "Index 1, i7 index"
 # I2.fastq.gz "Index 2, i5 index"
 ```
+
+# Contributing to Specification Improvements
+
+## Introduction
+
+This section outlines the process for suggesting improvements to the `seqspec` specification and the procedure for updating the specification.
+
+## Suggesting Improvements
+
+### How to Suggest
+
+- **Open an Issue**: For suggesting improvements, please open a new issue in the GitHub repository.
+- **Describe Your Suggestion**: Clearly describe the problem and your proposed solution. Include examples and use cases where possible.
+
+### Community Discussion
+
+- **Engagement**: Encourage community feedback on the suggestion through comments.
+- **Iterate**: Be open to iterating on your suggestion based on community feedback.
+
+## Review Process
+
+### Steps for Review
+
+1. **Initial Review**: A maintainer will review the suggestion for completeness and relevance.
+2. **Community Feedback**: A period for community feedback will follow.
+3. **Final Review**: The maintainers will make a final review, considering all feedback.
+
+### Decision Making
+
+- Decisions will be made based on the specification's goals, community feedback, and overall impact on the `seqspec` ecosystem.
+
+## Updating the Specification
+
+### Approval and Merging
+
+- Once approved, a maintainer will merge the changes into the specification.
+- Major changes may require a more detailed review process or a community vote.
+
+### Versioning and Change Log
+
+- **Versioning**: Follow semantic versioning. Major changes result in a version bump.
+- **Change Log**: Update the change log with a summary of the changes and contributors.
+
+### Testing and Validation
+
+- Ensure any changes are tested for compatibility and do not break existing functionality.
+
+## Conclusion
+
+We value your contributions and aim to make the process of improving the specification collaborative and transparent. For any questions, please contact the repository maintainers.
