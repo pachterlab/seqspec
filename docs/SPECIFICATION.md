@@ -79,29 +79,39 @@ regions: null
 - `region_id` is a free-form string and must be unique across all regions in the `seqspec` file.
   - if the assay contains multiple regions of the same `region_type` it may be useful to append an integer to the end of the `region_id` to differentiate those regions. For example, if the assay had four `barcodes` then each of the individual `barcode` regions could have the `region_id`s `barcode-1`, `barcode-2`, `barcode-3`, `barcode-4`.
 - `region_type` can be one of the following:
-  - RNA
-  - ATAC
-  - CRISPR
-  - HIC
-  - METHYL
-  - Protein
-  - illumina_p5
-  - illumina_p7
-  - nextera_read1
-  - nextera_read2
-  - s5
-  - s7
-  - ME1
-  - ME2
-  - truseq_read1
-  - truseq_read2
-  - index5
-  - index7
-  - fastq
-  - barcode
-  - umi
-  - cDNA
-  - gDNA
+  - `atac`: The modality for chromatin accesibility capture
+  - `barcode`: A region corresponding to a synthetic barcode sequence often associated with samples or cells
+  - `cdna`: Complementary DNA generated from an RNA product
+  - `crispr`: The modality for barcode-based CRISPR assay
+  - `custom_primer`: A synthesized segment of nucleic acid used to initiate DNA synthesis.
+  - `dna`: Deoxyribonucleic acid, targets often generated for MPRA assays.
+  - `fastq`: A region corresponding to a FASTQ file.
+  - `fastq_link`: A region corresponding to a FASTQ file that is stored remotely (via url).
+  - `gdna`: Genomic DNA, targets often obtained with ATACseq.
+  - `hic`: The modality corresponding to high-throughput chromosome conformation capture, a technique for studying the three-dimensional structure of genomes.
+  - `illumina_p5`: A sequencing primer specific to Illumina platforms, used to bind the library molecule to the flow cell.
+  - `illumina_p7`: A sequencing primer specific to Illumina platforms, used to bind the library molecule to the flow cell.
+  - `index5`: A barcode sequence used for multiplexing and sample identification in sequencing, associated with the P5 end.
+  - `index7`: A barcode sequence used for multiplexing and sample identification in sequencing, associated with the P7 end.
+  - `linker`: A short, synthetic DNA sequence used to connect two molecules or fragments.
+  - `ME1`: Mosaic end 1, used in the Nextera Library kit for library preparation.
+  - `ME2`: Mosaic end 2, used in the Nextera Library kit for library preparation.
+  - `methyl`: The modality for methylation sequencing which assays the presence of a methyl group.
+  - `named`: A custom named region for grouping other regions.
+  - `nextera_read1`: A read sequence obtained from the first end in paired-end Nextera library sequencing.
+  - `nextera_read2`: A read sequence obtained from the second end in paired-end Nextera library sequencing.
+  - `poly_A`: A sequence of multiple adenine nucleotides.
+  - `poly_G`: A sequence of multiple guanine nucleotides.
+  - `poly_T`: A sequence of multiple thymine nucleotides.
+  - `poly_C`: A sequence of multiple cytosine nucleotides.
+  - `protein`: The modality corresponding to assaying cell-surface proteins.
+  - `rna`: The modality corresponding to assaying RNA.
+  - `s5`: A sequencing primer or adaptor typically used in the Nextera kit in conjunction with ME1.
+  - `s7`: A sequencing primer or adaptor typically used in the Nextera kit in conjunction with ME2.
+  - `tag`: A short sequence of DNA or RNA used to label or identify a sample, protein, or other grouping.
+  - `truseq_read1`: The first read primer in a paired-end sequencing run using the Illumina TruSeq Library preparation kit.
+  - `truseq_read2`: The second read primer in a paired-end sequencing run using the Illumina TruSeq Library preparation kit.
+  - `umi`: Unique Molecular Identifier, a short nucleotide sequence used to tag individual molecules.
 - `name` is a free-form string for describing the region
 - `sequence_type` can be one of the following:
   - `fixed` indicates that sequence string is known
