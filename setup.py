@@ -10,7 +10,7 @@ long_description = read("README.md")
 
 setup(
     name="seqspec",
-    version="0.0.0",
+    version="0.1.0",
     url="https://github.com/sbooeshaghi/seqspec",
     author="Sina Booeshaghi",
     author_email="abooesha@caltech.edu",

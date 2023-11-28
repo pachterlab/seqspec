@@ -1,6 +1,6 @@
 # seqspec
-![github version](https://img.shields.io/badge/Version-0.0.0-informational)
-[![pypi version](https://img.shields.io/pypi/v/seqspec)](https://pypi.org/project/seqspec/0.0.0/)
+![github version](https://img.shields.io/badge/Version-0.1.0-informational)
+[![pypi version](https://img.shields.io/pypi/v/seqspec)](https://pypi.org/project/seqspec/0.1.0/)
 ![python versions](https://img.shields.io/pypi/pyversions/seqspec)
 [![license](https://img.shields.io/pypi/l/seqspec)](LICENSE)
 
