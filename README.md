@@ -13,6 +13,9 @@ A list of `seqspec` examples for multiple assays and sequencers can be found on 
 <img alt="image" src="https://github.com/IGVF/seqspec/assets/10369156/c314d7ee-c517-4137-ab48-b10d5ad08304">
 
 ```bash
+# release
+pip install seqspec
+
 # development
 pip install git+https://github.com/IGVF/seqspec.git
 
