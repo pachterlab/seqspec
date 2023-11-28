@@ -1,4 +1,5 @@
 # seqspec
+
 ![github version](https://img.shields.io/badge/Version-0.1.0-informational)
 [![pypi version](https://img.shields.io/pypi/v/seqspec)](https://pypi.org/project/seqspec/0.1.0/)
 ![python versions](https://img.shields.io/pypi/pyversions/seqspec)
@@ -10,7 +11,7 @@ Genomic library structure depends on both the assay and sequencer (and kit) used
 
 A list of `seqspec` examples for multiple assays and sequencers can be found on [this website](https://igvf.github.io/seqspec/). Each `spec.yaml` describes the 5'->3' "Final library structure" for the assay and sequencer. Sequence specification files can be formatted with the `seqspec` command line tool.
 
-<img alt="image" src="https://github.com/IGVF/seqspec/assets/10369156/c314d7ee-c517-4137-ab48-b10d5ad08304">
+<img alt="image" src="/docs/seqspec.png">
 
 ```bash
 # release
