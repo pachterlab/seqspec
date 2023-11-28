@@ -1,3 +1,4 @@
+bumpversion
 pytest
 pytest-cov
 tox
