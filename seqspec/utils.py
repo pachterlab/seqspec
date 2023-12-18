@@ -2,6 +2,7 @@ import io
 from seqspec.Assay import Assay
 import yaml
 import requests
+from Bio import GenBank
 
 
 def load_spec(spec_fn: str):
@@ -14,6 +15,16 @@ def load_spec_stream(spec_stream: io.IOBase):
     # set the parent id in the Assay object upon loading it
     for r in data.assay_spec:
         r.set_parent_id(None)
+    return data
+
+
+def load_genbank(gbk_fn: str):
+    with open(gbk_fn, "r") as stream:
+        return load_genbank_stream(stream)
+
+
+def load_genbank_stream(gbk_stream: io.IOBase):
+    data: GenBank = GenBank.read(gbk_stream)
     return data
 
 

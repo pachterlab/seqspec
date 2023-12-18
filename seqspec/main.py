@@ -6,7 +6,7 @@ from .seqspec_print import setup_print_args, validate_print_args
 from .seqspec_check import setup_check_args, validate_check_args
 from .seqspec_find import setup_find_args, validate_find_args
 
-# from .seqspec_convert import setup_convert_args, validate_convert_args
+from .seqspec_genbank import setup_genbank_args, validate_genbank_args
 from .seqspec_modify import setup_modify_args, validate_modify_args
 from .seqspec_index import setup_index_args, validate_index_args
 from .seqspec_info import setup_info_args, validate_info_args
@@ -39,6 +39,7 @@ def main():
         "check": setup_check_args(subparsers),
         "find": setup_find_args(subparsers),
         "format": setup_format_args(subparsers),
+        "genbank": setup_genbank_args(subparsers),
         "index": setup_index_args(subparsers),
         "info": setup_info_args(subparsers),
         "init": setup_init_args(subparsers),
@@ -76,6 +77,7 @@ def main():
         "onlist": validate_onlist_args,
         "split": validate_split_args,
         "version": validate_version_args,
+        "genbank": validate_genbank_args,
     }
     COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)
 
