@@ -46,6 +46,13 @@
       "description": "The link to Teichmann's libstructs page derived for this sequence",
       "type": "string"
     },
+    "sequence_spec": {
+      "description": "The spec for the sequencer",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/read"
+      }
+    },
     "assay_spec": {
       "description": "The spec for the assay",
       "type": "array",
@@ -172,6 +179,52 @@
         "min_len",
         "max_len"
       ]
+    },
+    "read": {
+      "title": "Read",
+      "type": "object",
+      "properties": {
+        "read_id": {
+          "type": "string",
+          "description": "The unique identifier for the read."
+        },
+        "read_name": {
+          "type": "string",
+          "description": "The name of the read."
+        },
+        "modality": {
+          "type": "string",
+          "description": "The modality of the assay generating the read."
+        },
+        "primer_id": {
+          "type": "string",
+          "description": "The region id of the primer used."
+        },
+        "min_len": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "The minimum length of the read, must be greater than or equal to 0."
+        },
+        "max_len": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "description": "The maximum length of the read, must be greater than 0."
+        },
+        "strand": {
+          "type": "string",
+          "enum": ["pos", "neg"],
+          "description": "The strand orientation of the read, either positive ('pos') or negative ('neg')."
+        }
+      },
+      "required": [
+        "read_id",
+        "modality",
+        "primer_id",
+        "min_len",
+        "max_len",
+        "strand"
+      ],
+      "additionalProperties": false
     }
   }
 }

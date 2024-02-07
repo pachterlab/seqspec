@@ -1,5 +1,5 @@
 import yaml
-from seqspec.Region import Region
+from seqspec.Region import Region, Read
 from typing import List
 import json
 from . import __version__
@@ -18,6 +18,7 @@ class Assay(yaml.YAMLObject):
         description: str,
         modalities: List[str],
         lib_struct: str,
+        sequence_spec: List[Read],
         assay_spec: List[Region],
         seqspec_version: str = __version__,
     ) -> None:
@@ -31,6 +32,7 @@ class Assay(yaml.YAMLObject):
         self.description = description
         self.modalities = modalities
         self.lib_struct = lib_struct
+        self.sequence_spec = sequence_spec
         self.assay_spec = assay_spec
 
     def __repr__(self) -> str:
@@ -44,6 +46,7 @@ class Assay(yaml.YAMLObject):
             "description": self.description,
             "modalities": self.modalities,
             "lib_struct": self.lib_struct,
+            "sequence_spec": self.sequence_spec,
             "assay_spec": self.assay_spec,
         }
         return f"{d}"
@@ -59,6 +62,7 @@ class Assay(yaml.YAMLObject):
             "description": self.description,
             "modalities": self.modalities,
             "lib_struct": self.lib_struct,
+            "sequence_spec": [o.to_dict() for o in self.sequence_spec],
             "assay_spec": [o.to_dict() for o in self.assay_spec],
         }
         return d

@@ -247,3 +247,50 @@ class Onlist(yaml.YAMLObject):
             "md5": self.md5,
         }
         return d
+
+
+class Read(yaml.YAMLObject):
+    yaml_tag = "!Read"
+
+    def __init__(
+        self,
+        read_id: str,
+        read_name: str,
+        modality: str,
+        primer_id: str,
+        min_len: int,
+        max_len: int,
+        strand: str,
+    ) -> None:
+        super().__init__()
+        self.read_id = read_id
+        self.read_name = read_name
+        self.modality = modality
+        self.primer_id = primer_id
+        self.min_len = min_len
+        self.max_len = max_len
+        self.strand = strand
+
+    def __repr__(self) -> str:
+        d = {
+            "read_id": self.read_id,
+            "read_name": self.read_name,
+            "modality": self.modality,
+            "primer_id": self.primer_id,
+            "min_len": self.min_len,
+            "max_len": self.max_len,
+            "strand": self.strand,
+        }
+        return f"{d}"
+
+    def to_dict(self):
+        d = {
+            "read_id": self.read_id,
+            "read_name": self.read_name,
+            "modality": self.modality,
+            "primer_id": self.primer_id,
+            "min_len": self.min_len,
+            "max_len": self.max_len,
+            "strand": self.strand,
+        }
+        return d
