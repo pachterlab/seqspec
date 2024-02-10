@@ -10,7 +10,7 @@ Each `spec` is described by two objects: the `Assay` object and the `Region` obj
 modalities:
     - Modality1
     - Modality2
-assay_spec:
+library_spec:
     - region_id: Modality1
       regions:
           - region_id: Region1
@@ -39,7 +39,7 @@ description: split-pool ligation-based transcriptome sequencing
 modalities:
   - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SPLiT-seq.html
-assay_spec:
+library_spec:
 	...
 ```
 
@@ -52,9 +52,9 @@ The following terms fully specify an `Assay`
 - `doi` is the doi link to the paper/protocol that describes the assay (if it exists)
 - `publication_date` is the date the assay was published (linked to by the `doi`). Must be in DD Month Year format.
 - `description` is a free-form string that describes the assay
-- `modalities` is a list of `region_types` that are contained within the library. Each string must be present in exactly one `Region` in the first "level" of the `assay_spec`.
+- `modalities` is a list of `region_types` that are contained within the library. Each string must be present in exactly one `Region` in the first "level" of the `library_spec`.
 - `lib_struct` is a link to the manually annotated library structure developed by Xi Chen in Sarah Teichmann's lab.
-- `assay_spec` is a list of `Regions`.
+- `library_spec` is a list of `Regions`.
 
 ### `Region` parameters
 
@@ -163,7 +163,7 @@ description: My custom assay
 modalities:
   - RNA
 lib_struct: www.link-to-libstructs.com
-assay_spec:
+library_spec:
   - !Region
     region_id: RNA
     region_type: RNA

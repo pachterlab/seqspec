@@ -21,7 +21,7 @@ def assay_dict(regions=[]):
         "description": "description",
         "modalities": ["RNA", "cDNA"],
         "lib_struct": "lib_struct",
-        "assay_spec": regions,
+        "library_spec": regions,
     }
 
 

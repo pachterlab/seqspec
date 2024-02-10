@@ -38,5 +38,5 @@ def validate_info_args(parser, args):
 def run_info(spec):
     # return json of the Assay object
     info = spec.to_dict()
-    del info["assay_spec"]
+    del info["library_spec"]
     return info

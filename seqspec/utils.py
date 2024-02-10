@@ -13,7 +13,7 @@ def load_spec(spec_fn: str):
 def load_spec_stream(spec_stream: io.IOBase):
     data: Assay = yaml.load(spec_stream, Loader=yaml.Loader)
     # set the parent id in the Assay object upon loading it
-    for r in data.assay_spec:
+    for r in data.library_spec:
         r.set_parent_id(None)
     return data
 
@@ -46,7 +46,8 @@ def write_read(header, seq, qual, f):
 
 def read_list(fname):
     with open(fname, "r") as f:
-        return [line.strip() for line in f.readlines()]
+        # just get the first column
+        return [line.strip().split()[0] for line in f.readlines()]
 
 
 def region_ids_in_spec(seqspec, modality, region_ids):

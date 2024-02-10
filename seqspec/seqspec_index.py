@@ -52,7 +52,12 @@ def setup_index_args(parser):
         required=True,
     )
     subparser_required.add_argument(
-        "-r", metavar="REGION", help=("Region"), type=str, default=None, required=True
+        "-r",
+        metavar="READ",
+        help=("Read"),
+        type=str,
+        default=None,
+        required=True,
     )
 
     return subparser
@@ -71,12 +76,12 @@ def validate_index_args(parser, args):
 
     # load spec
     spec = load_spec(fn)
-    rgns = r.split(",")
-    # regions can be paths, take the basename of the path, use os
+    rds = r.split(",")
+    # reads can be paths, take the basename of the path, use os
 
-    rgns = [os.path.basename(r) for r in rgns]
+    rds = [os.path.basename(r) for r in rds]
 
-    x = run_index(spec, m, rgns, fmt=t, rev=rev, subregion_type=s)
+    x = run_index(spec, m, rds, fmt=t, rev=rev, subregion_type=s)
 
     # post processing
     if o:
@@ -87,7 +92,7 @@ def validate_index_args(parser, args):
     return
 
 
-def run_index(spec, modality, regions, fmt="tab", rev=False, subregion_type=None):
+def run_index(spec, modality, reads, fmt="tab", rev=False, subregion_type=None):
     FORMAT = {
         "chromap": format_chromap,
         "kb": format_kallisto_bus,
@@ -98,8 +103,9 @@ def run_index(spec, modality, regions, fmt="tab", rev=False, subregion_type=None
         "zumis": format_zumis,
     }
     indices = []
-    for r in regions:
-        index = get_index(spec, modality, r, rev=rev)
+    for r in reads:
+        # index = get_index(spec, modality, r, rev=rev)
+        index = get_index_by_primer(spec, modality, r, rev=rev)
         indices.append({r: index})
     return FORMAT[fmt](indices, subregion_type)
 
@@ -141,6 +147,56 @@ def get_index(spec, modality, region_id, rev=False) -> Dict[Tuple[int, int], str
         index[c] = t
 
     return index
+
+
+def get_index_by_primer(
+    spec, modality: str, read_id: str, rev: bool = False
+) -> Dict[Tuple[int, int], str]:  # noqa
+    index = defaultdict()
+
+    # get all atomic elements from library
+    leaves = spec.get_modality(modality).get_leaves()
+
+    # get the read object and primer id
+    read = [i for i in spec.sequence_spec if i.read_id == read_id][0]
+    primer_id = read.primer_id
+
+    # get the index of the primer in the list of leaves (ASSUMPTION, 5'->3' and primer is an atomic element)
+    primer_idx = [i for i, l in enumerate(leaves) if l.region_id == primer_id][0]
+
+    # If we are on the opposite strand, we go in the opposite way
+    if read.strand == "neg":
+        rgn = leaves[:primer_idx][::-1]
+    else:
+        rgn = leaves[primer_idx + 1 :]
+
+    # get the cuts for all of the atomic elements (tuples of 0-indexed start stop)
+    cuts = get_cuts(rgn)
+
+    # associate each cut with its region type
+    for idx, r in enumerate(rgn):
+        t = r.region_type
+        c = cuts[idx]
+        index[c] = t
+    # intersect read with index
+    new_index = itx_read(index, read.max_len)
+
+    return new_index
+
+
+def itx_read(index: Dict[Tuple[int, int], str], read_stop: int):
+    new_index = defaultdict()
+
+    # three cases
+    for (itv_start, itv_stop), e in index.items():  # noqa
+        # A: read is shorter than itv_start of next element
+        if read_stop < itv_start:
+            continue
+
+        # B: read splits an element (same as case c)
+        elif read_stop > itv_start:
+            new_index[itv_start, min(itv_stop, read_stop)] = e
+    return new_index
 
 
 def format_kallisto_bus(indices, subregion_type=None):

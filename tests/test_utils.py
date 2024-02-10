@@ -19,7 +19,7 @@ description: first method to sequence the whole transcriptome (mRNA) of a single
 modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.html
-assay_spec:
+library_spec:
 - !Region
   region_id: RNA
   region_type: RNA

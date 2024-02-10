@@ -54,14 +54,14 @@ def validate_print_args(parser, args):
 def run_print(data):
     header = headerTemplate(data.name, data.doi, data.description, data.modalities)
     header2 = "## Final Library"
-    assay_spec = multiModalTemplate(data.assay_spec)
-    s = f"{header}\n{header2}\n{assay_spec}"
+    library_spec = multiModalTemplate(data.library_spec)
+    s = f"{header}\n{header2}\n{library_spec}"
     return s
 
 
 def run_print_tree(spec):
     t = []
-    for r in spec.assay_spec:
+    for r in spec.library_spec:
         t.append(r.to_newick())
     n = ",".join(t)
     # print(n)
@@ -231,8 +231,8 @@ def libStructTemplate(region):
     return s
 
 
-def multiModalTemplate(assay_spec):
+def multiModalTemplate(library_spec):
     s = "\n".join(
-        [libStructTemplate(v) + "\n" + regionsTemplate(v.regions) for v in assay_spec]
+        [libStructTemplate(v) + "\n" + regionsTemplate(v.regions) for v in library_spec]
     )
     return s

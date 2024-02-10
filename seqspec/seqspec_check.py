@@ -65,7 +65,7 @@ def run_check(schema, spec, spec_fn):
     # check that region_ids of the first level of the spec correspond to the modalities
     # one for each modality
     modes = spec.modalities
-    rgns = spec.assay_spec
+    rgns = spec.library_spec
     for r in rgns:
         rid = r.region_id
         if rid not in modes:
