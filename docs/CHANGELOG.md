@@ -19,4 +19,4 @@
 
 ### Fixed
 
--
+- specifications can be written for assays with overlapping read pairs
