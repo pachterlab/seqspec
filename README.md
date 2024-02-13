@@ -9,7 +9,7 @@
 
 Genomic library structure depends on both the assay and sequencer (and kit) used to generate and bind the assay-specific construct to the sequencing adapters to generate a sequencing library. Therefore, a `seqspec` is specific to both a genomics assay and sequencer.
 
-A list of `seqspec` examples for multiple assays and sequencers can be found on [this website](https://igvf.github.io/seqspec/). Each `spec.yaml` describes the 5'->3' "Final library structure" for the assay and sequencer. Sequence specification files can be formatted with the `seqspec` command line tool.
+A list of `seqspec` examples for multiple assays and sequencers can be found on [this website](https://igvf.github.io/seqspec/). Each `spec.yaml` describes the 5'->3' "Final library structure" for the assay and sequencer and can be extended to include sequencer-specific read annotations. Sequence specification files can be formatted with the `seqspec` command line tool.
 
 <img alt="image" src="/docs/seqspec.png">
 

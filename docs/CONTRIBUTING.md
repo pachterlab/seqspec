@@ -1,8 +1,8 @@
-## Contributing
+# Contributing
 
-Thank you for wanting to add a spec or improve `seqspec`. If you have a bug that is related to `seqspec` please create an issue.
+Thank you for wanting to add a spec or improve `seqspec`. If you have a bug that is related to `seqspec` please create an issue. This document outlines the process for suggesting improvements to the `seqspec` specification and the procedure for updating the specification.
 
-### Issues
+## Issues
 
 The issue should contain
 
@@ -10,7 +10,16 @@ The issue should contain
 - the error message, and
 - the `seqspec` and python version.
 
-### Specs and code changes
+## Improvements
+
+To suggest improvements to the seqspec project please do the following:
+
+- **Open an Issue**: For suggesting improvements, please open a new issue in the GitHub repository.
+- **Describe Your Suggestion**: Clearly describe the problem and your proposed solution. Include examples and use cases where possible.
+- **Engagement**: Encourage community feedback on the suggestion through comments.
+- **Iterate**: Be open to iterating on your suggestion based on community feedback.
+
+## Specs and code changes
 
 If you'd like to add assays sequence specifications or make modifications to the `seqspec` tool please do the following:
 
@@ -75,3 +84,33 @@ git push origin cool-new-feature
 5. Submit a pull request
 
 If you are unfamiliar with pull requests, you can find more information on the [GitHub help page.](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests)
+
+### Steps for Review
+
+1. **Initial Review**: A maintainer will review the suggestion for completeness and relevance.
+2. **Community Feedback**: A period for community feedback will follow.
+3. **Final Review**: The maintainers will make a final review, considering all feedback.
+
+### Decision Making
+
+- Decisions will be made based on the specification's goals, community feedback, and overall impact on the `seqspec` ecosystem.
+
+## Updating the Specification
+
+### Approval and Merging
+
+- Once approved, a maintainer will merge the changes into the specification.
+- Major changes may require a more detailed review process or a community vote.
+
+### Versioning and Change Log
+
+- **Versioning**: Follow semantic versioning. Major changes result in a version bump.
+- **Change Log**: Update the change log with a summary of the changes and contributors.
+
+### Testing and Validation
+
+- Ensure any changes are tested for compatibility and do not break existing functionality.
+
+## Conclusion
+
+We value your contributions and aim to make the process of improving the specification collaborative and transparent. For any questions, please contact the repository maintainers.
