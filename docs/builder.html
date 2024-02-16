@@ -5,203 +5,97 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js"></script>
+    <script src="Reads.js"></script>
+    <script src="Regions.js"></script>
+    <link rel="stylesheet" href="styles.css" />
     <title>Document</title>
     <script>
-      function generateYAML() {
-        var formData = {
-          region_id: $("#region_id").val(),
-          region_type: $("#region_type").val(),
-          name: $("#name").val(),
-          sequence_type: $("#sequence_type").val(),
-          sequence: $("#sequence").val(),
-          min_len: parseInt($("#min_len").val()),
-          max_len: parseInt($("#max_len").val()),
-          onlist: $("#onlist_location").val()
-            ? {
-                location: $("#onlist_location").val(),
-                filename: $("#onlist_filename").val(),
-                md5: $("#onlist_md5").val(),
-              }
-            : null,
-          regions: null,
-        };
-
-        var yamlStr = jsyaml.dump(formData, { lineWidth: -1 });
-        // this strips the - !Region from the yaml output
-        $("#yamlOutput").text(
-          `- !Region\n${yamlStr
-            .split("\n")
-            .map((line) => "  " + line)
-            .join("\n")}`
-        );
-      }
-
       $(document).ready(function () {
-        var container = $(".load-examples-container");
-        files = [
-          "illumina_p5.rgn.yaml",
-          "illumina_p7.rgn.yaml",
-          "truseq_r1.rgn.yaml",
-          "truseq_r2.rgn.yaml",
-          "nextera_r1.rgn.yaml",
-          "nextera_r2.rgn.yaml",
-        ];
-        files.forEach(function (file) {
-          var filePath = "regions/" + file;
-          var button = $("<button>")
-            .addClass("loadFileBtn")
-            .attr("data-file-path", filePath)
-            .text(file.split(".")[0]); // Removes the file extension for the button text
-          container.append(button);
-        });
+        // load example reads
 
-        $(".loadFileBtn").click(function () {
-          console.log($(this).data("file-path"));
-          var filePath = $(this).data("file-path"); // Retrieve the file path from the button
+        loadExampleReads();
 
-          $.ajax({
-            url: filePath, // Use the file path to load the file
-            dataType: "text", // Expecting a YAML/text response
-            success: function (data) {
-              // Assuming 'data' contains the YAML file content
-              data = data.replace(/- !Region/g, ""); // Remove the YAML tag
-              var fileContent = jsyaml.load(data); // Convert YAML string to JavaScript object
-
-              // Populate the form
-              $("#region_id").val(fileContent.region_id);
-              $("#region_type").val(fileContent.region_type);
-              $("#name").val(fileContent.name);
-              $("#sequence_type").val(fileContent.sequence_type);
-              $("#sequence").val(fileContent.sequence);
-              $("#min_len").val(fileContent.min_len);
-              $("#max_len").val(fileContent.max_len);
-              // handle onlist
-              if (fileContent.onlist) {
-                $("#onlist_location").val(fileContent.onlist.location);
-                $("#onlist_filename").val(fileContent.onlist.filename);
-                $("#onlist_md5").val(fileContent.onlist.md5);
-              }
-
-              // Automatically generate and display the YAML
-              generateYAML(); // This calls the previously defined generateYAML function
-            },
-            error: function (xhr, status, error) {
-              console.error("Error loading file:", status, error);
-            },
-          });
-        });
-        // create a function that adds an element to level_0 when the add_region button is clicked
-        $("#level_0").on("click", ".deleteBtn", function () {
-          const target = $(this).data("target");
-          console.log(target);
-          $(`#${target}`).remove();
-        });
-        $("#add_region_button").click(function () {
-          const region_id = $("#add_region_id").val();
-          $("#level_0").append(
-            `<div id="region_${region_id}" class="region-container">
-            <div class="region-id" id="${region_id}" style="width: 15em">
-              ${region_id}
-            </div>
-            <button class="deleteBtn" data-target="region_${region_id}">Delete</button>
-          </div>`
-          );
-        });
+        loadExampleRegions();
       });
     </script>
-    <style>
-      .region-container {
-        border: 1px solid #ccc;
-        padding: 10px;
-        margin-bottom: 10px;
-      }
-
-      .region-id {
-        padding: 5px;
-        margin-bottom: 5px;
-      }
-
-      .metadata p {
-        font-size: 0.8em;
-        margin: 5px 0;
-      }
-
-      .container {
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .form-container,
-      .output-container {
-        flex: 1; /* This makes each container take up equal space */
-        margin: 10px; /* Adds a little space between the form and output */
-      }
-
-      /* Optional styles for better appearance */
-      form {
-        display: flex;
-        flex-direction: column;
-        gap: 0px; /* Adds space between form elements */
-      }
-
-      pre {
-        background-color: #f0f0f0; /* Light grey background */
-        border: 1px solid #ccc; /* Light grey border */
-        padding: 10px; /* Adds padding inside the pre element */
-        overflow-x: auto; /* Ensures content is scrollable horizontally if it overflows */
-      }
-    </style>
   </head>
   <body>
     <div>
       <h1 style="text-align: center">Specification builder</h1>
-      <!--a row of blocks that can be deleted or added-->
-      <!-- <div id="add_region">
-        <input id="add_region_id" placeholder="region_id" />
-        <button id="add_region_button">Add Region</button>
-      </div>
-      <div id="level_0"></div>
-      <hr />
-      <h1>Test html below</h1>
-      <div id="region_cell_barcode" class="region-container">
-        <div class="region-id" id="cell_barcode" style="width: 15em">
-          cell_barcode
-        </div>
-        <button class="deleteBtn" data-target="region_cell_barcode">
-          Delete
-        </button>
-      </div>
-      <div id="region_umi" class="region-container">
-        <div class="region-id" id="umi" style="width: 15em">
-          unique_molecular_identifier
-        </div>
-        <button class="deleteBtn" data-target="region_umi">Delete</button>
-      </div> -->
-      <div class="load-examples-container">
-        <h2>Load examples</h2>
-        <!-- <button
-          class="loadFileBtn"
-          data-file-path="../examples/regions/illumina_p5.rgn.yaml"
+      <p>
+        Learn more about the
+        <a href="https://github.com/pachterlab/seqspec" target="_blank">
+          <i>seqspec</i> specification.</a
         >
-          illumina_p5
-        </button>
-
-        <button
-          class="loadFileBtn"
-          data-file-path="../examples/regions/illumina_p7.rgn.yaml"
-        >
-          illumina_p7
-        </button> -->
+      </p>
+      <div class="load-read-examples-container">
+        <h2>Load example read</h2>
       </div>
 
-      <h2>Create</h2>
+      <h2>Create read</h2>
       <div class="container">
         <div class="form-container">
-          <form id="yamlForm">
-            <label for="region_id">Region id:</label><br />
+          <form id="readForm">
+            <label for="read_id">Read id:</label>
+            <input type="text" id="read_id" name="read_id" /><br />
+
+            <label for="read_name">Read name:</label>
+            <input type="text" id="read_name" name="read_name" /><br />
+
+            <label for="read_modality">Modality:</label>
+            <input type="text" id="modality" name="modality" /><br />
+
+            <label for="primer_id">Primer id:</label>
+            <input type="text" id="primer_id" name="primer_id" /><br />
+
+            <label for="min_len">Min len:</label>
+            <input
+              type="number"
+              id="read_min_len"
+              name="min_len"
+              min="0"
+              max="2048"
+            /><br />
+
+            <label for="max_len">Max len:</label>
+            <input
+              type="number"
+              id="read_max_len"
+              name="max_len"
+              min="0"
+              max="2048"
+            /><br />
+
+            <label for="strand">Strand:</label>
+            <select id="strand" name="strand">
+              <option value="pos">pos</option>
+              <option value="neg">neg</option>
+              <!-- Add other options here --></select
+            ><br />
+            <input
+              type="button"
+              value="Generate Read"
+              onclick="generateRead()"
+            />
+          </form>
+        </div>
+        <div class="read-output-container">
+          <pre id="readOutput"></pre>
+        </div>
+      </div>
+
+      <div class="load-region-examples-container">
+        <h2>Load example regions</h2>
+      </div>
+
+      <h2>Create region</h2>
+      <div class="container">
+        <div class="form-container">
+          <form id="regionForm">
+            <label for="region_id">Region id:</label>
             <input type="text" id="region_id" name="region_id" /><br />
 
-            <label for="region_type">Region type:</label><br />
+            <label for="region_type">Region type:</label>
             <select id="region_type" name="region_type">
               <option value="atac">atac</option>
               <option value="barcode">barcode</option>
@@ -240,10 +134,10 @@
               <!-- Add other options here --></select
             ><br />
 
-            <label for="name">Region name:</label><br />
+            <label for="name">Region name:</label>
             <input type="text" id="name" name="name" /><br />
 
-            <label for="sequence_type">Sequence type:</label><br />
+            <label for="sequence_type">Sequence type:</label>
             <select id="sequence_type" name="sequence_type">
               <option value="fixed">fixed</option>
               <option value="random">random</option>
@@ -252,7 +146,7 @@
               <!-- Add other options here --></select
             ><br />
 
-            <label for="sequence">Sequence:</label><br />
+            <label for="sequence">Sequence:</label>
             <input
               type="text"
               id="sequence"
@@ -260,7 +154,7 @@
               pattern="^[ACGTRYMKSWHBVDNX]+$"
             /><br />
 
-            <label for="min_len">Min length:</label><br />
+            <label for="min_len">Min length:</label>
             <input
               type="number"
               id="min_len"
@@ -269,7 +163,7 @@
               max="2048"
             /><br />
 
-            <label for="max_len">Max length:</label><br />
+            <label for="max_len">Max length:</label>
             <input
               type="number"
               id="max_len"
@@ -305,13 +199,13 @@
 
             <input
               type="button"
-              value="Generate YAML"
-              onclick="generateYAML()"
+              value="Generate Region"
+              onclick="generateRegion()"
             />
           </form>
         </div>
-        <div class="output-container">
-          <pre id="yamlOutput"></pre>
+        <div class="region-output-container">
+          <pre id="regionOutput"></pre>
         </div>
       </div>
     </div>

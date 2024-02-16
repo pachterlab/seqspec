@@ -1,0 +1,43 @@
+.region-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .region-id {
+    padding: 5px;
+    margin-bottom: 5px;
+  }
+
+  .metadata p {
+    font-size: 0.8em;
+    margin: 5px 0;
+  }
+
+  .container {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .form-container,
+  .region-output-container,
+  .read-output-container {
+    flex: 1; /* This makes each container take up equal space */
+    margin: 10px; /* Adds a little space between the form and output */
+  }
+
+  /* Optional styles for better appearance */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 0px; /* Adds space between form elements */
+    margin-bottom: 0px; /* Reduce space below each input */
+    padding: 0px; /* Adjust padding inside input if necessary */
+  }
+
+  pre {
+    background-color: #f0f0f0; /* Light grey background */
+    border: 1px solid #ccc; /* Light grey border */
+    padding: 10px; /* Adds padding inside the pre element */
+    overflow-x: auto; /* Ensures content is scrollable horizontally if it overflows */
+  }

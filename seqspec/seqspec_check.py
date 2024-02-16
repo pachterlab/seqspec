@@ -117,6 +117,35 @@ def run_check(schema, spec, spec_fn):
                 errors.append(f"[error {idx}] {fqrgn.region_id} does not exist")
                 idx += 1
 
+    # read ids should be unique
+    read_ids = set()
+    for read in spec.sequence_spec:
+        if read.read_id in read_ids:
+            errors.append(
+                f"[error {idx}] read_id '{read.read_id}' is not unique across all reads"
+            )
+            idx += 1
+        else:
+            read_ids.add(read.read_id)
+
+    # iterate through reads in sequence_spec and check that the fastq files exist
+    for read in spec.sequence_spec:
+        check = path.join(path.dirname(spec_fn), read.read_id)
+        if not path.exists(check):
+            errors.append(f"[error {idx}] {read.read_id} file does not exist")
+            idx += 1
+
+    # check that the primer ids, strand tuple pairs are unique across all reads
+    primer_strand_pairs = set()
+    for read in spec.sequence_spec:
+        if (read.primer_id, read.strand) in primer_strand_pairs:
+            errors.append(
+                f"[error {idx}] primer_id '{read.primer_id}' and strand '{read.strand}' tuple is not unique across all reads"
+            )
+            idx += 1
+        else:
+            primer_strand_pairs.add((read.primer_id, read.strand))
+
     # TODO add option to check md5sum
 
     # check that the region_id is unique across all regions
@@ -130,6 +159,22 @@ def run_check(schema, spec, spec_fn):
                 idx += 1
             else:
                 rgn_ids.add(rgn.region_id)
+
+    # check that the modality is in the reads
+    for read in spec.sequence_spec:
+        if read.modality not in modes:
+            errors.append(
+                f"[error {idx}] '{read.read_id}' modality '{read.modality}' does not exist in the modalities"
+            )
+            idx += 1
+
+    # check that the unique primer ids exist as a region id in the library_spec
+    for read in spec.sequence_spec:
+        if read.primer_id not in rgn_ids:
+            errors.append(
+                f"[error {idx}] '{read.read_id}' primer_id '{read.primer_id}' does not exist in the library_spec"
+            )
+            idx += 1
 
     # check that sequence length is the same as min_length
     for m in modes:

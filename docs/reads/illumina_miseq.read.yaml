@@ -1,0 +1,8 @@
+- !Read
+  read_id: R1.fastq.gz
+  read_name: Read 1
+  modality: illumina_truseq_prep
+  primer_id: truseq_read1
+  min_len: 28
+  max_len: 28
+  strand: pos

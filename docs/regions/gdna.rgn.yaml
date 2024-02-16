@@ -1,0 +1,10 @@
+- !Region
+  region_id: gDNA
+  region_type: gDNA
+  name: Genomic DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null

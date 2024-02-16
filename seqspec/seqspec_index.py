@@ -53,11 +53,18 @@ def setup_index_args(parser):
     )
     subparser_required.add_argument(
         "-r",
-        metavar="READ",
-        help=("Read"),
+        metavar="READ or REGION",
+        help=("Read or Region"),
         type=str,
         default=None,
         required=True,
+    )
+
+    # boolean to indicate specifying a region or a read
+    subparser.add_argument(
+        "--region",
+        help="Specify a region",
+        action="store_true",
     )
 
     return subparser
@@ -74,6 +81,8 @@ def validate_index_args(parser, args):
     s = args.s
     rev = args.rev
 
+    rgn = args.region
+
     # load spec
     spec = load_spec(fn)
     rds = r.split(",")
@@ -81,7 +90,7 @@ def validate_index_args(parser, args):
 
     rds = [os.path.basename(r) for r in rds]
 
-    x = run_index(spec, m, rds, fmt=t, rev=rev, subregion_type=s)
+    x = run_index(spec, m, rds, fmt=t, rev=rev, region=rgn, subregion_type=s)
 
     # post processing
     if o:
@@ -92,7 +101,9 @@ def validate_index_args(parser, args):
     return
 
 
-def run_index(spec, modality, reads, fmt="tab", rev=False, subregion_type=None):
+def run_index(
+    spec, modality, reads, fmt="tab", rev=False, region=False, subregion_type=None
+):
     FORMAT = {
         "chromap": format_chromap,
         "kb": format_kallisto_bus,
@@ -104,8 +115,10 @@ def run_index(spec, modality, reads, fmt="tab", rev=False, subregion_type=None):
     }
     indices = []
     for r in reads:
-        # index = get_index(spec, modality, r, rev=rev)
-        index = get_index_by_primer(spec, modality, r, rev=rev)
+        if region:
+            index = get_index(spec, modality, r, rev=rev)
+        else:
+            index = get_index_by_primer(spec, modality, r, rev=rev)
         indices.append({r: index})
     return FORMAT[fmt](indices, subregion_type)
 
