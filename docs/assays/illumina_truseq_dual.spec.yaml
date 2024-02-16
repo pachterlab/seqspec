@@ -8,6 +8,7 @@ publication_date: null
 description: Example seqspec for any assay using Illumina Truseq Dual Index
 modalities:
 - illumina_truseq_prep
+- illumina_truseq_prep2
 lib_struct: null
 sequence_spec:
 - !Read

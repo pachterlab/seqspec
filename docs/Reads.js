@@ -21,7 +21,7 @@ function generateRead() {
 
 function loadExampleReads() {
   var container = $(".load-read-examples-container");
-  files = ["illumina_miseq.read.yaml"];
+  files = ["illumina_miseq_read1.read.yaml"];
   files.forEach(function (file) {
     var filePath = "reads/" + file;
     var button = $("<button>")
