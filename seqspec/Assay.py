@@ -10,42 +10,51 @@ class Assay(yaml.YAMLObject):
 
     def __init__(
         self,
-        assay: str,
-        sequencer: str,
+        assay_id: str,
         name: str,
         doi: str,
-        publication_date: str,
+        date: str,
         description: str,
         modalities: List[str],
         lib_struct: str,
+        sequence_protocol: str,
+        sequence_kit: str,
+        library_protocol: str,
+        library_kit: str,
         sequence_spec: List[Read],
         library_spec: List[Region],
         seqspec_version: str = __version__,
     ) -> None:
         super().__init__()
         self.seqspec_version = seqspec_version
-        self.assay = assay
-        self.sequencer = sequencer
+        self.assay_id = assay_id
         self.name = name
         self.doi = doi
-        self.publication_date = publication_date
+        self.date = date
         self.description = description
         self.modalities = modalities
         self.lib_struct = lib_struct
+        self.sequence_protocol = sequence_protocol
+        self.sequence_kit = sequence_kit
+        self.library_protocol = library_protocol
+        self.library_kit = library_kit
         self.sequence_spec = sequence_spec
         self.library_spec = library_spec
 
     def __repr__(self) -> str:
         d = {
             "seqspec_version": self.seqspec_version,
-            "assay": self.assay,
-            "sequencer": self.sequencer,
+            "assay_id": self.assay_id,
             "name": self.name,
             "doi": self.doi,
-            "publication_date": self.publication_date,
+            "date": self.date,
             "description": self.description,
             "modalities": self.modalities,
             "lib_struct": self.lib_struct,
+            "sequence_protocol": self.sequence_protocol,
+            "sequence_kit": self.sequence_kit,
+            "library_protocol": self.library_protocol,
+            "library_kit": self.library_kit,
             "sequence_spec": self.sequence_spec,
             "library_spec": self.library_spec,
         }
@@ -54,14 +63,17 @@ class Assay(yaml.YAMLObject):
     def to_dict(self):
         d = {
             "seqspec_version": self.seqspec_version,
-            "assay": self.assay,
-            "sequencer": self.sequencer,
+            "assay_id": self.assay_id,
             "name": self.name,
             "doi": self.doi,
-            "publication_date": self.publication_date,
+            "date": self.date,
             "description": self.description,
             "modalities": self.modalities,
             "lib_struct": self.lib_struct,
+            "sequence_protocol": self.sequence_protocol,
+            "sequence_kit": self.sequence_kit,
+            "library_protocol": self.library_protocol,
+            "library_kit": self.library_kit,
             "sequence_spec": [o.to_dict() for o in self.sequence_spec],
             "library_spec": [o.to_dict() for o in self.library_spec],
         }

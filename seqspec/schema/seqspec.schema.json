@@ -10,12 +10,8 @@
       "type": "string",
       "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
     },
-    "assay": {
-      "description": "The name of the assay",
-      "type": "string"
-    },
-    "sequencer": {
-      "description": "The sequencer used to sequence the library",
+    "assay_id": {
+      "description": "Identifier for the assay",
       "type": "string"
     },
     "name": {
@@ -26,9 +22,10 @@
       "description": "the doi of the paper that describes the assay",
       "type": "string"
     },
-    "publication_date": {
-      "description": "the publication date of the paper/announcement that describes the assay",
-      "type": "string"
+    "date": {
+      "description": "The seqspec creation date",
+      "type": "string",
+      "pattern": "^(0?[1-9]|[12][0-9]|3[01])\\s(January|February|March|April|May|June|July|August|September|October|November|December)\\s(19|20)\\d\\d$"
     },
     "description": {
       "description": "A short description of the assay",
@@ -44,6 +41,22 @@
     },
     "lib_struct": {
       "description": "The link to Teichmann's libstructs page derived for this sequence",
+      "type": "string"
+    },
+    "library_protocol": {
+      "description": "The protocol/machine/tool to generate the library insert",
+      "type": "string"
+    },
+    "library_kit": {
+      "description": "The kit used to make the library sequence_protocol compatible",
+      "type": "string"
+    },
+    "sequence_protocol": {
+      "description": "The protocol/machine/tool to generate sequences",
+      "type": "string"
+    },
+    "sequence_kit": {
+      "description": "The kit used with the protocol to sequence the library",
       "type": "string"
     },
     "sequence_spec": {
@@ -63,14 +76,17 @@
   },
   "required": [
     "seqspec_version",
-    "sequencer",
-    "assay",
+    "assay_id",
     "name",
     "doi",
-    "publication_date",
+    "date",
     "description",
     "modalities",
-    "lib_struct"
+    "lib_struct",
+    "library_protocol",
+    "library_kit",
+    "sequence_protocol",
+    "sequence_kit"
   ],
   "$defs": {
     "region": {
@@ -188,7 +204,7 @@
           "type": "string",
           "description": "The unique identifier for the read."
         },
-        "read_name": {
+        "name": {
           "type": "string",
           "description": "The name of the read."
         },

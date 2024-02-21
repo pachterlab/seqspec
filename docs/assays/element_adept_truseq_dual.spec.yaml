@@ -1,49 +1,49 @@
 !Assay
 seqspec_version: 0.0.0
-assay_id: Illumina-novaseq-truseq-dual-index
+assay_id: element-adept-truseq-dual-index
 name: Example assay
-doi: https://support.illumina.com/content/dam/illumina-support/documents/documentation/system_documentation/miseq/indexed-sequencing-overview-guide-15057455-08.pdf
+doi: https://www.elementbiosciences.com/blog/element-101-elevate-or-adept-library-preparation-for-the-aviti-system
 date: 21 February 2024
 description: Example seqspec for an assay
 modalities:
 - rna
 lib_struct: null
 library_protocol: 10xv3 RNA 3'
-library_kit: Illumina Truseq Dual Index
-sequence_protocol: Illumina NovaSeq 6000
-sequence_kit: NovaSeq 6000 v1.5
+library_kit: Illumina TruSeq Dual Index
+sequence_protocol: Element Aviti
+sequence_kit: Adept Workflow
 sequence_spec:
+  - !Read
+    read_id: I1.fastq.gz
+    name: Index 1
+    modality: rna
+    primer_id: element_read2
+    min_len: 9
+    max_len: 9
+    strand: pos
+  - !Read
+    read_id: I2.fastq.gz
+    name: Index 2 
+    modality: rna
+    primer_id: illumina_p5
+    min_len: 9
+    max_len: 9
+    strand: pos
   - !Read
     read_id: R1.fastq.gz
     name: Read 1
     modality: rna
-    primer_id: truseq_read1
+    primer_id: element_read1
     min_len: 1
-    max_len: 98
+    max_len: 150
     strand: pos
-  - !Read
-    read_id: I1.fastq.gz
-    name: Index 1 (i7 index)
-    modality: rna
-    primer_id: truseq_read2
-    min_len: 8
-    max_len: 8
-    strand: pos
-  - !Read
-    read_id: I2.fastq.gz
-    name: Index 2 (i5 index)
-    modality: rna
-    primer_id: truseq_read1
-    min_len: 8
-    max_len: 8
-    strand: neg
   - !Read
     read_id: R2.fastq.gz
     name: Read 2
     modality: rna
-    primer_id: truseq_read2
+    primer_id: element_read2
     min_len: 1
-    max_len: 98
+    max_len: 150
     strand: neg
 library_spec:
 - !Region

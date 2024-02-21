@@ -255,7 +255,7 @@ class Read(yaml.YAMLObject):
     def __init__(
         self,
         read_id: str,
-        read_name: str,
+        name: str,
         modality: str,
         primer_id: str,
         min_len: int,
@@ -264,7 +264,7 @@ class Read(yaml.YAMLObject):
     ) -> None:
         super().__init__()
         self.read_id = read_id
-        self.read_name = read_name
+        self.name = name
         self.modality = modality
         self.primer_id = primer_id
         self.min_len = min_len
@@ -274,7 +274,7 @@ class Read(yaml.YAMLObject):
     def __repr__(self) -> str:
         d = {
             "read_id": self.read_id,
-            "read_name": self.read_name,
+            "name": self.name,
             "modality": self.modality,
             "primer_id": self.primer_id,
             "min_len": self.min_len,
@@ -286,7 +286,7 @@ class Read(yaml.YAMLObject):
     def to_dict(self):
         d = {
             "read_id": self.read_id,
-            "read_name": self.read_name,
+            "name": self.name,
             "modality": self.modality,
             "primer_id": self.primer_id,
             "min_len": self.min_len,

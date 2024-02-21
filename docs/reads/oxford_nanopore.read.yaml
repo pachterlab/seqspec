@@ -1,0 +1,13 @@
+library_protocol: Any
+library_kit: null
+sequence_protocol: Oxford Nanopore
+sequence_kit: Direct RNA Sequencing Kit (SQK-RNA004)
+sequence_spec:
+  - !Read
+    read_id: R1.fastq.gz
+    name: Read 1
+    modality: oxford_nanopore_prep
+    primer_id: ont_primer
+    min_len: 1
+    max_len: 4000000
+    strand: pos

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js"></script>
+    <script src="seqspec.js"></script>
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css" />
+
+    <script>
+      function formatRegionRow(region, fn, index = 0) {
+        return `
+            <tr>
+                <td>${index}</td>
+                <td>${region.region_id}</td>
+                <td>${region.region_type}</td>
+                <td>${region.name}</td>
+                <td>${region.sequence_type}</td>
+                <td>${region.sequence}</td>
+                <td>${region.min_len}</td>
+                <td>${region.max_len}</td>
+                <td>${region.onlist ? true : false}</td>
+                <td>${region.regions.length > 0 ? true : false}</td>
+                <td><button class="region-row-button" data-file=${fn}>View</button></td>
+            </tr>
+            `;
+      }
+
+      function cleanTags(data) {
+        data = data.replace(/!Assay/g, "");
+        data = data.replace(/- !Read/g, "-");
+        data = data.replace(/- !Region/g, "-");
+        data = data.replace(/!Onlist/g, "");
+
+        return data;
+      }
+      $(document).ready(function () {
+        files = [
+          "illumina_index.rgn.yaml",
+          "illumina_p5.rgn.yaml",
+          "illumina_p7.rgn.yaml",
+          "truseq_r1.rgn.yaml",
+          "truseq_r2.rgn.yaml",
+          //   "nextera_r1.rgn.yaml",
+          //   "nextera_r2.rgn.yaml",
+          "nextera_r1_joined.rgn.yaml",
+          "nextera_r2_joined.rgn.yaml",
+          "umi.rgn.yaml",
+          "cdna.rgn.yaml",
+          "gdna.rgn.yaml",
+        ];
+
+        // load the regions into the table
+        for (let i = 0; i < files.length; i++) {
+          $.get(`regions/${files[i]}`, function (data) {
+            // Assuming Region is a constructor you've defined elsewhere
+            const region = new Region(jsyaml.load(cleanTags(data))[0]);
+            $(".region-row").append(
+              formatRegionRow(region, `regions/${files[i]}`, i + 1)
+            );
+          });
+        }
+
+        // setup the button click
+        $(document).on("click", ".region-row-button", function () {
+          const file = $(this).data("file");
+          // load the yaml
+          $.get(`${file}`, function (data) {
+            // Assuming Region is a constructor you've defined elsewhere
+            const formData = jsyaml.load(cleanTags(data))[0];
+
+            var yamlStr = jsyaml.dump(formData, { lineWidth: -1 });
+            // this strips the - !Region from the yaml output
+            $("#seqspecOutput").text(
+              `- !Region\n${yamlStr
+                .split("\n")
+                .map((line) => "  " + line)
+                .join("\n")}`
+            );
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div>
+      <h1 style="text-align: center">Specification builder</h1>
+      <p>
+        Learn more about the
+        <a href="https://github.com/pachterlab/seqspec" target="_blank">
+          <i>seqspec</i> specification.</a
+        >
+      </p>
+      <ul>
+        <li><a href="builder.html">Home</a></li>
+        <li><a href="reads.html">Example Reads</a></li>
+        <li><a href="regions.html">Example Regions</a></li>
+        <li><a href="assays.html">Example Assays</a></li>
+      </ul>
+    </div>
+    <div class="container">
+      <section>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Region Id</th>
+              <th>Region Type</th>
+              <th>Name</th>
+              <th>Sequence Type</th>
+              <th>Sequence</th>
+              <th>Min len</th>
+              <th>Max len</th>
+              <th>Onlist</th>
+              <th>Regions</th>
+              <th>View</th>
+            </tr>
+          </thead>
+          <tbody class="region-row"></tbody>
+        </table>
+        <div class="seqspec-view-container">
+          <pre id="seqspecOutput"></pre>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
