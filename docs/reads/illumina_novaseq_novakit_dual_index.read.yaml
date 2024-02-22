@@ -3,35 +3,35 @@ library_kit: Illumina Truseq Dual Index
 sequence_protocol: Illumina Novaseq 6000
 sequence_kit: NovaSeq 6000 v1.0
 sequence_spec:
-  - !Read
-    read_id: R1.fastq.gz
-    name: Read 1
-    modality: illumina_truseq_prep
-    primer_id: truseq_read1
-    min_len: 1
-    max_len: 250
-    strand: pos
-  - !Read
-    read_id: I1.fastq.gz
-    name: Index 1 (i7 index)
-    modality: illumina_truseq_prep
-    primer_id: truseq_read2
-    min_len: 8
-    max_len: 8
-    strand: pos
-  - !Read
-    read_id: I2.fastq.gz
-    name: Index 2 (i5 index)
-    modality: illumina_truseq_prep
-    primer_id: illumina_p5
-    min_len: 8
-    max_len: 8
-    strand: pos
-  - !Read
-    read_id: R2.fastq.gz
-    name: Read 2
-    modality: illumina_truseq_prep
-    primer_id: truseq_read2
-    min_len: 1
-    max_len: 250
-    strand: neg
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: illumina_truseq_prep
+  primer_id: truseq_read1
+  min_len: 1
+  max_len: 250
+  strand: pos
+- !Read
+  read_id: I1.fastq.gz
+  name: Index 1 (i7 index)
+  modality: illumina_truseq_prep
+  primer_id: truseq_read2
+  min_len: 8
+  max_len: 8
+  strand: pos
+- !Read
+  read_id: I2.fastq.gz
+  name: Index 2 (i5 index)
+  modality: illumina_truseq_prep
+  primer_id: illumina_p5
+  min_len: 8
+  max_len: 8
+  strand: pos
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: illumina_truseq_prep
+  primer_id: truseq_read2
+  min_len: 1
+  max_len: 250
+  strand: neg

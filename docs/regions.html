@@ -50,7 +50,7 @@
           "umi.rgn.yaml",
           "cdna.rgn.yaml",
           "gdna.rgn.yaml",
-          "barcode.rgn.yaml"
+          "barcode.rgn.yaml",
         ];
 
         // load the regions into the table
@@ -69,17 +69,7 @@
           const file = $(this).data("file");
           // load the yaml
           $.get(`${file}`, function (data) {
-            // Assuming Region is a constructor you've defined elsewhere
-            const formData = jsyaml.load(cleanTags(data))[0];
-
-            var yamlStr = jsyaml.dump(formData, { lineWidth: -1 });
-            // this strips the - !Region from the yaml output
-            $("#seqspecOutput").text(
-              `- !Region\n${yamlStr
-                .split("\n")
-                .map((line) => "  " + line)
-                .join("\n")}`
-            );
+            $("#seqspecOutput").text(data);
           });
         });
       });
