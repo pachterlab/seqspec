@@ -66,7 +66,7 @@ def run_onlist(spec: Assay, modality: str, region_id: str):
     regions = run_find_by_type(spec, modality, region_id)
     onlists = []
     for r in regions:
-        onlists.append(r.get_onlist().filename)
+        onlists.append(r.get_onlist())
 
     return join_onlists(onlists)
 
@@ -86,11 +86,26 @@ def run_list_onlists(spec: Assay, modality: str):
     return olsts
 
 
+def find_list_target_dir(onlists):
+    for l in onlists:
+        if l.location == "local":
+            base_path = os.path.dirname(os.path.abspath(onlists[0].filename))
+            if os.access(base_path, os.W_OK):
+                return base_path
+
+    return os.getcwd()
+
+
 def join_onlists(onlists):
-    base_path = os.path.dirname(os.path.abspath(onlists[0]))
-    if len(onlists) == 1:
-        return onlists[0]
+    """Given a list of onlist objects return a file containing the combined list
+    """
+    if len(onlists) == 0:
+        print("No lists present")
+        return
+    elif len(onlists) == 1:
+        return onlists[0].filename
     else:
+        base_path = find_list_target_dir(onlists)
         # join the onlists
         lsts = [read_list(o) for o in onlists]
         joined_path = os.path.join(base_path, "onlist_joined.txt")

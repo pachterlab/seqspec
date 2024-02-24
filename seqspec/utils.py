@@ -1,4 +1,5 @@
 import io
+import gzip
 from seqspec.Assay import Assay
 import yaml
 import requests
@@ -44,9 +45,32 @@ def write_read(header, seq, qual, f):
     f.write(f"{header}\n{seq}\n+\n{qual}\n")
 
 
-def read_list(fname):
-    with open(fname, "r") as f:
-        return [line.strip() for line in f.readlines()]
+def yield_onlist_contents(stream):
+    for line in stream:
+        yield line.strip().split()[0]
+
+
+def read_list(onlist):
+    """Given an onlist object read the local or remote data
+    """
+    if onlist.location == "remote":
+        response = requests.get(onlist.filename, stream=True)
+        response.raise_for_status()
+        # TODO: instead of just looking at the filename, should we check the content-type?
+        if onlist.filename.endswith(".gz"):
+            stream = io.TextIOWrapper(gzip.GzipFile(fileobj=response.raw))
+        else:
+            stream = response.raw
+        return list(yield_onlist_contents(stream))
+    elif onlist.location == "local" and onlist.filename.endswith(".gz"):
+        with gzip.open(onlist.filename, "rt") as f:
+            return list(yield_onlist_contents(f))
+    elif onlist.location == "local":
+        with open(onlist.filename, "rt") as f:
+            # just get the first column
+            return list(yield_onlist_contents(f))
+    else:
+        raise ValueError("Unsupported location {}. Expected remote or local".format(onlist.location))
 
 
 def region_ids_in_spec(seqspec, modality, region_ids):
