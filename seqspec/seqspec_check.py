@@ -43,7 +43,7 @@ def validate_check_args(parser, args):
         else:
             print("\n".join(errors))
 
-    return
+    return len(errors)
 
 
 def run_check(schema, spec, spec_fn):

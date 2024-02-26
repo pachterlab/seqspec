@@ -4,6 +4,7 @@ from unittest import TestCase
 
 from seqspec.Region import Region
 from seqspec.utils import load_spec_stream, project_regions_to_coordinates, write_read
+from seqspec import __version__
 
 from .test_region import (
     region_rna_joined_dict,
@@ -11,19 +12,44 @@ from .test_region import (
     region_rna_linker_dict,
 )
 
-example_spec = """!Assay
+example_spec = f"""!Assay
+seqspec_version: { __version__ }
+assay_id: test_assay
 name: my assay
 doi: https://doi.org/10.1038/nmeth.1315
-publication_date: 06 April 2009
+date: 06 April 2009
 description: first method to sequence the whole transcriptome (mRNA) of a single cell
+sequencer: custom
 modalities:
-- RNA
+- rna
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.html
+library_protocol: custom 1
+library_kit: custom 2
+sequence_protocol: custom 3
+sequence_kit: custom 4
+sequence_spec:
+- !Read
+  read_id: read1.fastq.gz
+  name: "Read1 for experiment"
+  modality: rna
+  primer_id: SOLiD_P1_adapter
+  min_len: 90
+  max_len: 187
+  # this is a guess
+  strand: pos
+- !Read
+  read_id: read2.fastq.gz
+  name: read2 for experiment
+  modality: rna
+  primer_id: p2_adapter
+  min_len: 25
+  max_len: 25
+  strand: pos
 library_spec:
 - !Region
-  region_id: RNA
-  region_type: RNA
-  name: RNA
+  region_id: rna
+  region_type: rna
+  name: rna
   sequence_type: joined
   sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGATXCGCCTTGGCCGTACAGCAGNNNNNNAGAGAATGAGGAACCCGGGGCAG
   min_len: 90
@@ -31,19 +57,19 @@ library_spec:
   onlist: null
   regions:
   - !Region
-    region_id: SOLiD_P1_adaptor
-    region_type: SOLiD_P1_adaptor
-    name: SOLiD_P1_adaptor
+    region_id: SOLiD_P1_adapter
+    region_type: custom_primer
+    name: SOLiD_P1_adapter
     sequence_type: fixed
     sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGAT
     min_len: 41
     max_len: 41
     onlist: null
     regions: null
-    parent_id: RNA
+    parent_id: rna
   - !Region
     region_id: cDNA
-    region_type: cDNA
+    region_type: cdna
     name: cDNA
     sequence_type: random
     sequence: X
@@ -51,10 +77,10 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: RNA
+    parent_id: rna
   - !Region
     region_id: SOLiD_bc_adapter
-    region_type: SOLiD_bc_adapter
+    region_type: linker
     name: SOLiD_bc_adapter
     sequence_type: fixed
     sequence: CGCCTTGGCCGTACAGCAG
@@ -62,10 +88,10 @@ library_spec:
     max_len: 19
     onlist: null
     regions: null
-    parent_id: RNA
+    parent_id: rna
   - !Region
     region_id: index
-    region_type: index
+    region_type: barcode
     name: index
     sequence_type: onlist
     sequence: NNNNNN
@@ -73,13 +99,13 @@ library_spec:
     max_len: 6
     onlist: !Onlist
       filename: index_onlist.txt
-      md5: null
+      md5: 939cb244b4c43248fcc795bbe79599b0
       location: local
     regions: null
-    parent_id: RNA
+    parent_id: rna
   - !Region
     region_id: p2_adapter
-    region_type: p2_adapter
+    region_type: custom_primer
     name: p2_adapter
     sequence_type: fixed
     sequence: AGAGAATGAGGAACCCGGGGCAG
@@ -87,7 +113,7 @@ library_spec:
     max_len: 23
     onlist: null
     regions: null
-    parent_id: RNA
+    parent_id: rna
 """
 
 
@@ -96,7 +122,7 @@ class TestUtils(TestCase):
         with StringIO(example_spec) as instream:
             spec = load_spec_stream(instream)
         self.assertEqual(spec.name, "my assay")
-        head = spec.get_libspec("RNA")
+        head = spec.get_libspec("rna")
         self.assertEqual(len(head.regions), 5)
 
     def test_project_regions_to_coordinates(self):
