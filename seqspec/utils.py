@@ -69,6 +69,7 @@ def file_exists(uri):
 REGION_TYPE_COLORS = {
     "barcode": "#2980B9",
     "cdna": "#8E44AD",
+    "custom_primer": "#3CB371",
     "fastq": "#F1C40F",
     "gdna": "#E67E22",
     "illumina_p5": "#E17A47",
