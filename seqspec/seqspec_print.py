@@ -151,7 +151,8 @@ def plot_png(assay, modalities, modes, nmodes, lengths):
         ax.set(**{"xlim": (0, max(lengths))})
 
         # hide the spines
-        ax.spines[["right", "top", "left", "bottom"]].set_visible(False)
+        for spine in ["right", "top", "left", "bottom"]:
+            ax.spines[spine].set_visible(False)
         # Hide the axis and ticks and labels
         ax.xaxis.set_visible(False)
         ax.set_yticklabels([])
@@ -162,7 +163,7 @@ def plot_png(assay, modalities, modes, nmodes, lengths):
 
     # adjust the xaxis for the last modality to show the length
     ax.xaxis.set_visible(True)
-    ax.spines[["bottom"]].set_visible(True)
+    ax.spines["bottom"].set_visible(True)
     ax.minorticks_on()
 
     ax.set(
