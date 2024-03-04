@@ -35,7 +35,7 @@ sequence_spec:
   modality: rna
   primer_id: truseq_read1
   min_len: 1
-  max_len: 150
+  max_len: 50
   strand: pos
 - !Read
   read_id: R2.fastq.gz
@@ -43,7 +43,7 @@ sequence_spec:
   modality: rna
   primer_id: truseq_read2
   min_len: 1
-  max_len: 150
+  max_len: 50
   strand: neg
 library_spec:
 - !Region
@@ -51,9 +51,9 @@ library_spec:
   region_type: named
   name: rna
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNTCTTTCCCTACACGACGCTCTTCCGATCTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNTCTTTCCCTACACGACGCTCTTCCGATCTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 135
-  max_len: 234
+  max_len: 184
   onlist: null
   regions:
   - !Region
@@ -97,9 +97,9 @@ library_spec:
     region_type: insert
     name: Custom insert
     sequence_type: random
-    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     min_len: 1
-    max_len: 100
+    max_len: 50
     onlist: null
     regions: null
     parent_id: rna
