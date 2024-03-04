@@ -68,6 +68,20 @@ library_spec:
     regions: null
     parent_id: rna
   - !Region
+    region_id: index5
+    region_type: index5
+    name: Truseq Read 2
+    sequence_type: onlist
+    sequence: NNNNNNNNN
+    min_len: 9
+    max_len: 9
+    onlist: !Onlist
+      filename: index5_onlist.txt
+      md5: null
+      location: local
+    regions: null
+    parent_id: rna
+  - !Region
     region_id: truseq_read1
     region_type: truseq_read1
     name: Truseq Read 1
@@ -83,9 +97,9 @@ library_spec:
     region_type: insert
     name: Custom insert
     sequence_type: random
-    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     min_len: 1
-    max_len: 150
+    max_len: 100
     onlist: null
     regions: null
     parent_id: rna
@@ -105,9 +119,9 @@ library_spec:
     region_type: index7
     name: Truseq Read 2
     sequence_type: onlist
-    sequence: NNNNNNNN
-    min_len: 8
-    max_len: 8
+    sequence: NNNNNNNNN
+    min_len: 9
+    max_len: 9
     onlist: !Onlist
       filename: index7_onlist.txt
       md5: null
