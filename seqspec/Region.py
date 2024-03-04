@@ -74,10 +74,10 @@ class Region(yaml.YAMLObject):
 
         self.sequence = self.get_sequence()
         self.min_len, self.max_len = self.get_len()
-        if self.sequence_type == "random" or self.sequence_type == "onlist":
-            self.sequence = "X" * self.min_len
+        if self.sequence_type == "random":
+            self.sequence = "X" * self.max_len
         if self.sequence_type == "onlist":
-            self.sequence = "N" * self.min_len
+            self.sequence = "N" * self.max_len
         return
 
     def __repr__(self) -> str:

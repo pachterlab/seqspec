@@ -16,6 +16,7 @@
 - `Assay` attribute `publication_date` changed to `date`
 - `Assay` attribute `sequencer` changed to `sequence_protocol`
 - `Assay` function `get_modality` changed to `get_libspec`
+- `Region` function `update_attr` uses the `max_len` to generate `random` and `onlist` sequence lengths instead of `min_len`
 
 ### Added
 
