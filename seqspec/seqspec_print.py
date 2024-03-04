@@ -24,7 +24,7 @@ def setup_print_args(parser):
         help=("Format"),
         type=str,
         default="tree",
-        choices=["tree", "html", "png"],
+        choices=["tree", "html", "png", "sequence"],
     )
     return subparser
 
@@ -39,6 +39,7 @@ def validate_print_args(parser, args):
         "tree": run_print_tree,
         "html": run_print_html,
         "png": run_print_png,
+        "sequence": run_print_sequence_spec,
     }
     s = CMD[fmt](spec)
     if fmt == "png":
@@ -57,6 +58,17 @@ def run_print(data):
     library_spec = multiModalTemplate(data.library_spec)
     s = f"{header}\n{header2}\n{library_spec}"
     return s
+
+
+def run_print_sequence_spec(spec):
+    p = []
+    for r in spec.sequence_spec:
+        p.append(
+            "\t".join(
+                [r.read_id, r.primer_id, r.strand, str(r.min_len), str(r.max_len)]
+            )
+        )
+    return "\n".join(p)
 
 
 def run_print_tree(spec):
