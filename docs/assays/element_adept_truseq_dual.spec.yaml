@@ -17,7 +17,7 @@ sequence_spec:
   read_id: I1.fastq.gz
   name: Index 1
   modality: rna
-  primer_id: element_read2
+  primer_id: truseq_read2
   min_len: 9
   max_len: 9
   strand: pos
@@ -33,7 +33,7 @@ sequence_spec:
   read_id: R1.fastq.gz
   name: Read 1
   modality: rna
-  primer_id: element_read1
+  primer_id: truseq_read1
   min_len: 1
   max_len: 150
   strand: pos
@@ -41,7 +41,7 @@ sequence_spec:
   read_id: R2.fastq.gz
   name: Read 2
   modality: rna
-  primer_id: element_read2
+  primer_id: truseq_read2
   min_len: 1
   max_len: 150
   strand: neg
@@ -73,8 +73,8 @@ library_spec:
     name: Truseq Read 1
     sequence_type: fixed
     sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
-    min_len: 10
-    max_len: 10
+    min_len: 29
+    max_len: 29
     onlist: null
     regions: null
     parent_id: rna

@@ -179,9 +179,12 @@ def run_check(schema, spec, spec_fn):
     # check that sequence length is the same as min_length
     for m in modes:
         for rgn in spec.get_libspec(m).get_leaves():
-            if rgn.sequence and len(rgn.sequence) < rgn.min_len:
+            if rgn.sequence and (
+                len(rgn.sequence) < rgn.min_len or len(rgn.sequence) > rgn.max_len
+            ):
+                # noqa
                 errors.append(
-                    f"[error {idx}] '{rgn.region_id}' sequence '{rgn.sequence}' length '{len(rgn.sequence)}' is less than min_len '{rgn.min_len}'"
+                    f"[error {idx}] '{rgn.region_id}' sequence '{rgn.sequence}' has length {len(rgn.sequence)}, expected range ({rgn.min_len}, {rgn.max_len})"
                 )
                 idx += 1
 

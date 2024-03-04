@@ -43,3 +43,4 @@ TODO:
 ### Fixed
 
 - Sequencing overlapping pairs now supported
+- `seqspec check` correctly handles sequences lengths longer than the stated min/max range
