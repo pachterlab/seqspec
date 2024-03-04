@@ -15,6 +15,7 @@
 - `Read` attribute `read_name` changed to `name`
 - `Assay` attribute `publication_date` changed to `date`
 - `Assay` attribute `sequencer` changed to `sequence_protocol`
+- `Assay` function `get_modality` changed to `get_libspec`
 
 ### Added
 
@@ -29,6 +30,7 @@
 - Add `library_protocol` to `Assay` object (library that generates insert)
 - Add `sequence_kit` to `Assay` object
 - Add website to view example `seqspec` objects
+- Add `get_seqspec` to assay returns sequence structure for a given modality
 
 ### Removed
 

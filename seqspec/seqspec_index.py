@@ -168,7 +168,7 @@ def get_index_by_primer(
     index = defaultdict()
 
     # get all atomic elements from library
-    leaves = spec.get_modality(modality).get_leaves()
+    leaves = spec.get_libspec(modality).get_leaves()
 
     # get the read object and primer id
     read = [i for i in spec.sequence_spec if i.read_id == read_id][0]

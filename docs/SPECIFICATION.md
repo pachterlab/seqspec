@@ -184,6 +184,6 @@ from seqspec.utils import load_spec
 
 spec = load_spec("seqspec/assays/10x-RNA-v3/spec.yaml")
 
-print(spec.get_modality("RNA").sequence)
+print(spec.get_libspec("RNA").sequence)
 # AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
 ```

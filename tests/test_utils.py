@@ -96,7 +96,7 @@ class TestUtils(TestCase):
         with StringIO(example_spec) as instream:
             spec = load_spec_stream(instream)
         self.assertEqual(spec.name, "my assay")
-        head = spec.get_modality("RNA")
+        head = spec.get_libspec("RNA")
         self.assertEqual(len(head.regions), 5)
 
     def test_get_cuts(self):

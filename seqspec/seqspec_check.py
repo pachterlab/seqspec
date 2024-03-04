@@ -78,7 +78,7 @@ def run_check(schema, spec, spec_fn):
     modes = spec.modalities
     olrgns = []
     for m in modes:
-        olrgns += [i.onlist for i in spec.get_modality(m).get_onlist_regions()]
+        olrgns += [i.onlist for i in spec.get_libspec(m).get_onlist_regions()]
 
     # check paths relative to spec_fn
     for ol in olrgns:
@@ -103,8 +103,8 @@ def run_check(schema, spec, spec_fn):
     # get all of the regions with type fastq in the spec and check that those files exist relative to the path of the spec
     fqrgns = []
     for m in modes:
-        fqrgns += [i for i in spec.get_modality(m).get_region_by_type("fastq")]
-        fqrgns += [i for i in spec.get_modality(m).get_region_by_type("fastq_link")]
+        fqrgns += [i for i in spec.get_libspec(m).get_region_by_type("fastq")]
+        fqrgns += [i for i in spec.get_libspec(m).get_region_by_type("fastq_link")]
     for fqrgn in fqrgns:
         if fqrgn.region_type == "fastq":
             check = path.join(path.dirname(spec_fn), fqrgn.region_id)
@@ -151,7 +151,7 @@ def run_check(schema, spec, spec_fn):
     # check that the region_id is unique across all regions
     rgn_ids = set()
     for m in modes:
-        for rgn in spec.get_modality(m).get_leaves():
+        for rgn in spec.get_libspec(m).get_leaves():
             if rgn.region_id in rgn_ids:
                 errors.append(
                     f"[error {idx}] region_id '{rgn.region_id}' is not unique across all regions"
@@ -178,7 +178,7 @@ def run_check(schema, spec, spec_fn):
 
     # check that sequence length is the same as min_length
     for m in modes:
-        for rgn in spec.get_modality(m).get_leaves():
+        for rgn in spec.get_libspec(m).get_leaves():
             if rgn.sequence and len(rgn.sequence) < rgn.min_len:
                 errors.append(
                     f"[error {idx}] '{rgn.region_id}' sequence '{rgn.sequence}' length '{len(rgn.sequence)}' is less than min_len '{rgn.min_len}'"

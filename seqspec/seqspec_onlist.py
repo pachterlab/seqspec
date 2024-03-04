@@ -72,7 +72,7 @@ def run_onlist(spec: Assay, modality: str, region_id: str):
 
 
 def run_list_onlists(spec: Assay, modality: str):
-    regions = spec.get_modality(modality).get_onlist_regions()
+    regions = spec.get_libspec(modality).get_onlist_regions()
     olsts = []
     for r in regions:
         olsts.append(

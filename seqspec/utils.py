@@ -52,7 +52,7 @@ def read_list(fname):
 
 def region_ids_in_spec(seqspec, modality, region_ids):
     # return True if all region_ids are in seqspec
-    spec = seqspec.get_modality(modality)
+    spec = seqspec.get_libspec(modality)
     found = []
     for region_id in region_ids:
         found += [r.region_id for r in spec.get_region_by_id(region_id)]

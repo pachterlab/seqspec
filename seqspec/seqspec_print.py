@@ -92,7 +92,7 @@ def run_print_png(spec):
 
     # modality
     modalities = spec.list_modalities()
-    modes = [spec.get_modality(m) for m in modalities]
+    modes = [spec.get_libspec(m) for m in modalities]
     lengths = [i.min_len for i in modes]
     nmodes = len(modalities)
 

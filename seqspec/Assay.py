@@ -96,8 +96,11 @@ class Assay(yaml.YAMLObject):
         for r in self.library_spec:
             r.update_attr()
 
-    def get_modality(self, modality):
+    def get_libspec(self, modality):
         return self.library_spec[self.modalities.index(modality)]
+
+    def get_seqspec(self, modality):
+        return [r for r in self.sequence_spec if r.modality == modality]
 
     def get_read(self, read_id):
         return [r for r in self.sequence_spec if r.read_id == read_id][0]

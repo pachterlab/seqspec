@@ -46,6 +46,6 @@ class TestAssay(TestCase):
 
         a = Assay(**expected)
 
-        self.assertEqual(a.get_modality("RNA"), r_expected)
+        self.assertEqual(a.get_libspec("RNA"), r_expected)
 
-        self.assertRaises(IndexError, a.get_modality, "cDNA")
+        self.assertRaises(IndexError, a.get_libspec, "cDNA")

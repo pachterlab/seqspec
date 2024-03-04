@@ -135,7 +135,7 @@ def run_modify(
     min_len,
     max_len,
 ):
-    spec.get_modality(modality).update_region_by_id(
+    spec.get_libspec(modality).update_region_by_id(
         target_region,
         region_id,
         region_type,
