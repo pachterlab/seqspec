@@ -176,6 +176,23 @@ def run_check(schema, spec, spec_fn):
             )
             idx += 1
 
+    # NOTE: this is a strong assumption that may be relaxed in the future
+    # check that the primer id for each read is in the leaves of the spec for that modality
+    for read in spec.sequence_spec:
+        mode = spec.get_libspec(read.modality)
+        leaves = mode.get_leaves()
+        if read.primer_id not in [i.region_id for i in leaves]:
+            errors.append(
+                f"[error {idx}] '{read.read_id}' primer_id '{read.primer_id}' does not exist as an atomic region in the library_spec for modality '{read.modality}'"
+            )
+            idx += 1
+
+    # check that the max read len is not longer than the max len of the lib spec after the primer
+    # for read in spec.sequence_spec:
+    #     mode = spec.get_libspec(read.modality)
+    #     leaves = mode.get_leaves()
+    #     idx = [i.region_id for i in leaves].index(read.primer_id)
+
     # check that sequence length is the same as min_length
     for m in modes:
         for rgn in spec.get_libspec(m).get_leaves():
