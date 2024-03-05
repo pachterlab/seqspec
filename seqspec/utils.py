@@ -98,3 +98,31 @@ REGION_TYPE_COLORS = {
 # unused
 # '#FF8C00'
 # '#95A5A6'
+
+
+def complement_nucleotide(nucleotide):
+    complements = {
+        "A": "T",
+        "T": "A",
+        "G": "C",
+        "C": "G",
+        "R": "Y",
+        "Y": "R",
+        "S": "S",
+        "W": "W",
+        "K": "M",
+        "M": "K",
+        "B": "V",
+        "D": "H",
+        "V": "B",
+        "H": "D",
+        "N": "N",
+        "X": "X",
+    }
+    return complements.get(
+        nucleotide, "N"
+    )  # Default to 'N' if nucleotide is not recognized
+
+
+def complement_sequence(sequence):
+    return "".join(complement_nucleotide(n) for n in sequence.upper())

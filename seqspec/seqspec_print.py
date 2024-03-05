@@ -1,7 +1,7 @@
 from seqspec.utils import load_spec
 from seqspec.seqspec_print_html import run_print_html
 import newick
-from .utils import REGION_TYPE_COLORS
+from .utils import REGION_TYPE_COLORS, complement_sequence, get_cuts
 
 
 def setup_print_args(parser):
@@ -24,7 +24,7 @@ def setup_print_args(parser):
         help=("Format"),
         type=str,
         default="tree",
-        choices=["tree", "html", "png", "sequence"],
+        choices=["tree", "html", "png", "sequence", "libseq"],
     )
     return subparser
 
@@ -40,6 +40,7 @@ def validate_print_args(parser, args):
         "html": run_print_html,
         "png": run_print_png,
         "sequence": run_print_sequence_spec,
+        "libseq": run_print_libseq,
     }
     s = CMD[fmt](spec)
     if fmt == "png":
@@ -50,6 +51,55 @@ def validate_print_args(parser, args):
             print(s, file=f)
     else:
         print(s)
+
+
+def run_print_libseq(spec):
+    p = []
+    for modality in spec.modalities:
+        p.append(libseq(spec, modality))
+    return "\n".join(p)
+
+
+def libseq(spec, modality):
+    libspec = spec.get_libspec(modality)
+    seqspec = spec.get_seqspec(modality)
+
+    p = []
+    n = []
+    leaves = libspec.get_leaves()
+    cuts = get_cuts(leaves)
+    for idx, read in enumerate(seqspec, 1):
+        read_len = read.max_len
+        read_id = read.read_id
+        primer_id = read.primer_id
+        primer_idx = [i for i, l in enumerate(leaves) if l.region_id == primer_id][0]
+        primer_pos = cuts[primer_idx]
+        if read.strand == "pos":
+            wsl = primer_pos[1] - 1
+            ws = wsl * " "
+
+            arrowl = read_len - 1
+            arrow = arrowl * "-"
+
+            p.append(f"{ws}|{arrow}>({idx}) {read_id}")
+        elif read.strand == "neg":
+            wsl = primer_pos[0] - read_len
+            ws = wsl * " "
+
+            arrowl = read_len - 1
+            arrow = arrowl * "-"
+
+            n.append(f"{ws}<{arrow}|({idx}) {read_id}")
+
+            s = "\n".join(
+                [
+                    "\n".join(p),
+                    libspec.sequence,
+                    complement_sequence(libspec.sequence),
+                    "\n".join(n),
+                ]
+            )
+            return s
 
 
 def run_print(data):
