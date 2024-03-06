@@ -93,6 +93,8 @@ def libseq(spec, modality):
 
             s = "\n".join(
                 [
+                    modality,
+                    "---",
                     "\n".join(p),
                     libspec.sequence,
                     complement_sequence(libspec.sequence),

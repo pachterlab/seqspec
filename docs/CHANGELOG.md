@@ -32,6 +32,19 @@
 - Add `sequence_kit` to `Assay` object
 - Add website to view example `seqspec` objects
 - Add `get_seqspec` to assay returns sequence structure for a given modality
+- Add multiple checks to `seqspec check`
+  - check read modalities exist in assay modalities
+  - check primer ids from seqspec are unique and exists as region ids in libspec
+  - check that the primer id exists as an atomic region (currently a strong assumption that may be relaxed in the future)
+  - check properties of multiple sequence types
+    - `fixed` and `regions` not null incompatible
+    - `joined` and `regions` null incompatible
+    - `random` and `regions` not null incompatible
+    - `random` must have `sequence` of all X's
+    - `onlist` and `onlist` property null incompatible
+  - check that the min len is less than or equal to the max len
+  - check that the length of the sequence is between min and max len
+    - Note a strong assumption in `seqspec print` is that the sequence have a length equal to the `max_len` for visualization purposes
 
 ### Removed
 

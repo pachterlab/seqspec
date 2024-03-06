@@ -193,16 +193,80 @@ def run_check(schema, spec, spec_fn):
     #     leaves = mode.get_leaves()
     #     idx = [i.region_id for i in leaves].index(read.primer_id)
 
-    # check that sequence length is the same as min_length
+    # if a region has a sequence type "fixed" then it should not contain subregions
+    # if a region has a sequence type "joiend" then it should contain subregions
+    # if a region has a sequence type "random" then it should not contain subregions and should be all X's
+    # if a region has a sequence type "onlist" then it should have an onlist object
+    def seqtype_check(rgn, errors, idx):
+        # this is a recursive function that iterates through all regions and checks the sequence type
+        if rgn.sequence_type == "fixed" and rgn.regions:
+            errors.append(
+                f"[error {idx}] '{rgn.region_id}' sequence_type is 'fixed' and contains subregions"
+            )
+            idx += 1
+        if rgn.sequence_type == "joined" and not rgn.regions:
+            errors.append(
+                f"[error {idx}] '{rgn.region_id}' sequence_type is 'joined' and does not contain subregions"
+            )
+            idx += 1
+        if rgn.sequence_type == "random" and rgn.regions:
+            errors.append(
+                f"[error {idx}] '{rgn.region_id}' sequence_type is 'random' and contains subregions"
+            )
+            idx += 1
+        if rgn.sequence_type == "random" and rgn.sequence != "X" * rgn.max_len:
+            errors.append(
+                f"[error {idx}] '{rgn.region_id}' sequence_type is 'random' and sequence is not all X's"
+            )
+            idx += 1
+        if rgn.sequence_type == "onlist" and not rgn.onlist:
+            errors.append(
+                f"[error {idx}] '{rgn.region_id}' sequence_type is 'onlist' and does not have an onlist object"
+            )
+            idx += 1
+        if rgn.regions:
+            for r in rgn.regions:
+                errors, idx = seqtype_check(r, errors, idx)
+        return (errors, idx)
+
     for m in modes:
-        for rgn in spec.get_libspec(m).get_leaves():
-            if rgn.sequence and (
-                len(rgn.sequence) < rgn.min_len or len(rgn.sequence) > rgn.max_len
-            ):
-                # noqa
-                errors.append(
-                    f"[error {idx}] '{rgn.region_id}' sequence '{rgn.sequence}' has length {len(rgn.sequence)}, expected range ({rgn.min_len}, {rgn.max_len})"
-                )
-                idx += 1
+        for rgn in [spec.get_libspec(m)]:
+            errors, idx = seqtype_check(rgn, errors, idx)
+
+    # check the lengths of every region against the max_len, using a recursive function
+    def len_check(rgn, errors, idx):
+        if rgn.regions:
+            for r in rgn.regions:
+                errors, idx = len_check(r, errors, idx)
+        if rgn.max_len < rgn.min_len:
+            errors.append(
+                f"[error {idx}] '{rgn.region_id}' max_len is less than min_len"
+            )
+            idx += 1
+        return (errors, idx)
+
+    for m in modes:
+        for rgn in [spec.get_libspec(m)]:
+            errors, idx = len_check(rgn, errors, idx)
+
+    # check that the length of the sequence is equal to the max_len using a recursive function
+    # an assumption in the code and spec is that the displayed sequence is equal to the max_len
+    def seq_len_check(rgn, errors, idx):
+        if rgn.regions:
+            for r in rgn.regions:
+                errors, idx = seq_len_check(r, errors, idx)
+        if rgn.sequence and (
+            len(rgn.sequence) < rgn.min_len or len(rgn.sequence) > rgn.max_len
+        ):
+            # noqa
+            errors.append(
+                f"[error {idx}] '{rgn.region_id}' sequence '{rgn.sequence}' has length {len(rgn.sequence)}, expected range ({rgn.min_len}, {rgn.max_len})"
+            )
+            idx += 1
+        return (errors, idx)
+
+    for m in modes:
+        for rgn in [spec.get_libspec(m)]:
+            errors, idx = seq_len_check(rgn, errors, idx)
 
     return errors
