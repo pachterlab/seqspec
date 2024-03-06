@@ -32,6 +32,14 @@ def setup_onlist_args(parser):
     subparser_required.add_argument(
         "-r", metavar="REGION", help=("Region"), type=str, default=None, required=False
     )
+    subparser.add_argument(
+        "-f",
+        metavar="FORMAT",
+        type=str,
+        default="product",
+        choices=["product", "multi"],
+        help="select between cartesian product 'product' or multiple barcode lists in file 'multi'"
+    )
     subparser.add_argument("--list", action="store_true", help=("List onlists"))
     return subparser
 
@@ -41,6 +49,7 @@ def validate_onlist_args(parser, args):
     fn = args.yaml
     m = args.m
     r = args.r
+    f = args.f
     # TODO: if onlist is a link, download. also fix output path
     # o = args.o
     # load spec
@@ -54,12 +63,12 @@ def validate_onlist_args(parser, args):
             print(f"{ol['region_id']}\t{ol['filename']}\t{ol['location']}\t{ol['md5']}")
         return
 
-    olist = run_onlist(spec, m, r)
+    olist = run_onlist(spec, m, r, f)
     print(os.path.join(os.path.dirname(os.path.abspath(fn)), olist))
     return
 
 
-def run_onlist(spec: Assay, modality: str, region_id: str):
+def run_onlist(spec: Assay, modality: str, region_id: str, fmt: str):
     # for now return the path to the onlist file for the modality/region pair
 
     # run function
@@ -68,7 +77,7 @@ def run_onlist(spec: Assay, modality: str, region_id: str):
     for r in regions:
         onlists.append(r.get_onlist())
 
-    return join_onlists(onlists)
+    return join_onlists(onlists, fmt)
 
 
 def run_list_onlists(spec: Assay, modality: str):
@@ -96,7 +105,7 @@ def find_list_target_dir(onlists):
     return os.getcwd()
 
 
-def join_onlists(onlists):
+def join_onlists(onlists, fmt):
     """Given a list of onlist objects return a file containing the combined list
     """
     if len(onlists) == 0:
@@ -109,7 +118,27 @@ def join_onlists(onlists):
         # join the onlists
         lsts = [read_list(o) for o in onlists]
         joined_path = os.path.join(base_path, "onlist_joined.txt")
+        formatter_functions = {
+            "product": join_product_onlist,
+            "multi": join_multi_onlist,
+        }
+        formatter = formatter_functions.get(fmt)
+        if formatter is None:
+            raise ValueError("Unrecognized format type {}. Expected".format(
+                fmt, list(formatter_functions.keys())))
+
         with open(joined_path, "w") as f:
-            for i in itertools.product(*lsts):
-                f.write(f"{''.join(i)}\n")
+            for line in formatter(lsts):
+                f.write(line)
+
         return joined_path
+
+
+def join_product_onlist(lsts):
+    for i in itertools.product(*lsts):
+        yield f"{''.join(i)}\n"
+
+
+def join_multi_onlist(lsts):
+    for row in itertools.zip_longest(*lsts, fillvalue='-'):
+        yield f"{' '.join((str(x) for x in row))}\n"
