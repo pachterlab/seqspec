@@ -138,7 +138,7 @@ def join_onlists(onlists):
     if len(onlists) == 0:
         print("No lists present")
         return
-    elif len(onlists) == 1:
+    elif len(onlists) == 1 and onlists[0].location.lower() == "local":
         return onlists[0].filename
     else:
         base_path = find_list_target_dir(onlists)
