@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from seqspec.Region import Region, Onlist
+from seqspec.Region import Read, Region, Onlist
 
 
 def region_rna_joined_dict(region_id, regions=[]):
@@ -34,6 +34,19 @@ def region_rna_linker_dict(region_id, regions=[]):
         "sequence_type": "RNA",
         "sequence": "CATTGG",
         "regions": regions,
+    }
+    return expected
+
+
+def read_rna_dict(read_id, min_len=0, max_len=100):
+    expected = {
+        "read_id": read_id,
+        "name": f"{read_id}-name",
+        "modality": "RNA",
+        "primer_id": f"{read_id}-primer",
+        "min_len": min_len,
+        "max_len": max_len,
+        "strand": "pos",
     }
     return expected
 
@@ -201,3 +214,14 @@ class TestRegion(TestCase):
         # and region: None for repr()
         expected["regions"] = None
         self.assertEqual(repr(r), repr(expected))
+
+
+class TestRead(TestCase):
+    def test_minimal_read(self):
+        expected = read_rna_dict("read-1")
+        r = Read(**expected)
+        for key in expected:
+            self.assertEqual(getattr(r, key), expected[key])
+
+        self.assertEqual(repr(r), repr(expected))
+        self.assertEqual(r.to_dict(), expected)
