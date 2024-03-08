@@ -9,7 +9,7 @@ modalities:
 - rna
 lib_struct: null
 library_protocol: 10xv3 RNA 3'
-library_kit: Illumina Truseq Dual Index
+library_kit: Illumina TruSeq Dual Index
 sequence_protocol: Illumina NovaSeq 6000
 sequence_kit: NovaSeq 6000 v1.5
 sequence_spec:

@@ -91,17 +91,17 @@ def libseq(spec, modality):
 
             n.append(f"{ws}<{arrow}|({idx}) {read_id}")
 
-            s = "\n".join(
-                [
-                    modality,
-                    "---",
-                    "\n".join(p),
-                    libspec.sequence,
-                    complement_sequence(libspec.sequence),
-                    "\n".join(n),
-                ]
-            )
-            return s
+    s = "\n".join(
+        [
+            modality,
+            "---",
+            "\n".join(p),
+            libspec.sequence,
+            complement_sequence(libspec.sequence),
+            "\n".join(n),
+        ]
+    )
+    return s
 
 
 def run_print(data):
