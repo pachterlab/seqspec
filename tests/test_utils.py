@@ -72,9 +72,9 @@ library_spec:
     region_type: cdna
     name: cDNA
     sequence_type: random
-    sequence: X
+    sequence: XXXXXXXXXXXXXXXXXXXX
     min_len: 1
-    max_len: 98
+    max_len: 20
     onlist: null
     regions: null
     parent_id: rna
