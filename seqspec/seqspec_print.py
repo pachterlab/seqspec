@@ -154,9 +154,9 @@ def run_print_png(spec):
     modalities = [modalities[i] for i in asort]
     lengths = [lengths[i] for i in asort]
     modes = [modes[i] for i in asort]
-    assay = spec.assay
+    assay_id = spec.assay_id
 
-    fig, _ = plot_png(assay, modalities, modes, nmodes, lengths)
+    fig, _ = plot_png(assay_id, modalities, modes, nmodes, lengths)
     return fig
 
 
