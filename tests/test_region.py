@@ -67,7 +67,7 @@ class TestRegion(TestCase):
         self.assertEqual(r.regions, [])
 
         self.assertEqual(r.get_region_by_id(expected["region_id"]), [r])
-        self.assertEqual(r.get_region_by_type(expected["region_type"]), [r])
+        self.assertEqual(r.get_region_by_region_type(expected["region_type"]), [r])
         self.assertEqual(r.get_leaves(), [r])
         self.assertEqual(r.get_leaf_region_types(), set([expected["region_type"]]))
 
@@ -94,13 +94,14 @@ class TestRegion(TestCase):
 
         self.assertEqual(r_expected.get_region_by_id(r_umi_dict["region_id"]), [r_umi])
         self.assertEqual(
-            r_expected.get_region_by_type(r_umi_dict["region_type"]), [r_umi]
+            r_expected.get_region_by_region_type(r_umi_dict["region_type"]), [r_umi]
         )
         self.assertEqual(
             r_expected.get_region_by_id(r_linker_dict["region_id"]), [r_linker]
         )
         self.assertEqual(
-            r_expected.get_region_by_type(r_linker_dict["region_type"]), [r_linker]
+            r_expected.get_region_by_region_type(r_linker_dict["region_type"]),
+            [r_linker],
         )
         self.assertEqual(r_expected.get_leaves(), [r_umi, r_linker])
         self.assertEqual(
@@ -127,7 +128,7 @@ class TestRegion(TestCase):
         r1_dict = region_rna_joined_dict("region-1", [r2, r3, r4])
         r1 = Region(**r1_dict)
 
-        self.assertEqual(r1.get_region_by_type(r2_dict["region_type"]), [r2, r4])
+        self.assertEqual(r1.get_region_by_region_type(r2_dict["region_type"]), [r2, r4])
 
     def test_set_parent_id(self):
         r2_dict = region_rna_umi_dict("region-2")

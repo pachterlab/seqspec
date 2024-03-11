@@ -3,7 +3,7 @@ import os
 from unittest import TestCase
 
 from seqspec.Region import Region
-from seqspec.utils import load_spec_stream, get_cuts, write_read
+from seqspec.utils import load_spec_stream, project_regions_to_coordinates, write_read
 
 from .test_region import (
     region_rna_joined_dict,
@@ -99,7 +99,7 @@ class TestUtils(TestCase):
         head = spec.get_libspec("RNA")
         self.assertEqual(len(head.regions), 5)
 
-    def test_get_cuts(self):
+    def test_project_regions_to_coordinates(self):
         r_umi_dict = region_rna_umi_dict("region-2")
         r_umi = Region(**r_umi_dict)
         r_linker_dict = region_rna_linker_dict("region-3")
@@ -112,7 +112,7 @@ class TestUtils(TestCase):
         r_linker_min, r_linker_max = r_linker.get_len()
         r_linker_min += r_umi_max
         r_linker_max += r_linker_max
-        cuts = get_cuts(r_expected.regions)
+        cuts = project_regions_to_coordinates(r_expected.regions)
         self.assertEqual(cuts, [(r_umi_min, r_umi_max), (r_linker_min, r_linker_max)])
 
     def test_write_header(self):

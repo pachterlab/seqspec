@@ -17,6 +17,8 @@
 - `Assay` attribute `sequencer` changed to `sequence_protocol`
 - `Assay` function `get_modality` changed to `get_libspec`
 - `Region` function `update_attr` uses the `max_len` to generate `random` and `onlist` sequence lengths instead of `min_len`
+- `get_region_by_type` changed to `get_region_by_region_type` to disambiguate between `region_type` and `sequence_type`
+- `seqspec onlist` (by default) searches for onlists in the `Region`s intersected by the `Read` passed to `-r`.
 
 ### Added
 
@@ -25,7 +27,6 @@
 - Add `sequence_spec` to the seqspec json schema
 - Add `Read` object to specification document
 - Add `Read` generator to website GUI
-- Add prior version seqspec schema to seqspec/schema (note to self, this must be done for every release)
 - Add pattern matching to `date` in `Assay` (expected date format: DAY MONTH YEAR, where day is one or two numbers, month is the full named month starting with a Capital letter and year is the full year)
 - Add `library_kit` to `Assay` object (kit that adds seq adapters)
 - Add `library_protocol` to `Assay` object (library that generates insert)
@@ -45,6 +46,8 @@
   - check that the min len is less than or equal to the max len
   - check that the length of the sequence is between min and max len
     - Note a strong assumption in `seqspec print` is that the sequence have a length equal to the `max_len` for visualization purposes
+- Add `RegionCoordinate` object that maps `Region` min/max lengths to 0-indexed positions
+- `seqspec onlist` searches for onlists in a `Region` based on `--region` flag
 
 ### Removed
 

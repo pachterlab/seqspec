@@ -103,8 +103,10 @@ def run_check(schema, spec, spec_fn):
     # get all of the regions with type fastq in the spec and check that those files exist relative to the path of the spec
     fqrgns = []
     for m in modes:
-        fqrgns += [i for i in spec.get_libspec(m).get_region_by_type("fastq")]
-        fqrgns += [i for i in spec.get_libspec(m).get_region_by_type("fastq_link")]
+        fqrgns += [i for i in spec.get_libspec(m).get_region_by_region_type("fastq")]
+        fqrgns += [
+            i for i in spec.get_libspec(m).get_region_by_region_type("fastq_link")
+        ]
     for fqrgn in fqrgns:
         if fqrgn.region_type == "fastq":
             check = path.join(path.dirname(spec_fn), fqrgn.region_id)

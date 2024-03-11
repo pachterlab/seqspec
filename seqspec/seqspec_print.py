@@ -1,7 +1,8 @@
 from seqspec.utils import load_spec
 from seqspec.seqspec_print_html import run_print_html
 import newick
-from .utils import REGION_TYPE_COLORS, complement_sequence, get_cuts
+from .utils import REGION_TYPE_COLORS, complement_sequence
+from seqspec.Region import project_regions_to_coordinates
 
 
 def setup_print_args(parser):
@@ -67,7 +68,7 @@ def libseq(spec, modality):
     p = []
     n = []
     leaves = libspec.get_leaves()
-    cuts = get_cuts(leaves)
+    cuts = project_regions_to_coordinates(leaves)
     for idx, read in enumerate(seqspec, 1):
         read_len = read.max_len
         read_id = read.read_id
@@ -75,7 +76,7 @@ def libseq(spec, modality):
         primer_idx = [i for i, l in enumerate(leaves) if l.region_id == primer_id][0]
         primer_pos = cuts[primer_idx]
         if read.strand == "pos":
-            wsl = primer_pos[1] - 1
+            wsl = primer_pos.stop - 1
             ws = wsl * " "
 
             arrowl = read_len - 1
@@ -83,7 +84,7 @@ def libseq(spec, modality):
 
             p.append(f"{ws}|{arrow}>({idx}) {read_id}")
         elif read.strand == "neg":
-            wsl = primer_pos[0] - read_len
+            wsl = primer_pos.start - read_len
             ws = wsl * " "
 
             arrowl = read_len - 1

@@ -1,5 +1,6 @@
 from seqspec.Assay import Assay
-from seqspec.utils import load_spec
+from seqspec.Region import project_regions_to_coordinates, itx_read
+from seqspec.utils import load_spec, map_read_id_to_regions
 from seqspec.seqspec_find import run_find_by_type
 import os
 from seqspec.utils import read_list
@@ -21,6 +22,11 @@ def setup_onlist_args(parser):
         type=str,
         default=None,
     )
+    subparser.add_argument(
+        "--region",
+        help="Specify a region",
+        action="store_true",
+    )
     subparser_required.add_argument(
         "-m",
         metavar="MODALITY",
@@ -30,7 +36,12 @@ def setup_onlist_args(parser):
         required=True,
     )
     subparser_required.add_argument(
-        "-r", metavar="REGION", help=("Region"), type=str, default=None, required=False
+        "-r",
+        metavar="READ or REGION",
+        help=("Read or Region"),
+        type=str,
+        default=None,
+        required=False,
     )
     subparser.add_argument("--list", action="store_true", help=("List onlists"))
     return subparser
@@ -53,13 +64,15 @@ def validate_onlist_args(parser, args):
         for ol in onlists:
             print(f"{ol['region_id']}\t{ol['filename']}\t{ol['location']}\t{ol['md5']}")
         return
-
-    olist = run_onlist(spec, m, r)
+    if args.region:
+        olist = run_onlist_region(spec, m, r)
+    else:
+        olist = run_onlist_read(spec, m, r)
     print(os.path.join(os.path.dirname(os.path.abspath(fn)), olist))
     return
 
 
-def run_onlist(spec: Assay, modality: str, region_id: str):
+def run_onlist_region(spec: Assay, modality: str, region_id: str):
     # for now return the path to the onlist file for the modality/region pair
 
     # run function
@@ -67,6 +80,29 @@ def run_onlist(spec: Assay, modality: str, region_id: str):
     onlists = []
     for r in regions:
         onlists.append(r.get_onlist().filename)
+    if len(onlists) == 0:
+        raise ValueError(f"No onlist found for region {region_id}")
+    return join_onlists(onlists)
+
+
+def run_onlist_read(spec: Assay, modality: str, read_id: str):
+    # for now return the path to the onlist file for the modality/region pair
+
+    # run function
+    (read, rgns) = map_read_id_to_regions(spec, modality, read_id)
+    # convert regions to region coordinates
+    rcs = project_regions_to_coordinates(rgns)
+    # intersect read with region coordinates
+    new_rcs = itx_read(rcs, 0, read.max_len)
+
+    onlists = []
+    for r in new_rcs:
+        ol = r.get_onlist()
+        if ol:
+            onlists.append(ol.filename)
+
+    if len(onlists) == 0:
+        raise ValueError(f"No onlist found for read {read_id}")
 
     return join_onlists(onlists)
 

@@ -75,5 +75,5 @@ def run_find(spec: Assay, modality: str, region_id: str):
 
 def run_find_by_type(spec: Assay, modality: str, region_type: str):
     m = spec.get_libspec(modality)
-    regions = m.get_region_by_type(region_type)
+    regions = m.get_region_by_region_type(region_type)
     return regions

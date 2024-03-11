@@ -129,14 +129,14 @@ class Region(yaml.YAMLObject):
                 found = r.get_region_by_id(region_id, found)
         return found
 
-    def get_region_by_type(self, region_type, found=[]):
+    def get_region_by_region_type(self, region_type, found=[]):
         if not found:
             found = []
         if self.region_type == region_type:
             found.append(self)
         if self.regions:
             for r in self.regions:
-                found = r.get_region_by_type(region_type, found)
+                found = r.get_region_by_region_type(region_type, found)
         return found
 
     def get_onlist_regions(self, found=[]):
@@ -221,6 +221,123 @@ class Region(yaml.YAMLObject):
             if max_len:
                 target_region.max_len = max_len
         return
+
+    def reverse(self):
+        if self.regions:
+            # reverse the list of sub regions
+            for r in self.regions[::-1]:
+                r.reverse()
+        else:
+            # reverse the actual sequence
+            self.sequence = self.sequence[::-1]
+        return
+
+    def complement(self):
+        if self.regions:
+            for r in self.regions:
+                r.complement()
+        else:
+            self.sequence = complement_sequence(self.sequence)
+
+
+def complement_nucleotide(nucleotide):
+    complements = {
+        "A": "T",
+        "T": "A",
+        "G": "C",
+        "C": "G",
+        "R": "Y",
+        "Y": "R",
+        "S": "S",
+        "W": "W",
+        "K": "M",
+        "M": "K",
+        "B": "V",
+        "D": "H",
+        "V": "B",
+        "H": "D",
+        "N": "N",
+        "X": "X",
+    }
+    return complements.get(
+        nucleotide, "N"
+    )  # Default to 'N' if nucleotide is not recognized
+
+
+def complement_sequence(sequence):
+    return "".join(complement_nucleotide(n) for n in sequence.upper())
+
+
+class RegionCoordinate(Region):
+    def __init__(
+        self,
+        region: Region,
+        start: int = 0,
+        stop: int = 0,
+    ):
+        super().__init__(
+            region.region_id,
+            region.region_type,
+            region.name,
+            region.sequence_type,
+            region.sequence,
+            region.min_len,
+            region.max_len,
+            region.onlist,
+            region.regions,
+        )
+        self.start = start
+        self.stop = stop
+
+    def __repr__(self):
+        return f"RegionCoordinate {self.name} [{self.region_type}]: ({self.start}, {self.stop})"
+
+    def __str__(self):
+        return f"RegionCoordinate {self.name} [{self.region_type}]: ({self.start}, {self.stop})"
+
+    def __eq__(self, other):
+        return self.start == other.start and self.stop == other.stop
+
+
+def project_regions_to_coordinates(
+    regions: List[Region], rcs: List[RegionCoordinate] = []
+) -> List[RegionCoordinate]:
+    if not rcs:
+        rcs = []
+    prev = 0
+    for r in regions:
+        nxt = prev + r.max_len
+        rc = RegionCoordinate(r, prev, nxt)
+        rcs.append(rc)
+        prev = nxt
+    return rcs
+
+
+def itx_read(
+    region_coordinates: List[RegionCoordinate], read_start: int, read_stop: int
+):
+    # return a list of region_coordinates intersect with read start/stop
+    new_rcs = []
+
+    for idx, rc in enumerate(region_coordinates):
+        # read start after rc ends, ignore
+        if read_start >= rc.stop:
+            continue
+        # read stop before rc starts, ignore
+        if read_stop <= rc.start:
+            continue
+
+        # all region_coordinates now have read start or stop in the rc
+
+        # read start in rc, update start
+        if read_start >= rc.start:
+            rc.start = read_start
+        # read stop in rc, update stop
+        if read_stop < rc.stop:
+            rc.stop = read_stop
+        new_rcs.append(rc)
+
+    return new_rcs
 
 
 class Onlist(yaml.YAMLObject):
