@@ -7,9 +7,9 @@ from requests import HTTPError
 from unittest import TestCase
 from unittest.mock import patch
 
-from seqspec.Region import Region, Onlist
+from seqspec.Region import Region, RegionCoordinate, Onlist, project_regions_to_coordinates
 from seqspec.utils import (
-    load_spec_stream, project_regions_to_coordinates, write_read, read_list, yield_onlist_contents
+    load_spec_stream, write_read, read_list, yield_onlist_contents
 )
 from seqspec import __version__
 
@@ -145,8 +145,12 @@ class TestUtils(TestCase):
         r_linker_min, r_linker_max = r_linker.get_len()
         r_linker_min += r_umi_max
         r_linker_max += r_linker_max
+
+        umi_region = RegionCoordinate(r_umi, r_umi_min, r_umi_max)
+        linker_region = RegionCoordinate(r_linker, r_linker_min, r_linker_max)
+
         cuts = project_regions_to_coordinates(r_expected.regions)
-        self.assertEqual(cuts, [(r_umi_min, r_umi_max), (r_linker_min, r_linker_max)])
+        self.assertEqual(cuts, [umi_region, linker_region])
 
     def test_write_header(self):
         stream = StringIO()
