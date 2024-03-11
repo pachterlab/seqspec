@@ -51,7 +51,7 @@ sequence_spec:
   primer_id: p2_adapter
   min_len: 25
   max_len: 25
-  strand: pos
+  strand: neg
 library_spec:
 - !Region
   region_id: rna

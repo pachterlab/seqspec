@@ -1,6 +1,7 @@
 import io
 import gzip
 from seqspec.Assay import Assay
+from seqspec.Region import Onlist
 import yaml
 import requests
 from Bio import GenBank
@@ -55,7 +56,7 @@ def yield_onlist_contents(stream):
         yield line.strip().split()[0]
 
 
-def read_list(onlist):
+def read_list(onlist: Onlist):
     """Given an onlist object read the local or remote data
     """
     if onlist.location == "remote":

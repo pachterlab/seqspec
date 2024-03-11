@@ -1,5 +1,5 @@
 from seqspec.Assay import Assay
-from seqspec.Region import project_regions_to_coordinates, itx_read
+from seqspec.Region import project_regions_to_coordinates, itx_read, Onlist
 from seqspec.utils import load_spec, map_read_id_to_regions
 from seqspec.seqspec_find import run_find_by_type
 import os
@@ -88,7 +88,7 @@ def run_onlist_region(spec: Assay, modality: str, region_id: str, fmt: str):
     regions = run_find_by_type(spec, modality, region_id)
     onlists = []
     for r in regions:
-        onlists.append(r.get_onlist().filename)
+        onlists.append(r.get_onlist())
     if len(onlists) == 0:
         raise ValueError(f"No onlist found for region {region_id}")
     return join_onlists(onlists, fmt)
@@ -108,7 +108,7 @@ def run_onlist_read(spec: Assay, modality: str, read_id: str, fmt: str):
     for r in new_rcs:
         ol = r.get_onlist()
         if ol:
-            onlists.append(ol.filename)
+            onlists.append(ol)
 
     if len(onlists) == 0:
         raise ValueError(f"No onlist found for read {read_id}")
@@ -141,7 +141,7 @@ def find_list_target_dir(onlists):
     return os.getcwd()
 
 
-def join_onlists(onlists, fmt):
+def join_onlists(onlists: [Onlist], fmt: str):
     """Given a list of onlist objects return a file containing the combined list
     """
     if len(onlists) == 0:
