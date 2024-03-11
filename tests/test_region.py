@@ -1,7 +1,12 @@
 from unittest import TestCase
 
-from seqspec.Region import Read, Region, Onlist
-
+from seqspec.Region import (
+    project_regions_to_coordinates,
+    Read,
+    Region,
+    RegionCoordinate,
+    Onlist,
+)
 
 def region_rna_joined_dict(region_id, regions=[]):
     expected = {
@@ -214,6 +219,29 @@ class TestRegion(TestCase):
         # and region: None for repr()
         expected["regions"] = None
         self.assertEqual(repr(r), repr(expected))
+
+
+class TestRegionCoordinates(TestCase):
+    def test_project_regions_to_coordinates(self):
+        r1_dict = region_rna_umi_dict("region-1")
+        r1 = Region(**r1_dict)
+        r2_dict = region_rna_linker_dict("region-2")
+        r2 = Region(**r2_dict)
+
+        r3_dict = region_rna_umi_dict("region-3")
+        r3 = Region(**r3_dict)
+        r4_dict = region_rna_linker_dict("region-4")
+        r4 = Region(**r4_dict)
+
+        regions = [r1,r2,r3,r4]
+        coords = project_regions_to_coordinates(regions)
+
+        cur_start = 0
+        for r, c in zip(regions, coords):
+            cur_stop = cur_start + r.max_len
+            self.assertEqual(c.start, cur_start)
+            self.assertEqual(c.stop, cur_stop)
+            cur_start = cur_stop
 
 
 class TestRead(TestCase):
