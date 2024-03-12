@@ -64,13 +64,15 @@ def validate_print_args(parser, args):
         raise ValueError("-f html only valid for -s library")
     if fmt == "info" and spectype != "sequence":
         raise ValueError("-f info only valid for -s sequence")
+    if fmt == "sequence" and spectype != "libseq":
+        raise ValueError("-f sequence only valid for -s libseq")
 
     fn = args.yaml
     o = args.o
     spec = load_spec(fn)
 
     LIBSEQ_CMD = {
-        "libseq": run_print_libseq,
+        "sequence": run_print_libseq_sequence,
     }
 
     SEQUENCE_CMD = {
@@ -98,7 +100,7 @@ def validate_print_args(parser, args):
         print(s)
 
 
-def run_print_libseq(spec):
+def run_print_libseq_sequence(spec):
     p = []
     for modality in spec.modalities:
         p.append(libseq(spec, modality))
