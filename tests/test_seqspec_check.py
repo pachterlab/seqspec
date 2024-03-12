@@ -1,8 +1,7 @@
 from argparse import ArgumentParser
-import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest import TestCase, skipUnless
+from unittest import TestCase
 from unittest.mock import patch
 
 from seqspec.seqspec_check import (
@@ -10,6 +9,7 @@ from seqspec.seqspec_check import (
     validate_check_args,
 )
 from .test_utils import example_spec
+
 
 def create_stub_check_parser():
     parser = ArgumentParser()
@@ -49,4 +49,4 @@ class TestSeqspecCheck(TestCase):
             with patch("os.path.exists") as path_exists:
                 path_exists.return_value = True
                 errors = validate_check_args(None, args)
-                self.assertEqual(errors, 0)
+                self.assertEqual(errors, None)

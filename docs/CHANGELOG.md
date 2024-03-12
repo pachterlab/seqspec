@@ -19,6 +19,12 @@
 - `Region` function `update_attr` uses the `max_len` to generate `random` and `onlist` sequence lengths instead of `min_len`
 - `get_region_by_type` changed to `get_region_by_region_type` to disambiguate between `region_type` and `sequence_type`
 - `seqspec onlist` (by default) searches for onlists in the `Region`s intersected by the `Read` passed to `-r`.
+- Support older versions of matplotlib by handling the `spines[["top", "bottom"...]]` structure
+- Increase the number of Xs in the random region to match `max_len` for validation
+- Update `seqspec print` command to use the replacement `assay_id` attribute instead of `assay`
+- Implement downloading onlists via URLs and transparently decompress gzip files
+- Change `read_list` function to take the `onlist` object for handling local and remote files
+- Add `onlist` argument to specify combined barcode list file format (kallisto's multi-file format and default cartesian product format)
 
 ### Added
 
@@ -45,9 +51,11 @@
     - `onlist` and `onlist` property null incompatible
   - check that the min len is less than or equal to the max len
   - check that the length of the sequence is between min and max len
-    - Note a strong assumption in `seqspec print` is that the sequence have a length equal to the `max_len` for visualization purposes
+  - Note a strong assumption in `seqspec print` is that the sequence have a length equal to the `max_len` for visualization purposes
 - Add `RegionCoordinate` object that maps `Region` min/max lengths to 0-indexed positions
 - `seqspec onlist` searches for onlists in a `Region` based on `--region` flag
+- Add type annotations for `join_onlists` to clarify it needs a list of `Onlist` objects
+- Add minimal tests for `RegionCoordinate`, `project_regions_to_coordinates`, `run_onlist_region`, `run_onlist_read`, and seqspec print functions
 
 ### Removed
 
@@ -60,3 +68,6 @@ TODO:
 
 - Sequencing overlapping pairs now supported
 - `seqspec check` correctly handles sequences lengths longer than the stated min/max range
+- Fix test for `project_regions_to_coordinates`
+- Get the test of seqspec check working again by updating the schema for the refactored example specification YAML files and mocking fastq and barcode files
+- Only return the onlist filename if it's a local file, downloading remote lists when needed
