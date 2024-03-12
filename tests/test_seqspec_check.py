@@ -1,18 +1,15 @@
 from argparse import ArgumentParser
 import os
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest import TestCase, skipUnless
+from unittest.mock import patch
 
 from seqspec.seqspec_check import (
     setup_check_args,
     validate_check_args,
 )
-
-
-test_dir = Path(__file__).parent
-default_assay_dir = test_dir / ".." / "assays"
-assay_dir = os.environ.get("SEQSPEC_ASSAY_DIR", default_assay_dir)
-
+from .test_utils import example_spec
 
 def create_stub_check_parser():
     parser = ArgumentParser()
@@ -36,13 +33,20 @@ class TestSeqspecCheck(TestCase):
         self.assertEqual(args.o, output_name)
         self.assertEqual(args.yaml, spec_name)
 
-    @skipUnless(assay_dir.is_dir(), "Couldn't find assays directory")
     def test_validate_check_args(self):
         parser = create_stub_check_parser()
 
-        spec = assay_dir / "Quartz-seq" / "spec.yaml"
-        cmdline = ["check", str(spec)]
-        args = parser.parse_args(cmdline)
+        with TemporaryDirectory(prefix="seqspec_check_") as tmpdir:
+            target = Path(tmpdir) / "spec.yaml"
 
-        errors = validate_check_args(None, args)
-        self.assertEqual(errors, 0)
+            with open(target, "wt") as stream:
+                stream.write(example_spec)
+
+            cmdline = ["check", str(target)]
+            args = parser.parse_args(cmdline)
+
+            # ignore testing if the files barcode & fastq files exist
+            with patch("os.path.exists") as path_exists:
+                path_exists.return_value = True
+                errors = validate_check_args(None, args)
+                self.assertEqual(errors, 0)
