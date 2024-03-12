@@ -5,6 +5,7 @@ from seqspec.seqspec_find import run_find_by_type
 import os
 from seqspec.utils import read_list
 import itertools
+from typing import List
 
 
 def setup_onlist_args(parser):
@@ -43,13 +44,14 @@ def setup_onlist_args(parser):
         default=None,
         required=False,
     )
+    format_choices = ["product", "multi"]
     subparser.add_argument(
         "-f",
         metavar="FORMAT",
         type=str,
         default="product",
-        choices=["product", "multi"],
-        help="select between cartesian product 'product' or multiple barcode lists in file 'multi'"
+        choices=format_choices,
+        help=f"Format for combining multiple onlists ({', '.join(format_choices)}). default: product",
     )
     subparser.add_argument("--list", action="store_true", help=("List onlists"))
     return subparser
@@ -132,8 +134,8 @@ def run_list_onlists(spec: Assay, modality: str):
 
 
 def find_list_target_dir(onlists):
-    for l in onlists:
-        if l.location == "local":
+    for olst in onlists:
+        if olst.location == "local":
             base_path = os.path.dirname(os.path.abspath(onlists[0].filename))
             if os.access(base_path, os.W_OK):
                 return base_path
@@ -141,9 +143,8 @@ def find_list_target_dir(onlists):
     return os.getcwd()
 
 
-def join_onlists(onlists: [Onlist], fmt: str):
-    """Given a list of onlist objects return a file containing the combined list
-    """
+def join_onlists(onlists: List[Onlist], fmt: str):
+    """Given a list of onlist objects return a file containing the combined list"""
     if len(onlists) == 0:
         print("No lists present")
         return
@@ -160,8 +161,9 @@ def join_onlists(onlists: [Onlist], fmt: str):
         }
         formatter = formatter_functions.get(fmt)
         if formatter is None:
-            raise ValueError("Unrecognized format type {}. Expected".format(
-                fmt, list(formatter_functions.keys())))
+            raise ValueError(
+                f"Unrecognized format type {fmt}. Expected {', '.join(list(formatter_functions.keys()))}"
+            )
 
         with open(joined_path, "w") as f:
             for line in formatter(lsts):
@@ -176,5 +178,5 @@ def join_product_onlist(lsts):
 
 
 def join_multi_onlist(lsts):
-    for row in itertools.zip_longest(*lsts, fillvalue='-'):
+    for row in itertools.zip_longest(*lsts, fillvalue="-"):
         yield f"{' '.join((str(x) for x in row))}\n"

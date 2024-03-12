@@ -19,13 +19,14 @@ def setup_print_args(parser):
         type=str,
         default=None,
     )
+    format_choices = ["tree", "html", "png", "sequence", "libseq"]
     subparser.add_argument(
         "-f",
         metavar="FORMAT",
-        help=("Format"),
+        help=(f"Format ({', '.join(format_choices)}), default: tree"),
         type=str,
         default="tree",
-        choices=["tree", "html", "png", "sequence", "libseq"],
+        choices=format_choices,
     )
     return subparser
 

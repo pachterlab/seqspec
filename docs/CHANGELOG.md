@@ -56,6 +56,7 @@
 - `seqspec onlist` searches for onlists in a `Region` based on `--region` flag
 - Add type annotations for `join_onlists` to clarify it needs a list of `Onlist` objects
 - Add minimal tests for `RegionCoordinate`, `project_regions_to_coordinates`, `run_onlist_region`, `run_onlist_read`, and seqspec print functions
+- Add list of options to `-f FORMAT` for `seqspec onlist` and `seqspec print`
 
 ### Removed
 
