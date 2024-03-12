@@ -19,7 +19,25 @@ def setup_print_args(parser):
         type=str,
         default=None,
     )
-    format_choices = ["tree", "html", "png", "sequence", "libseq"]
+
+    format_choices = ["library", "sequence", "both"]
+    subparser.add_argument(
+        "-s",
+        metavar="SPEC",
+        help=(
+            f"Specification to print, default: library ({', '.join(format_choices)})"
+        ),
+        type=str,
+        default="library",
+        choices=format_choices,
+    )
+    # TODO: fix naming convention: sequence -> seqspec,
+    # add libspec (list of regions tab delimited)
+    # change tree -> libspec-tree
+    #
+    # actually, add -s which clarifies which spec to print (library or sequence)
+    # then -f should have tree, png, html, sequence
+    format_choices = ["tree", "html", "png", "sequence", "info"]
     subparser.add_argument(
         "-f",
         metavar="FORMAT",
@@ -28,23 +46,48 @@ def setup_print_args(parser):
         default="tree",
         choices=format_choices,
     )
+
     return subparser
 
 
 def validate_print_args(parser, args):
     # if everything is valid the run_print
+    fmt = args.f
+    spectype = args.s
+
+    # validate fmt and spectype pairs, only some are valid
+    if fmt == "png" and spectype != "library":
+        raise ValueError("-f png only valid for -s library")
+    if fmt == "tree" and spectype != "library":
+        raise ValueError("-f tree only valid for -s library")
+    if fmt == "html" and spectype != "library":
+        raise ValueError("-f html only valid for -s library")
+    if fmt == "info" and spectype != "sequence":
+        raise ValueError("-f info only valid for -s sequence")
+
     fn = args.yaml
     o = args.o
-    fmt = args.f
     spec = load_spec(fn)
-    CMD = {
-        "tree": run_print_tree,
-        "html": run_print_html,
-        "png": run_print_png,
-        "sequence": run_print_sequence_spec,
+
+    LIBSEQ_CMD = {
         "libseq": run_print_libseq,
     }
-    s = CMD[fmt](spec)
+
+    SEQUENCE_CMD = {
+        "info": run_print_sequence_spec,
+    }
+    LIBRARY_CMD = {
+        "tree": run_print_library_tree,
+        "html": run_print_html,
+        "png": run_print_library_png,
+    }
+    CMD = {
+        "library": LIBRARY_CMD,
+        "sequence": SEQUENCE_CMD,
+        "libseq": LIBSEQ_CMD,
+    }
+
+    s = CMD[spectype][fmt](spec)
     if fmt == "png":
         s.savefig(o, dpi=300, bbox_inches="tight")
         return
@@ -125,7 +168,7 @@ def run_print_sequence_spec(spec):
     return "\n".join(p)
 
 
-def run_print_tree(spec):
+def run_print_library_tree(spec):
     t = []
     for r in spec.library_spec:
         t.append(r.to_newick())
@@ -141,7 +184,7 @@ def argsort(arr):
     return sorted(range(len(arr)), key=arr.__getitem__)
 
 
-def run_print_png(spec):
+def run_print_library_png(spec):
     # builds directly off of https://colab.research.google.com/drive/1ZCIGrwLEIfE0yo33bP8uscUNPEn1p1DH developed by https://github.com/LucasSilvaFerreira
 
     # modality
