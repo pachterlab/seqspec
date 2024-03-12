@@ -20,7 +20,7 @@ def setup_print_args(parser):
         default=None,
     )
 
-    format_choices = ["library", "sequence", "both"]
+    format_choices = ["library", "sequence", "libseq"]
     subparser.add_argument(
         "-s",
         metavar="SPEC",
