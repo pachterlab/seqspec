@@ -58,6 +58,7 @@
 - Add minimal tests for `RegionCoordinate`, `project_regions_to_coordinates`, `run_onlist_region`, `run_onlist_read`, and seqspec print functions
 - Add list of options to CLI for `-f FORMAT` within `seqspec onlist` and `seqspec print`
 - Add `-s SEQTYPE` to `seqspec print` to disambiguate printing `sequence`, `library`, or `libseq` objects. TODO wrap `seqspec info` into `seqspec print -f info`.
+- Add `-s SPECOBJECT` to `seqspec onlist`. Specify specific object `read`, `region`, or `region-type` for finding the `onlist`.
 
 ### Removed
 

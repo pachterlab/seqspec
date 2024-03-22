@@ -1,7 +1,7 @@
 from seqspec.Assay import Assay
 from seqspec.Region import project_regions_to_coordinates, itx_read, Onlist
 from seqspec.utils import load_spec, map_read_id_to_regions
-from seqspec.seqspec_find import run_find_by_type
+from seqspec.seqspec_find import run_find_by_type, run_find
 import os
 from seqspec.utils import read_list
 import itertools
@@ -23,10 +23,14 @@ def setup_onlist_args(parser):
         type=str,
         default=None,
     )
+    format_choices = ["read", "region", "region-type"]
     subparser.add_argument(
-        "--region",
-        help="Specify a region",
-        action="store_true",
+        "-s",
+        metavar="SPECOBJECT",
+        type=str,
+        default="read",
+        choices=format_choices,
+        help=f"Type of spec object ({', '.join(format_choices)}), default: region",
     )
     subparser_required.add_argument(
         "-m",
@@ -51,7 +55,7 @@ def setup_onlist_args(parser):
         type=str,
         default="product",
         choices=format_choices,
-        help=f"Format for combining multiple onlists ({', '.join(format_choices)}). default: product",
+        help=f"Format for combining multiple onlists ({', '.join(format_choices)}), default: product",
     )
     subparser.add_argument("--list", action="store_true", help=("List onlists"))
     return subparser
@@ -75,19 +79,34 @@ def validate_onlist_args(parser, args):
         for ol in onlists:
             print(f"{ol['region_id']}\t{ol['filename']}\t{ol['location']}\t{ol['md5']}")
         return
-    if args.region:
+    if args.s == "region":
         olist = run_onlist_region(spec, m, r, f)
-    else:
+    elif args.s == "region-type":
+        olist = run_onlist_region_type(spec, m, r, f)
+    elif args.s == "read":
         olist = run_onlist_read(spec, m, r, f)
     print(os.path.join(os.path.dirname(os.path.abspath(fn)), olist))
     return
+
+
+def run_onlist_region_type(spec: Assay, modality: str, region_type: str, fmt: str):
+    # for now return the path to the onlist file for the modality/region pair
+
+    # run function
+    regions = run_find_by_type(spec, modality, region_type)
+    onlists = []
+    for r in regions:
+        onlists.append(r.get_onlist())
+    if len(onlists) == 0:
+        raise ValueError(f"No onlist found for region type {region_type}")
+    return join_onlists(onlists, fmt)
 
 
 def run_onlist_region(spec: Assay, modality: str, region_id: str, fmt: str):
     # for now return the path to the onlist file for the modality/region pair
 
     # run function
-    regions = run_find_by_type(spec, modality, region_id)
+    regions = run_find(spec, modality, region_id)
     onlists = []
     for r in regions:
         onlists.append(r.get_onlist())

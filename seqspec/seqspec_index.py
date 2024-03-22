@@ -10,8 +10,8 @@ from seqspec.Region import RegionCoordinate, project_regions_to_coordinates, itx
 def setup_index_args(parser):
     subparser = parser.add_parser(
         "index",
-        description="index regions in a seqspec file",
-        help="index regions in a seqspec file",
+        description="index reads or regions in a seqspec file",
+        help="index reads or regions in a seqspec file",
     )
     subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file")

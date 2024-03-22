@@ -25,7 +25,7 @@ def setup_print_args(parser):
         "-s",
         metavar="SPEC",
         help=(
-            f"Specification to print, default: library ({', '.join(format_choices)})"
+            f"Specification to print ({', '.join(format_choices)}), default: library"
         ),
         type=str,
         default="library",
