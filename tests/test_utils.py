@@ -239,7 +239,7 @@ class TestUtils(TestCase):
         def fake_request_get(url, stream=False, **kwargs):
             class response:
                 def __init__(self):
-                    self.raw = StringIO(fake_contents)
+                    self.raw = BytesIO(fake_contents.encode("utf-8"))
                     self.status_code = 200
 
                 def raise_for_status(self):
