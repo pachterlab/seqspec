@@ -1,7 +1,9 @@
 import io
 import gzip
+from pathlib import Path
 from seqspec.Assay import Assay
 from seqspec.Region import Onlist
+from urllib.parse import urlparse
 import yaml
 import requests
 from Bio import GenBank
@@ -59,24 +61,54 @@ def yield_onlist_contents(stream):
 def read_list(onlist: Onlist):
     """Given an onlist object read the local or remote data
     """
-    if onlist.location == "remote":
-        response = requests.get(onlist.filename, stream=True)
-        response.raise_for_status()
-        # TODO: instead of just looking at the filename, should we check the content-type?
-        if onlist.filename.endswith(".gz"):
-            stream = io.TextIOWrapper(gzip.GzipFile(fileobj=response.raw))
-        else:
+    location, filename = find_onlist_file(onlist)
+
+    stream = None
+    try:
+        # open stream
+        if location == "remote":
+            response = requests.get(filename, stream=True)
+            response.raise_for_status()
             stream = response.raw
-        return list(yield_onlist_contents(stream))
-    elif onlist.location == "local" and onlist.filename.endswith(".gz"):
-        with gzip.open(onlist.filename, "rt") as f:
-            return list(yield_onlist_contents(f))
-    elif onlist.location == "local":
-        with open(onlist.filename, "rt") as f:
-            # just get the first column
-            return list(yield_onlist_contents(f))
+        elif location == "local":
+            stream = open(filename, "rb")
+        else:
+            raise ValueError(
+                "Unsupported location {}. Expected remote or local".format(location))
+
+        # do we need to decompress?
+        if filename.endswith(".gz"):
+            stream = gzip.GzipFile(fileobj=stream)
+
+        # convert to text stream
+        stream = io.TextIOWrapper(stream)
+
+        results = list(yield_onlist_contents(stream))
+    finally:
+        if stream is None:
+            print("Warning: unable to open barcode file {}".format(filename))
+        else:
+            stream.close()
+
+    return results
+
+
+def find_onlist_file(onlist: Onlist):
+    url = urlparse(onlist.filename)
+    pathname = Path(url.path)
+    basename = Path(pathname.name)
+    if basename.exists():
+        # we have a copy of the file in this directory
+        return ("local", str(basename))
+    elif pathname.exists():
+        # we have a path to another directory
+        return ("local", str(pathname))
+    elif url.scheme != '' and onlist.location == "remote":
+        # Should we ignore the location if there's a url scheme?
+        return ("remote", str(onlist.filename))
     else:
-        raise ValueError("Unsupported location {}. Expected remote or local".format(onlist.location))
+        raise FileNotFoundError(
+            "No such {} file {}".format(onlist.location, onlist.filename))
 
 
 def region_ids_in_spec(seqspec, modality, region_ids):

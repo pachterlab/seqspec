@@ -2,14 +2,21 @@ import gzip
 from hashlib import md5
 from io import StringIO
 import os
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from requests import HTTPError
 from unittest import TestCase
 from unittest.mock import patch
 
-from seqspec.Region import Region, RegionCoordinate, Onlist, project_regions_to_coordinates
+from seqspec.Region import (
+    Region, RegionCoordinate, Onlist, project_regions_to_coordinates
+)
 from seqspec.utils import (
-    load_spec_stream, write_read, read_list, yield_onlist_contents
+    find_onlist_file,
+    load_spec_stream,
+    write_read,
+    read_list,
+    yield_onlist_contents
 )
 from seqspec import __version__
 
@@ -171,6 +178,27 @@ class TestUtils(TestCase):
 
         response = list(yield_onlist_contents(fake_stream))
         self.assertEqual(response, fake_onlist)
+
+    def test_find_onlist_file_local_copy(self):
+        test_dir = Path(__file__).parent
+        test_file = test_dir / "test_utils.py"
+        test_url = "https://example.com" + str(test_file)
+        test_onlist_local_copy = Onlist(test_url, "md5sum", "remote")
+        location, filename = find_onlist_file(test_onlist_local_copy)
+        self.assertEqual(location, "local")
+        self.assertEqual(filename, str(test_file))
+
+    def test_find_onlist_remote_file(self):
+        test_url = "https://example.com/test/barcode.txt.gz"
+        test_onlist_local_copy = Onlist(test_url, "md5sum", "remote")
+        location, filename = find_onlist_file(test_onlist_local_copy)
+        self.assertEqual(location, "remote")
+        self.assertEqual(filename, test_url)
+
+    def test_find_onlist_local_file(self):
+        test_url = "https://example.com/test/barcode.txt.gz"
+        test_onlist = Onlist(test_url, "md5sum", "local")
+        self.assertRaises(FileNotFoundError, find_onlist_file, test_onlist)
 
     def test_read_list_local(self):
         fake_onlist = ["ATATATAT", "GCGCGCGC"]
