@@ -1,4 +1,5 @@
 import io
+import os
 import gzip
 from pathlib import Path
 from seqspec.Assay import Assay
@@ -67,7 +68,8 @@ def read_list(onlist: Onlist):
     try:
         # open stream
         if location == "remote":
-            response = requests.get(filename, stream=True)
+            auth = get_remote_auth_token()
+            response = requests.get(filename, stream=True, auth=auth)
             response.raise_for_status()
             stream = response.raw
         elif location == "local":
@@ -109,6 +111,19 @@ def find_onlist_file(onlist: Onlist):
     else:
         raise FileNotFoundError(
             "No such {} file {}".format(onlist.location, onlist.filename))
+
+
+def get_remote_auth_token():
+    """Look for authentication tokens for accessing remote resources
+    """
+    username = os.environ.get("IGVF_API_KEY")
+    password = os.environ.get("IGVF_SECRET_KEY")
+    if not (username is None or password is None):
+        auth = (username, password)
+    else:
+        auth = None
+
+    return auth
 
 
 def region_ids_in_spec(seqspec, modality, region_ids):

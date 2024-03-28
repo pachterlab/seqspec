@@ -1,6 +1,6 @@
 import gzip
 from hashlib import md5
-from io import StringIO
+from io import StringIO, BytesIO
 import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -12,6 +12,7 @@ from seqspec.Region import (
     Region, RegionCoordinate, Onlist, project_regions_to_coordinates
 )
 from seqspec.utils import (
+    get_remote_auth_token,
     find_onlist_file,
     load_spec_stream,
     write_read,
@@ -252,3 +253,27 @@ class TestUtils(TestCase):
             loaded_list = read_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
+
+    def test_get_igvf_auth(self):
+        test_data = [
+            (None, None, None),
+            ("user", "pass", ("user", "pass")),
+        ]
+
+        igvf_variables = ["IGVF_API_KEY", "IGVF_SECRET_KEY"]
+        previous = {name: os.environ.get(name) for name in igvf_variables}
+
+        for username, password, expected in test_data:
+            if username is not None:
+                os.environ["IGVF_API_KEY"] = username
+            if password is not None:
+                os.environ["IGVF_SECRET_KEY"] = password
+
+            auth = get_remote_auth_token()
+            self.assertEqual(auth, expected)
+
+        for name in igvf_variables:
+            if previous[name] is None:
+                del os.environ[name]
+            else:
+                os.environ[name] = previous[name]
