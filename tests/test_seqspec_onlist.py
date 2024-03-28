@@ -14,12 +14,13 @@ from seqspec.seqspec_onlist import (
 from seqspec.utils import load_spec_stream
 from .test_utils import example_spec
 
+
 class TestSeqspecOnlist(TestCase):
     def test_run_onlist_region(self):
         with StringIO(example_spec) as instream:
             spec = load_spec_stream(instream)
         # returns the one local barcode path
-        regions = run_onlist_region(spec, "rna", "barcode", "multi")
+        regions = run_onlist_region(spec, "rna", "index", "multi")
         self.assertEqual(regions, "index_onlist.txt")
 
     def test_run_onlist_read(self):
