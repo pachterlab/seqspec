@@ -3,7 +3,7 @@ from seqspec.Region import project_regions_to_coordinates, itx_read, Onlist
 from seqspec.utils import load_spec, map_read_id_to_regions
 from seqspec.seqspec_find import run_find_by_type, run_find
 import os
-from seqspec.utils import read_list
+from seqspec.utils import read_list, find_onlist_file
 import itertools
 from typing import List
 
@@ -167,8 +167,11 @@ def join_onlists(onlists: List[Onlist], fmt: str):
     if len(onlists) == 0:
         print("No lists present")
         return
-    elif len(onlists) == 1 and onlists[0].location.lower() == "local":
-        return onlists[0].filename
+
+    # look to see if the barcode file is present.
+    first_location, first_filename = find_onlist_file(onlists[0])
+    if len(onlists) == 1 and first_location == "local":
+        return first_filename
     else:
         base_path = find_list_target_dir(onlists)
         # join the onlists
