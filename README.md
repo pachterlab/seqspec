@@ -11,6 +11,12 @@ Genomic library structure depends on both the assay and sequencer (and kit) used
 
 A list of `seqspec` examples for multiple assays and sequencers can be found on [this website](https://igvf.github.io/seqspec/). Each `spec.yaml` describes the 5'->3' "Final library structure" for the assay and sequencer and can be extended to include sequencer-specific read annotations. Sequence specification files can be formatted with the `seqspec` command line tool.
 
+The `seqspec` format and tool is described in this [publication](https://doi.org/10.1093/bioinformatics/btae168). If you use `seqspec` please cite
+
+```
+Ali Sina Booeshaghi, Xi Chen, Lior Pachter, A machine-readable specification for genomics assays, Bioinformatics, Volume 40, Issue 4, April 2024, btae168.
+```
+
 <img alt="image" src="/docs/seqspec.png">
 
 ```bash
