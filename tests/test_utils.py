@@ -1,15 +1,23 @@
 import gzip
 from hashlib import md5
-from io import StringIO
+from io import StringIO, BytesIO
 import os
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from requests import HTTPError
 from unittest import TestCase
 from unittest.mock import patch
 
-from seqspec.Region import Region, RegionCoordinate, Onlist, project_regions_to_coordinates
+from seqspec.Region import (
+    Region, RegionCoordinate, Onlist, project_regions_to_coordinates
+)
 from seqspec.utils import (
-    load_spec_stream, write_read, read_list, yield_onlist_contents
+    get_remote_auth_token,
+    find_onlist_file,
+    load_spec_stream,
+    write_read,
+    read_list,
+    yield_onlist_contents
 )
 from seqspec import __version__
 
@@ -172,6 +180,27 @@ class TestUtils(TestCase):
         response = list(yield_onlist_contents(fake_stream))
         self.assertEqual(response, fake_onlist)
 
+    def test_find_onlist_file_local_copy(self):
+        test_dir = Path(__file__).parent
+        test_file = test_dir / "test_utils.py"
+        test_url = "https://example.com" + str(test_file)
+        test_onlist_local_copy = Onlist(test_url, "md5sum", "remote")
+        location, filename = find_onlist_file(test_onlist_local_copy)
+        self.assertEqual(location, "local")
+        self.assertEqual(filename, str(test_file))
+
+    def test_find_onlist_remote_file(self):
+        test_url = "https://example.com/test/barcode.txt.gz"
+        test_onlist_local_copy = Onlist(test_url, "md5sum", "remote")
+        location, filename = find_onlist_file(test_onlist_local_copy)
+        self.assertEqual(location, "remote")
+        self.assertEqual(filename, test_url)
+
+    def test_find_onlist_local_file(self):
+        test_url = "https://example.com/test/barcode.txt.gz"
+        test_onlist = Onlist(test_url, "md5sum", "local")
+        self.assertRaises(FileNotFoundError, find_onlist_file, test_onlist)
+
     def test_read_list_local(self):
         fake_onlist = ["ATATATAT", "GCGCGCGC"]
         fake_contents = "{}\n".format("\n".join(fake_onlist))
@@ -210,7 +239,7 @@ class TestUtils(TestCase):
         def fake_request_get(url, stream=False, **kwargs):
             class response:
                 def __init__(self):
-                    self.raw = StringIO(fake_contents)
+                    self.raw = BytesIO(fake_contents.encode("utf-8"))
                     self.status_code = 200
 
                 def raise_for_status(self):
@@ -224,3 +253,27 @@ class TestUtils(TestCase):
             loaded_list = read_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
+
+    def test_get_igvf_auth(self):
+        test_data = [
+            (None, None, None),
+            ("user", "pass", ("user", "pass")),
+        ]
+
+        igvf_variables = ["IGVF_API_KEY", "IGVF_SECRET_KEY"]
+        previous = {name: os.environ.get(name) for name in igvf_variables}
+
+        for username, password, expected in test_data:
+            if username is not None:
+                os.environ["IGVF_API_KEY"] = username
+            if password is not None:
+                os.environ["IGVF_SECRET_KEY"] = password
+
+            auth = get_remote_auth_token()
+            self.assertEqual(auth, expected)
+
+        for name in igvf_variables:
+            if previous[name] is None:
+                del os.environ[name]
+            else:
+                os.environ[name] = previous[name]
