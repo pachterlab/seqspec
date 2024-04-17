@@ -40,7 +40,7 @@ def validate_split_args(parser, args):
             spec.description,
             [m],
             spec.lib_struct,
-            [spec.get_modality(m)],
+            [spec.get_libspec(m)],
             spec.seqspec_version,
         )
         spec_m.update_spec()

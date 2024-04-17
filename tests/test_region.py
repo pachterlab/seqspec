@@ -1,7 +1,12 @@
 from unittest import TestCase
 
-from seqspec.Region import Region, Onlist
-
+from seqspec.Region import (
+    project_regions_to_coordinates,
+    Read,
+    Region,
+    RegionCoordinate,
+    Onlist,
+)
 
 def region_rna_joined_dict(region_id, regions=[]):
     expected = {
@@ -38,6 +43,19 @@ def region_rna_linker_dict(region_id, regions=[]):
     return expected
 
 
+def read_rna_dict(read_id, min_len=0, max_len=100):
+    expected = {
+        "read_id": read_id,
+        "name": f"{read_id}-name",
+        "modality": "RNA",
+        "primer_id": f"{read_id}-primer",
+        "min_len": min_len,
+        "max_len": max_len,
+        "strand": "pos",
+    }
+    return expected
+
+
 class TestOnlist(TestCase):
     def test_simple_onlist(self):
         name = "barcodes.txt"
@@ -67,7 +85,7 @@ class TestRegion(TestCase):
         self.assertEqual(r.regions, [])
 
         self.assertEqual(r.get_region_by_id(expected["region_id"]), [r])
-        self.assertEqual(r.get_region_by_type(expected["region_type"]), [r])
+        self.assertEqual(r.get_region_by_region_type(expected["region_type"]), [r])
         self.assertEqual(r.get_leaves(), [r])
         self.assertEqual(r.get_leaf_region_types(), set([expected["region_type"]]))
 
@@ -94,13 +112,14 @@ class TestRegion(TestCase):
 
         self.assertEqual(r_expected.get_region_by_id(r_umi_dict["region_id"]), [r_umi])
         self.assertEqual(
-            r_expected.get_region_by_type(r_umi_dict["region_type"]), [r_umi]
+            r_expected.get_region_by_region_type(r_umi_dict["region_type"]), [r_umi]
         )
         self.assertEqual(
             r_expected.get_region_by_id(r_linker_dict["region_id"]), [r_linker]
         )
         self.assertEqual(
-            r_expected.get_region_by_type(r_linker_dict["region_type"]), [r_linker]
+            r_expected.get_region_by_region_type(r_linker_dict["region_type"]),
+            [r_linker],
         )
         self.assertEqual(r_expected.get_leaves(), [r_umi, r_linker])
         self.assertEqual(
@@ -127,7 +146,7 @@ class TestRegion(TestCase):
         r1_dict = region_rna_joined_dict("region-1", [r2, r3, r4])
         r1 = Region(**r1_dict)
 
-        self.assertEqual(r1.get_region_by_type(r2_dict["region_type"]), [r2, r4])
+        self.assertEqual(r1.get_region_by_region_type(r2_dict["region_type"]), [r2, r4])
 
     def test_set_parent_id(self):
         r2_dict = region_rna_umi_dict("region-2")
@@ -200,3 +219,37 @@ class TestRegion(TestCase):
         # and region: None for repr()
         expected["regions"] = None
         self.assertEqual(repr(r), repr(expected))
+
+
+class TestRegionCoordinates(TestCase):
+    def test_project_regions_to_coordinates(self):
+        r1_dict = region_rna_umi_dict("region-1")
+        r1 = Region(**r1_dict)
+        r2_dict = region_rna_linker_dict("region-2")
+        r2 = Region(**r2_dict)
+
+        r3_dict = region_rna_umi_dict("region-3")
+        r3 = Region(**r3_dict)
+        r4_dict = region_rna_linker_dict("region-4")
+        r4 = Region(**r4_dict)
+
+        regions = [r1,r2,r3,r4]
+        coords = project_regions_to_coordinates(regions)
+
+        cur_start = 0
+        for r, c in zip(regions, coords):
+            cur_stop = cur_start + r.max_len
+            self.assertEqual(c.start, cur_start)
+            self.assertEqual(c.stop, cur_stop)
+            cur_start = cur_stop
+
+
+class TestRead(TestCase):
+    def test_minimal_read(self):
+        expected = read_rna_dict("read-1")
+        r = Read(**expected)
+        for key in expected:
+            self.assertEqual(getattr(r, key), expected[key])
+
+        self.assertEqual(repr(r), repr(expected))
+        self.assertEqual(r.to_dict(), expected)

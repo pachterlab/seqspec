@@ -4,8 +4,8 @@ from seqspec.Region import Region
 def run_print_html(spec):
     # header = headerTemplate(spec.name, spec.doi, spec.description, spec.modalities)
     # header2 = "## Final Library"
-    # assay_spec = multiModalTemplate(spec.assay_spec)
-    # s = f"{header}\n{header2}\n{assay_spec}"
+    # library_spec = multiModalTemplate(spec.library_spec)
+    # s = f"{header}\n{header2}\n{library_spec}"
     s = htmlTemplate(spec)
     return s
 
@@ -127,9 +127,9 @@ def libStructTemplate(region):
     return s
 
 
-def multiModalTemplate(assay_spec):
+def multiModalTemplate(library_spec):
     s = "".join(
-        [libStructTemplate(v) + "\n" + regionsTemplate(v.regions) for v in assay_spec]
+        [libStructTemplate(v) + "\n" + regionsTemplate(v.regions) for v in library_spec]
     )
     return s
 
@@ -171,9 +171,9 @@ def htmlTemplate(spec):
             spec.modalities
           )}
         </div>
-        <div id="assay_spec">
+        <div id="library_spec">
           <h2>Final library</h2>
-          {multiModalTemplate(spec.assay_spec)}
+          {multiModalTemplate(spec.library_spec)}
         </div>
       </div>
     </body>

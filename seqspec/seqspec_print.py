@@ -1,7 +1,8 @@
 from seqspec.utils import load_spec
 from seqspec.seqspec_print_html import run_print_html
 import newick
-from .utils import REGION_TYPE_COLORS
+from .utils import REGION_TYPE_COLORS, complement_sequence
+from seqspec.Region import project_regions_to_coordinates
 
 
 def setup_print_args(parser):
@@ -18,29 +19,77 @@ def setup_print_args(parser):
         type=str,
         default=None,
     )
+
+    format_choices = ["library", "sequence", "libseq"]
+    subparser.add_argument(
+        "-s",
+        metavar="SPEC",
+        help=(
+            f"Specification to print ({', '.join(format_choices)}), default: library"
+        ),
+        type=str,
+        default="library",
+        choices=format_choices,
+    )
+    # TODO: fix naming convention: sequence -> seqspec,
+    # add libspec (list of regions tab delimited)
+    # change tree -> libspec-tree
+    #
+    # actually, add -s which clarifies which spec to print (library or sequence)
+    # then -f should have tree, png, html, sequence
+    format_choices = ["tree", "html", "png", "sequence", "info"]
     subparser.add_argument(
         "-f",
         metavar="FORMAT",
-        help=("Format"),
+        help=(f"Format ({', '.join(format_choices)}), default: tree"),
         type=str,
         default="tree",
-        choices=["tree", "html", "png"],
+        choices=format_choices,
     )
+
     return subparser
 
 
 def validate_print_args(parser, args):
     # if everything is valid the run_print
+    fmt = args.f
+    spectype = args.s
+
+    # validate fmt and spectype pairs, only some are valid
+    if fmt == "png" and spectype != "library":
+        raise ValueError("-f png only valid for -s library")
+    if fmt == "tree" and spectype != "library":
+        raise ValueError("-f tree only valid for -s library")
+    if fmt == "html" and spectype != "library":
+        raise ValueError("-f html only valid for -s library")
+    if fmt == "info" and spectype != "sequence":
+        raise ValueError("-f info only valid for -s sequence")
+    if fmt == "sequence" and spectype != "libseq":
+        raise ValueError("-f sequence only valid for -s libseq")
+
     fn = args.yaml
     o = args.o
-    fmt = args.f
     spec = load_spec(fn)
-    CMD = {
-        "tree": run_print_tree,
-        "html": run_print_html,
-        "png": run_print_png,
+
+    LIBSEQ_CMD = {
+        "sequence": run_print_libseq_sequence,
     }
-    s = CMD[fmt](spec)
+
+    SEQUENCE_CMD = {
+        "info": run_print_sequence_spec,
+    }
+    LIBRARY_CMD = {
+        "tree": run_print_library_tree,
+        "html": run_print_html,
+        "png": run_print_library_png,
+    }
+    CMD = {
+        "library": LIBRARY_CMD,
+        "sequence": SEQUENCE_CMD,
+        "libseq": LIBSEQ_CMD,
+    }
+
+    s = CMD[spectype][fmt](spec)
     if fmt == "png":
         s.savefig(o, dpi=300, bbox_inches="tight")
         return
@@ -51,17 +100,79 @@ def validate_print_args(parser, args):
         print(s)
 
 
-def run_print(data):
-    header = headerTemplate(data.name, data.doi, data.description, data.modalities)
-    header2 = "## Final Library"
-    assay_spec = multiModalTemplate(data.assay_spec)
-    s = f"{header}\n{header2}\n{assay_spec}"
+def run_print_libseq_sequence(spec):
+    p = []
+    for modality in spec.modalities:
+        p.append(libseq(spec, modality))
+    return "\n".join(p)
+
+
+def libseq(spec, modality):
+    libspec = spec.get_libspec(modality)
+    seqspec = spec.get_seqspec(modality)
+
+    p = []
+    n = []
+    leaves = libspec.get_leaves()
+    cuts = project_regions_to_coordinates(leaves)
+    for idx, read in enumerate(seqspec, 1):
+        read_len = read.max_len
+        read_id = read.read_id
+        primer_id = read.primer_id
+        primer_idx = [i for i, l in enumerate(leaves) if l.region_id == primer_id][0]
+        primer_pos = cuts[primer_idx]
+        if read.strand == "pos":
+            wsl = primer_pos.stop - 1
+            ws = wsl * " "
+
+            arrowl = read_len - 1
+            arrow = arrowl * "-"
+
+            p.append(f"{ws}|{arrow}>({idx}) {read_id}")
+        elif read.strand == "neg":
+            wsl = primer_pos.start - read_len
+            ws = wsl * " "
+
+            arrowl = read_len - 1
+            arrow = arrowl * "-"
+
+            n.append(f"{ws}<{arrow}|({idx}) {read_id}")
+
+    s = "\n".join(
+        [
+            modality,
+            "---",
+            "\n".join(p),
+            libspec.sequence,
+            complement_sequence(libspec.sequence),
+            "\n".join(n),
+        ]
+    )
     return s
 
 
-def run_print_tree(spec):
+def run_print(data):
+    header = headerTemplate(data.name, data.doi, data.description, data.modalities)
+    header2 = "## Final Library"
+    library_spec = multiModalTemplate(data.library_spec)
+    s = f"{header}\n{header2}\n{library_spec}"
+    return s
+
+
+def run_print_sequence_spec(spec):
+    p = []
+    for r in spec.sequence_spec:
+        p.append(
+            "\t".join(
+                [r.read_id, r.primer_id, r.strand, str(r.min_len), str(r.max_len)]
+            )
+        )
+    return "\n".join(p)
+
+
+def run_print_library_tree(spec):
     t = []
-    for r in spec.assay_spec:
+    for r in spec.library_spec:
         t.append(r.to_newick())
     n = ",".join(t)
     # print(n)
@@ -75,12 +186,12 @@ def argsort(arr):
     return sorted(range(len(arr)), key=arr.__getitem__)
 
 
-def run_print_png(spec):
+def run_print_library_png(spec):
     # builds directly off of https://colab.research.google.com/drive/1ZCIGrwLEIfE0yo33bP8uscUNPEn1p1DH developed by https://github.com/LucasSilvaFerreira
 
     # modality
     modalities = spec.list_modalities()
-    modes = [spec.get_modality(m) for m in modalities]
+    modes = [spec.get_libspec(m) for m in modalities]
     lengths = [i.min_len for i in modes]
     nmodes = len(modalities)
 
@@ -89,9 +200,9 @@ def run_print_png(spec):
     modalities = [modalities[i] for i in asort]
     lengths = [lengths[i] for i in asort]
     modes = [modes[i] for i in asort]
-    assay = spec.assay
+    assay_id = spec.assay_id
 
-    fig, _ = plot_png(assay, modalities, modes, nmodes, lengths)
+    fig, _ = plot_png(assay_id, modalities, modes, nmodes, lengths)
     return fig
 
 
@@ -151,7 +262,8 @@ def plot_png(assay, modalities, modes, nmodes, lengths):
         ax.set(**{"xlim": (0, max(lengths))})
 
         # hide the spines
-        ax.spines[["right", "top", "left", "bottom"]].set_visible(False)
+        for spine in ["right", "top", "left", "bottom"]:
+            ax.spines[spine].set_visible(False)
         # Hide the axis and ticks and labels
         ax.xaxis.set_visible(False)
         ax.set_yticklabels([])
@@ -162,7 +274,7 @@ def plot_png(assay, modalities, modes, nmodes, lengths):
 
     # adjust the xaxis for the last modality to show the length
     ax.xaxis.set_visible(True)
-    ax.spines[["bottom"]].set_visible(True)
+    ax.spines["bottom"].set_visible(True)
     ax.minorticks_on()
 
     ax.set(
@@ -231,8 +343,8 @@ def libStructTemplate(region):
     return s
 
 
-def multiModalTemplate(assay_spec):
+def multiModalTemplate(library_spec):
     s = "\n".join(
-        [libStructTemplate(v) + "\n" + regionsTemplate(v.regions) for v in assay_spec]
+        [libStructTemplate(v) + "\n" + regionsTemplate(v.regions) for v in library_spec]
     )
     return s

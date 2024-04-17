@@ -1,0 +1,142 @@
+!Assay
+seqspec_version: 0.0.0
+assay_id: element-adept-truseq-dual-index
+name: Example assay
+doi: https://www.elementbiosciences.com/blog/element-101-elevate-or-adept-library-preparation-for-the-aviti-system
+date: 21 February 2024
+description: Example seqspec for an assay
+modalities:
+- rna
+lib_struct: null
+library_protocol: 10xv3 RNA 3'
+library_kit: Illumina TruSeq Dual Index
+sequence_protocol: Element Aviti
+sequence_kit: Adept Workflow
+sequence_spec:
+- !Read
+  read_id: I1.fastq.gz
+  name: Index 1
+  modality: rna
+  primer_id: truseq_read2
+  min_len: 9
+  max_len: 9
+  strand: pos
+- !Read
+  read_id: I2.fastq.gz
+  name: Index 2
+  modality: rna
+  primer_id: illumina_p5
+  min_len: 9
+  max_len: 9
+  strand: pos
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: rna
+  primer_id: truseq_read1
+  min_len: 1
+  max_len: 50
+  strand: pos
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: rna
+  primer_id: truseq_read2
+  min_len: 1
+  max_len: 50
+  strand: neg
+library_spec:
+- !Region
+  region_id: rna
+  region_type: named
+  name: rna
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNTCTTTCCCTACACGACGCTCTTCCGATCTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 135
+  max_len: 184
+  onlist: null
+  regions:
+  - !Region
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: Illumina P5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: index5
+    region_type: index5
+    name: Truseq Read 2
+    sequence_type: onlist
+    sequence: NNNNNNNNN
+    min_len: 9
+    max_len: 9
+    onlist: !Onlist
+      filename: index5_onlist.txt
+      md5: null
+      location: local
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: truseq_read1
+    region_type: truseq_read1
+    name: Truseq Read 1
+    sequence_type: fixed
+    sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: insert
+    region_type: insert
+    name: Custom insert
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    min_len: 1
+    max_len: 50
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: truseq_read2
+    region_type: truseq_read2
+    name: Truseq Read 2
+    sequence_type: fixed
+    sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: index7
+    region_type: index7
+    name: Truseq Read 2
+    sequence_type: onlist
+    sequence: NNNNNNNNN
+    min_len: 9
+    max_len: 9
+    onlist: !Onlist
+      filename: index7_onlist.txt
+      md5: null
+      location: local
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: Illumina P7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: rna
+  parent_id: null

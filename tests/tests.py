@@ -156,7 +156,7 @@ assay = Assay(
     description="combinatorial single-cell RNA-sequence",
     modalities=["RNA"],
     lib_struct="https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-sequence.html",  # noqa  # noqa
-    assay_spec={"RNA": RNA},
+    library_spec={"RNA": RNA},
 )
 # assay.print_sequence()
 # print(i7_primer.get_len())

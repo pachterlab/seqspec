@@ -54,7 +54,7 @@ def validate_init_args(parser, args):
     spec.to_YAML(o)
 
 
-# takes in assay_spec list of nodes
+# takes in library_spec list of nodes
 def run_init(name: str, tree: List[newick.Node]):
     # make regions for each fastq
     # make region for each modality
@@ -76,7 +76,7 @@ def run_init(name: str, tree: List[newick.Node]):
         description="",
         modalities=mnames,
         lib_struct="",
-        assay_spec=rgns,
+        library_spec=rgns,
     )
 
     return assay

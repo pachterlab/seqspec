@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-yaml/dist/js-yaml.min.js"></script>
+    <script src="seqspec.js"></script>
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script>
+      function formatRegionRow(region, fn, index = 0) {
+        return `
+                  <tr>
+                      <td>${index}</td>
+                      <td>${region.region_id}</td>
+                      <td>${region.region_type}</td>
+                      <td>${region.name}</td>
+                      <td>${region.sequence_type}</td>
+                      <td>${region.sequence}</td>
+                      <td>${region.min_len}</td>
+                      <td>${region.max_len}</td>
+                      <td>${region.onlist ? true : false}</td>
+                      <td>${region.regions.length > 0 ? true : false}</td>
+                      <td><button class="region-row-button" data-file=${fn}>View</button></td>
+                  </tr>
+                  `;
+      }
+
+      function formatReadRow(read, index = 0) {
+        return `
+                  <tr>
+                    <td>${index}</td>
+                    <td>${read.read_id}</td>
+                    <td>${read.name}</td>
+                    <td>${read.modality}</td>
+                    <td>${read.primer_id}</td>
+                    <td>${read.min_len}</td>
+                    <td>${read.max_len}</td>
+                    <td>${read.strand}</td>
+                  </tr>
+                  `;
+      }
+
+      function formatReadsRow(
+        library_protocol,
+        library_kit,
+        sequence_protocol,
+        sequence_kit,
+        reads,
+        fn,
+        index = 0
+      ) {
+        return `
+                  <tr>
+                    <td>${library_protocol}</td>
+                    <td>${library_kit}</td>
+                    <td>${sequence_protocol}</td>
+                    <td>${sequence_kit}</td>
+                    <td>
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Order</th>
+                            <th>Read id</th>
+                            <th>Name</th>
+                            <th>Modality</th>
+                            <th>Primer id</th>
+                            <th>Min len</th>
+                            <th>Max len</th>
+                            <th>Strand</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            ${reads
+                              .map((read, i) => formatReadRow(read, i + 1))
+                              .join("")}
+                        </tbody>
+                      </table>
+                    </td>
+                    <td><button class="read-row-button" data-file=${fn}>View</button></td>
+                  </tr>
+      `;
+      }
+
+      function cleanTags(data) {
+        data = data.replace(/!Assay/g, "");
+        data = data.replace(/- !Read/g, "-");
+        data = data.replace(/- !Region/g, "-");
+        data = data.replace(/!Onlist/g, "");
+
+        return data;
+      }
+      $(document).ready(function () {
+        files = [
+          //   "illumina_nextseq_truseq_dual_index.read.yaml",
+          "illumina_novaseq_truseq_single_index.read.yaml",
+          "illumina_novaseq_truseq_dual_index.read.yaml",
+          "illumina_novaseq_novakit_dual_index.read.yaml",
+          "element_adept_workflow.read.yaml",
+          "element_elevate_workflow.read.yaml",
+          "oxford_nanopore.read.yaml",
+        ];
+
+        // load the regions into the table
+        for (let i = 0; i < files.length; i++) {
+          $.get(`reads/${files[i]}`, function (data) {
+            // Assuming Region is a constructor you've defined elsewhere
+            let seq = jsyaml.load(cleanTags(data));
+            let reads = seq.sequence_spec.map((read) => new Read(read));
+
+            $(".reads-row").append(
+              formatReadsRow(
+                seq.library_protocol,
+                seq.library_kit,
+                seq.sequence_protocol,
+                seq.sequence_kit,
+                reads,
+                `reads/${files[i]}`,
+                i + 1
+              )
+            );
+          });
+        }
+
+        // setup the button click
+        $(document).on("click", ".read-row-button", function () {
+          const file = $(this).data("file");
+          // load the yaml
+          $.get(`${file}`, function (data) {
+            $("#seqspecOutput").text(data);
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div>
+      <h1 style="text-align: center">Specification builder</h1>
+      <p>
+        Learn more about the
+        <a href="https://github.com/pachterlab/seqspec" target="_blank">
+          <i>seqspec</i> specification.</a
+        >
+      </p>
+      <ul>
+        <li><a href="builder.html">Home</a></li>
+        <li><a href="reads.html">Example Reads</a></li>
+        <li><a href="regions.html">Example Regions</a></li>
+        <li><a href="assays.html">Example Assays</a></li>
+      </ul>
+    </div>
+    <div class="container">
+      <section>
+        <table>
+          <thead>
+            <tr>
+              <th>Lib. Protocol</th>
+              <th>Lib. Kit</th>
+              <th>Seq. Protocol</th>
+              <th>Seq. Kit</th>
+              <th>Reads</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody class="reads-row"></tbody>
+        </table>
+
+        <div class="seqspec-view-container">
+          <pre id="seqspecOutput"></pre>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>

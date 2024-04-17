@@ -1,0 +1,37 @@
+library_protocol: Any
+library_kit: Illumina TruSeq Dual Index
+sequence_protocol: Element Aviti
+sequence_kit: Adept Workflow
+sequence_spec:
+- !Read
+  read_id: I1.fastq.gz
+  name: Index 1
+  modality: element_adept
+  primer_id: element_read2
+  min_len: 9
+  max_len: 9
+  strand: pos
+- !Read
+  read_id: I2.fastq.gz
+  name: Index 2 
+  modality: element_adept
+  primer_id: illumina_p5
+  min_len: 9
+  max_len: 9
+  strand: pos
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: element_adept
+  primer_id: element_read1
+  min_len: 1
+  max_len: 150
+  strand: pos
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: element_adept
+  primer_id: element_read2
+  min_len: 1
+  max_len: 150
+  strand: neg
