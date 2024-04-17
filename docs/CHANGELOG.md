@@ -59,6 +59,7 @@
 - Add list of options to CLI for `-f FORMAT` within `seqspec onlist` and `seqspec print`
 - Add `-s SEQTYPE` to `seqspec print` to disambiguate printing `sequence`, `library`, or `libseq` objects. TODO wrap `seqspec info` into `seqspec print -f info`.
 - Add `-s SPECOBJECT` to `seqspec onlist`. Specify specific object `read`, `region`, or `region-type` for finding the `onlist`.
+- Add fetching ability for seqspec onlist from remote with IGVF credentials (credit to @detrout)
 
 ### Removed
 
