@@ -55,3 +55,13 @@ class TestAssay(TestCase):
         self.assertEqual(a.get_libspec("RNA"), r_expected)
 
         self.assertRaises(IndexError, a.get_libspec, "cDNA")
+
+    def test_assay_invalid_data(self):
+        with self.assertRaises(TypeError):
+            Assay(123)  # Passing a non-dict type should raise TypeError
+
+        # Create a valid assay dictionary and add an unknown key to it
+        invalid_assay_data = assay_dict()
+        invalid_assay_data["unknown_key"] = "unknown_value"
+        with self.assertRaises(TypeError):  # Expecting TypeError for unknown keys
+            Assay(**invalid_assay_data)
