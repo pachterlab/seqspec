@@ -3,25 +3,26 @@
 The development version can be installed with
 
 ```bash
-pip install git+https://github.com/IGVF/seqspec
+pip install git+https://github.com/pachterlab/seqspec
 ```
 
 ## Usage
 
-`seqspec` consists of eleven subcommands:
+`seqspec` consists of twelve subcommands:
 
 ```
 $ seqspec
 usage: seqspec [-h] <CMD> ...
 
-seqspec 0.0.0: Format sequence specification files
+seqspec 0.2.0: Format sequence specification files
 
 positional arguments:
   <CMD>
     check     validate seqspec file
     find      find regions in a seqspec file
     format    format seqspec file
-    index     index regions in a seqspec file
+    genbank   get genbank about seqspec file
+    index     index reads or regions in a seqspec file
     info      get info about seqspec file
     init      init a seqspec file
     modify    modify region attributes
@@ -34,7 +35,7 @@ optional arguments:
   -h, --help  show this help message and exit
 ```
 
-`seqspec` operates on `seqspec` compatible YAML files that follow the specification. All of the following examples will use the `seqspec` specification for the DOGMAseq-DIG assay which can be found here: `seqspec/specs/dogmaseq-dig/spec.yaml`.
+`seqspec` operates on `seqspec` compatible YAML files that follow the specification. All of the following examples will use the `seqspec` specification for the DOGMAseq-DIG assay which can be found here: `seqspec/examples/specs/dogmaseq-dig/spec.yaml`.
 
 **IMPORTANT**: Many `seqspec` commands require that the specification be properly formatted and error-corrected. Errors in the spec can be found with `seqspec check` (see below for instructions). The spec can be properly formatted (or "filled in") with `seqspec format`. It is recommended to run `seqspec format` followed by `seqspec check` after writing a `seqspec` (or correcting errors in one).
 
