@@ -1,4 +1,4 @@
-# seqspec Technical Specification Document
+# `seqspec` Technical Specification Document
 
 ## Introduction
 
@@ -10,7 +10,7 @@ The `seqspec` schema is designed to annotate sequencing libraries through three 
 
 Each seqspec file is associated with a sequencing run and documents the designed library structure and the designed read structure. A simple (but incomplete example) looks like the following:
 
-```
+```yaml
 modalities:
   - Modality1
   - Modality2
@@ -39,34 +39,39 @@ The `Assay` object contains overall metadata for the sequencing run.
 Fields:
 
 - `seqspec_version`: String specifying the version of the seqspec specification, adhering to [semantic versioning](https://semver.org/).
-- `assay`: A string labeling the assay.
-- `sequencer`: A string identifying the sequencer used.
-- `name`: A unique identifier for the assay/sequencer combination.
-- `doi`: DOI link to the paper/protocol describing the assay.
-- `publication_date`: Publication date of the assay, in "DD Month YYYY" format.
-- `description`: A brief description of the assay.
-- `modalities`: An array of strings listing the region_types contained within the library.
-- `lib_struct`: URL to the manually annotated library structure.
-- `library_spec`: An array of Region objects detailing the structure of the library.
+- `assay_id`: Identifier for the assay.
+- `name`: The name of the assay.
+- `doi`: The doi of the paper that describes the assay.
+- `date`: The seqspec creation date, in "DD Month YYYY" format.
+- `description`: A short description of the assay.
+- `modalities`: The modalities the assay targets. Can be one or more of "dna", "rna", "tag", "protein", "atac", "crispr".
+- `lib_struct`: The link to Teichmann's libstructs page derived for this sequence.
+- `library_protocol`: The protocol/machine/tool to generate the library insert.
+- `library_kit`: The kit used to make the library sequence_protocol compatible.
+- `sequence_protocol`: The protocol/machine/tool to generate sequences.
+- `sequence_kit`: The kit used with the protocol to sequence the library.
+- `sequence_spec`: The spec for the sequencer, an array of Read objects.
+- `library_spec`: The spec for the assay, an array of Region objects.
 
 Example:
 
 ```yaml
 !Assay
 seqspec_version: 0.0.0
-assay: SPLiT-seq
-sequencer: Illumina NextSeq500
-name: SPLiT-seq/Illumina
+assay_id: SPLiT-seq/Illumina
+name: SPLiT-seq
 doi: https://doi.org/10.1126/science.aam8999
-publication_date: 15 March 2018
+date: 15 March 2018
 description: split-pool ligation-based transcriptome sequencing
 modalities:
-  - RNA
+  - rna
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SPLiT-seq.html
-sequence_spec:
-  ...
-library_spec:
-	...
+library_protocol: SPLiT-seq
+library_kit: Custom
+sequence_protocol: Illumina NextSeq 500
+sequence_kit: Illumina NextSeq 500 High Output Kit v2.5 (150 Cycles)
+sequence_spec: ...
+library_spec: ...
 ```
 
 ### `Region` Object
@@ -109,23 +114,22 @@ The `library_structure` contains a list of, possibly nested, `Region objects` wh
   - `truseq_read1`: The first read primer in a paired-end sequencing run using the Illumina TruSeq Library preparation kit.
   - `truseq_read2`: The second read primer in a paired-end sequencing run using the Illumina TruSeq Library preparation kit.
   - `umi`: Unique Molecular Identifier, a short nucleotide sequence used to tag individual molecules.
-- `name` is a free-form string for describing the region
 - `sequence_type` can be one of the following:
   - `fixed` indicates that sequence string is known
   - `joined` indicates that the sequence is created (joined) from nested regions
   - `onlist` indicates that the sequence is derived from an onlist (if specified, then `onlist` must be non-null
   - `random` indicates that the sequence is not known a-priori
-- `sequence` is a representation of the sequence
+- `sequence` is a representation of the sequence, must match the pattern `^[ACGTRYMKSWHBVDNX]+$`
   - if the `sequence_type` is `fixed` then the actual sequence string is provided
   - if the `sequence_type` is `joined` then field must be the concatenation of the nested regions
   - if the `sequence_type` is `onlist` then field must an `N` string of length of the shortest sequence on the onlist
   - if the `sequence_type` is `random` then the field must be an `X` string
-- `min_len` is an integer greater than or equal to zero. It represents the minimum possible length of the `sequence`
-- `max_len` is an integer greater than or equal to the `min_len`. It represents the maximum length of the `sequence`
+- `min_len` is an integer greater than or equal to 0 and less than or equal to 2048. It represents the minimum possible length of the `sequence`
+- `max_len` is an integer greater than or equal to 0 and less than or equal to 2048. It represents the maximum length of the `sequence`
 - `onlist` can be `null` or contain
-  - `filename` which is a path relative to the `seqspec` file containing a list of sequences
   - `location` denotes whether the filename is a local path to a file or a URI to a file.
-  - `md5` is the md5sum of the uncompressed file in `filename`
+  - `filename` which is a path relative to the `seqspec` file containing a list of sequences
+  - `md5` is the md5sum of the uncompressed file in `filename`, must match the pattern `^[a-f0-9]{32}$`
 - `regions` can either be `null` or contain a list of `regions` as specified above.
 
 Example:
@@ -134,14 +138,13 @@ Example:
 !Region
 region_id: barcode-1
 region_type: barcode
-name: barcode-1
 sequence_type: onlist
 sequence: NNNNNNNN
 min_len: 8
 max_len: 8
 onlist: !Onlist
-  filename: barcode-1_onlist.txt
   location: local
+  filename: barcode-1_onlist.txt
   md5: 5b62453df2771f5aa856f78797f16591
 regions: null
 ```
@@ -154,20 +157,20 @@ The `sequence_structure` contains a list of `Read` objects which describe the se
 
 Fields:
 
-- `read_id`: A string unique identifier for the read.
-- `read_name`: A descriptive name for the read.
-- `modality`: Specifies the modality of the assay generating the read.
-- `primer_id`: Links the read to a specific primer used in the sequencing process by referencing the region_id of the primer.
-- `min_len`: An integer indicating the minimum length of the read.
-- `max_len`: An integer specifying the maximum length of the read.
-- `strand`: A string indicating the strand orientation of the read. One of "pos" (positive) or "neg" (negative).
+- `read_id`: The unique identifier for the read.
+- `name`: The name of the read.
+- `modality`: The modality of the assay generating the read.
+- `primer_id`: The region id of the primer used.
+- `min_len`: The minimum length of the read, must be greater than or equal to 0.
+- `max_len`: The maximum length of the read, must be greater than 0.
+- `strand`: The strand orientation of the read, either positive ('pos') or negative ('neg').
 
 Example:
 
 ```yaml
 - !Read
   read_id: read_001
-  read_name: Read 1 of Sample A
+  name: Read 1 of Sample A
   modality: rna
   primer_id: primer_25
   min_len: 50

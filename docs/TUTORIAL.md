@@ -1,8 +1,21 @@
 # Getting started
 
+A `seqspec` file requires users to understand multiple aspects of the sequencing library and FASTQ read structure. The following information will be helpful:
+
+- The library protocol used to generate your assay library (e.g. 10x Genomics v3)
+- The library kit used to append sequencing primers to your library (e.g. Illumina Truseq dual index)
+- The sequencing kit used to sequence your library (e.g. Illumina NovaSeq 6000 v1.5 kit)
+- The sequencing protocol (machine) used to sequence your library (e.g. Illumina NovaSeq 6000)
+- The elements and nucleotide sequences of your sequencing library
+  - For example, the first 10 bp are a primer the next 16 are a barcode, etc.
+- The sequencing reads generated from your sequencing protocol
+  - Read 1 uses the read 1 primer
+  - Index 1 uses the index 1 primer
+  - etc
+
 ## Initializing the spec
 
-To help users create a seqspec from their own data, the `seqspec` cli offers a simple tool `seqspec init` that autogenerates a `spec.yaml` from a string representation of the data. The input is a [newick file format](https://en.wikipedia.org/wiki/Newick_format) which naturally represents nested grouping of sequencing files and sequenced elements. By way of example, suppose we had the following sequencing data:
+To help users create a seqspec from their own data, the `seqspec` cli offers a simple tool `seqspec init` that autogenerates an initial `spec.yaml` from a string representation of the data. The spec is incomplete and requires additional information and checks to be a fully valid spec. The seqspec input is a [newick file format](https://en.wikipedia.org/wiki/Newick_format) which naturally represents nested grouping of sequencing files and sequenced elements. By way of example, suppose we had the following sequencing data:
 
 - `R1.fastq.gz` contains
   - 16bp barcode from a predefined "onlist"

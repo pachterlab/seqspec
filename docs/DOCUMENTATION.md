@@ -8,6 +8,8 @@ pip install git+https://github.com/pachterlab/seqspec
 
 ## Usage
 
+The `seqspec` specification is detailed in `docs/SPECIFICATION.md`. Please review it before using and developing `seqspec` files; knowing the structure will help in understanding how to effectively use `seqspec`.
+
 `seqspec` consists of twelve subcommands:
 
 ```
