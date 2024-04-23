@@ -39,8 +39,7 @@ The `Assay` object contains overall metadata for the sequencing run.
 Fields:
 
 - `seqspec_version`: String specifying the version of the seqspec specification, adhering to [semantic versioning](https://semver.org/).
-- `assay`: A string labeling the assay.
-- `sequencer`: A string identifying the sequencer used.
+- `assay_id`: A string labeling the assay.
 - `name`: A unique identifier for the assay/sequencer combination.
 - `doi`: DOI link to the paper/protocol describing the assay.
 - `publication_date`: Publication date of the assay, in "DD Month YYYY" format.
@@ -187,3 +186,4 @@ spec = load_spec("seqspec/assays/10x-RNA-v3/spec.yaml")
 print(spec.get_libspec("RNA").sequence)
 # AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNNNXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
 ```
+Note: The "Read" object does not allow additional properties as per the JSON schema.
