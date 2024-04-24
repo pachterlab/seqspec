@@ -1,39 +1,39 @@
 # Getting started
 
-A `seqspec` file requires users to understand multiple aspects of the sequencing library and FASTQ read structure. The following information will be helpful:
+A `seqspec` file requires an understanding of multiple aspects of the sequencing library and FASTQ read structure, including:
 
-- The library protocol used to generate your assay library (e.g. 10x Genomics v3)
-- The library kit used to append sequencing primers to your library (e.g. Illumina Truseq dual index)
-- The sequencing kit used to sequence your library (e.g. Illumina NovaSeq 6000 v1.5 kit)
-- The sequencing protocol (machine) used to sequence your library (e.g. Illumina NovaSeq 6000)
+- The library protocol used to generate your assay library (e.g., 10x Genomics v3)
+- The library kit used to append sequencing primers to your library (e.g., Illumina Truseq dual index)
+- The sequencing kit used to sequence your library (e.g., Illumina NovaSeq 6000 v1.5 kit)
+- The sequencing machine used to sequence your library (e.g., Illumina NovaSeq 6000)
 - The elements and nucleotide sequences of your sequencing library
-  - For example, the first 10 bp are a primer the next 16 are a barcode, etc.
+  - For example, the first 10 bp are a primer, the next 16 are a barcode, etc.
 - The sequencing reads generated from your sequencing protocol
   - Read 1 uses the read 1 primer
   - Index 1 uses the index 1 primer
-  - etc
+  - etc.
 
-**Note**: if you are developing a `seqspec` file for a published assay, you may get frustrated. Much of the information needed to construct a `seqspec` file is often assumed by the authors to be know by the readers or is omitted entirely.
+**Note**: Developing a `seqspec` file for a published assay can be challenging, as authors often assume readers have prior knowledge or omit necessary information.
 
 ## Example: SPLiT-Seq Assay
 
-We will be developing a `seqspec` for the [SPLiT-Seq assay](https://www.science.org/doi/10.1126/science.aam8999). first we will collect the relevant information needed for the spec. We need to determine both the library structure, or the structure of the molecule that gets placed on the sequencing machine, as well as the read structure, or the elements contained within the FASTQ reads.
+Let's develop a `seqspec` for the [SPLiT-Seq assay](https://www.science.org/doi/10.1126/science.aam8999). We'll first gather the relevant information needed for the spec, determining both the library structure (the structure of the molecule placed on the sequencing machine) and the read structure (the elements contained within the FASTQ reads).
 
-### Determining the library structure
+### Library structure
 
-Figure 1A shows the library molecule structure; the caption states:
+Figure 1A shows the library molecule structure, with the caption stating:
 
 > Labeling transcriptomes with split-pool barcoding. In each split-pool round, fixed cells or nuclei are randomly distributed into wells, and transcripts are labeled with well-specific barcodes. Barcoded RT primers are used in the first round. Second- and third-round barcodes are appended to cDNA through ligation. A fourth barcode is added to cDNA molecules by PCR during sequencing library preparation. The bottom schematic shows the final barcoded cDNA molecule.
 
-We need to extract and positionally index various pieces of the final barcoded molecule. These include well-specific barcode sequences, primers, and biologically relevant features (cDNA). From Figure 1A we have an idea of the structure:
+We need to extract and positionally index various pieces of the final barcoded molecule, including well-specific barcode sequences, primers, and biologically relevant features (cDNA). From Figure 1A, we have an idea of the structure:
 
 ```
 P5/R1/cDNA/RT primer/1st BC/2nd BC/3rd BC/R2/4th BC/P7
 ```
 
-The P5/P7 primers are Illumina specific sequencing primers that bind the final molecule to the Illumina flow cell to fix the molecules position for sequencing. The R1/R2 are primers where sequencing by synthesis gets initiated (either on the positive or negative strand). The RT primer is a primer used to bind to the cDNA on the first round of barcode synthesis for reverse transcription of the cDNA, either a 15bp polyA stretch or random hexamer (6bp). The BC are synthetic barcode sequences designed by the authors; we will need to find the list of these barcodes.
+The P5/P7 primers are Illumina-specific sequencing primers that bind the final molecule to the Illumina flow cell to fix the molecule's position for sequencing. R1/R2 are primers where sequencing by synthesis is initiated (either on the positive or negative strand). The RT primer binds to the cDNA in the first round of barcode synthesis for reverse transcription of the cDNA, using either a 15bp polyA stretch or random hexamer (6bp). The BCs are synthetic barcode sequences designed by the authors; we'll need to find the list of these barcodes.
 
-To help us understand each of the elements of the final library, we go through the methods section:
+To better understand each element of the final library, we'll go through the methods section:
 
 > The first round of barcoding occurs through an in situ reverse transcription (RT) reaction. Cells are split into up to 48 wells, each containing barcoded well-specific reverse transcription primers. Both random hexamer and anchored poly(dT)15 barcoded RT primers were used in each well (Table S1).
 
@@ -59,7 +59,7 @@ BC_0215	Round 2 barcode linker	CGAATGCTCTGGCCTCTCAAGCACGTGGAT
 BC_0216	Round 2 blocking strand	ATCCACGTGCTTGAGAGGCCAGAGCATTCG
 ```
 
-The round 1 RT and round 2/3 ligation barcodes are in the remaining three sheets. Because they are quite long, I've included them in `examples/specs/SPLiT-Seq`. Below are the first 10 round 1 RT barcodes and round 2/3 ligation barcodes (note I've put spaces between the relevant regions):
+The round 1 RT and round 2/3 ligation barcodes are in the remaining three sheets. Because they are quite long, I've included them in examples/specs/SPLiT-Seq. Below are the first 10 round 1 RT barcodes and round 2/3 ligation barcodes (note I've put spaces between the relevant regions):
 
 ```tsv
 # Round 1 RT Barcodes
@@ -294,6 +294,8 @@ From the manuscript we have extracted the following information about the librar
     - Min. len: 24
     - Max. len: 24
 
+**Note**: The significance of the barcodes being reverse and on the bottom strand (relative to the list of barcodes in Table S12) is that we must reverse complement the barcodes so that the seqspec represents the elements of the library 5' -> 3' on the top strand.
+
 ### Sequence structure
 
 - Read 1
@@ -468,9 +470,11 @@ Let's start with one of the barcode elements (the rest are the same):
   onlist: !Onlist
     location: local
     filename: onlist_round1.txt
-    md5: null
+    md5: 076f32ce8a96038bfc0c618da2204c77
   regions: null
 ```
+
+Note that we put the specific 8bp barcode sequences in their own file (one sequence per line).
 
 The other regions follow similarly:
 
@@ -504,9 +508,16 @@ And lastly, check that the spec is properly formatted and manually correct error
 seqspec check fmt.yaml
 ```
 
+We recommend depositing 1 million FASTQ records from for the FASTQ files pointed to by the spec. This can be generated by running the following:
+
+```bash
+# fastq files has 4 lines per record so 1 million records = 4 million lines
+zcat allreads_R1.fastq.gz | head -4000000 | gzip > R1.fastq.gz
+```
+
 ## View the spec
 
-To view the "ordered tree" representation of the `seqspec`, run
+To view the "ordered tree" representation of the `library_spec`, run
 
 ```bash
 seqspec print fmt.yaml
@@ -530,9 +541,16 @@ which prints
                                           ├─'Read_2_primer:22'
                                           ├─'Round_4_BC:6'
                                           └─'P7:24'
+```
+
+`seqspec print` also allows users to layer on the `sequence_spec` onto the `library_spec`. This can be helpful for debugging your spec.
 
 ```
+seqspec print -s libseq -f sequence spec.yaml
+```
+
+![Kiku](../examples/specs/SPLiT-seq/libseq.png)
 
 # A note on checking the correctness of the spec
 
-The `seqspec` CLI comes with the capabilities to check the correctness of your `spec.yaml` against the formal specification. When running `seqspec check spec.yaml` you may find that your spec has numerous errors that will need to be corrected. `seqspec check spec.yaml` can be run again after fixing these errors to ensure that the spec fully conforms to the formal specification. For a list of errors, please see the [DOCUMENTATION.md](DOCUMENTATION.md)
+The `seqspec` CLI comes with the capabilities to check the correctness of your `spec.yaml` against the formal specification. When running `seqspec check spec.yaml` you may find that your spec has numerous errors that will need to be corrected. `seqspec check spec.yaml` can be run again after fixing these errors to ensure that the spec fully conforms to the formal specification. Make sure to reformat your spec after correcting errors using `seqspec format`. For a list of errors, please see the [DOCUMENTATION.md](DOCUMENTATION.md)
