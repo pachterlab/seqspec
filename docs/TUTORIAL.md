@@ -520,12 +520,7 @@ zcat allreads_R1.fastq.gz | head -4000000 | gzip > R1.fastq.gz
 To view the "ordered tree" representation of the `library_spec`, run
 
 ```bash
-seqspec print fmt.yaml
-```
-
-which prints
-
-```bash
+$ seqspec print fmt.yaml
                                           ┌─'P5:29'
                                           ├─'Spacer:8'
                                           ├─'Read_1_primer:33'
@@ -545,11 +540,17 @@ which prints
 
 `seqspec print` also allows users to layer on the `sequence_spec` onto the `library_spec`. This can be helpful for debugging your spec.
 
-```
-seqspec print -s libseq -f sequence spec.yaml
-```
+```bash
+$ seqspec print -s libseq -f sequence spec.yaml
+rna
+---
+                                                                     |----------------------------------------------------------------->(1) R1.fastq.gz
+                                                                                                                                                                                                                                                                                                            |----->(2) I1.fastq.gz
+AATGATACGGCGACCACCGAGATCTACACTAGATCGCTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXNNNNNNNNNNNNNNNNNNNNNNNGCTTACGAGACCGGAGAGTTCGTGCACCTANNNNNNNNTCAGCATGCGGCTACGCTTTGTAGCCGGTGNNNNNNNNXXXXXXXXXXTCTAGCCTTCTCGTGTGCAGACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+TTACTATGCCGCTGGTGGCTCTAGATGTGATCTAGCGAGCAGCCGTCGCAGTCTACACATATTCTCTGTCXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXNNNNNNNNNNNNNNNNNNNNNNNCGAATGCTCTGGCCTCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNNXXXXXXXXXXAGATCGGAAGAGCACACGTCTGNNNNNNTAGAGCATACGGCAGAAGACGAAC
+                                                                                                                                                                                         <---------------------------------------------------------------------------------------------|(3) R2.fastq.gz
 
-![Kiku](../examples/specs/SPLiT-seq/libseq.png)
+```
 
 # A note on checking the correctness of the spec
 
