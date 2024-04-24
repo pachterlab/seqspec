@@ -68,14 +68,18 @@ def run_init(name: str, tree: List[newick.Node]):
         mnames.append(t.name)
 
     assay = Assay(
-        assay="",
-        sequencer="",
+        assay_id="",
         name=name,
         doi="",
-        publication_date="",
+        date="",
         description="",
         modalities=mnames,
         lib_struct="",
+        library_kit="",
+        library_protocol="",
+        sequence_kit="",
+        sequence_protocol="",
+        sequence_spec=[],
         library_spec=rgns,
     )
 
