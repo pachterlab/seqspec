@@ -131,11 +131,15 @@ library_spec:
     parent_id: rna
 """
 
+def load_example_spec(spec_text):
+    with StringIO(spec_text) as instream:
+        spec = load_spec_stream(instream)
+    return spec
+
 
 class TestUtils(TestCase):
     def test_load_spec_stream(self):
-        with StringIO(example_spec) as instream:
-            spec = load_spec_stream(instream)
+        spec = load_example_spec(example_spec)
         self.assertEqual(spec.name, "my assay")
         head = spec.get_libspec("rna")
         self.assertEqual(len(head.regions), 5)

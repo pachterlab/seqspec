@@ -13,8 +13,7 @@ from seqspec.seqspec_onlist import (
     run_onlist_region,
     run_onlist_read,
 )
-from seqspec.utils import load_spec_stream
-from .test_utils import example_spec
+from .test_utils import example_spec, load_example_spec
 
 
 @contextmanager
@@ -38,16 +37,14 @@ def create_temporary_barcode_files(filenames):
 class TestSeqspecOnlist(TestCase):
     def test_run_onlist_region(self):
         with create_temporary_barcode_files(["index_onlist.txt"]):
-            with StringIO(example_spec) as instream:
-                spec = load_spec_stream(instream)
+            spec = load_example_spec(example_spec)
             # returns the one local barcode path
             regions = run_onlist_region(spec, "rna", "index", "multi")
             self.assertEqual(regions, "index_onlist.txt")
 
     def test_run_onlist_read(self):
         with create_temporary_barcode_files(["index_onlist.txt"]):
-            with StringIO(example_spec) as instream:
-                spec = load_spec_stream(instream)
+            spec = load_example_spec(example_spec)
             reads = run_onlist_read(spec, "rna", "read2.fastq.gz", "multi")
             self.assertEqual(reads, "index_onlist.txt")
 
