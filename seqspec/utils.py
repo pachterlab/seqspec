@@ -204,10 +204,22 @@ def map_read_id_to_regions(
     # get all atomic elements from library
     leaves = spec.get_libspec(modality).get_leaves()
     # get the read object and primer id
-    read = [i for i in spec.sequence_spec if i.read_id == region_id][0]
+    for i in spec.sequence_spec:
+        if i.read_id == region_id:
+            read = i
+            break
+    else:
+        raise IndexError("region_id {} not found in reads {}".format(
+            region_id, [i.read_id for i in spec.sequence_spec]))
     primer_id = read.primer_id
     # get the index of the primer in the list of leaves (ASSUMPTION, 5'->3' and primer is an atomic element)
-    primer_idx = [i for i, l in enumerate(leaves) if l.region_id == primer_id][0]
+    for i, l in enumerate(leaves):
+        if l.region_id == primer_id:
+            primer_idx = i
+            break
+    else:
+        raise IndexError("primer_id {} not found in regions {}".format(
+            primer_id, [l.region_id for l in leaves]))
     # If we are on the opposite strand, we go in the opposite way
     if read.strand == "neg":
         rgns = leaves[:primer_idx][::-1]
