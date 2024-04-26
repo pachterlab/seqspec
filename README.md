@@ -24,7 +24,7 @@ Ali Sina Booeshaghi, Xi Chen, Lior Pachter, A machine-readable specification for
 pip install seqspec
 
 # development
-pip install git+https://github.com/IGVF/seqspec.git
+pip install git+https://github.com/pachterlab/seqspec.git
 
 # verify install
 seqspec --help
