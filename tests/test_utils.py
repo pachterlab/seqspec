@@ -15,6 +15,7 @@ from seqspec.utils import (
     get_remote_auth_token,
     find_onlist_file,
     load_spec_stream,
+    map_read_id_to_regions,
     write_read,
     read_list,
     yield_onlist_contents
@@ -281,3 +282,20 @@ class TestUtils(TestCase):
                 del os.environ[name]
             else:
                 os.environ[name] = previous[name]
+
+    def test_map_read_id_to_regions(self):
+        spec = load_example_spec(example_spec)
+
+        read1_id = "read1.fastq.gz"
+        read, region = map_read_id_to_regions(spec, "rna", read1_id)
+        self.assertEqual(read.read_id, read1_id)
+        self.assertEqual(len(region), 4)
+        expected_regions = [
+            (0, "cDNA"),
+            (1, "SOLiD_bc_adapter"),
+            (2, "index"),
+            (3, "p2_adapter"),
+        ]
+        for i, region_id in expected_regions:
+            self.assertEqual(region[i].region_id, region_id)
+        self.assertRaises(IndexError, map_read_id_to_regions, spec, "rna", "foo")
