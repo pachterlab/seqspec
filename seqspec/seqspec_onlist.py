@@ -204,9 +204,11 @@ def join_onlists(onlists: List[List[str]], fmt: str) -> List[str]:
         "product": join_product_onlist,
         "multi": join_multi_onlist,
     }
-    joined_onlist = list(formatter_functions[fmt](onlists))
+    jo = []
+    for i in formatter_functions[fmt](onlists):
+        jo.append(i)
 
-    return joined_onlist
+    return jo
 
 
 def write_onlist(onlist: List[str], path: str) -> str:
