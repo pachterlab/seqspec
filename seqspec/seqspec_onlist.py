@@ -111,6 +111,7 @@ def validate_onlist_args(parser, args):
         elif location == "remote":
             # download the onlist to the base path and return the path
             onlist_elements = read_remote_list(onlists[0])
+            print(onlist_elements)
             onlist_path = write_onlist(onlist_elements, save_path)
 
     # anytime we join onlists, we create a new onlist file
@@ -204,17 +205,15 @@ def join_onlists(onlists: List[List[str]], fmt: str) -> List[str]:
         "product": join_product_onlist,
         "multi": join_multi_onlist,
     }
-    jo = []
-    for i in formatter_functions[fmt](onlists):
-        jo.append(i)
+    joined_onlist = list(formatter_functions[fmt](onlists))
 
-    return jo
+    return joined_onlist
 
 
 def write_onlist(onlist: List[str], path: str) -> str:
     with open(path, "w") as f:
         for line in onlist:
-            f.write(line)
+            f.write(f"{line}\n")
     return path
 
 
