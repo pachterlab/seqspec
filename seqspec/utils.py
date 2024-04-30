@@ -68,7 +68,9 @@ def read_local_list(onlist: Onlist, base_path: str = "") -> List[str]:
     # convert to text stream
     stream = io.TextIOWrapper(stream)
 
-    results = list(yield_onlist_contents(stream))
+    results = []
+    for i in yield_onlist_contents(stream):
+        results.append(i)
     stream.close()
     return results
 
@@ -92,7 +94,9 @@ def read_remote_list(onlist: Onlist, base_path: str = "") -> List[str]:
         # convert to text stream
         stream = io.TextIOWrapper(stream)
 
-        results = list(yield_onlist_contents(stream))
+        results = []
+        for i in yield_onlist_contents(stream):
+            results.append(i)
     finally:
         if stream is None:
             print("Warning: unable to open barcode file {}".format(filename))
