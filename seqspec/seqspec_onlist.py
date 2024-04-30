@@ -72,7 +72,7 @@ def validate_onlist_args(parser, args):
     base_path = os.path.dirname(os.path.abspath(fn))
 
     # set the save path if it exists
-    save_path = args.o
+    save_path = os.path.abspath(args.o)
     if not save_path:
         # otherwise the save path is the same path as the spec
         save_path = base_path
