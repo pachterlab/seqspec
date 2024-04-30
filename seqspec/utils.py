@@ -96,7 +96,6 @@ def read_remote_list(onlist: Onlist, base_path: str = "") -> List[str]:
 
         results = []
         for i in yield_onlist_contents(stream):
-            print(i)
             # add the new line when writing to file
             results.append(i)
     finally:
