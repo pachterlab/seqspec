@@ -111,8 +111,8 @@ def validate_onlist_args(parser, args):
         elif location == "remote":
             # download the onlist to the base path and return the path
             onlist_elements = read_remote_list(onlists[0], save_path)
-            onlist_path = os.path.join(
-                write_onlist(onlist_elements, save_path), onlist_fn
+            onlist_path = write_onlist(
+                onlist_elements, os.path.join(save_path, onlist_fn)
             )
 
     # anytime we join onlists, we create a new onlist file
@@ -125,8 +125,8 @@ def validate_onlist_args(parser, args):
                 # base_path is ignored for remote onlists
                 lsts.append(read_remote_list(o, base_path))
         onlist_elements = join_onlists(onlists, f)
-        onlist_path = os.path.join(
-            write_onlist(onlist_elements, save_path), "onlist_joined.txt"
+        onlist_path = write_onlist(
+            onlist_elements, os.path.join(save_path, "onlist_joined.txt")
         )
 
     # print the path to the onlist
