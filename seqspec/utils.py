@@ -1,13 +1,12 @@
 import io
 import os
 import gzip
-from pathlib import Path
 from seqspec.Assay import Assay
-from seqspec.Region import Onlist
-from urllib.parse import urlparse
+from seqspec.Region import Onlist, Region, Read
 import yaml
 import requests
 from Bio import GenBank
+from typing import Tuple, List
 
 
 def load_spec(spec_fn: str):
@@ -59,24 +58,32 @@ def yield_onlist_contents(stream):
         yield line.strip().split()[0]
 
 
-def read_list(onlist: Onlist):
-    """Given an onlist object read the local or remote data
-    """
-    location, filename = find_onlist_file(onlist)
+def read_local_list(onlist: Onlist, base_path: str = "") -> List[str]:
+    filename = os.path.join(base_path, onlist.filename)
+    stream = open(filename, "rb")
+    # do we need to decompress?
+    if filename.endswith(".gz"):
+        stream = gzip.GzipFile(fileobj=stream)
+
+    # convert to text stream
+    stream = io.TextIOWrapper(stream)
+
+    results = list(yield_onlist_contents(stream))
+    stream.close()
+    return results
+
+
+def read_remote_list(onlist: Onlist, base_path: str = "") -> List[str]:
+    """Given an onlist object read the local or remote data"""
+    filename = str(onlist.filename)
 
     stream = None
     try:
         # open stream
-        if location == "remote":
-            auth = get_remote_auth_token()
-            response = requests.get(filename, stream=True, auth=auth)
-            response.raise_for_status()
-            stream = response.raw
-        elif location == "local":
-            stream = open(filename, "rb")
-        else:
-            raise ValueError(
-                "Unsupported location {}. Expected remote or local".format(location))
+        auth = get_remote_auth_token()
+        response = requests.get(filename, stream=True, auth=auth)
+        response.raise_for_status()
+        stream = response.raw
 
         # do we need to decompress?
         if filename.endswith(".gz"):
@@ -95,27 +102,8 @@ def read_list(onlist: Onlist):
     return results
 
 
-def find_onlist_file(onlist: Onlist):
-    url = urlparse(onlist.filename)
-    pathname = Path(url.path)
-    basename = Path(pathname.name)
-    if basename.exists():
-        # we have a copy of the file in this directory
-        return ("local", str(basename))
-    elif pathname.exists():
-        # we have a path to another directory
-        return ("local", str(pathname))
-    elif url.scheme != '' and onlist.location == "remote":
-        # Should we ignore the location if there's a url scheme?
-        return ("remote", str(onlist.filename))
-    else:
-        raise FileNotFoundError(
-            "No such {} file {}".format(onlist.location, onlist.filename))
-
-
 def get_remote_auth_token():
-    """Look for authentication tokens for accessing remote resources
-    """
+    """Look for authentication tokens for accessing remote resources"""
     username = os.environ.get("IGVF_API_KEY")
     password = os.environ.get("IGVF_SECRET_KEY")
     if not (username is None or password is None):
@@ -205,7 +193,9 @@ def complement_sequence(sequence):
     return "".join(complement_nucleotide(n) for n in sequence.upper())
 
 
-def map_read_id_to_regions(spec, modality, region_id):
+def map_read_id_to_regions(
+    spec: Assay, modality: str, region_id: str
+) -> Tuple[Read, List[Region]]:
     # get all atomic elements from library
     leaves = spec.get_libspec(modality).get_leaves()
     # get the read object and primer id

@@ -64,7 +64,7 @@ class Region(yaml.YAMLObject):
             max_l += self.max_len
         return (min_l, max_l)
 
-    def get_onlist(self):
+    def get_onlist(self) -> Optional["Onlist"]:
         return self.onlist
 
     def update_attr(self):
@@ -129,7 +129,9 @@ class Region(yaml.YAMLObject):
                 found = r.get_region_by_id(region_id, found)
         return found
 
-    def get_region_by_region_type(self, region_type, found=[]):
+    def get_region_by_region_type(
+        self, region_type: str, found: List["Region"] = []
+    ) -> List["Region"]:
         if not found:
             found = []
         if self.region_type == region_type:
@@ -139,7 +141,7 @@ class Region(yaml.YAMLObject):
                 found = r.get_region_by_region_type(region_type, found)
         return found
 
-    def get_onlist_regions(self, found=[]):
+    def get_onlist_regions(self, found: List["Region"] = []) -> List["Region"]:
         if not found:
             found = []
         if self.onlist is not None:
@@ -149,7 +151,7 @@ class Region(yaml.YAMLObject):
                 found = r.get_onlist_regions(found)
         return found
 
-    def get_leaves(self, leaves=[]):
+    def get_leaves(self, leaves: List["Region"] = []) -> List["Region"]:
         if not leaves:
             leaves = []
         if not self.regions:
@@ -315,7 +317,7 @@ def project_regions_to_coordinates(
 
 def itx_read(
     region_coordinates: List[RegionCoordinate], read_start: int, read_stop: int
-):
+) -> List[RegionCoordinate]:
     # return a list of region_coordinates intersect with read start/stop
     new_rcs = []
 

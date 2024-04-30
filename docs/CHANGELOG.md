@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.x] - XXXX-XX-XX
+
+### Changed
+
+- Modified the internals of `seqspec onlist` to manage saving the joined onlist to the `-o` location when specified (otherwise saves to path where spec lives).
+
+### Added
+
+- Add typing hints to many `Assay` and `Region` functions
+
+### Removed
+
+### Fixed
+
 ## [0.2.0] - 2024-04-17
 
 ### Changed

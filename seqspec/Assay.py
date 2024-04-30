@@ -96,7 +96,7 @@ class Assay(yaml.YAMLObject):
         for r in self.library_spec:
             r.update_attr()
 
-    def get_libspec(self, modality):
+    def get_libspec(self, modality) -> Region:
         return self.library_spec[self.modalities.index(modality)]
 
     def get_seqspec(self, modality):

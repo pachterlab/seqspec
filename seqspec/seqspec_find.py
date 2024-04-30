@@ -1,6 +1,8 @@
 from seqspec.utils import load_spec
 from seqspec.Assay import Assay
+from seqspec.Region import Region
 import yaml
+from typing import List
 
 
 def setup_find_args(parser):
@@ -73,7 +75,7 @@ def run_find(spec: Assay, modality: str, region_id: str):
     return regions
 
 
-def run_find_by_type(spec: Assay, modality: str, region_type: str):
+def run_find_by_type(spec: Assay, modality: str, region_type: str) -> List[Region]:
     m = spec.get_libspec(modality)
     regions = m.get_region_by_region_type(region_type)
     return regions
