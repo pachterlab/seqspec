@@ -16,7 +16,8 @@ from seqspec.utils import (
     load_spec_stream,
     map_read_id_to_regions,
     write_read,
-    read_list,
+    read_local_list,
+    read_remote_list,
     yield_onlist_contents
 )
 from seqspec import __version__
@@ -184,7 +185,7 @@ class TestUtils(TestCase):
         response = list(yield_onlist_contents(fake_stream))
         self.assertEqual(response, fake_onlist)
 
-    def test_read_list_local(self):
+    def test_read_local_list(self):
         fake_onlist = ["ATATATAT", "GCGCGCGC"]
         fake_contents = "{}\n".format("\n".join(fake_onlist))
         fake_md5 = md5(fake_contents.encode("ascii")).hexdigest()
@@ -195,11 +196,11 @@ class TestUtils(TestCase):
                 stream.write(fake_contents)
 
             onlist1 = Onlist(temp_list_filename, fake_md5, "local")
-            loaded_list = read_list(onlist1)
+            loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
 
-    def test_read_list_local_gz(self):
+    def test_read_local_list_gz(self):
         fake_onlist = ["ATATATAT", "GCGCGCGC"]
         fake_contents = "{}\n".format("\n".join(fake_onlist))
         fake_md5 = md5(fake_contents.encode("ascii")).hexdigest()
@@ -210,11 +211,11 @@ class TestUtils(TestCase):
                 stream.write(fake_contents)
 
             onlist1 = Onlist(temp_list_filename, fake_md5, "local")
-            loaded_list = read_list(onlist1)
+            loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
 
-    def test_read_list_remote(self):
+    def test_read_remote_list(self):
         fake_onlist = ["ATATATAT", "GCGCGCGC"]
         fake_contents = "{}\n".format("\n".join(fake_onlist))
         fake_md5 = md5(fake_contents.encode("ascii")).hexdigest()
@@ -233,7 +234,7 @@ class TestUtils(TestCase):
 
         with patch("requests.get", new=fake_request_get):
             onlist1 = Onlist("http://localhost/testlist.txt", fake_md5, "remote")
-            loaded_list = read_list(onlist1)
+            loaded_list = read_remote_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
 
