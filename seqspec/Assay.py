@@ -1,6 +1,6 @@
 import yaml
 from seqspec.Region import Region, Read
-from typing import List
+from typing import List, Optional
 import json
 from . import __version__
 
@@ -83,9 +83,18 @@ class Assay(yaml.YAMLObject):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=False, indent=4)
 
     # note to_yaml is reserved for yaml.YAMLObject
-    def to_YAML(self, fname: str):
-        with open(fname, "w") as f:
-            yaml.dump(self, f, sort_keys=False)
+    def to_YAML(self, fname: Optional[str]=None):
+        """Export seqspec to yaml
+
+        If fname is provided, the seqspec text will be written to the
+        file.
+        If fname is None, the seqspec text will be returned as a string.
+        """
+        if fname is None:
+            return yaml.dump(self, sort_keys=False)
+        else:
+            with open(fname, "w") as f:
+                yaml.dump(self, f, sort_keys=False)
 
     def print_sequence(self):
         for region in self.library_spec:
