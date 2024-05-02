@@ -10,6 +10,7 @@ from seqspec.seqspec_onlist import (
     join_onlists,
     join_product_onlist,
     join_multi_onlist,
+    join_onlists,
     run_onlist_region,
     run_onlist_read,
 )
@@ -63,30 +64,6 @@ class TestSeqspecOnlist(TestCase):
         target_dir = find_list_target_dir([onlist1])
         self.assertEqual(target_dir, os.getcwd())
 
-    def test_join_one_list_remote_cached_locally(self):
-        with create_temporary_barcode_files(["index_onlist.txt"]):
-            # Can we find a local copy of a  remote list?
-            onlist_name = "index_onlist.txt"
-            onlist1 = Onlist(
-                "http:localhost:9/{}".format(onlist_name),
-                "d41d8cd98f00b204e9800998ecf8427e",
-                "remote")
-
-            filename = join_onlists([onlist1], "multi")
-            self.assertEqual(filename, onlist_name)
-
-    def test_join_multiple_lists_remote_cached_locally(self):
-        # Can we find a local copy of a  remote list?
-        with create_temporary_barcode_files(["index_onlist.txt"]) as tmpdir:
-            onlist_name = "index_onlist.txt"
-            onlist1 = Onlist(
-                "http:localhost:9/{}".format(onlist_name),
-                "d41d8cd98f00b204e9800998ecf8427e",
-                "remote")
-
-            filename = join_onlists([onlist1, onlist1], "multi")
-            self.assertEqual(filename, os.path.join(tmpdir, "onlist_joined.txt"))
-
     def test_join_product_onlist(self):
         onlists = [
             ["AAAA", "TTTT"],
@@ -98,6 +75,17 @@ class TestSeqspecOnlist(TestCase):
         self.assertEqual(joined[0], "AAAAGGGG\n")
         self.assertEqual(joined[3], "TTTTCCCC\n")
 
+    def test_join_onlist_product(self):
+        onlists = [
+            ["AAAA", "TTTT"],
+            ["GGGG", "CCCC"],
+        ]
+
+        joined = list(join_onlists(onlists, "product"))
+        self.assertEqual(len(joined), 4)
+        self.assertEqual(joined[0], "AAAAGGGG\n")
+        self.assertEqual(joined[3], "TTTTCCCC\n")
+
     def test_join_multi_onlist(self):
         onlists = [
             ["AAAA", "TTTT"],
@@ -105,6 +93,18 @@ class TestSeqspecOnlist(TestCase):
         ]
 
         joined = list(join_multi_onlist(onlists))
+        self.assertEqual(len(joined), 3)
+        self.assertEqual(joined[0], "AAAA GGGG\n")
+        self.assertEqual(joined[1], "TTTT CCCC\n")
+        self.assertEqual(joined[2], "- GGTT\n")
+
+    def test_join_onlist_multi(self):
+        onlists = [
+            ["AAAA", "TTTT"],
+            ["GGGG", "CCCC", "GGTT"],
+        ]
+
+        joined = list(join_onlists(onlists, "multi"))
         self.assertEqual(len(joined), 3)
         self.assertEqual(joined[0], "AAAA GGGG\n")
         self.assertEqual(joined[1], "TTTT CCCC\n")
