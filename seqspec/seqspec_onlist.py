@@ -107,8 +107,10 @@ def validate_onlist_args(parser, args):
     elif len(onlists) == 1:
         location = onlists[0].location
         onlist_fn = os.path.basename(onlists[0].filename)
-        if location == "local":
-            onlist_path = os.path.join(base_path, onlist_fn)
+        onlist_path = os.path.join(base_path, onlist_fn)
+
+        if os.path.exists(onlist_path):
+            location = "local"
         elif location == "remote":
             # download the onlist to the base path and return the path
             onlist_elements = read_remote_list(onlists[0])
@@ -128,7 +130,7 @@ def validate_onlist_args(parser, args):
 
     # print the path to the onlist
     print(onlist_path)
-    return
+    return onlist_path
 
 
 def run_onlist_region_type(
