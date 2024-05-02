@@ -40,14 +40,22 @@ class TestSeqspecOnlist(TestCase):
         with create_temporary_barcode_files(["index_onlist.txt"]):
             spec = load_example_spec(example_spec)
             # returns the one local barcode path
-            regions = run_onlist_region(spec, "rna", "index", "multi")
-            self.assertEqual(regions, "index_onlist.txt")
+            regions = run_onlist_region(spec, "rna", "index")
+            self.assertEqual(len(regions), 1)
+            region = regions[0]
+            self.assertEqual(region.location, "local")
+            self.assertEqual(region.filename, "index_onlist.txt")
+            self.assertEqual(region.md5, "939cb244b4c43248fcc795bbe79599b0")
 
     def test_run_onlist_read(self):
         with create_temporary_barcode_files(["index_onlist.txt"]):
             spec = load_example_spec(example_spec)
-            reads = run_onlist_read(spec, "rna", "read2.fastq.gz", "multi")
-            self.assertEqual(reads, "index_onlist.txt")
+            reads = run_onlist_read(spec, "rna", "read2.fastq.gz")
+            self.assertEqual(len(reads), 1)
+            read = reads[0]
+            self.assertEqual(read.location, "local")
+            self.assertEqual(read.filename, "index_onlist.txt")
+            self.assertEqual(read.md5, "939cb244b4c43248fcc795bbe79599b0")
 
     def test_find_list_target_dir_local(self):
         with create_temporary_barcode_files(["index_onlist.txt"]) as tmpdir:
