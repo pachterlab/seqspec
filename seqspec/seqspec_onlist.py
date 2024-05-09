@@ -125,7 +125,7 @@ def validate_onlist_args(parser, args):
             elif o.location == "remote":
                 # base_path is ignored for remote onlists
                 lsts.append(read_remote_list(o, base_path))
-        onlist_elements = join_onlists(onlists, f)
+        onlist_elements = join_onlists(lsts, f)
         onlist_path = write_onlist(onlist_elements, save_path)
 
     # print the path to the onlist
