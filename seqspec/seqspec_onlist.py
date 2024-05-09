@@ -221,9 +221,9 @@ def write_onlist(onlist: List[str], path: str) -> str:
 
 def join_product_onlist(lsts: List[List[str]]):
     for i in itertools.product(*lsts):
-        yield f"{''.join(i)}\n"
+        yield f"{''.join(i)}"
 
 
 def join_multi_onlist(lsts: List[List[str]]):
     for row in itertools.zip_longest(*lsts, fillvalue="-"):
-        yield f"{' '.join((str(x) for x in row))}\n"
+        yield f"{' '.join((str(x) for x in row))}"

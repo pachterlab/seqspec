@@ -17,6 +17,7 @@ from seqspec.seqspec_onlist import (
     run_onlist_read,
     setup_onlist_args,
     validate_onlist_args,
+    write_onlist,
 )
 from .test_utils import example_spec, load_example_spec
 
@@ -84,8 +85,8 @@ class TestSeqspecOnlist(TestCase):
 
         joined = list(join_product_onlist(onlists))
         self.assertEqual(len(joined), 4)
-        self.assertEqual(joined[0], "AAAAGGGG\n")
-        self.assertEqual(joined[3], "TTTTCCCC\n")
+        self.assertEqual(joined[0], "AAAAGGGG")
+        self.assertEqual(joined[3], "TTTTCCCC")
 
     def test_join_onlist_product(self):
         onlists = [
@@ -95,8 +96,8 @@ class TestSeqspecOnlist(TestCase):
 
         joined = list(join_onlists(onlists, "product"))
         self.assertEqual(len(joined), 4)
-        self.assertEqual(joined[0], "AAAAGGGG\n")
-        self.assertEqual(joined[3], "TTTTCCCC\n")
+        self.assertEqual(joined[0], "AAAAGGGG")
+        self.assertEqual(joined[3], "TTTTCCCC")
 
     def test_join_multi_onlist(self):
         onlists = [
@@ -106,9 +107,9 @@ class TestSeqspecOnlist(TestCase):
 
         joined = list(join_multi_onlist(onlists))
         self.assertEqual(len(joined), 3)
-        self.assertEqual(joined[0], "AAAA GGGG\n")
-        self.assertEqual(joined[1], "TTTT CCCC\n")
-        self.assertEqual(joined[2], "- GGTT\n")
+        self.assertEqual(joined[0], "AAAA GGGG")
+        self.assertEqual(joined[1], "TTTT CCCC")
+        self.assertEqual(joined[2], "- GGTT")
 
     def test_join_onlist_multi(self):
         onlists = [
@@ -118,9 +119,9 @@ class TestSeqspecOnlist(TestCase):
 
         joined = list(join_onlists(onlists, "multi"))
         self.assertEqual(len(joined), 3)
-        self.assertEqual(joined[0], "AAAA GGGG\n")
-        self.assertEqual(joined[1], "TTTT CCCC\n")
-        self.assertEqual(joined[2], "- GGTT\n")
+        self.assertEqual(joined[0], "AAAA GGGG")
+        self.assertEqual(joined[1], "TTTT CCCC")
+        self.assertEqual(joined[2], "- GGTT")
 
     def test_local_validate_onlist_args(self):
         onlist_name = "index_onlist.txt"
@@ -172,3 +173,23 @@ class TestSeqspecOnlist(TestCase):
 
                 self.assertEqual(onlist_path, expected_onlist_path)
 
+    def test_write_onlist_no_double_spacing(self):
+        # Make sure that joined onlists don't end up double spaced.
+        
+        onlists = [
+            ["AAAA", "TTTT"],
+            ["GGGG", "CCCC", "GGTT"],
+        ]
+        joined = list(join_multi_onlist(onlists))
+
+        with TemporaryDirectory(prefix="seqspec_test_") as tmpdir:
+            target = os.path.join(tmpdir, "onlist_joined.txt")
+            write_onlist(joined, target)
+
+            with open(target, "rt") as instream:
+                saved = []
+                for line in instream:
+                    saved.append(line.rstrip())
+
+        assert len(saved) == 3
+        assert saved == joined
