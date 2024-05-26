@@ -107,8 +107,10 @@ def validate_onlist_args(parser, args):
     elif len(onlists) == 1:
         location = onlists[0].location
         onlist_fn = os.path.basename(onlists[0].filename)
-        if location == "local":
-            onlist_path = os.path.join(base_path, onlist_fn)
+        onlist_path = os.path.join(base_path, onlist_fn)
+
+        if os.path.exists(onlist_path):
+            location = "local"
         elif location == "remote":
             # download the onlist to the base path and return the path
             onlist_elements = read_remote_list(onlists[0])
@@ -123,12 +125,12 @@ def validate_onlist_args(parser, args):
             elif o.location == "remote":
                 # base_path is ignored for remote onlists
                 lsts.append(read_remote_list(o, base_path))
-        onlist_elements = join_onlists(onlists, f)
+        onlist_elements = join_onlists(lsts, f)
         onlist_path = write_onlist(onlist_elements, save_path)
 
     # print the path to the onlist
     print(onlist_path)
-    return
+    return onlist_path
 
 
 def run_onlist_region_type(
@@ -219,9 +221,9 @@ def write_onlist(onlist: List[str], path: str) -> str:
 
 def join_product_onlist(lsts: List[List[str]]):
     for i in itertools.product(*lsts):
-        yield f"{''.join(i)}\n"
+        yield f"{''.join(i)}"
 
 
 def join_multi_onlist(lsts: List[List[str]]):
     for row in itertools.zip_longest(*lsts, fillvalue="-"):
-        yield f"{' '.join((str(x) for x in row))}\n"
+        yield f"{' '.join((str(x) for x in row))}"

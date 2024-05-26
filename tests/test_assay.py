@@ -1,5 +1,6 @@
 import json
 from unittest import TestCase
+import yaml
 from seqspec.Region import Region
 from seqspec.Assay import Assay
 
@@ -39,6 +40,7 @@ class TestAssay(TestCase):
         self.assertEqual(a.to_dict(), expected)
 
         self.assertEqual(a.to_JSON(), json.dumps(expected, sort_keys=False, indent=4))
+        self.assertTrue(a.to_YAML().startswith("!Assay"))
 
     def test_assay_with_regions(self):
         r_umi_dict = region_rna_umi_dict("region-2")

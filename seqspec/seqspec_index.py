@@ -285,6 +285,17 @@ def format_zumis(indices, subregion_type=None):
     return "\n".join(xl)[:-1]
 
 
+def stable_deduplicate_fqs(fqs):
+    # stably deduplicate gdna_fqs
+    seen_fqs = set()
+    deduplicated_fqs = []
+    for r in fqs:
+        if r not in seen_fqs:
+            deduplicated_fqs.append(r)
+            seen_fqs.add(r)
+    return deduplicated_fqs
+
+
 def format_chromap(indices, subregion_type=None):
     bc_fqs = []
     bc_str = []
@@ -306,8 +317,9 @@ def format_chromap(indices, subregion_type=None):
         raise Exception("chromap only supports genomic dna from two fastqs")
 
     barcode_fq = bc_fqs[0]
-    read1_fq = list(set(gdna_fqs))[0]
-    read2_fq = list(set(gdna_fqs))[1]
+    deduplicated_gdna_fqs = stable_deduplicate_fqs(gdna_fqs)
+    read1_fq = deduplicated_gdna_fqs[0]
+    read2_fq = deduplicated_gdna_fqs[1]
     read_str = ",".join([f"r{idx}:{ele}" for idx, ele in enumerate(gdna_str, 1)])
     bc_str = ",".join(bc_str)
 
