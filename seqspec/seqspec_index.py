@@ -295,11 +295,11 @@ def format_chromap(indices, subregion_type=None):
             for cut in cuts:
                 if cut.region_type.upper() == "BARCODE":
                     bc_fqs.append(rgn)
-                    bc_str.append(f"bc:{cut.start}:{cut.stop}")
+                    bc_str.append(f"bc:{cut.start}:{cut.stop-1}")
                     pass
                 elif cut.region_type.upper() == "GDNA":
                     gdna_fqs.append(rgn)
-                    gdna_str.append(f"{cut.start}:{cut.stop}")
+                    gdna_str.append(f"{cut.start}:{cut.stop-1}")
     if len(set(bc_fqs)) > 1:
         raise Exception("chromap only supports barcodes from one fastq")
     if len(set(gdna_fqs)) > 2:
