@@ -34,7 +34,7 @@ Documentation:
 
 - [ Learn about `seqspec` : `docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md)
 - [Write a `seqspec` from scratch : `docs/TUTORIAL.md`](docs/TUTORIAL.md)
-- [Write a `seqspec` from a template : `docs/TUTORIAL.md`](docs/TUTORIAL_FROM_TEMPLATE.md)
+- [Write a `seqspec` from a template : `docs/TUTORIAL_FROM_TEMPLATE.md`](docs/TUTORIAL_FROM_TEMPLATE.md)
 - [Contribute a `seqspec` : `docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
 - [The `seqspec` specification : `docs/SPECIFICATION.md`](docs/SPECIFICATION.md)
 - [YouTube video that introduces `seqspec`](https://youtu.be/NSj6Vpzy8tU)
