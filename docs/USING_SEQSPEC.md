@@ -60,7 +60,8 @@ rna     P7      illumina_p7     P7      fixed   ATCTCGTATGCCGTCTTCTGCTTG        
 Which library elements are contained in my sequencing reads?
 Using the tables above we specify the sequencing read and the associated modality.
 
-````bash
+Elements in R1.fastq.gz
+```bash
 $ seqspec index -m rna -r "R1.fastq.gz" spec.yaml
 R1.fastq.gz     cDNA    cdna    0       100
 R1.fastq.gz     RT_primer       primer  100     115
@@ -68,6 +69,7 @@ R1.fastq.gz     Round_1_BC      barcode 115     123
 R1.fastq.gz     linker_1        linker  123     140
 ```
 
+Elements in R2.fastq.gz
 ```bash
 $ seqspec index -m rna -r "R2.fastq.gz" spec.yaml
 R2.fastq.gz     UMI     umi     0       10
@@ -77,6 +79,7 @@ R2.fastq.gz     Round_2_BC      barcode 48      56
 R2.fastq.gz     linker_1        linker  56      86
 ```
 
+Elements in I1.fastq.gz
 ```bash
 $ seqspec index -m rna -r "I1.fastq.gz" spec.yaml
 I1.fastq.gz     Round_4_BC      barcode 0       6
