@@ -40,7 +40,7 @@ rna     R2.fastq.gz     neg     86      86      Read_2_primer   Read 2
 What does my sequencing library look like?
 
 ```bash
-seqspec info -k library_spec spec.yaml
+$ seqspec info -k library_spec spec.yaml
 rna     P5      illumina_p5     P5      fixed   AATGATACGGCGACCACCGAGATCTACAC   29      29      None
 rna     Spacer  linker  Spacer  fixed   TAGATCGC        8       8       None
 rna     Read_1_primer   read1_primer    Read_1_primer   fixed   TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG       33      33      None
@@ -66,6 +66,7 @@ R1.fastq.gz     cDNA    cdna    0       100
 R1.fastq.gz     RT_primer       primer  100     115
 R1.fastq.gz     Round_1_BC      barcode 115     123
 R1.fastq.gz     linker_1        linker  123     140
+```
 
 ```bash
 $ seqspec index -m rna -r "R2.fastq.gz" spec.yaml
@@ -74,7 +75,7 @@ R2.fastq.gz     Round_3_BC      barcode 10      18
 R2.fastq.gz     Linker_2        linker  18      48
 R2.fastq.gz     Round_2_BC      barcode 48      56
 R2.fastq.gz     linker_1        linker  56      86
-````
+```
 
 ```bash
 $ seqspec index -m rna -r "I1.fastq.gz" spec.yaml
