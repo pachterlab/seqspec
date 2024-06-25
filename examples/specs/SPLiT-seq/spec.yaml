@@ -18,8 +18,8 @@ sequence_spec:
   name: Read 1
   modality: rna
   primer_id: Read_1_primer
-  min_len: 66
-  max_len: 66
+  min_len: 140
+  max_len: 140
   strand: pos
 - !Read
   read_id: I1.fastq.gz
@@ -34,8 +34,8 @@ sequence_spec:
   name: Read 2
   modality: rna
   primer_id: Read_2_primer
-  min_len: 94
-  max_len: 94
+  min_len: 86
+  max_len: 86
   strand: neg
 library_spec:
 - !Region

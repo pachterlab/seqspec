@@ -15,6 +15,7 @@ from .seqspec_split import setup_split_args, validate_split_args
 from .seqspec_init import setup_init_args, validate_init_args
 from .seqspec_onlist import setup_onlist_args, validate_onlist_args
 from .seqspec_version import setup_version_args, validate_version_args
+from .seqspec_methods import setup_methods_args, validate_methods_args
 
 # Steps to add new subcommands
 # Create seqspec_subcommand.py (create setup_subcmd_args, validate_subcmd_args, run_subcmd in that file)
@@ -43,12 +44,14 @@ def main():
         "index": setup_index_args(subparsers),
         "info": setup_info_args(subparsers),
         "init": setup_init_args(subparsers),
+        "methods": setup_methods_args(subparsers),
         "modify": setup_modify_args(subparsers),
         "onlist": setup_onlist_args(subparsers),
         "print": setup_print_args(subparsers),
         "split": setup_split_args(subparsers),
         "version": setup_version_args(subparsers),
     }
+
     # Show help when no arguments are given
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -73,6 +76,7 @@ def main():
         "index": validate_index_args,
         "info": validate_info_args,
         "init": validate_init_args,
+        "methods": validate_methods_args,
         "modify": validate_modify_args,
         "onlist": validate_onlist_args,
         "split": validate_split_args,
