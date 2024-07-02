@@ -1,3 +1,10 @@
+---
+title: Changelog
+date: 2024-06-25
+authors:
+  - name: A. Sina Booeshaghi
+---
+
 # Changelog
 
 ## [0.2.x] - XXXX-XX-XX
@@ -9,6 +16,8 @@
 ### Added
 
 - Add typing hints to many `Assay` and `Region` functions
+- Add `'k key` to `seqspec info` to display one of `meta` for metadata, `sequence_spec` for sequence spec, and `library_spec` for library spec
+- Add `-f format` to `seqspec info` to enable multiple formats for displaying info
 
 ### Removed
 

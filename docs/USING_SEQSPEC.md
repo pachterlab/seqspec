@@ -1,15 +1,20 @@
-# Using seqspec effectively
+---
+title: Common uses
+date: 2024-06-25
+authors:
+  - name: A. Sina Booeshaghi
+---
 
 A `seqspec` file provides complete information about the structure of a sequencing library and seqeuencing reads generated from it. Herein we document common tasks that users may find useful when working with `seqspec` files. In this document we will work with the `examples/specs/SPLiT-seq/spec.yaml` file. In some cases we will use the command line tool `jq` to extract relevant information from the `seqspec` tool output though this is not required.
 
-What modalities are annotated in my spec?
+# What modalities are annotated in my spec?
 
 ```bash
 $ seqspec info -k modalities spec.yaml
 rna
 ```
 
-What library kits/protocols and sequencing kit/protocols were used to generated the library?
+# What library kits/protocols and sequencing kit/protocols were used to generated the library?
 
 ```bash
 $ seqspec info -f json -k meta spec.yaml
@@ -28,7 +33,7 @@ $ seqspec info -f json -k meta spec.yaml
 }
 ```
 
-What are the sequencing reads annotated in my spec?
+# What are the sequencing reads annotated in my spec?
 
 ```bash
 $ seqspec info -k sequence_spec spec.yaml
@@ -37,7 +42,7 @@ rna     I1.fastq.gz     pos     6       6       Read_2_primer   Index 1 (i7 inde
 rna     R2.fastq.gz     neg     86      86      Read_2_primer   Read 2
 ```
 
-What does my sequencing library look like?
+# What does my sequencing library look like?
 
 ```bash
 $ seqspec info -k library_spec spec.yaml
@@ -57,10 +62,12 @@ rna     Round_4_BC      barcode Round_4_BC      onlist  NNNNNN  6       6       
 rna     P7      illumina_p7     P7      fixed   ATCTCGTATGCCGTCTTCTGCTTG        24      24      None
 ```
 
-Which library elements are contained in my sequencing reads?
+# Which library elements are contained in my sequencing reads?
+
 Using the tables above we specify the sequencing read and the associated modality.
 
 Elements in R1.fastq.gz
+
 ```bash
 $ seqspec index -m rna -r "R1.fastq.gz" spec.yaml
 R1.fastq.gz     cDNA    cdna    0       100
@@ -70,6 +77,7 @@ R1.fastq.gz     linker_1        linker  123     140
 ```
 
 Elements in R2.fastq.gz
+
 ```bash
 $ seqspec index -m rna -r "R2.fastq.gz" spec.yaml
 R2.fastq.gz     UMI     umi     0       10
@@ -80,6 +88,7 @@ R2.fastq.gz     linker_1        linker  56      86
 ```
 
 Elements in I1.fastq.gz
+
 ```bash
 $ seqspec index -m rna -r "I1.fastq.gz" spec.yaml
 I1.fastq.gz     Round_4_BC      barcode 0       6

@@ -1,14 +1,15 @@
-## Installation
+---
+title: Usage
+date: 2024-06-25
+authors:
+  - name: A. Sina Booeshaghi
+---
 
-The development version can be installed with
+# Usage
 
-```bash
-pip install git+https://github.com/pachterlab/seqspec
-```
-
-## Usage
-
+:::{important}
 The `seqspec` specification is detailed in `docs/SPECIFICATION.md`. Please review it before using and developing `seqspec` files; knowing the structure will help in understanding how to effectively use `seqspec`.
+:::
 
 `seqspec` consists of twelve subcommands:
 
@@ -39,9 +40,11 @@ optional arguments:
 
 `seqspec` operates on `seqspec` compatible YAML files that follow the specification. All of the following examples will use the `seqspec` specification for the DOGMAseq-DIG assay which can be found here: `seqspec/examples/specs/dogmaseq-dig/spec.yaml`.
 
+:::{attention}
 **IMPORTANT**: Many `seqspec` commands require that the specification be properly formatted and error-corrected. Errors in the spec can be found with `seqspec check` (see below for instructions). The spec can be properly formatted (or "filled in") with `seqspec format`. It is recommended to run `seqspec format` followed by `seqspec check` after writing a `seqspec` (or correcting errors in one).
+:::
 
-### `seqspec check`: validate seqspec file
+## `seqspec check`: validate seqspec file
 
 Check that the `seqspec` file is correctly formatted and consistent with the [specification](https://github.com/IGVF/seqspec/blob/main/docs/SPECIFICATION.md).
 
@@ -83,7 +86,7 @@ A list of possible errors are shown below:
 [error 9] '7asddd7asd7' does not match '^[a-f0-9]{32}$' in spec['library_spec'][0]['regions'][8]['onlist']['md5']
 ```
 
-#### Examples
+### Examples
 
 ```bash
 # check the spec against the formal specification
@@ -92,7 +95,7 @@ $ seqspec check spec.yaml
 [error 2] 'Ribonucleic acid' is not one of ['rna', 'tag', 'protein', 'atac', 'crispr'] in spec['modalities'][0]
 ```
 
-### `seqspec find`: find regions in a seqspec file
+## `seqspec find`: find regions in a seqspec file
 
 ```
 seqspec find [-o OUT] [--rtype] -m MODALITY -r REGION  yaml
@@ -104,7 +107,7 @@ seqspec find [-o OUT] [--rtype] -m MODALITY -r REGION  yaml
 - `-r REGION` is the `region_id` you are searching for.
 - `yaml` corresponds to the `seqspec` file.
 
-#### Examples
+### Examples
 
 ```bash
 $ seqspec find -m rna -r barcode --rtype spec.yaml
@@ -123,7 +126,7 @@ $ seqspec find -m rna -r barcode --rtype spec.yaml
   parent_id: rna_R1_SRR18677638.fastq.gz
 ```
 
-### `seqspec format`: format seqspec file
+## `seqspec format`: format seqspec file
 
 ```
 seqspec format -o OUT yaml
@@ -132,7 +135,7 @@ seqspec format -o OUT yaml
 - `-o OUT` the path to create the formatted `seqspec` file.
 - `yaml` corresponds to the `seqspec` file.
 
-#### Examples
+### Examples
 
 ```bash
 # format the spec into a file called fmt.yaml
@@ -142,7 +145,7 @@ $ seqspec format -o fmt.yaml spec.yaml
 $ seqspec format -o spec.yaml spec.yaml
 ```
 
-### `seqspec index`: index regions in a seqspec file
+## `seqspec index`: index regions in a seqspec file
 
 Returns the 0-indexed position of elements contained in a given region in the 5'->3' direction.
 
@@ -163,7 +166,7 @@ seqspec index [-o OUT] [-t TOOL] [--rev] -m MODALITY -r REGION yaml
 - `-r REGION` is the `region_id` you are indexing.
 - `yaml` corresponds to the `seqspec` file.
 
-#### Examples
+### Examples
 
 ```bash
 # get the indices of the elements contained within the FASTQs specified in the spec in tab format
@@ -178,7 +181,7 @@ $ seqspec index -t kb -m atac -r fastqs/atac_R1_SRR18677642.fastq.gz,fastqs/atac
 1,8,24:-1,-1,-1:0,0,52,2,0,52
 ```
 
-### `seqspec info`: get info about seqspec file
+## `seqspec info`: get info about seqspec file
 
 ```bash
 seqspec info -o OUT yaml
@@ -187,7 +190,7 @@ seqspec info -o OUT yaml
 - optionally, `-o OUT` path to create info json file.
 - `yaml` corresponds to the `seqspec` file.
 
-#### Examples
+### Examples
 
 ```bash
 $ seqspec info spec.yaml
@@ -209,7 +212,7 @@ $ seqspec info spec.yaml
 }
 ```
 
-### `seqspec init`: init a seqspec file
+## `seqspec init`: init a seqspec file
 
 ```bash
 seqspec init -n NAME -m MODALITIES -o OUT newick
@@ -220,7 +223,7 @@ seqspec init -n NAME -m MODALITIES -o OUT newick
 - `-n NAME` is the name associated with the `seqspec` file.
 - `newick` is the [`newick`](http://bioinformatics.intec.ugent.be/MotifSuite/treeformat.php#:~:text=Newick%20Tree%20file%20format,html.) string corresponding to the structure of assay.
 
-#### Examples
+### Examples
 
 ```bash
 # single-cell RNA
@@ -233,7 +236,7 @@ $ seqspec init -n myassay -m 1 -o spec.yaml "(((barcode:16,umi:12)r1.fastq.gz,(c
 $ seqspec init -n myassay -m 2 -o spec.yaml "(((barcode:16,umi:12)rna_r1.fastq.gz,(cdna:150)rna_r2.fastq.gz)rna,((barcode:16)atac_r1.fastq.gz,(gdna:150)atac_r2.fastq.gz,(gdna:150)atac_r3.fastq.gz)atac)"
 ```
 
-### `seqspec modify`: modify region attributes
+## `seqspec modify`: modify region attributes
 
 ```bash
 seqspec modify [--region-id REGIONID] [--region-type REGIONTYPE] [--region-name REGIONNAME] [--sequence-type SEQUENCETYPE] [--sequence SEQUENCE] [--min-len MINLEN] [--max-len MAXLEN] -o OUT -r REGIONID -m MODALITY yaml
@@ -253,14 +256,14 @@ seqspec modify [--region-id REGIONID] [--region-type REGIONTYPE] [--region-name 
 
 _Note_: modifying multiple attributes at one time is currently not supported.
 
-#### Examples
+### Examples
 
 ```bash
 # rename the atac R1 FASTQ
 $ seqspec modify -m rna -o mod.yaml -r "atac_R1_SRR18677642.fastq.gz" --region-id "renamed_atac_R1_SRR18677642.fastq.gz" spec.yaml
 ```
 
-### `seqspec onlist`: get onlist file for specific regions
+## `seqspec onlist`: get onlist file for specific regions
 
 ```bash
 seqspec onlist [-o OUT] -m MODALITY -r REGION yaml
@@ -273,7 +276,7 @@ seqspec onlist [-o OUT] -m MODALITY -r REGION yaml
 
 _Note_: If, for example, there are multiple regions with the specified `region_type` in the modality (e.g. multiple barcodes), then `seqspec onlist` will return a path to an onlist that it generates where the entries in that onlist are the cartesian product of the onlists for all of the regions found.
 
-#### Examples
+### Examples
 
 ```bash
 # get the onlist for the atac barcodes
@@ -281,7 +284,7 @@ $ seqspec onlist -m atac -r barcode spec.yaml
 /path/to/seqspec/specs/dogmaseq-dig/ATA-737K-arc-v1_rc.txt
 ```
 
-### `seqspec print`: print seqspec file
+## `seqspec print`: print seqspec file
 
 ```
 seqspec print [-o OUT] [-f FORMAT] yaml
@@ -294,13 +297,13 @@ seqspec print [-o OUT] [-f FORMAT] yaml
   - `png`: prints a formal diagram of the seqspec
 - `yaml` corresponds to the `seqspec` file.
 
-#### Examples
+### Examples
 
 ```
 $ seqspec print -f png spec.yaml
 ```
 
-### `seqspec split`: split seqspec into modalities
+## `seqspec split`: split seqspec into modalities
 
 ```bash
 seqspec split -o OUT yaml
@@ -309,7 +312,7 @@ seqspec split -o OUT yaml
 - optionally, `-o OUT` name prepended to split specs.
 - `yaml` corresponds to the `seqspec` file.
 
-#### Examples
+### Examples
 
 ```bash
 $ seqspec split -o split spec.yaml
@@ -321,7 +324,7 @@ split.rna.yaml
 split.tag.yaml
 ```
 
-### `seqspec version`: Get seqspec version and seqspec file version
+## `seqspec version`: Get seqspec version and seqspec file version
 
 ```bash
 seqspec version [-o OUT] yaml
@@ -330,7 +333,7 @@ seqspec version [-o OUT] yaml
 - optionally, `-o OUT` path to file to write output.
 - `yaml` corresponds to the `seqspec` file.
 
-#### Examples
+### Examples
 
 ```bash
 $ seqspec version spec.yaml

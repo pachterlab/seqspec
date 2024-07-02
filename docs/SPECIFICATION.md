@@ -1,10 +1,15 @@
-# `seqspec` Technical Specification Document
+---
+title: Technical Specification
+date: 2024-06-25
+authors:
+  - name: A. Sina Booeshaghi
+---
 
-## Introduction
+# Introduction
 
 `seqspec` is an open-source file format specification and command-line tool for annotating sequencing libraries that utilized YAML for data representation. This document outlines the specification and explains various use-cases.
 
-## Schema Overview
+# Schema Overview
 
 The `seqspec` schema is designed to annotate sequencing libraries through three main objects: `Assay`, `Region`, and `Read` objects. `Assay` objects contain `Region` objects, possibly nested, which can be orthogonally annotated with `Read` objects. The `Assay` object is the parent object and describes the structure of the molecules in a sequencing library (the library specification) as well as the structure of the reads obtained after sequencing the sequencing library (the sequence specification).
 
@@ -32,7 +37,7 @@ library_spec:
 
 In order to catalogue relevant information for each library structure, multiple properties are specified for each `Assay` and each `Region`. A description of the `Assay` and `Region` schema can be found in `seqspec/schema/seqspec.schema.json`.
 
-### `Assay` Object
+## `Assay` Object
 
 The `Assay` object contains overall metadata for the sequencing run.
 
@@ -74,7 +79,7 @@ sequence_spec: ...
 library_spec: ...
 ```
 
-### `Region` Object
+## `Region` Object
 
 The `library_structure` contains a list of, possibly nested, `Region objects` which detail individual segments within the sequencing library molecule, specifying types, sequences, and relationships between segments.
 
@@ -151,7 +156,7 @@ regions: null
 
 For more information about the specification of the various fields, please see the JSON schema representation of the various fields described above (`seqspec/schema/seqspec.schema.json`). For consistency across assays I suggest the following standard naming conventions for common regions. Please see `seqspec/docs/regions` for a list of example regions.
 
-### Read Object
+## Read Object
 
 The `sequence_structure` contains a list of `Read` objects which describe the sequencing "reads" that are generated from sequencing the molecule described in the `library_structure`. A crucial concept is that `Read` objects contain a `primer_id` which maps to a single `region_id` in the `library_structure`.
 
@@ -178,7 +183,7 @@ Example:
   strand: pos
 ```
 
-### YAML Tags
+## YAML Tags
 
 seqspec files contains YAML tags (strings prepended with an exclamation point `!`) to describe the various objects (`Assay`, `Region`, `Onlist`, `Read`). These tags make it easy to load `seqspec` files into python as a python object. Python manipulation of seqspec files becomes straightforward with "dot notation":
 

@@ -1,4 +1,9 @@
-# Getting started
+---
+title: Build a seqspec
+date: 2024-06-25
+authors:
+  - name: A. Sina Booeshaghi
+---
 
 A `seqspec` file requires an understanding of multiple aspects of the sequencing library and FASTQ read structure, including:
 
@@ -13,13 +18,15 @@ A `seqspec` file requires an understanding of multiple aspects of the sequencing
   - Index 1 uses the index 1 primer
   - etc.
 
+:::{note}
 **Note**: Developing a `seqspec` file for a published assay can be challenging, as authors often assume readers have prior knowledge or omit necessary information.
+:::
 
-## Example: SPLiT-Seq Assay
+# Example: SPLiT-Seq Assay
 
 Let's develop a `seqspec` for the [SPLiT-Seq assay](https://www.science.org/doi/10.1126/science.aam8999). We'll first gather the relevant information needed for the spec, determining both the library structure (the structure of the molecule placed on the sequencing machine) and the read structure (the elements contained within the FASTQ reads).
 
-### Library structure
+## Library structure
 
 Figure 1A shows the library molecule structure, with the caption stating:
 
@@ -206,7 +213,7 @@ R2 (fixed, TCTAGCCTTCTCGTGTGCAGAC)
 P7 (ATCTCGTATGCCGTCTTCTGCTTG)
 ```
 
-### Determining the Read structure
+## Determining the Read structure
 
 > Libraries were sequenced on MiSeq or NextSeq systems (Illumina) using 150 nucleotide (nt) kits and paired-end sequencing. Read 1 (66 nt) covered the transcript sequences. Read 2 (94 nt) covered the UMI and UBC barcode combinations. The index read (6 nt), serving as the fourth barcode, covered the sublibrary indices introduced after tagmentation.
 
@@ -216,11 +223,11 @@ A useful resource of the order and strandedness of various sequencing libraries/
 2. Index 1: uses the Read 2 primer, sequences 5' -> 3' on the top strand into the insert. Ibn the case of this assay, Index 1 is 6bp.
 3. Read 2: uses the Read 2 primer, sequences the 5' -> 3' on the bottom strand into the insert. In the case of this assay Read 2 is 94 bp.
 
-## Summary
+# Summary
 
 From the manuscript we have extracted the following information about the library structure and the read structure:
 
-### Library structure
+## Library structure
 
 - rna assay
   - P5
@@ -296,7 +303,7 @@ From the manuscript we have extracted the following information about the librar
 
 **Note**: The significance of the barcodes being reverse and on the bottom strand (relative to the list of barcodes in Table S12) is that we must reverse complement the barcodes so that the seqspec represents the elements of the library 5' -> 3' on the top strand.
 
-### Sequence structure
+## Sequence structure
 
 - Read 1
   - Modality: rna
@@ -319,7 +326,7 @@ From the manuscript we have extracted the following information about the librar
 
 This information is sufficient to build the `seqspec`.
 
-## Initializing the spec
+# Initializing the spec
 
 To help users create a seqspec from their own data, the `seqspec` cli offers a simple tool `seqspec init` that autogenerates an initial `spec.yaml` from a string representation of the data. The spec is incomplete and requires additional information and checks to be a fully valid spec. The seqspec input is a [newick file format](https://en.wikipedia.org/wiki/Newick_format) which naturally represents nested grouping of sequencing files and sequenced elements. Following our example from before we have the following library structure:
 
@@ -362,11 +369,11 @@ seqspec init -n SPLiTSeq -m 1 -o spec.yaml "((P5:29,Spacer:8,Read_1_primer:33,cD
 
 Note that the newick string must be enclosed in quotes.
 
-## Populate the spec
+# Populate the spec
 
 Next, add relevant information to the spec by hand. We will need to populate the header, the sequence_spec and the library_spec with relevant information.
 
-### Updating the header
+## Updating the header
 
 ```yaml
 !Assay
@@ -387,7 +394,7 @@ sequence_spec: []
 library_spec:
 ```
 
-### Updating the `sequence_spec`
+## Updating the `sequence_spec`
 
 The `sequence_spec` stores information about the sequencing reads that are generated from the sequencing procedure. We have alread identified the relevant information the various reads. We need to populate a list of `Read` objects in the `seqspec`:
 
@@ -434,7 +441,7 @@ sequence_spec:
 
 **Important**: ensure that the `primer_id` maps to the correct `region_id` off of which the sequencing read is generated (in the `library_spec`).
 
-### Updating the `library_spec`
+## Updating the `library_spec`
 
 We now need to augment the elements of our `library_spec`. We will fill in the following information for each element:
 
@@ -494,7 +501,7 @@ The other regions follow similarly:
 
 Once you've populated all of the metadata for the various regions we can move onto formatting the spec and checking the correctness of it.
 
-## Format and check the spec
+# Format and check the spec
 
 Update the `seqspec` file with `seqspec format`:
 
@@ -515,7 +522,7 @@ We recommend depositing 1 million FASTQ records from for the FASTQ files pointed
 zcat allreads_R1.fastq.gz | head -4000000 | gzip > R1.fastq.gz
 ```
 
-## View the spec
+# View the spec
 
 To view the "ordered tree" representation of the `library_spec`, run
 

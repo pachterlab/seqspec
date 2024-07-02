@@ -1,3 +1,10 @@
+---
+title: Contributing
+date: 2024-06-25
+authors:
+  - name: A. Sina Booeshaghi
+---
+
 # Contributing
 
 Thank you for wanting to add a spec or improve `seqspec`. If you have a bug that is related to `seqspec` please create an issue. This document outlines the process for suggesting improvements to the `seqspec` specification and the procedure for updating the specification.
