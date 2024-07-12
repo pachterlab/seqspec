@@ -24,7 +24,7 @@ Ali Sina Booeshaghi, Xi Chen, Lior Pachter, A machine-readable specification for
 pip install seqspec
 
 # development
-pip install git+https://github.com/pachterlab/seqspec.git
+pip install git+https://github.com/pachterlab/seqspec.git@devel
 
 # verify install
 seqspec --help
@@ -32,7 +32,7 @@ seqspec --help
 
 Documentation:
 
-- [ Learn about `seqspec` : `docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md)
+- [Learn about `seqspec` : `docs/DOCUMENTATION.md`](docs/SEQSPEC_FILE.md)
 - [Write a `seqspec` : `docs/TUTORIAL.md`](docs/TUTORIAL.md)
 - [Contribute a `seqspec` : `docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
 - [The `seqspec` specification : `docs/SPECIFICATION.md`](docs/SPECIFICATION.md)

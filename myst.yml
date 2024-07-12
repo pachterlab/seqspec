@@ -14,7 +14,8 @@ project:
     - file: docs/INSTALLATION.md
     - title: Documentation
       children:
-      - file: docs/DOCUMENTATION.md
+      - file: docs/SEQSPEC_FILE.md
+      - file: docs/SEQSPEC_TOOL.md
       - file: docs/SPECIFICATION.md
     - title: Tutorials
       children:
@@ -26,7 +27,7 @@ project:
 site:
   template: book-theme
   title: seqspec
-  logo_text: Machine readable specificaiton for genomics assays
+  logo_text: Machine readable specification for genomics assays
   actions:
     - title: GitHub
       url: https://github.com/pachterlab/seqspec

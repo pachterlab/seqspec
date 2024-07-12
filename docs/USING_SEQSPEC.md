@@ -7,6 +7,11 @@ authors:
 
 A `seqspec` file provides complete information about the structure of a sequencing library and seqeuencing reads generated from it. Herein we document common tasks that users may find useful when working with `seqspec` files. In this document we will work with the `examples/specs/SPLiT-seq/spec.yaml` file. In some cases we will use the command line tool `jq` to extract relevant information from the `seqspec` tool output though this is not required.
 
+```bash
+git clone https://github.com/pachterlab/seqspec.git
+cd seqspec/examples/specs/SPLiT-seq
+```
+
 # What modalities are annotated in my spec?
 
 ```bash

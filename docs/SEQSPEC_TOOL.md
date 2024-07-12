@@ -1,5 +1,5 @@
 ---
-title: Usage
+title: Tool Usage
 date: 2024-06-25
 authors:
   - name: A. Sina Booeshaghi
