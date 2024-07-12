@@ -20,7 +20,7 @@ project:
     - title: Tutorials
       children:
       - file: docs/TUTORIAL.md
-      - file: docs/USING_SEQSPEC.md
+      - file: docs/USING_SEQSPEC.ipynb
     - file: docs/CONTRIBUTING.md
     - file: docs/CHANGELOG.md
     
