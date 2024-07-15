@@ -49,6 +49,18 @@ The `library_spec` describes the "regions" in the sequencing library. Each regio
 - `sequence`: Actual or representative sequence
 - `min_len` and `max_len`: Minimum and maximum length of the region
 
+Each region can have nested regions under the `regions` property. This means a valid library structure could look like:
+
+```
+region_1
+|-region_2
+|-region_3
+region_4
+|-region_5
+```
+
+Importantly, the first "level" of the `library_spec` must have `region_ids` that correspond to the list of `modalities`.
+
 ## Sequence structure
 
 The `sequence_spec` describes the sequencing reads. Each read includes:
