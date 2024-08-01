@@ -37,11 +37,13 @@ sequence_spec:
   # List of reads generated from the library
 ```
 
+`modalities` contains a list of strings describing the types of molecules assayed. They come from a [controlled vocabulary](SPECIFICATION.md). Additional assay metadata includes library preparation kit and protocol as well as sequencing kit and protocol.
+
 `seqspec` files can be manipulated and used with the `seqspec` command line tool.
 
 ## Library structure
 
-The `library_spec` describes the "regions" in the sequencing library. Each region includes:
+The `library_spec` describes the "regions", or set of standard "blocks" such as a barcode, contained in the sequencing library. Each region is annotated with the following metadata:
 
 - `region_id`: Unique identifier for the region
 - `region_type`: Type of region (e.g., barcode, UMI, cDNA)
@@ -49,21 +51,24 @@ The `library_spec` describes the "regions" in the sequencing library. Each regio
 - `sequence`: Actual or representative sequence
 - `min_len` and `max_len`: Minimum and maximum length of the region
 
-Each region can have nested regions under the `regions` property. This means a valid library structure could look like:
+Each region can contain nested regions under the `regions` property. This means a valid library structure could look like:
 
 ```
 region_1
 |-region_2
-|-region_3
-region_4
-|-region_5
+  |--region_3
+|-region_4
+region_5
+|-region_6
 ```
 
-Importantly, the first "level" of the `library_spec` must have `region_ids` that correspond to the list of `modalities`.
+```{important}
+The first "level" of the `library_spec` must have `region_ids` that correspond to the list of `modalities`. In the example above, the first level corresponds to the region ids `region_1` and `region_5`.
+```
 
 ## Sequence structure
 
-The `sequence_spec` describes the sequencing reads. Each read includes:
+The `sequence_spec` contains a list of the sequencing "reads" generated from the `library_spec`. Each read is annotated with the following metadata:
 
 - `read_id`: Identifier for the read
 - `modality`: Associated modality
@@ -75,13 +80,20 @@ The `sequence_spec` describes the sequencing reads. Each read includes:
 
 The relationship between the `sequence_spec` and `library_spec` in `seqspec` is defined as follows:
 
-1. Each read in the sequence specification has a `primer_id` that corresponds to a unique `region_id` in the library specification.
-2. This `primer_id` indicates the starting point of the read within the library structure.
+1. Each read in the `sequence_spec` has a `primer_id` that corresponds to a unique `region_id` in the `library_spec`.
+2. This `primer_id` indicates the starting point of the read within the library molecule.
 3. The `min_len` and `max_len` properties of the read define how many bases are sequenced from this starting point.
-4. The read encompasses all library elements that fall within its length, starting from the primer region.
+4. The read encompasses all library elements that fall within its length, starting from the end of the `primer_id` region.
 5. If the read is on the positive strand, it extends to the right of the primer; if on the negative strand, it extends to the left.
 
-This mapping allows precise identification of which library elements are captured in each sequencing read using the `seqspec index` command.
+This mapping allows the precise identification the library elements captured in each sequencing read using the `seqspec index` command.
+
+# Format requirements
+
+The following requirements are often sources of errors when writing a `seqspec` file.
+
+- Each `region_id` in top-most level of the `library_spec` should correspond to one modality in the `modalities`.
+- The `primer_id` of each read in the `sequence_spec` must exist as a `region_id` in the `library_spec`
 
 # Conclusion
 
