@@ -5,30 +5,30 @@ authors:
   - name: A. Sina Booeshaghi
 ---
 
-A `seqspec` file requires an understanding of multiple aspects of the sequencing library and FASTQ read structure, including:
+A `seqspec` file contains information about an dna library and the sequencing reads generated from it. To write a `seqspec` file one must know:
 
 - The library protocol used to generate your assay library (e.g., 10x Genomics v3)
 - The library kit used to append sequencing primers to your library (e.g., Illumina Truseq dual index)
 - The sequencing kit used to sequence your library (e.g., Illumina NovaSeq 6000 v1.5 kit)
 - The sequencing machine used to sequence your library (e.g., Illumina NovaSeq 6000)
-- The elements and nucleotide sequences of your sequencing library
-  - For example, the first 10 bp are a primer, the next 16 are a barcode, etc.
+- The components and nucleotide sequences of your sequencing library
+  - E.g., the first 10 bp are a primer, the next 16 are a barcode, etc.
 - The sequencing reads generated from your sequencing protocol
   - Read 1 uses the read 1 primer
   - Index 1 uses the index 1 primer
   - etc.
 
 :::{note}
-**Note**: Developing a `seqspec` file for a published assay can be challenging, as authors often assume readers have prior knowledge or omit necessary information.
+**Note**: Developing a `seqspec` file for a published assay can be challenging, as authors often assume readers have prior knowledge of library preparation steps.
 :::
 
 # Example: SPLiT-Seq Assay
 
-Let's develop a `seqspec` for the [SPLiT-Seq assay](https://www.science.org/doi/10.1126/science.aam8999). We'll first gather the relevant information needed for the spec, determining both the library structure (the structure of the molecule placed on the sequencing machine) and the read structure (the elements contained within the FASTQ reads).
+Let's develop a `seqspec` for the [SPLiT-Seq assay](https://www.science.org/doi/10.1126/science.aam8999). We'll first gather information needed for the spec. Then we will figure out the library structure (the structure of the molecule placed on the sequencing machine) and the read structure (the elements contained within the FASTQ reads).
 
 ## Library structure
 
-Figure 1A shows the library molecule structure, with the caption stating:
+The manuscript gives us insight into the structure of the generated library. Figure 1A shows the library molecule structure, with the caption stating:
 
 > Labeling transcriptomes with split-pool barcoding. In each split-pool round, fixed cells or nuclei are randomly distributed into wells, and transcripts are labeled with well-specific barcodes. Barcoded RT primers are used in the first round. Second- and third-round barcodes are appended to cDNA through ligation. A fourth barcode is added to cDNA molecules by PCR during sequencing library preparation. The bottom schematic shows the final barcoded cDNA molecule.
 
@@ -111,7 +111,7 @@ A9	Round3_09	/5Biosg/CAGACGTGTGCTCTTCCGATCT NNNNNNNNNN CGCTGATC GTGGCCGATGTTTCG
 A10	Round3_10	/5Biosg/CAGACGTGTGCTCTTCCGATCT NNNNNNNNNN ACAAGCTA GTGGCCGATGTTTCG
 ```
 
-Note that the barcodes are 8bp long.
+Note that the variable part of the "barcode" is 8bp long.
 
 The methods describe how the final library is constructed from these various pieces:
 

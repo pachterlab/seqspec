@@ -1,0 +1,10 @@
+- !Region
+  region_id: illumina_p7
+  region_type: illumina_p7
+  name: Illumina P7
+  sequence_type: fixed
+  sequence: ATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 24
+  max_len: 24
+  onlist: null
+  regions: null

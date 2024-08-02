@@ -38,7 +38,7 @@ optional arguments:
   -h, --help  show this help message and exit
 ```
 
-`seqspec` operates on `seqspec` compatible YAML files that follow the specification. All of the following examples will use the `seqspec` specification for the DOGMAseq-DIG assay which can be found here: `seqspec/examples/specs/dogmaseq-dig/spec.yaml`.
+`seqspec` operates on `seqspec` compatible YAML files that follow the specification. All of the following examples will use the `seqspec` specification for the [DOGMAseq-DIG](https://doi.org/10.1186/s13059-022-02698-8) assay which can be found here: `seqspec/examples/specs/dogmaseq-dig/spec.yaml`.
 
 :::{attention}
 **IMPORTANT**: Many `seqspec` commands require that the specification be properly formatted and error-corrected. Errors in the spec can be found with `seqspec check` (see below for instructions). The spec can be properly formatted (or "filled in") with `seqspec format`. It is recommended to run `seqspec format` followed by `seqspec check` after writing a `seqspec` (or correcting errors in one).

@@ -1,0 +1,33 @@
+- !Region
+  region_id: barcode
+  region_type: barcode
+  name: Barcode
+  sequence_type: onlist
+  sequence: NNNNNNNNNNNNNNNN
+  min_len: 16
+  max_len: 16
+  onlist: !Onlist
+    filename: barcode_onlist.txt
+    location: local
+    md5: 5b62453df2771f5aa856f78797f16591
+  regions: null
+- !Region
+  region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNNNN
+  min_len: 10
+  max_len: 10
+  onlist: null
+  regions: null
+- !Region
+  region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null

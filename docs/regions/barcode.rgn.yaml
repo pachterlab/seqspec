@@ -1,0 +1,14 @@
+# note for multiple of the same region the region id gets a number, i.e. barcode-1 barcode-2
+- !Region
+  region_id: barcode
+  region_type: barcode
+  name: Barcode
+  sequence_type: onlist
+  sequence: NNNNNNNNNNNNNNNN
+  min_len: 16
+  max_len: 16
+  onlist: !Onlist
+    filename: barcode_onlist.txt
+    location: local
+    md5: 5b62453df2771f5aa856f78797f16591
+  regions: null
