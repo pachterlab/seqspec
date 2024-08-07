@@ -144,8 +144,7 @@
         },
         "sequence": {
           "description": "The sequence",
-          "type": "string",
-          "pattern": "^[ACGTRYMKSWHBVDNX]+$"
+          "type": "string"
         },
         "min_len": {
           "description": "The minimum length of the sequence",
@@ -194,7 +193,31 @@
         "sequence",
         "min_len",
         "max_len"
-      ]
+      ],
+      "if": {
+        "properties": {
+          "min_len": {
+            "const": 0
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "sequence": {
+            "type": "string",
+            "pattern": "^[ACGTRYMKSWHBVDNX]*$"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "sequence": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^[ACGTRYMKSWHBVDNX]+$"
+          }
+        }
+      }
     },
     "read": {
       "title": "Read",
