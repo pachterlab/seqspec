@@ -31,18 +31,23 @@ def validate_split_args(parser, args):
     modalities = spec.list_modalities()
     # make a new spec per modality
     for m in modalities:
-        spec_m = Assay(
-            spec.assay,
-            spec.sequencer,
-            spec.name,
-            spec.doi,
-            spec.publication_date,
-            spec.description,
-            [m],
-            spec.lib_struct,
-            [spec.get_libspec(m)],
-            spec.seqspec_version,
-        )
+        info = {
+            "assay_id": spec.assay_id,
+            "name": spec.name,
+            "doi": spec.doi,
+            "date": spec.date,
+            "description": spec.description,
+            "modalities": [m],
+            "lib_struct": spec.lib_struct,
+            "library_kit": spec.library_kit,
+            "library_protocol": spec.library_protocol,
+            "sequence_kit": spec.sequence_kit,
+            "sequence_protocol": spec.sequence_protocol,
+            "sequence_spec": spec.get_seqspec(m),
+            "library_spec": [spec.get_libspec(m)],
+            "seqspec_version": spec.seqspec_version,
+        }
+        spec_m = Assay(**info)
         spec_m.update_spec()
         base_o = "spec." if os.path.basename(o) == "" else f"{os.path.basename(o)}."
 
