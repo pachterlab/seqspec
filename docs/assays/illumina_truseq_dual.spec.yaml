@@ -1,5 +1,5 @@
 !Assay
-seqspec_version: 0.0.0
+seqspec_version: 0.2.0
 assay_id: Illumina-novaseq-truseq-dual-index
 name: Example assay
 doi: https://support.illumina.com/content/dam/illumina-support/documents/documentation/system_documentation/miseq/indexed-sequencing-overview-guide-15057455-08.pdf

@@ -118,6 +118,22 @@ If you are unfamiliar with pull requests, you can find more information on the [
 
 - Ensure any changes are tested for compatibility and do not break existing functionality.
 
+## Adding or modifying controlled vocabulary
+
+Various `Region` attributes use controlled vocabulary to describe the sequence. These vocabulary are listed in the [specification](SPECIFICAITON.md). If you wish to add new controlled vocabulary or modify existing controlled vocabulary please first review the specification and then submit a pull request with an example `Region`. Please justify the inclusion of the controlled vocabulary in your pull request. Below are a list of questions and prompts to address:
+
+If you are suggesting a new `region_type`:
+
+1. In what assay is this `region_type` used? Please link to primary sources.
+2. In what ways will the identification and extraction of the `region_type` be useful for sequence processing?
+3. What `seqspec` tools need to be modified to take advantage of this new `region_type`?
+
+If you are suggesting a new `sequence_type`:
+
+1. Given examples of this sequence type.
+2. Where is this sequence type used?
+3. What `seqspec` tools need to be modified to take advantage of this new `sequence_type`?
+
 ## Conclusion
 
 We value your contributions and aim to make the process of improving the specification collaborative and transparent. For any questions, please contact the repository maintainers.

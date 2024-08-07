@@ -156,12 +156,24 @@ seqspec index [-o OUT] [-t TOOL] [--rev] -m MODALITY -r REGION yaml
 - optionally, `-o OUT` can be used to write the output to a file.
 - optionally, `--rev` can be set to return the 3'->5' index.
 - optionally, `-t TOOL` returns the indices in the format specified by the tool. One of:
-  - `kb`: `kallisto`/`kb count` `-x TECHNOLOGY` ([format](https://pachterlab.github.io/kallisto/manual#:~:text=will%20accept%20a-,string,-specifying%20a%20new))
+  - `kb`: `kallisto`/`kb count` `-x TECHNOLOGY` ([format](https://pachterlab.github.io/kallisto/manual#:~:text=will%20accept%20a-,string,-specifying%20a%20new)) requires a barcode, UMI, and sequence. The following `region_type` are used during indexing:
+    - `barcode` for the barcode
+    - `umi` for the umi
+    - `cdna`, `gdna`, `protein`, or `tag` for the sequence
   - `seqkit`: `seqkit subseq` `-r, --region string` ([format](https://bioinf.shenwei.me/seqkit/usage/#subseq))
-  - `simpleaf`: `simpleaf quant` `-c, --chemistry` ([format](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag))
-  - `starsolo`: `--soloCBstart`, `--soloCBlen`, `--soloUMIstart`, `--soloUMIlen` ([format](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md#barcode-geometry)
+  - `simpleaf`: `simpleaf quant` `-c, --chemistry` ([format](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag)) requires a barcode, UMI, and sequence. The following `region_type` are used during indexing:
+    - `barcode` for the barcode
+    - `umi` for the umi
+    - `cdna` for the sequence
+  - `starsolo`: `--soloCBstart`, `--soloCBlen`, `--soloUMIstart`, `--soloUMIlen` ([format](https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md#barcode-geometry)) requires a barcode, UMI, and sequence. The following `region_type` are used during indexing:
+    - `barcode` for the barcode
+    - `umi` for the umi
+    - `cdna` for the sequence
   - `tab`: tab delimited file (`region<\t>element<\t>start<t>end`)
-  - `zumis`: yaml ([format](https://github.com/sdparekh/zUMIs/blob/main/zUMIs.yaml))
+  - `zumis`: yaml ([format](https://github.com/sdparekh/zUMIs/blob/main/zUMIs.yaml)) requires a barcode, UMI, and sequence. The following `region_type` are used during indexing:
+    - `barcode` for the barcode
+    - `umi` for the umi
+    - `cdna` for the sequence
 - `-m MODALITY` is the modality that the `-r REGION`region resides in.
 - `-r REGION` is the `region_id` you are indexing.
 - `yaml` corresponds to the `seqspec` file.
