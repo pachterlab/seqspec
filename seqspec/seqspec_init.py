@@ -1,5 +1,5 @@
 from seqspec.Assay import Assay
-from seqspec.Region import Region
+from seqspec.Region import Region, Read
 from typing import List
 import newick
 
@@ -7,6 +7,7 @@ import newick
 
 
 # seqspec init -n myassay -m 1 -o spec.yaml "(((barcode:16,umi:12)r1.fastq.gz,(cdna:150)r2.fastq.gz)rna)"
+# seqspec init -n myassay -m 1 -o spec.yaml -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg" "((truseq_r1:10,barcode:16,umi:12,cdna:150)rna)"
 # seqspec init -n myassay -m 2 -o spec.yaml "(((barcode:16,umi:12)r1.fastq.gz,(cdna:150)r2.fastq.gz)rna,((barcode:16)r1.fastq.gz,(gdna:150)r2.fastq.gz,(gdna:150)r3.fastq.gz)atac)"
 def setup_init_args(parser):
     subparser = parser.add_parser(
@@ -20,6 +21,15 @@ def setup_init_args(parser):
     )
     subparser_required.add_argument(
         "-m", metavar="MODALITIES", type=int, help="number of modalities", required=True
+    )
+
+    # -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg"
+    subparser_required.add_argument(
+        "-r",
+        metavar="READS",
+        type=str,
+        help="list of modalities, reads, primer_ids, lengths, and strand (e.g. modality,fastq_name,primer_id,len,strand:...)",
+        required=True,
     )
 
     subparser_required.add_argument(
@@ -50,12 +60,12 @@ def validate_init_args(parser, args):
         )
 
     # load in two specs
-    spec = run_init(name, tree[0].descendants)
+    spec = run_init(name, tree[0].descendants, parse_reads_string(args.r))
     spec.to_YAML(o)
 
 
 # takes in library_spec list of nodes
-def run_init(name: str, tree: List[newick.Node]):
+def run_init(name: str, tree: List[newick.Node], reads: List[Read]):
     # make regions for each fastq
     # make region for each modality
     # add fastq regions to modality regions
@@ -79,7 +89,7 @@ def run_init(name: str, tree: List[newick.Node]):
         library_protocol="",
         sequence_kit="",
         sequence_protocol="",
-        sequence_spec=[],
+        sequence_spec=reads,
         library_spec=rgns,
     )
 
@@ -111,3 +121,43 @@ def newick_to_region(
             )
         )
     return region
+
+
+# def parse_reads_string(input_string):
+#     reads = []
+#     objects = input_string.split(":")
+
+#     for obj in objects:
+#         parts = obj.split(",")
+#         read_id, primer_id, min_len, strand = parts
+#         read_dict = {
+#             "read_id": read_id,
+#             "primer_id": primer_id,
+#             "min_len": int(min_len),
+#             "max_len": int(min_len),
+#             "strand": strand,
+#         }
+#         reads.append(read_dict)
+
+#     return reads
+
+
+def parse_reads_string(input_string):
+    reads = []
+    objects = input_string.split(":")
+    for obj in objects:
+        parts = obj.split(",")
+        modality, read_id, primer_id, min_len, strand = parts
+
+        read = Read(
+            read_id=read_id,
+            name=read_id,
+            modality=modality,  # Assuming modality is always DNA
+            primer_id=primer_id,
+            min_len=int(min_len),
+            max_len=int(min_len),
+            strand=strand,
+        )
+        reads.append(read)
+
+    return reads
