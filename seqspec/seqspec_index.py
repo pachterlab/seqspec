@@ -1,10 +1,14 @@
 from seqspec.utils import load_spec, map_read_id_to_regions
 from seqspec.seqspec_find import run_find
-from collections import defaultdict
-from typing import Dict, List, Tuple
+
+# from typing import Dict, List
 from argparse import SUPPRESS
 import os
-from seqspec.Region import RegionCoordinate, project_regions_to_coordinates, itx_read
+from seqspec.Region import (
+    project_regions_to_coordinates,
+    itx_read,
+    ReadCoordinate,
+)
 
 
 def setup_index_args(parser):
@@ -124,34 +128,35 @@ def run_index(
 
 
 # TODO: modify to use RegionCoordinate object
-def get_index_by_type(
-    spec, modality, region_id, rev=False
-) -> Dict[str, List[Tuple[int, int]]]:
-    rid = region_id
-    # run function
-    index = defaultdict(list)
-    regions = run_find(spec, modality, rid)
-    leaves = regions[0].get_leaves()
-    if rev:
-        leaves.reverse()
-    cuts = project_regions_to_coordinates(leaves)
+# def get_index_by_type(
+#     spec, modality, region_id, rev=False
+# ) -> Dict[str, List[Tuple[int, int]]]:
+#     rid = region_id
+#     # run function
+#     index = defaultdict(list)
+#     regions = run_find(spec, modality, rid)
+#     leaves = regions[0].get_leaves()
+#     if rev:
+#         leaves.reverse()
+#     cuts = project_regions_to_coordinates(leaves)
 
-    # index is a legacy data structure, todo fix
-    for c in cuts:
-        index[c.start, c.stop] = c.region_type
+#     # index is a legacy data structure, todo fix
+#     for c in cuts:
+#         index[c.start, c.stop] = c.region_type
 
-    # groupby requested region
-    for idx, l in enumerate(leaves):
-        t = l.region_type
-        c = cuts[idx]
+#     # groupby requested region
+#     for idx, l in enumerate(leaves):
+#         t = l.region_type
+#         c = cuts[idx]
 
-        index[t].extend([c])
-    return index
+#         index[t].extend([c])
+#     return index
 
 
+# TODO fix return type
 def get_index(
     spec, modality, region_id, rev=False
-) -> Dict[str, List[RegionCoordinate]]:
+):  # -> Dict[str, List[RegionCoordinate]]:
     rid = region_id
     regions = run_find(spec, modality, rid)
     leaves = regions[0].get_leaves()
@@ -159,12 +164,13 @@ def get_index(
         leaves.reverse()
     cuts = project_regions_to_coordinates(leaves)
 
-    return {region_id: cuts}
+    return {region_id: cuts, "strand": "pos"}
 
 
+# TODO fix return type
 def get_index_by_primer(
     spec, modality: str, read_id: str
-) -> Dict[str, List[RegionCoordinate]]:  # noqa
+):  # -> Dict[str, List[RegionCoordinate]]:  # noqa
     # this manages the strandedness internally
     (read, rgns) = map_read_id_to_regions(spec, modality, read_id)
 
@@ -172,8 +178,9 @@ def get_index_by_primer(
     rcs = project_regions_to_coordinates(rgns)
 
     new_rcs = itx_read(rcs, 0, read.max_len)
+    rdc = ReadCoordinate(read, new_rcs)
 
-    return {read_id: new_rcs}
+    return {read_id: new_rcs, "strand": rdc.read.strand}
 
 
 def format_kallisto_bus(indices, subregion_type=None):
@@ -181,6 +188,7 @@ def format_kallisto_bus(indices, subregion_type=None):
     umi = []
     feature = []
     for idx, region in enumerate(indices):
+        rg_strand = region.pop("strand")  # noqa
         for rgn, cuts in region.items():
             for cut in cuts:
                 if cut.region_type.upper() == "BARCODE":
@@ -223,6 +231,7 @@ def format_seqkit_subseq(indices, subregion_type=None):
 def format_tab(indices, subregion_type=None):
     x = ""
     for idx, region in enumerate(indices):
+        rg_strand = region.pop("strand")  # noqa
         for rgn, cuts in region.items():
             for cut in cuts:
                 x += f"{rgn}\t{cut.name}\t{cut.region_type}\t{cut.start}\t{cut.stop}\n"
@@ -235,6 +244,7 @@ def format_starsolo(indices, subregion_type=None):
     umi = []
     cdna = []
     for idx, region in enumerate(indices):
+        rg_strand = region.pop("strand")  # noqa
         for rgn, cuts in region.items():
             for cut in cuts:
                 if cut.region_type.upper() == "BARCODE":
@@ -253,6 +263,7 @@ def format_simpleaf(indices, subregion_type=None):
     x = ""
     xl = []
     for idx, region in enumerate(indices):
+        rg_strand = region.pop("strand")  # noqa
         fn = idx
         x = f"{fn+1}{{"
         for rgn, cuts in region.items():
@@ -271,6 +282,7 @@ def format_simpleaf(indices, subregion_type=None):
 def format_zumis(indices, subregion_type=None):
     xl = []
     for idx, region in enumerate(indices):
+        rg_strand = region.pop("strand")  # noqa
         x = ""
         for rgn, cuts in region.items():
             for cut in cuts:
@@ -302,11 +314,14 @@ def format_chromap(indices, subregion_type=None):
     gdna_fqs = []
     gdna_str = []
     for idx, region in enumerate(indices):
+        rg_strand = region.pop("strand")
+        print(rg_strand)
+        strand = "" if rg_strand == "pos" else ":-"
         for rgn, cuts in region.items():
             for cut in cuts:
                 if cut.region_type.upper() == "BARCODE":
                     bc_fqs.append(rgn)
-                    bc_str.append(f"bc:{cut.start}:{cut.stop-1}")
+                    bc_str.append(f"bc:{cut.start}:{cut.stop-1}{strand}")
                     pass
                 elif cut.region_type.upper() == "GDNA":
                     gdna_fqs.append(rgn)

@@ -439,3 +439,9 @@ class Read(yaml.YAMLObject):
         if strand:
             self.strand = strand
         return
+
+
+class ReadCoordinate:
+    def __init__(self, read: Read, rcv: List[RegionCoordinate]) -> None:
+        self.read = read
+        self.rcv = rcv
