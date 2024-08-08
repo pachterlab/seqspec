@@ -11,6 +11,43 @@ def setup_modify_args(parser):
     subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
 
+    subparser.add_argument(
+        "--region",
+        help=("Switch to region mode"),
+        action="store_true",
+        default=False,
+    )
+
+    # Read properties
+    subparser.add_argument(
+        "--read-id",
+        metavar="READID",
+        help=("New ID of read"),
+        type=str,
+        default=None,
+    )
+    subparser.add_argument(
+        "--read-name",
+        metavar="READNAME",
+        help=("New name of read"),
+        type=str,
+        default=None,
+    )
+    subparser.add_argument(
+        "--primer-id",
+        metavar="PRIMERID",
+        help=("New ID of primer"),
+        type=str,
+        default=None,
+    )
+    subparser.add_argument(
+        "--strand",
+        metavar="STRAND",
+        help=("New strand"),
+        type=str,
+        default=None,
+    )
+
     # Region properties
 
     subparser.add_argument(
@@ -73,8 +110,8 @@ def setup_modify_args(parser):
     )
     subparser_required.add_argument(
         "-r",
-        metavar="REGIONID",
-        help=("ID of region to modify"),
+        metavar="READID/REGIONID",
+        help=("ID of read/region to modify"),
         type=str,
         default=None,
         required=True,
@@ -97,17 +134,35 @@ def validate_modify_args(parser, args):
     o = args.o
     spec = load_spec(fn)
     modality = args.m
-    target_region = args.r
+    target_r = args.r
 
+    # Read properties
+    read_id = args.read_id
+    read_name = args.read_name
+    primer_id = args.primer_id
+    strand = args.strand
+
+    # Region properties
     region_id = args.region_id
     region_type = args.region_type
     region_name = args.region_name
     sequence_type = args.sequence_type
     sequence = args.sequence
 
+    # Read and Region properties
     min_len = args.min_len
     max_len = args.max_len
-    kwd = {
+
+    read_kwd = {
+        "read_id": read_id,
+        "read_name": read_name,
+        "primer_id": primer_id,
+        "min_len": min_len,
+        "max_len": max_len,
+        "strand": strand,
+    }
+
+    region_kwd = {
         "region_id": region_id,
         "region_type": region_type,
         "name": region_name,
@@ -116,14 +171,38 @@ def validate_modify_args(parser, args):
         "min_len": min_len,
         "max_len": max_len,
     }
-    spec = run_modify(spec, modality, target_region, **kwd)
+    if args.region:
+        spec = run_modify_region(spec, modality, target_r, **region_kwd)
+    else:
+        spec = run_modify_read(spec, modality, target_r, **read_kwd)
     # update region in spec
     # once the region is updated, update the spec
     spec.update_spec()
     spec.to_YAML(o)
 
 
-def run_modify(
+def run_modify_read(
+    spec,
+    modality,
+    target_read,
+    read_id,
+    read_name,
+    primer_id,
+    min_len,
+    max_len,
+    strand,
+):
+    reads = spec.get_seqspec(modality)
+    for r in reads:
+        if r.read_id == target_read:
+            r.update_read_by_id(
+                read_id, read_name, modality, primer_id, min_len, max_len, strand
+            )
+
+    return spec
+
+
+def run_modify_region(
     spec,
     modality,
     target_region,

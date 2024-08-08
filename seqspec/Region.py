@@ -413,3 +413,29 @@ class Read(yaml.YAMLObject):
             "strand": self.strand,
         }
         return d
+
+    def update_read_by_id(
+        self,
+        read_id,
+        name,
+        modality,
+        primer_id,
+        min_len,
+        max_len,
+        strand,
+    ):
+        if read_id:
+            self.read_id = read_id
+        if name:
+            self.name = name
+        if modality:
+            self.modality = modality
+        if primer_id:
+            self.primer_id = primer_id
+        if min_len:
+            self.min_len = min_len
+        if max_len:
+            self.max_len = max_len
+        if strand:
+            self.strand = strand
+        return
