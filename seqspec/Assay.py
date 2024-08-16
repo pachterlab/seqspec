@@ -1,6 +1,6 @@
 import yaml
 from seqspec.Region import Region, Read
-from typing import List, Optional
+from typing import List, Optional, Union
 import json
 from . import __version__
 
@@ -17,10 +17,10 @@ class Assay(yaml.YAMLObject):
         description: str,
         modalities: List[str],
         lib_struct: str,
-        sequence_protocol: str,
-        sequence_kit: str,
-        library_protocol: str,
-        library_kit: str,
+        sequence_protocol: Union[str, List["SeqProtocol"], None],
+        sequence_kit: Union[str, List["SeqKit"], None],
+        library_protocol: Union[str, List["LibProtocol"], None],
+        library_kit: Union[str, List["LibKit"], None],
         sequence_spec: List[Read],
         library_spec: List[Region],
         seqspec_version: str = __version__,
@@ -61,6 +61,26 @@ class Assay(yaml.YAMLObject):
         return f"{d}"
 
     def to_dict(self):
+        if isinstance(self.sequence_kit, list):
+            sequence_kit = [o.to_dict() for o in self.sequence_kit]
+        else:
+            sequence_kit = self.sequence_kit
+
+        if isinstance(self.sequence_protocol, list):
+            sequence_protocol = [o.to_dict() for o in self.sequence_protocol]
+        else:
+            sequence_protocol = self.sequence_protocol
+
+        if isinstance(self.library_kit, list):
+            library_kit = [o.to_dict() for o in self.library_kit]
+        else:
+            library_kit = self.library_kit
+
+        if isinstance(self.library_protocol, list):
+            library_protocol = [o.to_dict() for o in self.library_protocol]
+        else:
+            library_protocol = self.library_protocol
+
         d = {
             "seqspec_version": self.seqspec_version,
             "assay_id": self.assay_id,
@@ -70,20 +90,21 @@ class Assay(yaml.YAMLObject):
             "description": self.description,
             "modalities": self.modalities,
             "lib_struct": self.lib_struct,
-            "sequence_protocol": self.sequence_protocol,
-            "sequence_kit": self.sequence_kit,
-            "library_protocol": self.library_protocol,
-            "library_kit": self.library_kit,
+            "sequence_protocol": sequence_protocol,
+            "sequence_kit": sequence_kit,
+            "library_protocol": library_protocol,
+            "library_kit": library_kit,
             "sequence_spec": [o.to_dict() for o in self.sequence_spec],
             "library_spec": [o.to_dict() for o in self.library_spec],
         }
+
         return d
 
     def to_JSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=False, indent=4)
 
     # note to_yaml is reserved for yaml.YAMLObject
-    def to_YAML(self, fname: Optional[str]=None):
+    def to_YAML(self, fname: Optional[str] = None):
         """Export seqspec to yaml
 
         If fname is provided, the seqspec text will be written to the
@@ -116,3 +137,105 @@ class Assay(yaml.YAMLObject):
 
     def list_modalities(self):
         return self.modalities
+
+
+class SeqProtocol(yaml.YAMLObject):
+    yaml_tag = "!SeqProtocol"
+
+    def __init__(self, name: str, modality: str) -> None:
+        self.protocol_id = id
+        self.name = name
+        self.modality = modality
+
+    def __repr__(self) -> str:
+        d = {
+            "protocol_id": self.protocol_id,
+            "name": self.name,
+            "modality": self.modality,
+        }
+        return f"{d}"
+
+    def to_dict(self):
+        d = {
+            "protocol_id": self.protocol_id,
+            "name": self.name,
+            "modality": self.modality,
+        }
+        return d
+
+
+class SeqKit(yaml.YAMLObject):
+    yaml_tag = "!SeqKit"
+
+    def __init__(self, kit_id: str, name: str, modality: str) -> None:
+        self.kit_id = kit_id
+        self.name = name
+        self.modality = modality
+
+    def __repr__(self) -> str:
+        d = {
+            "kit_id": self.kit_id,
+            "name": self.name,
+            "modality": self.modality,
+        }
+        return f"{d}"
+
+    def to_dict(self):
+        d = {
+            "kit_id": self.kit_id,
+            "name": self.name,
+            "modality": self.modality,
+        }
+        return d
+
+
+class LibProtocol(yaml.YAMLObject):
+    yaml_tag = "!LibProtocol"
+
+    def __init__(
+        self, protocol_id: str, name: str, description: str, modality: str
+    ) -> None:
+        self.protocol_id = protocol_id
+        self.name = name
+        self.modality = modality
+
+    def __repr__(self) -> str:
+        d = {
+            "protocol_id": self.protocol_id,
+            "name": self.name,
+            "modality": self.modality,
+        }
+        return f"{d}"
+
+    def to_dict(self):
+        d = {
+            "protocol_id": self.protocol_id,
+            "name": self.name,
+            "modality": self.modality,
+        }
+        return d
+
+
+class LibKit(yaml.YAMLObject):
+    yaml_tag = "!LibKit"
+
+    def __init__(self, kit_id: str, name: str, modality: str) -> None:
+        self.kit_id = kit_id
+        self.name = name
+        self.modality = modality
+
+    def __repr__(self) -> str:
+        d = {
+            "kit_id": self.kit_id,
+            "name": self.name,
+            "modality": self.modality,
+        }
+        return f"{d}"
+
+    def to_dict(self):
+        d = {
+            "kit_id": self.kit_id,
+            "name": self.name,
+            "modality": self.modality,
+        }
+        return d

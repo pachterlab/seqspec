@@ -1,4 +1,5 @@
 from seqspec.utils import load_spec
+from seqspec.Region import File
 
 
 def setup_modify_args(parser):
@@ -44,6 +45,16 @@ def setup_modify_args(parser):
         "--strand",
         metavar="STRAND",
         help=("New strand"),
+        type=str,
+        default=None,
+    )
+
+    # files to insert into the read
+    # format: filename,filetype,filesize,url,urltype,md5:...
+    subparser.add_argument(
+        "--files",
+        metavar="FILES",
+        help=("New files, (filename,filetype,filesize,url,urltype,md5:...)"),
         type=str,
         default=None,
     )
@@ -141,6 +152,7 @@ def validate_modify_args(parser, args):
     read_name = args.read_name
     primer_id = args.primer_id
     strand = args.strand
+    files = args.files
 
     # Region properties
     region_id = args.region_id
@@ -160,6 +172,7 @@ def validate_modify_args(parser, args):
         "min_len": min_len,
         "max_len": max_len,
         "strand": strand,
+        "files": files,
     }
 
     region_kwd = {
@@ -191,12 +204,14 @@ def run_modify_read(
     min_len,
     max_len,
     strand,
+    files,
 ):
     reads = spec.get_seqspec(modality)
+    files = parse_files_string(files)
     for r in reads:
         if r.read_id == target_read:
             r.update_read_by_id(
-                read_id, read_name, modality, primer_id, min_len, max_len, strand
+                read_id, read_name, modality, primer_id, min_len, max_len, strand, files
             )
 
     return spec
@@ -226,3 +241,24 @@ def run_modify_region(
     )
 
     return spec
+
+
+# filename,filetype,filesize,url,urltype,md5:...
+def parse_files_string(input_string):
+    files = []
+    objects = input_string.split(":")
+    for obj in objects:
+        parts = obj.split(",")
+        filename, filetype, filesize, url, urltype, md5 = parts
+
+        file = File(
+            filename=filename,
+            filetype=filetype,
+            filesize=int(filesize),
+            url=url,
+            urltype=urltype,
+            md5=md5,
+        )
+        files.append(file)
+
+    return files

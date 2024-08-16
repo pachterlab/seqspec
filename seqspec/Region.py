@@ -345,16 +345,78 @@ def itx_read(
 class Onlist(yaml.YAMLObject):
     yaml_tag = "!Onlist"
 
-    def __init__(self, filename: str, md5: str, location: str) -> None:
+    def __init__(
+        self,
+        filename: str,
+        filetype: str,
+        filesize: int,
+        url: str,
+        urltype: str,
+        md5: str,
+        location: str,
+    ) -> None:
         super().__init__()
         self.filename = filename
+        self.filetype = filetype
+        self.filesize = filesize
+        self.url = url
+        self.urltype = urltype
         self.md5 = md5
+        # to depracate
         self.location = location
 
     def __repr__(self) -> str:
         d = {
             "filename": self.filename,
+            # "filetype": self.filetype,
+            # "filesize": self.filesize,
+            # "url": self.url,
+            # "urltype": self.urltype,
+            "md5": self.md5,
             "location": self.location,
+        }
+        return f"{d}"
+
+    def to_dict(self):
+        d = {
+            "filename": self.filename,
+            # "filetype": self.filetype,
+            # "filesize": self.filesize,
+            # "url": self.url,
+            # "urltype": self.urltype,
+            "md5": self.md5,
+            "location": self.location,
+        }
+        return d
+
+
+class File(yaml.YAMLObject):
+    yaml_tag = "!File"
+
+    def __init__(
+        self,
+        filename: str,
+        filetype: str,
+        filesize: int,
+        url: str,
+        urltype: str,
+        md5: str,
+    ) -> None:
+        super().__init__()
+        self.filename = filename
+        self.filetype = filetype
+        self.filesize = filesize
+        self.url = url
+        self.urltype = urltype
+        self.md5 = md5
+
+    def __repr__(self) -> str:
+        d = {
+            "filename": self.filename,
+            "filetype": self.filetype,
+            "filesize": self.filesize,
+            "url": self.url,
+            "urltype": self.urltype,
             "md5": self.md5,
         }
         return f"{d}"
@@ -362,7 +424,10 @@ class Onlist(yaml.YAMLObject):
     def to_dict(self):
         d = {
             "filename": self.filename,
-            "location": self.location,
+            "filetype": self.filetype,
+            "filesize": self.filesize,
+            "url": self.url,
+            "urltype": self.urltype,
             "md5": self.md5,
         }
         return d
@@ -380,6 +445,7 @@ class Read(yaml.YAMLObject):
         min_len: int,
         max_len: int,
         strand: str,
+        files: Optional[List["File"]] = None,
     ) -> None:
         super().__init__()
         self.read_id = read_id
@@ -389,6 +455,10 @@ class Read(yaml.YAMLObject):
         self.min_len = min_len
         self.max_len = max_len
         self.strand = strand
+        self.files = files
+
+    def set_files(self, files: Optional[List["File"]] = None):
+        self.files = files
 
     def __repr__(self) -> str:
         d = {
@@ -399,10 +469,16 @@ class Read(yaml.YAMLObject):
             "min_len": self.min_len,
             "max_len": self.max_len,
             "strand": self.strand,
+            "files": self.files,
         }
         return f"{d}"
 
     def to_dict(self):
+        # TODO is this necessary for backwards compatibility?
+        if self.files:
+            files = [i.to_dict() for i in self.files]
+        else:
+            files = []
         d = {
             "read_id": self.read_id,
             "name": self.name,
@@ -411,18 +487,12 @@ class Read(yaml.YAMLObject):
             "min_len": self.min_len,
             "max_len": self.max_len,
             "strand": self.strand,
+            "files": files,
         }
         return d
 
     def update_read_by_id(
-        self,
-        read_id,
-        name,
-        modality,
-        primer_id,
-        min_len,
-        max_len,
-        strand,
+        self, read_id, name, modality, primer_id, min_len, max_len, strand, files
     ):
         if read_id:
             self.read_id = read_id
@@ -438,6 +508,8 @@ class Read(yaml.YAMLObject):
             self.max_len = max_len
         if strand:
             self.strand = strand
+        if files:
+            self.files = files
         return
 
 

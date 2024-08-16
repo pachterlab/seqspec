@@ -7,6 +7,7 @@ import yaml
 import requests
 from Bio import GenBank
 from typing import Tuple, List
+from packaging import version
 
 
 def load_spec(spec_fn: str):
@@ -19,6 +20,12 @@ def load_spec_stream(spec_stream: io.IOBase):
     # set the parent id in the Assay object upon loading it
     for r in data.library_spec:
         r.set_parent_id(None)
+
+    # for backwards compatibilty, for specs < v0.3.0 set the files to empty
+    for r in data.sequence_spec:
+        if version.parse(data.seqspec_version) < version.parse("0.3.0"):
+            r.set_files([])
+
     return data
 
 
@@ -209,8 +216,11 @@ def map_read_id_to_regions(
             read = i
             break
     else:
-        raise IndexError("region_id {} not found in reads {}".format(
-            region_id, [i.read_id for i in spec.sequence_spec]))
+        raise IndexError(
+            "region_id {} not found in reads {}".format(
+                region_id, [i.read_id for i in spec.sequence_spec]
+            )
+        )
     primer_id = read.primer_id
     # get the index of the primer in the list of leaves (ASSUMPTION, 5'->3' and primer is an atomic element)
     for i, l in enumerate(leaves):
@@ -218,8 +228,11 @@ def map_read_id_to_regions(
             primer_idx = i
             break
     else:
-        raise IndexError("primer_id {} not found in regions {}".format(
-            primer_id, [l.region_id for l in leaves]))
+        raise IndexError(
+            "primer_id {} not found in regions {}".format(
+                primer_id, [leaf.region_id for leaf in leaves]
+            )
+        )
     # If we are on the opposite strand, we go in the opposite way
     if read.strand == "neg":
         rgns = leaves[:primer_idx][::-1]

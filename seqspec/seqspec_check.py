@@ -1,7 +1,6 @@
 from jsonschema import Draft4Validator
 import yaml
 from os import path
-
 from seqspec.utils import load_spec, file_exists
 
 
@@ -49,12 +48,16 @@ def validate_check_args(parser, args):
 def run_check(schema, spec, spec_fn):
     errors = []
     v = Draft4Validator(schema)
-    idx = 1
+    idx = 0
+
+    # with open("del.json", "w") as f:
+    #     json.dump(spec.to_dict(), f, indent=4)
+
     for idx, error in enumerate(v.iter_errors(spec.to_dict()), 1):
         errors.append(
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
         )
-
+    idx += 1
     # check that the modalities are unique
     if len(spec.modalities) != len(set(spec.modalities)):
         errors.append(

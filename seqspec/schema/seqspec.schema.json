@@ -45,19 +45,180 @@
     },
     "library_protocol": {
       "description": "The protocol/machine/tool to generate the library insert",
-      "type": "string"
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "imaging assay (OBI:0000185)",
+            "self-transcribing active regulatory region sequencing assay (OBI:0002041)",
+            "Hi-C assay (OBI:0002440)",
+            "single-nucleus ATAC-seq (OBI:0002762)",
+            "protein-protein interaction detection assay (OBI:0000288)",
+            "cas mediated mutagenesis (OBI:0003133)",
+            "bulk RNA-seq assay (OBI:0003090)",
+            "ChIP-seq assay (OBI:0000716)",
+            "bulk assay for transposase-accessible chromatin using sequencing (OBI:0003089)",
+            "single-nucleus RNA sequencing assay (OBI:0003109)",
+            "single-cell RNA sequencing assay (OBI:0002631)",
+            "micro-C assay (OBI:0003302)",
+            "transcription factor binding site identification by ChIP-Seq assay (OBI:0002019)",
+            "CRISPR screen (NTR:0000520)",
+            "flow cytometry assay (OBI:0000916)",
+            "single-nucleus methylCytosine Transcriptome sequencing (NTR:0000764)",
+            "DNA sequencing assay (OBI:0000626)",
+            "spatial transcriptomics (NTR:0000761)",
+            "single-cell ATAC-seq (OBI:0002764)",
+            "massively parallel reporter assay (OBI:0002675)",
+            "chromosome conformation capture-on-chip assay (OBI:0002458)",
+            "single nucleus methylation chromatin conformation capture seq (NTR:0000745)",
+            "Custom"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "protocol_id": { "type": "string" },
+              "name": { "type": ["string", "null"] },
+              "modality": { "type": "string" }
+            },
+            "required": ["protocol_id", "modality"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      ]
     },
     "library_kit": {
       "description": "The kit used to make the library sequence_protocol compatible",
-      "type": "string"
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kit_id": { "type": "string" },
+              "name": { "type": ["string", "null"] },
+              "modality": { "type": "string" }
+            },
+            "required": ["kit_id", "modality"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      ]
     },
     "sequence_protocol": {
       "description": "The protocol/machine/tool to generate sequences",
-      "type": "string"
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "ONT GridION X5 (EFO:0008633)",
+            "Illumina NovaSeq 6000 (EFO:0008637)",
+            "PacBio Sequel system (EFO:0008630)",
+            "454 GS FLX sequencer (EFO:0004432)",
+            "Illumina HiSeq X (EFO:0008567)",
+            "Illumina NextSeq 500 (EFO:0009173)",
+            "Illumina Genome Analyzer II (EFO:0004201)",
+            "Visium Spatial Gene Expression (EFO:0010961)",
+            "AB SOLiD 4 System (EFO:0004438)",
+            "PacBio Sequel II System (EFO:0700015)",
+            "Illumina Genome Analyzer IIx (EFO:0004202)",
+            "ONT MinION (EFO:0008632)",
+            "ONT PromethION 2 Solo (EFO:0700019)",
+            "ONT PromethION (EFO:0008634)",
+            "Illumina MiniSeq (EFO:0008636)",
+            "Illumina MiSeq (EFO:0004205)",
+            "Illumina HiSeq 1000 (EFO:0004204)",
+            "Illumina HiSeq 2500 (EFO:0008565)",
+            "Illumina NextSeq 550 (EFO:0008566)",
+            "Illumina HiSeq 4000 (EFO:0008563)",
+            "Illumina NextSeq 2000 (EFO:0010963)",
+            "Illumina NovaSeq X (NTR:0000765)",
+            "PacBio RS II (EFO:0008631)",
+            "Custom"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "protocol_id": { "type": "string" },
+              "name": { "type": ["string", "null"] },
+              "modality": { "type": "string" }
+            },
+            "required": ["protocol_id", "modality"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      ]
     },
     "sequence_kit": {
       "description": "The kit used with the protocol to sequence the library",
-      "type": "string"
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "HiSeq SBS Kit v4",
+            "HiSeq SR Cluster Kit v4-cBot-HS",
+            "HiSeq PE Cluster Kit v4-cBot-HS",
+            "HiSeq SR Rapid Cluster Kit v2",
+            "HiSeq PE Rapid Cluster Kit v2",
+            "HiSeq Rapid SBS Kit v2",
+            "HiSeq 3000/4000 SBS Kit",
+            "HiSeq 3000/4000 SR Cluster Kit",
+            "HiSeq 3000/4000 PE Cluster Kit",
+            "MiSeq Reagent Kit v2",
+            "NextSeq 500 Mid Output Kit",
+            "NextSeq 500 High Output Kit",
+            "NextSeq 500 Mid Output v2 Kit",
+            "NextSeq 500 High Output v2 Kit",
+            "NextSeq 500/550 Mid-Output v2.5 Kit",
+            "NextSeq 500/550 High-Output v2.5 Kit",
+            "TG NextSeq 500/550 Mid-Output Kit v2.5",
+            "TG NextSeq 500/550 High-Output Kit v2.5",
+            "NextSeq 1000/2000 P1 Reagent Kit",
+            "NextSeq 1000/2000 P2 Reagent Kit",
+            "NextSeq 1000/2000 P3 Reagent Kit",
+            "NextSeq 1000/2000 P1 XLEAP-SBS Reagent Kit",
+            "NextSeq 1000/2000 P2 XLEAP-SBS Reagent Kit",
+            "NextSeq 2000 P3 XLEAP-SBS Reagent Kit",
+            "NextSeq 2000 P4 XLEAP-SBS Reagent Kit",
+            "NovaSeq 6000 SP Reagent Kit v1.5",
+            "NovaSeq 6000 S1 Reagent Kit v1.5",
+            "NovaSeq 6000 S2 Reagent Kit v1.5",
+            "NovaSeq 6000 S4 Reagent Kit v1.5",
+            "NovaSeq X Series 1.5B Reagent Kit",
+            "NovaSeq X Series 10B Reagent Kit",
+            "NovaSeq X Series 25B Reagent Kit",
+            "ONT Ligation Sequencing Kit V14",
+            "Sequel sequencing kit 3.0",
+            "Sequel II sequencing kit 2.0",
+            "Custom"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "kit_id": { "type": "string" },
+              "name": { "type": ["string", "null"] },
+              "modality": { "type": "string" }
+            },
+            "required": ["kit_id", "modality"],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        }
+      ]
     },
     "sequence_spec": {
       "description": "The spec for the sequencer",
@@ -162,21 +323,47 @@
           "description": "The file containing the sequence if seq_type = onlist",
           "type": ["object", "null"],
           "properties": {
+            "filename": {
+              "description": "filename for the onlist",
+              "type": "string"
+            },
+            "filetype": {
+              "description": "the type of file",
+              "type": "string"
+            },
+            "filesize": {
+              "description": "the size of the file in bytes",
+              "type": "integer"
+            },
+            "url": {
+              "description": "The path or url to the file",
+              "type": "string"
+            },
+            "urltype": {
+              "description": "type of file path",
+              "type": "string",
+              "enum": ["local", "ftp", "http", "https"]
+            },
             "location": {
               "description": "location of onlist",
               "type": "string",
               "enum": ["local", "remote"]
-            },
-            "filename": {
-              "description": "filename for the onlist",
-              "type": "string"
             },
             "md5": {
               "description": "md5sum for the file pointed to by filename",
               "type": "string",
               "pattern": "^[a-f0-9]{32}$"
             }
-          }
+          },
+          "required": [
+            "filename",
+            "filetype",
+            "filesize",
+            "url",
+            "urltype",
+            "location",
+            "md5"
+          ]
         },
         "regions": {
           "description": "The regions being joined",
@@ -253,6 +440,41 @@
           "type": "string",
           "enum": ["pos", "neg"],
           "description": "The strand orientation of the read, either positive ('pos') or negative ('neg')."
+        },
+        "files": {
+          "description": "An array of files containing the reads",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "filename": {
+                "description": "filename",
+                "type": "string"
+              },
+              "filetype": {
+                "description": "the type of file",
+                "type": "string"
+              },
+              "filesize": {
+                "description": "the size of the file in bytes",
+                "type": "integer"
+              },
+              "url": {
+                "description": "The path or url to the file",
+                "type": "string"
+              },
+              "urltype": {
+                "description": "type of file path",
+                "type": "string",
+                "enum": ["local", "ftp", "http", "https"]
+              },
+              "md5": {
+                "description": "md5sum for the file pointed to by filename",
+                "type": "string",
+                "pattern": "^[a-f0-9]{32}$"
+              }
+            }
+          }
         }
       },
       "required": [
