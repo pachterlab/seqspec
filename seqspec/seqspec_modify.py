@@ -207,7 +207,8 @@ def run_modify_read(
     files,
 ):
     reads = spec.get_seqspec(modality)
-    files = parse_files_string(files)
+    if files:
+        files = parse_files_string(files)
     for r in reads:
         if r.read_id == target_read:
             r.update_read_by_id(
