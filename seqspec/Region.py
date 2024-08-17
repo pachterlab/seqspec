@@ -368,10 +368,10 @@ class Onlist(yaml.YAMLObject):
     def __repr__(self) -> str:
         d = {
             "filename": self.filename,
-            # "filetype": self.filetype,
-            # "filesize": self.filesize,
-            # "url": self.url,
-            # "urltype": self.urltype,
+            "filetype": self.filetype,
+            "filesize": self.filesize,
+            "url": self.url,
+            "urltype": self.urltype,
             "md5": self.md5,
             "location": self.location,
         }
@@ -380,10 +380,10 @@ class Onlist(yaml.YAMLObject):
     def to_dict(self):
         d = {
             "filename": self.filename,
-            # "filetype": self.filetype,
-            # "filesize": self.filesize,
-            # "url": self.url,
-            # "urltype": self.urltype,
+            "filetype": self.filetype,
+            "filesize": self.filesize,
+            "url": self.url,
+            "urltype": self.urltype,
             "md5": self.md5,
             "location": self.location,
         }

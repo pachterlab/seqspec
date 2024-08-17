@@ -99,9 +99,14 @@ def run_check(schema, spec, spec_fn):
                     idx += 1
         elif ol.location == "remote":
             # ping the link with a simple http request to check if the file exists at that URI
-            if not file_exists(ol.filename):
-                errors.append(f"[error {idx}] {ol.filename} does not exist")
-                idx += 1
+            if spec.seqspec_version == "0.3.0":
+                if not file_exists(ol.url):
+                    errors.append(f"[error {idx}] {ol.filename} does not exist")
+                    idx += 1
+            else:
+                if not file_exists(ol.filename):
+                    errors.append(f"[error {idx}] {ol.filename} does not exist")
+                    idx += 1
 
     # get all of the regions with type fastq in the spec and check that those files exist relative to the path of the spec
     fqrgns = []

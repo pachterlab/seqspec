@@ -22,9 +22,26 @@ def load_spec_stream(spec_stream: io.IOBase):
         r.set_parent_id(None)
 
     # for backwards compatibilty, for specs < v0.3.0 set the files to empty
-    for r in data.sequence_spec:
-        if version.parse(data.seqspec_version) < version.parse("0.3.0"):
+    # TODO for backwards compatibility of the specs < v0.3.0, set the onlist regions with missing properties
+    if version.parse(data.seqspec_version) < version.parse("0.3.0"):
+        for r in data.sequence_spec:
             r.set_files([])
+
+        for r in data.library_spec:
+            for lf in r.get_leaves():
+                if lf.onlist is not None:
+                    filename = lf.onlist.filename
+                    location = lf.onlist.location
+                    md5 = lf.onlist.md5
+                    lf.onlist = Onlist(
+                        filename,
+                        filetype="",
+                        filesize=0,
+                        url="",
+                        urltype="",
+                        md5=md5,
+                        location=location,
+                    )
 
     return data
 
