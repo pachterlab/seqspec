@@ -38,4 +38,4 @@ Documentation:
 - [Contribute a `seqspec` : `docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
 - [The `seqspec` specification : `docs/SPECIFICATION.md`](docs/SPECIFICATION.md)
 - [YouTube video that introduces `seqspec`](https://youtu.be/NSj6Vpzy8tU)
-- [_bioRxiv_ preprint that describes `seqspec`](https://doi.org/10.1101/2023.03.17.533215)
+- [Paper that describes `seqspec`](https://academic.oup.com/bioinformatics/article/40/4/btae168/7641535)
