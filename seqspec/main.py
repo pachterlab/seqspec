@@ -17,6 +17,8 @@ from .seqspec_onlist import setup_onlist_args, validate_onlist_args
 from .seqspec_version import setup_version_args, validate_version_args
 from .seqspec_methods import setup_methods_args, validate_methods_args
 
+import warnings
+
 # Steps to add new subcommands
 # Create seqspec_subcommand.py (create setup_subcmd_args, validate_subcmd_args, run_subcmd in that file)
 # (in this file) from seqspec_subcmd import setup_subcmd_args, validate_subcmd_args
@@ -25,6 +27,8 @@ from .seqspec_methods import setup_methods_args, validate_methods_args
 
 
 def main():
+    warnings.simplefilter("default", DeprecationWarning)
+
     # setup parsers
     parser = argparse.ArgumentParser(
         description=f"seqspec {__version__}: Format sequence specification files"

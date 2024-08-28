@@ -279,4 +279,6 @@ def run_check(schema, spec, spec_fn):
         for rgn in [spec.get_libspec(m)]:
             errors, idx = seq_len_check(rgn, errors, idx)
 
+    # TODO add check on the files for the reads. The list of files for each read should be the same length
+
     return errors

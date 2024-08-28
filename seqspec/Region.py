@@ -445,7 +445,7 @@ class Read(yaml.YAMLObject):
         min_len: int,
         max_len: int,
         strand: str,
-        files: Optional[List["File"]] = None,
+        files: Optional[List["File"]] = [],
     ) -> None:
         super().__init__()
         self.read_id = read_id
@@ -457,7 +457,7 @@ class Read(yaml.YAMLObject):
         self.strand = strand
         self.files = files
 
-    def set_files(self, files: Optional[List["File"]] = None):
+    def set_files(self, files: Optional[List["File"]] = []):
         self.files = files
 
     def __repr__(self) -> str:
@@ -511,6 +511,13 @@ class Read(yaml.YAMLObject):
         if files:
             self.files = files
         return
+
+    def get_read_by_file_id(self, file_id):
+        if self.files:
+            for f in self.files:
+                if f.filename == file_id:
+                    return self
+        return None
 
 
 class ReadCoordinate:
