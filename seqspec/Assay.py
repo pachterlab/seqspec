@@ -123,6 +123,13 @@ class Assay(yaml.YAMLObject):
         print("\n", end="")
 
     def update_spec(self):
+        # add file_id to onlist elements
+        for rgn in self.library_spec:
+            ol_rgn = rgn.get_onlist_regions()
+            for ol in ol_rgn:
+                ol.onlist.update_file_id(ol.onlist.filename)
+
+        # remove, this is for adding file ids
         for read in self.sequence_spec:
             for f in read.files:
                 f.update_file_id(f.filename)

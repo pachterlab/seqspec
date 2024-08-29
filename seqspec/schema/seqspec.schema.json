@@ -323,6 +323,10 @@
           "description": "The file containing the sequence if seq_type = onlist",
           "type": ["object", "null"],
           "properties": {
+            "file_id": {
+              "description": "filename",
+              "type": "string"
+            },
             "filename": {
               "description": "filename for the onlist",
               "type": "string"
@@ -356,6 +360,7 @@
             }
           },
           "required": [
+            "file_id",
             "filename",
             "filetype",
             "filesize",
