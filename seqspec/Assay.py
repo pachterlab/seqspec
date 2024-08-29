@@ -123,6 +123,9 @@ class Assay(yaml.YAMLObject):
         print("\n", end="")
 
     def update_spec(self):
+        for read in self.sequence_spec:
+            for f in read.files:
+                f.update_file_id(f.filename)
         for r in self.library_spec:
             r.update_attr()
 

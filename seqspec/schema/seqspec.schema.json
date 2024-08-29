@@ -447,6 +447,10 @@
           "items": {
             "type": "object",
             "properties": {
+              "file_id": {
+                "description": "filename",
+                "type": "string"
+              },
               "filename": {
                 "description": "filename",
                 "type": "string"

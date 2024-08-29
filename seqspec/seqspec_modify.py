@@ -253,6 +253,7 @@ def parse_files_string(input_string):
         filename, filetype, filesize, url, urltype, md5 = parts
 
         file = File(
+            file_id=filename,
             filename=filename,
             filetype=filetype,
             filesize=int(filesize),
