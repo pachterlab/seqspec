@@ -5,11 +5,21 @@
 ![python versions](https://img.shields.io/pypi/pyversions/seqspec)
 [![license](https://img.shields.io/pypi/l/seqspec)](LICENSE)
 
-`seqspec` is a machine-readable YAML file format to describe the content of molecules in genomic libraries, the structure of reads generated from them, and how those are stored in files. It was inspired by and builds off of the Teichmann Lab [Single Cell Genomics Library Structure](https://github.com/Teichlab/scg_lib_structs) by [Xi Chen](https://github.com/dbrg77).
+`seqspec` is a file format and tool that describe data generated from genomics experiments.
 
-Genomic library structure depends on both the assay and sequencer (and kit) used to generate and bind the assay-specific construct to the sequencing adapters to generate a sequencing library. Therefore, a `seqspec` is specific to both a genomics assay and sequencer.
+A `seqspec` file contains
 
-A list of `seqspec` examples for multiple assays and sequencers can be found on [this website](https://igvf.github.io/seqspec/). Each `spec.yaml` describes the 5'->3' "Final library structure" for the assay and sequencer and can be extended to include sequencer-specific read annotations. Sequence specification files can be formatted with the `seqspec` command line tool.
+1. Assay-level metadata such as library kit and sequencing machine,
+2. The 5'->3' annotation and position of the elements in a library molecule (e.g. barcodes, UMIs),
+3. A list of the reads generated from sequencing the library molecule.
+
+More specifically, `seqspec` is a machine-readable YAML file to describe the content of molecules in genomic libraries, the structure of reads generated from them, and how those are stored in files.
+
+The `seqspec` tool operates on `seqspec` files and
+
+1. Facilitates the standardization of preprocessing steps across different assays,
+2. Enables data management and tracking,
+3. Simplifies the interpretation and reuse of sequencing data.
 
 The `seqspec` format and tool are described in this [publication](https://doi.org/10.1093/bioinformatics/btae168). If you use `seqspec` please cite
 
@@ -32,9 +42,12 @@ seqspec --help
 
 Documentation:
 
+- [Example `seqspec` files: `https://igvf.github.io/seqspec/`](https://igvf.github.io/seqspec/)
 - [Learn about `seqspec` : `docs/DOCUMENTATION.md`](docs/SEQSPEC_FILE.md)
 - [Write a `seqspec` : `docs/TUTORIAL.md`](docs/TUTORIAL.md)
 - [Contribute a `seqspec` : `docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
 - [The `seqspec` specification : `docs/SPECIFICATION.md`](docs/SPECIFICATION.md)
 - [YouTube video that introduces `seqspec`](https://youtu.be/NSj6Vpzy8tU)
 - [_bioRxiv_ preprint that describes `seqspec`](https://doi.org/10.1101/2023.03.17.533215)
+
+`seqspec` was inspired by and builds off of the Teichmann Lab [Single Cell Genomics Library Structure](https://github.com/Teichlab/scg_lib_structs) by [Xi Chen](https://github.com/dbrg77).

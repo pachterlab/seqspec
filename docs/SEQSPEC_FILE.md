@@ -1,15 +1,15 @@
 ---
 title: File Format
-date: 2024-07-12
+date: 2024-08-30
 authors:
   - name: A. Sina Booeshaghi
 ---
 
 # Overview
 
-seqspec is a machine-readable specification for annotating sequencing libraries produced by genomics assays. It provides a standardized format for describing the structure of sequencing libraries and the resulting sequencing reads.
+`seqspec` is a machine-readable specification for annotating sequencing libraries produced by genomics assays. Genomic library structure depends on both the assay and sequencer (and kits) used to generate and bind the assay-specific construct to the sequencing adapters to generate a sequencing library. `seqspec` is specific to both a genomics assay and sequencer and provides a standardized format for describing the structure of sequencing libraries and the resulting sequencing reads.
 
-The primary goal of a seqspec file is to:
+The primary goal of a `seqspec` file is to:
 
 1. Facilitate standardization of preprocessing steps across different assays
 2. Enable data management and tracking
