@@ -102,6 +102,8 @@ def read_local_list(onlist: Onlist, base_path: str = "") -> List[str]:
 def read_remote_list(onlist: Onlist, base_path: str = "") -> List[str]:
     """Given an onlist object read the local or remote data"""
     filename = str(onlist.filename)
+    if onlist.url:
+        filename = str(onlist.url)
 
     stream = None
     try:
