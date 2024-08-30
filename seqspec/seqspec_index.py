@@ -235,6 +235,7 @@ def run_list_files(spec, modality, ids, idtype="read", fmt="paired"):
     return x
 
 
+# TODO work on this, return url or filename?
 def list_files_by_read_id(spec, modality, read_ids):
     seqspec = spec.get_seqspec(modality)
     files = defaultdict(list)
@@ -244,7 +245,8 @@ def list_files_by_read_id(spec, modality, read_ids):
     for read in seqspec:
         if read.read_id in ids:
             for file in read.files:
-                files[read.read_id].append(file.filename)
+                # files[read.read_id].append(file.filename)
+                files[read.read_id].append(file.url)
     return files
 
 
@@ -256,7 +258,8 @@ def list_files_by_file_id(spec, modality, file_ids):
     for read in seqspec:
         for file in read.files:
             if file.filename in ids:
-                files[read.read_id].append(file.filename)
+                # files[read.read_id].append(file.filename)
+                files[read.read_id].append(file.url)
     return files
 
 
