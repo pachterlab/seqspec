@@ -279,6 +279,13 @@ def run_check(schema, spec, spec_fn):
         for rgn in [spec.get_libspec(m)]:
             errors, idx = seq_len_check(rgn, errors, idx)
 
-    # TODO add check on the files for the reads. The list of files for each read should be the same length
+    # check that the number of files in each "File" object for all Read object are all the same length
+    nfiles = []
+    for read in spec.sequence_spec:
+        nfiles.append(len(read.files))
+
+    if len(set(nfiles)) != 1:
+        errors.append(f"[error {idx}] Reads must have the same number of files")
+        idx += 1
 
     return errors

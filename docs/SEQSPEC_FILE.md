@@ -37,9 +37,13 @@ sequence_spec:
   # List of reads generated from the library
 ```
 
-`modalities` contains a list of strings describing the types of molecules assayed. They come from a [controlled vocabulary](SPECIFICATION.md). Additional assay metadata includes library preparation kit and protocol as well as sequencing kit and protocol.
-
 `seqspec` files can be manipulated and used with the `seqspec` command line tool.
+
+## Assay Information
+
+The header of a `seqspec` file stores assay metadata including library preparation and sequencing kits and protocols.
+
+`modalities` contains a list of strings describing the types of molecules assayed. They come from a [controlled vocabulary](SPECIFICATION.md).
 
 ## Library structure
 
