@@ -23,7 +23,7 @@ def setup_find_args(parser):
     )
     # depracate
     subparser.add_argument("--rtype", help=argparse.SUPPRESS, action="store_true")
-    choices = ["read", "region", "file", "region_type"]
+    choices = ["read", "region", "file", "region-type"]
     subparser.add_argument(
         "-s",
         metavar="Selector",
