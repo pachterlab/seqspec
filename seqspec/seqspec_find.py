@@ -85,7 +85,7 @@ def validate_find_args(parser, args):
 def run_find(spec_fn: str, modality: str, id: str, idtype: str, o: str):
     spec = load_spec(spec_fn)
     found = []
-    if idtype == "region_type":
+    if idtype == "region-type":
         found = find_by_region_type(spec, modality, id)
     elif idtype == "region":
         found = find_by_region_id(spec, modality, id)
