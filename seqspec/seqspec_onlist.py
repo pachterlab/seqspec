@@ -121,13 +121,13 @@ def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
     # for only one onlist we can just return the path
     # if only one, its remote and we save it to the base path
     elif len(onlists) == 1:
-        location = onlists[0].urltype
+        urltype = onlists[0].urltype
         onlist_fn = os.path.basename(onlists[0].filename)
         onlist_path = os.path.join(base_path, onlist_fn)
-
+        print(urltype)
         if os.path.exists(onlist_path):
-            location = "local"
-        elif location == "remote":
+            urltype = "local"
+        elif urltype == "http":
             # download the onlist to the base path and return the path
             onlist_elements = read_remote_list(onlists[0])
             onlist_path = write_onlist(onlist_elements, save_path)
@@ -136,9 +136,9 @@ def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
     elif len(onlists) > 1:
         lsts = []
         for o in onlists:
-            if o.location == "local":
+            if o.urltype == "local":
                 lsts.append(read_local_list(o, base_path))
-            elif o.location == "remote":
+            elif o.urltype == "http":
                 # base_path is ignored for remote onlists
                 lsts.append(read_remote_list(o, base_path))
         onlist_elements = join_onlists(lsts, fmt)
@@ -189,7 +189,7 @@ def run_onlist_read(spec: Assay, modality: str, read_id: str) -> List[Onlist]:
 
 def find_list_target_dir(onlists):
     for olst in onlists:
-        if olst.location == "local":
+        if olst.urltype == "local":
             base_path = os.path.dirname(os.path.abspath(onlists[0].filename))
             if os.access(base_path, os.W_OK):
                 return base_path
