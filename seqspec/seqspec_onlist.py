@@ -124,7 +124,6 @@ def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
         urltype = onlists[0].urltype
         onlist_fn = os.path.basename(onlists[0].filename)
         onlist_path = os.path.join(base_path, onlist_fn)
-        print(urltype)
         if os.path.exists(onlist_path):
             urltype = "local"
         elif urltype == "http":
