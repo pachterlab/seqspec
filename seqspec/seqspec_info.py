@@ -1,7 +1,8 @@
 from seqspec.utils import load_spec
 import json
 from typing import List
-from seqspec.Region import Read, Region
+from seqspec.Region import Region
+from seqspec.Read import Read
 from seqspec.Assay import Assay
 
 
@@ -13,10 +14,11 @@ def setup_info_args(parser):
     )
 
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    choices = ["modalities", "meta", "sequence_spec", "library_spec"]
     subparser.add_argument(
         "-k",
         metavar="KEY",
-        help=("The key of the object to display"),
+        help=(f"Object to display, [{', '.join(choices)}] (default: meta)"),
         type=str,
         default="meta",
         required=False,
@@ -41,25 +43,16 @@ def setup_info_args(parser):
 
 
 def validate_info_args(parser, args):
-    # if everything is valid the run_info
-    fn = args.yaml
+    spec_fn = args.yaml
     o = args.o
-    spec = load_spec(fn)
     k = args.k
     fmt = args.f
-    s = run_info(spec, fmt, k)
-
-    if o:
-        with open(o, "w") as f:
-            json.dump(s, f, sort_keys=False, indent=4)
-    else:
-        print(s)
-        # print(json.dumps(s, sort_keys=False, indent=4))
+    return run_info(spec_fn, fmt, k, o)
 
 
-def run_info(spec, f, k=None):
+def run_info(spec_fn, f, k=None, o=None):
     # return json of the Assay object
-
+    spec = load_spec(spec_fn)
     CMD = {
         "modalities": seqspec_info_modalities,
         "meta": seqspec_info,
@@ -69,7 +62,13 @@ def run_info(spec, f, k=None):
     s = ""
     if k:
         s = CMD[k](spec, f)
-    return s
+
+    if o:
+        with open(o, "w") as f:
+            json.dump(s, f, sort_keys=False, indent=4)
+    else:
+        print(s)
+    return
 
 
 def seqspec_info(spec, fmt):
@@ -126,7 +125,7 @@ def format_sequence_spec(sequence_spec: List[Read], fmt="tab"):
     if fmt == "tab":
         # format the output as a table
         for r in sequence_spec:
-            s += f"{r.modality}\t{r.read_id}\t{r.strand}\t{r.min_len}\t{r.max_len}\t{r.primer_id}\t{r.name}\n"
+            s += f"{r.modality}\t{r.read_id}\t{r.strand}\t{r.min_len}\t{r.max_len}\t{r.primer_id}\t{r.name}\t{','.join([i.file_id for i in r.files])}\n"
         s = s[:-1]
     elif fmt == "json":
         s = json.dumps([i.to_dict() for i in sequence_spec], sort_keys=False, indent=4)

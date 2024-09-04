@@ -1,17 +1,15 @@
 from seqspec.utils import load_spec, map_read_id_to_regions
-from seqspec.seqspec_find import run_find
+from seqspec.seqspec_find import find_by_region_id
 import warnings
-from collections import defaultdict
-from typing import List, Dict
+from seqspec.seqspec_file import list_files_by_file_id, list_read_files
 
-# from typing import Dict, List
 from argparse import SUPPRESS
-import os
+
 from seqspec.Region import (
     project_regions_to_coordinates,
     itx_read,
-    ReadCoordinate,
 )
+from seqspec.Read import ReadCoordinate
 
 
 def setup_index_args(parser):
@@ -42,33 +40,27 @@ def setup_index_args(parser):
     subparser.add_argument(
         "-t",
         metavar="TOOL",
-        help=(f"Tool, [{','.join(choices)}] (default: tab)"),
+        help=(f"Tool, [{', '.join(choices)}] (default: tab)"),
         default="tab",
         type=str,
-        choices=["chromap", "kb", "seqkit", "simpleaf", "starsolo", "tab", "zumis"],
+        choices=choices,
     )
     # the object we are using to index
     choices = ["read", "region", "file"]
     subparser.add_argument(
-        "-c",
-        metavar="CLASS",
-        help=(f"Class, [{','.join(choices)}] (default: read)"),
+        "-s",
+        metavar="SELECTOR",
+        help=(f"Selector for ID, [{', '.join(choices)}] (default: read)"),
         type=str,
         default="read",
-        choices=["read", "region", "file"],
-    )
-    subparser.add_argument(
-        "--list-files",
-        help="List files",
-        type=str,
-        default=None,
-        choices=["paired", "interleaved", "index"],
+        choices=choices,
     )
     subparser.add_argument(
         "--rev", help="Returns 3'->5' region order", action="store_true"
     )
 
     # boolean to indicate specifying a region or a read
+    # depracate
     subparser.add_argument(
         "--region",
         action="store_true",
@@ -101,11 +93,6 @@ def setup_index_args(parser):
     return subparser
 
 
-# nested index command
-# seqspec index -c file -t kb -m rna -i \
-# "$(seqspec index --list-files index -c file -t kb -m rna \
-# -i "rna_R2_SRR18677638.fastq.gz,rna_R1_SRR18677638.fastq.gz" spec.yaml)" \
-# spec.yaml
 def validate_index_args(parser, args):
     if args.r is not None:
         warnings.warn(
@@ -116,9 +103,13 @@ def validate_index_args(parser, args):
         # Optionally map the old option to the new one
         if not args.i:
             args.i = args.r
+    if args.region:
+        warnings.warn(
+            "The '--region' argument is deprecated and will be removed in a future version. "
+            "Please use '-s region' instead.",
+            DeprecationWarning,
+        )
 
-    # if everything is valid the get_index
-    # get paramters
     fn = args.yaml
     m = args.m
     ids = args.i  # this can be a list of ids (reads, regions, or files)
@@ -126,25 +117,31 @@ def validate_index_args(parser, args):
     o = args.o
     subregion_type = args.subregion_type
     rev = args.rev
-    list_files = args.list_files
+    idtype = args.s
 
-    idtype = args.c
+    if ids is None and (idtype == "read" or idtype == "region"):
+        parser.error("Must specify ids with -i for -s read or -s region")
 
-    # load spec
-    spec = load_spec(fn)
-    ids = ids.split(",")
-    # ids can be paths, take the basename of the path, use os
-    if idtype == "file" or idtype == "read":
-        ids = [os.path.basename(r) for r in ids]
-    elif idtype == "region":
-        ids = ids
+    return run_index(fn, m, ids, idtype, t, rev, subregion_type, o=o)
 
-    if list_files is not None:
-        x = run_list_files(spec, m, ids, idtype=idtype, fmt=list_files)
+
+def run_index(
+    spec_fn,
+    modality,
+    ids,
+    idtype,
+    fmt,
+    rev,
+    subregion_type,
+    o,
+):
+    spec = load_spec(spec_fn)
+    if ids is None:
+        ids = []
     else:
-        x = run_index(
-            spec, m, ids, idtype, fmt=t, rev=rev, subregion_type=subregion_type
-        )
+        ids = ids.split(",")
+
+    x = index(spec, modality, ids, idtype, fmt, rev, subregion_type)
 
     # post processing
     if o:
@@ -152,15 +149,16 @@ def validate_index_args(parser, args):
             print(x, file=f)
     else:
         print(x)
+
     return
 
 
-def run_index(
+def index(
     spec,
     modality,
     ids,
-    idtype="read",
-    fmt="tab",
+    idtype,
+    fmt,
     rev=False,
     subregion_type=None,
 ):
@@ -174,23 +172,38 @@ def run_index(
         "zumis": format_zumis,
     }
 
-    indices = []
-    if idtype == "file":
-        indices = get_index_by_files(spec, modality, ids)
+    GET_INDICES = {
+        "file": get_index_by_files,
+    }
+
+    GET_INDICES_BY_IDS = {
+        "file": get_index_by_file_ids,
+        "region": get_index_by_region_ids,
+        "read": get_index_by_read_ids,
+    }
+
+    if len(ids) == 0:
+        indices = GET_INDICES[idtype](spec, modality)
     else:
-        for id in ids:
-            if idtype == "region":
-                index = get_index(spec, modality, id, rev=rev)
-            elif idtype == "read":
-                index = get_index_by_primer(spec, modality, id)
-            indices.append(index)
+        indices = GET_INDICES_BY_IDS[idtype](spec, modality, ids)
+
     return FORMAT[fmt](indices, subregion_type)
 
 
-# seqspec index -c file -t kb -m rna -i "rna_R2_SRR18677638.fastq.gz,rna_R1_SRR18677638.fastq.gz" spec.yaml
-def get_index_by_files(spec, modality, file_ids):
+def get_index_by_files(spec, modality):
     # get the read associated for each file for each read get the regions by mapping primer
+    files = list_read_files(spec, modality)
 
+    # iterate through the keys (read ids) and get the index for each read
+    indices = []
+    for k, v in files.items():
+        index = get_index_by_primer(spec, modality, k)
+        indices.append(index)
+    return indices
+
+
+def get_index_by_file_ids(spec, modality, file_ids):
+    # get the read associated for each file for each read get the regions by mapping primer
     files = list_files_by_file_id(spec, modality, file_ids)
 
     # iterate through the keys (read ids) and get the index for each read
@@ -201,66 +214,20 @@ def get_index_by_files(spec, modality, file_ids):
     return indices
 
 
-def format_list_files(files: Dict[str, List[str]], fmt):
-    # input dict of read id to list of files
-    x = ""
-    if fmt == "paired":
-        for items in zip(*files.values()):
-            f = "\t".join(items)
-            x += f"{f}\n"
-        x = x[:-1]
-
-    elif fmt == "interleaved":
-        for items in zip(*files.values()):
-            for item in items:
-                x += item + "\n"
-        x = x[:-1]
-    elif fmt == "index":
-        for items in zip(*files.values()):
-            for item in items:
-                x += item + ","
-        x = x[:-1]
-    return x
+def get_index_by_region_ids(spec, modality, region_ids):
+    indices = []
+    for id in region_ids:
+        index = get_index_by_primer(spec, modality, id)
+        indices.append(index)
+    return indices
 
 
-# seqspec index --list-files paired -c file -t kb -m rna -i "rna_R2_SRR18677638.fastq.gz,rna_R1_SRR18677638.fastq.gz" spec.yaml
-def run_list_files(spec, modality, ids, idtype="read", fmt="paired"):
-    # first get the files associated with each id
-    # NOTE: LIST FILES DOES NOT RESPECT ORDERING OF INPUT IDs LIST
-    if idtype == "read":
-        files = list_files_by_read_id(spec, modality, ids)
-    elif idtype == "file":
-        files = list_files_by_file_id(spec, modality, ids)
-    x = format_list_files(files, fmt)
-    return x
-
-
-# TODO work on this, return url or filename?
-def list_files_by_read_id(spec, modality, read_ids):
-    seqspec = spec.get_seqspec(modality)
-    files = defaultdict(list)
-    ids = set(read_ids)
-    # TODO return the files in the order of the ids given in the input
-    # NOTE ORDERING HERE IS IMPORANT SEE GET_INDEX_BY_FILES FUNCTION
-    for read in seqspec:
-        if read.read_id in ids:
-            for file in read.files:
-                # files[read.read_id].append(file.filename)
-                files[read.read_id].append(file.url)
-    return files
-
-
-def list_files_by_file_id(spec, modality, file_ids):
-    seqspec = spec.get_seqspec(modality)
-    ids = set(file_ids)
-    files = defaultdict(list)
-    # TODO: NOTE ORDERING HERE IS IMPORTANT SEE RUN_LIST_FILES FUNCTION
-    for read in seqspec:
-        for file in read.files:
-            if file.filename in ids:
-                # files[read.read_id].append(file.filename)
-                files[read.read_id].append(file.url)
-    return files
+def get_index_by_read_ids(spec, modality, read_ids):
+    indices = []
+    for id in read_ids:
+        index = get_index_by_primer(spec, modality, id)
+        indices.append(index)
+    return indices
 
 
 # TODO fix return type
@@ -268,7 +235,7 @@ def get_index(
     spec, modality, region_id, rev=False
 ):  # -> Dict[str, List[RegionCoordinate]]:
     rid = region_id
-    regions = run_find(spec, modality, rid)
+    regions = find_by_region_id(spec, modality, rid)
     leaves = regions[0].get_leaves()
     if rev:
         leaves.reverse()

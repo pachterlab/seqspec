@@ -2,6 +2,7 @@ from jsonschema import Draft4Validator
 import yaml
 from os import path
 from seqspec.utils import load_spec, file_exists
+from seqspec.Assay import Assay
 
 
 def setup_check_args(parser):
@@ -22,18 +23,21 @@ def setup_check_args(parser):
 
 
 def validate_check_args(parser, args):
-    # if everything is valid the run_check
     spec_fn = args.yaml
     o = args.o
     schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
-    # schema_fn = "schema/seqspec.schema.json"
-    with open(schema_fn, "r") as stream:
-        schema = yaml.load(stream, Loader=yaml.Loader)
-    # print(schema)
 
+    return run_check(schema_fn, spec_fn, o)
+
+
+def run_check(schema_fn, spec_fn, o):
     spec = load_spec(spec_fn)
 
-    errors = run_check(schema, spec, spec_fn)  # , o)
+    with open(schema_fn, "r") as stream:
+        schema = yaml.load(stream, Loader=yaml.Loader)
+    v = Draft4Validator(schema)
+
+    errors = check(v, spec, spec_fn)
 
     if errors:
         if o:
@@ -41,19 +45,17 @@ def validate_check_args(parser, args):
                 print("\n".join(errors), file=f)
         else:
             print("\n".join(errors))
+    return errors
 
-    return
 
-
-def run_check(schema, spec, spec_fn):
+def check(schema: Draft4Validator, spec: Assay, spec_fn: str):
     errors = []
-    v = Draft4Validator(schema)
     idx = 0
 
     # with open("del.json", "w") as f:
     #     json.dump(spec.to_dict(), f, indent=4)
 
-    for idx, error in enumerate(v.iter_errors(spec.to_dict()), 1):
+    for idx, error in enumerate(schema.iter_errors(spec.to_dict()), 1):
         errors.append(
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
         )

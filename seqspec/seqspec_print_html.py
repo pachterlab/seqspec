@@ -1,7 +1,7 @@
 from seqspec.Region import Region
 
 
-def run_print_html(spec):
+def print_seqspec_html(spec):
     # header = headerTemplate(spec.name, spec.doi, spec.description, spec.modalities)
     # header2 = "## Final Library"
     # library_spec = multiModalTemplate(spec.library_spec)

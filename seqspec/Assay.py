@@ -1,5 +1,6 @@
 import yaml
-from seqspec.Region import Region, Read
+from seqspec.Region import Region
+from seqspec.Read import Read
 from typing import List, Optional, Union
 import json
 from . import __version__

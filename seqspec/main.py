@@ -16,6 +16,7 @@ from .seqspec_init import setup_init_args, validate_init_args
 from .seqspec_onlist import setup_onlist_args, validate_onlist_args
 from .seqspec_version import setup_version_args, validate_version_args
 from .seqspec_methods import setup_methods_args, validate_methods_args
+from .seqspec_file import setup_file_args, validate_file_args
 
 import warnings
 
@@ -43,6 +44,7 @@ def main():
     command_to_parser = {
         "check": setup_check_args(subparsers),
         "find": setup_find_args(subparsers),
+        "file": setup_file_args(subparsers),
         "format": setup_format_args(subparsers),
         # "genbank": setup_genbank_args(subparsers),
         "index": setup_index_args(subparsers),
@@ -85,6 +87,7 @@ def main():
         "onlist": validate_onlist_args,
         "split": validate_split_args,
         "version": validate_version_args,
+        "file": validate_file_args,
         # "genbank": validate_genbank_args,
     }
     COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)

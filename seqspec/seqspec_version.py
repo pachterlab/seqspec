@@ -24,16 +24,22 @@ def validate_version_args(parser, args):
     # if everything is valid the run_version
     fn = args.yaml
     o = args.o
-    spec = load_spec(fn)
-    version = spec.seqspec_version
-    tool_version = __version__
-    s = f"seqspec version: {tool_version}\nseqspec file version: {version}"
+    run_version(fn, o)
+
+
+def run_version(spec_fn, o):
+    spec = load_spec(spec_fn)
+    s = version(spec)
     if o:
         with open(o, "w") as f:
             print(s, file=f)
     else:
         print(s)
+    return
 
 
-def run_version(spec):
-    pass
+def version(spec):
+    version = spec.seqspec_version
+    tool_version = __version__
+    s = f"seqspec version: {tool_version}\nseqspec file version: {version}"
+    return s

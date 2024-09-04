@@ -27,7 +27,22 @@ def validate_split_args(parser, args):
     # if everything is valid the run_split
     fn = args.yaml
     o = args.o
-    spec = load_spec(fn)
+    return run_split(fn, o)
+
+
+def run_split(spec_fn, o):
+    spec = load_spec(spec_fn)
+    specs = split(spec, o)
+
+    for spec in specs:
+        spec["spec"].to_YAML(
+            os.path.join(os.path.dirname(o), f"{spec['p']}{spec['m']}.yaml")
+        )
+    return
+
+
+def split(spec, o=""):
+    specs = []
     modalities = spec.list_modalities()
     # make a new spec per modality
     for m in modalities:
@@ -50,9 +65,5 @@ def validate_split_args(parser, args):
         spec_m = Assay(**info)
         spec_m.update_spec()
         base_o = "spec." if os.path.basename(o) == "" else f"{os.path.basename(o)}."
-
-        spec_m.to_YAML(os.path.join(os.path.dirname(o), f"{base_o}{m}.yaml"))
-
-
-def run_split(spec):
-    pass
+        specs.append({"p": base_o, "spec": spec_m, "m": m})
+    return specs

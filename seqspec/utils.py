@@ -2,7 +2,8 @@ import io
 import os
 import gzip
 from seqspec.Assay import Assay
-from seqspec.Region import Onlist, Region, Read
+from seqspec.Region import Onlist, Region
+from seqspec.Read import Read
 import yaml
 import requests
 from Bio import GenBank

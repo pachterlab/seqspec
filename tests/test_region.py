@@ -2,11 +2,11 @@ from unittest import TestCase
 
 from seqspec.Region import (
     project_regions_to_coordinates,
-    Read,
     Region,
-    RegionCoordinate,
     Onlist,
 )
+from seqspec.Read import Read
+
 
 def region_rna_joined_dict(region_id, regions=[]):
     expected = {
@@ -233,7 +233,7 @@ class TestRegionCoordinates(TestCase):
         r4_dict = region_rna_linker_dict("region-4")
         r4 = Region(**r4_dict)
 
-        regions = [r1,r2,r3,r4]
+        regions = [r1, r2, r3, r4]
         coords = project_regions_to_coordinates(regions)
 
         cur_start = 0

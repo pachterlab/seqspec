@@ -6,12 +6,13 @@ from seqspec.Region import Region
 def setup_methods_args(parser):
     subparser = parser.add_parser(
         "methods",
-        description="Get seqspec version and seqspec file version",
-        help="Get seqspec version and seqspec file version",
+        description="Return methods section of sequencing specification",
+        help="Return methods section of sequencing specification",
     )
+    subparser_required = subparser.add_argument_group("required arguments")
 
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
-    subparser.add_argument(
+    subparser_required.add_argument(
         "-m",
         metavar="MODALITY",
         help=("Modality"),
@@ -33,21 +34,31 @@ def validate_methods_args(parser, args):
     # if everything is valid the run_methods
     fn = args.yaml
     o = args.o
-    spec = load_spec(fn)
-    m = args.m
 
-    methods = f"""Methods
-The {m} portion of the {spec.name} assay was generated on {spec.date}.
-    """
-    methods += format_library_spec(spec, m)
+    m = args.m
+    return run_methods(fn, m, o)
+
+
+def run_methods(spec_fn, m, o):
+    spec = load_spec(spec_fn)
+    m = methods(spec, m)
 
     if o:
         with open(o, "w") as f:
-            print(methods, file=f)
+            print(m, file=f)
     else:
-        print(methods)
+        print(m)
 
 
+def methods(spec, modality):
+    m = f"""Methods
+The {modality} portion of the {spec.name} assay was generated on {spec.date}.
+    """
+    m += format_library_spec(spec, modality)
+    return m
+
+
+# TODO: manage sequence/library protocol/kit for cases where each modality has different protocols/kits
 def format_library_spec(spec: Assay, m):
     leaves = spec.get_libspec(m).get_leaves()
     s = f"""
@@ -78,7 +89,3 @@ def format_region(region: Region, idx: int = 1):
 def format_read(read, idx: int = 1):
     s = f"- {read.name}: {read.max_len} cycles on the {'positive' if read.strand == 'pos' else 'negative'} strand using the {read.primer_id} primer.\n"
     return s
-
-
-def run_methods(spec):
-    pass

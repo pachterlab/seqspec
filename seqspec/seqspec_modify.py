@@ -1,13 +1,13 @@
 from seqspec.utils import load_spec
-from seqspec.Region import File
+from seqspec.File import File
 
 
 def setup_modify_args(parser):
     # given a spec, a region id and a list of key value property pairs, modify the spec
     subparser = parser.add_parser(
         "modify",
-        description="modify region attributes",
-        help="modify region attributes",
+        description="Modify attributes",
+        help="Modify attributes",
     )
     subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
@@ -143,7 +143,6 @@ def validate_modify_args(parser, args):
     # if everything is valid the run_format
     fn = args.yaml
     o = args.o
-    spec = load_spec(fn)
     modality = args.m
     target_r = args.r
 
@@ -164,6 +163,8 @@ def validate_modify_args(parser, args):
     # Read and Region properties
     min_len = args.min_len
     max_len = args.max_len
+
+    spec = load_spec(fn)
 
     read_kwd = {
         "read_id": read_id,
@@ -191,7 +192,10 @@ def validate_modify_args(parser, args):
     # update region in spec
     # once the region is updated, update the spec
     spec.update_spec()
-    spec.to_YAML(o)
+    if o:
+        spec.to_YAML(o)
+    else:
+        print(spec.to_YAML())
 
 
 def run_modify_read(

@@ -1,11 +1,13 @@
 from seqspec.Assay import Assay
 from seqspec.Region import project_regions_to_coordinates, itx_read, Onlist
 from seqspec.utils import load_spec, map_read_id_to_regions
-from seqspec.seqspec_find import run_find_by_type, run_find
+from seqspec.seqspec_find import find_by_region_type, find_by_region_id
 import os
 from seqspec.utils import read_local_list, read_remote_list
 import itertools
 from typing import List
+from argparse import SUPPRESS
+import warnings
 
 
 def setup_onlist_args(parser):
@@ -23,14 +25,14 @@ def setup_onlist_args(parser):
         type=str,
         default=None,
     )
-    format_choices = ["read", "region", "region-type"]
+    choices = ["read", "region", "region-type"]
     subparser.add_argument(
         "-s",
-        metavar="SPECOBJECT",
+        metavar="SELECTOR",
+        help=(f"Selector for ID, [{', '.join(choices)}] (default: read)"),
         type=str,
         default="read",
-        choices=format_choices,
-        help=f"Type of spec object ({', '.join(format_choices)}), default: region",
+        choices=choices,
     )
     subparser_required.add_argument(
         "-m",
@@ -43,7 +45,7 @@ def setup_onlist_args(parser):
     subparser_required.add_argument(
         "-r",
         metavar="READ or REGION",
-        help=("Read or Region"),
+        help=SUPPRESS,
         type=str,
         default=None,
         required=False,
@@ -57,55 +59,69 @@ def setup_onlist_args(parser):
         choices=format_choices,
         help=f"Format for combining multiple onlists ({', '.join(format_choices)}), default: product",
     )
-    subparser.add_argument("--list", action="store_true", help=("List onlists"))
+    subparser_required.add_argument(
+        "-i",
+        metavar="IDs",
+        help=("IDs"),
+        type=str,
+        default=None,
+        required=False,
+    )
+    # subparser.add_argument("--list", action="store_true", help=("List onlists"))
     return subparser
 
 
 def validate_onlist_args(parser, args):
-    # get paramters
+    if args.r is not None:
+        warnings.warn(
+            "The '-r' argument is deprecated and will be removed in a future version. "
+            "Please use '-i' instead.",
+            DeprecationWarning,
+        )
+        # Optionally map the old option to the new one
+        if not args.i:
+            args.i = args.r
+
     fn = args.yaml
     m = args.m
-    r = args.r
-    f = args.f
+    ids = args.i
+    fmt = args.f
+    o = args.o
+    idtype = args.s
 
+    return run_onlist(fn, m, ids, idtype, fmt, o)
+
+
+def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
     # the base path is the path to the spec file
-    base_path = os.path.dirname(os.path.abspath(fn))
+    base_path = os.path.dirname(os.path.abspath(spec_fn))
 
     # set the save path if it exists
-    if args.o:
-        save_path = os.path.abspath(args.o)
+    if o:
+        save_path = os.path.abspath(o)
     else:
         # otherwise the save path is the same path as the spec
         save_path = os.path.join(base_path, "onlist_joined.txt")
 
     # load spec
-    spec = load_spec(fn)
+    spec = load_spec(spec_fn)
     # if number of barcodes > 1 then we need to join them
-    # note that in order to enable --list as an option we make regions optional but its
-    # required for the standard onlist function
-    if args.list:
-        onlists = run_list_onlists(spec, m)
-        for ol in onlists:
-            print(f"{ol['region_id']}\t{ol['filename']}\t{ol['location']}\t{ol['md5']}")
-        return
 
     CMD = {
         "region": run_onlist_region,
         "region-type": run_onlist_region_type,
         "read": run_onlist_read,
     }
-    if args.s in CMD.keys():
-        onlists = CMD[args.s](spec, m, r)
-    else:
-        raise ValueError(f"Unrecognized spec object {args.s}")
+
+    onlists = CMD[idtype](spec, modality, ids)
 
     if len(onlists) == 0:
-        raise ValueError(f"No onlist found for {m}, {args.s}, {r}")
+        raise ValueError(f"No onlist found for {modality}, {idtype}, {ids}")
 
     # for only one onlist we can just return the path
     # if only one, its remote and we save it to the base path
     elif len(onlists) == 1:
-        location = onlists[0].location
+        location = onlists[0].urltype
         onlist_fn = os.path.basename(onlists[0].filename)
         onlist_path = os.path.join(base_path, onlist_fn)
 
@@ -125,18 +141,18 @@ def validate_onlist_args(parser, args):
             elif o.location == "remote":
                 # base_path is ignored for remote onlists
                 lsts.append(read_remote_list(o, base_path))
-        onlist_elements = join_onlists(lsts, f)
+        onlist_elements = join_onlists(lsts, fmt)
         onlist_path = write_onlist(onlist_elements, save_path)
 
     # print the path to the onlist
     print(onlist_path)
-    return onlist_path
+    return
 
 
 def run_onlist_region_type(
     spec: Assay, modality: str, region_type: str
 ) -> List[Onlist]:
-    regions = run_find_by_type(spec, modality, region_type)
+    regions = find_by_region_type(spec, modality, region_type)
     onlists: List[Onlist] = []
     for r in regions:
         ol = r.get_onlist()
@@ -146,7 +162,7 @@ def run_onlist_region_type(
 
 
 def run_onlist_region(spec: Assay, modality: str, region_id: str) -> List[Onlist]:
-    regions = run_find(spec, modality, region_id)
+    regions = find_by_region_id(spec, modality, region_id)
     onlists: List[Onlist] = []
     for r in regions:
         onlists.append(r.get_onlist())
@@ -169,23 +185,6 @@ def run_onlist_read(spec: Assay, modality: str, read_id: str) -> List[Onlist]:
             onlists.append(ol)
 
     return onlists
-
-
-def run_list_onlists(spec: Assay, modality: str):
-    regions = spec.get_libspec(modality).get_onlist_regions()
-    olsts = []
-    for r in regions:
-        if r.onlist is None:
-            continue
-        olsts.append(
-            {
-                "region_id": r.region_id,
-                "filename": r.onlist.filename,
-                "location": r.onlist.location,
-                "md5": r.onlist.md5,
-            }
-        )
-    return olsts
 
 
 def find_list_target_dir(onlists):

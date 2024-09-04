@@ -1,5 +1,7 @@
 from seqspec.Assay import Assay
-from seqspec.Region import Region, Read
+from seqspec.Region import Region
+from seqspec.File import File
+from seqspec.Read import Read
 from typing import List
 import newick
 
@@ -32,43 +34,52 @@ def setup_init_args(parser):
         required=True,
     )
 
-    subparser_required.add_argument(
+    subparser.add_argument(
         "-o",
         metavar="OUT",
         help=("Path to output file"),
         type=str,
         default=None,
-        required=True,
     )
     subparser.add_argument("newick", help=("tree in newick format"))
     return subparser
 
 
 def validate_init_args(parser, args):
-    # if everything is valid the run_init
     name = args.n
     modalities = args.m
     newick_str = args.newick
     o = args.o
-    if newick is None:
-        raise ValueError("modality-FASTQs pairs must be provided")
+    reads_str = args.r
 
+    if newick_str is None:
+        parser.error("modality-FASTQs pairs must be provided")
+
+    return run_init(name, modalities, newick_str, reads_str, o)
+
+
+def run_init(name: str, modalities, newick_str, reads_str, o=None):
+    reads = parse_reads_string(reads_str)
     tree = newick.loads(newick_str)
     if len(tree[0].descendants) != modalities:
         raise ValueError(
             "Number of modalities must match number of modality-FASTQs pairs"
         )
 
-    # load in two specs
-    spec = run_init(name, tree[0].descendants, parse_reads_string(args.r))
-    spec.to_YAML(o)
+    reads = parse_reads_string(reads_str)
+    spec = init(name, tree[0].descendants, reads)
+
+    if o:
+        spec.to_YAML(o)
+    else:
+        print(spec.to_YAML())
+
+    return
 
 
-# takes in library_spec list of nodes
-def run_init(name: str, tree: List[newick.Node], reads: List[Read]):
-    # make regions for each fastq
+def init(name: str, tree: List[newick.Node], reads: List[Read]):
+    # make read for each fastq
     # make region for each modality
-    # add fastq regions to modality regions
     # add modality regions to assay
     rgns = []
     mnames = []
@@ -92,16 +103,9 @@ def run_init(name: str, tree: List[newick.Node], reads: List[Read]):
         sequence_spec=reads,
         library_spec=rgns,
     )
-
     return assay
 
 
-# nw = "((barcode,umi)r1.fastq.gz,(cdna)r2.fastq.gz)rna;"
-# wn = "rna(r1.fastq.gz(barcode,umi),r1.fastq.gz(cdna));"
-# ex = {"rna": [{"r1.fastq.gz": [{"barcode": "barcode"}, {"umi": "umi"}]}, {"r2.fastq.gz": [{"cdna": "cdna"}]}]}
-# tree = newick.loads(nw)
-# print(tree[0].ascii_art())
-# user writes newick format cli and gets an initialized spec file
 def newick_to_region(
     node, region=Region(region_id="", region_type="", name="", sequence_type="")
 ):
@@ -123,25 +127,6 @@ def newick_to_region(
     return region
 
 
-# def parse_reads_string(input_string):
-#     reads = []
-#     objects = input_string.split(":")
-
-#     for obj in objects:
-#         parts = obj.split(",")
-#         read_id, primer_id, min_len, strand = parts
-#         read_dict = {
-#             "read_id": read_id,
-#             "primer_id": primer_id,
-#             "min_len": int(min_len),
-#             "max_len": int(min_len),
-#             "strand": strand,
-#         }
-#         reads.append(read_dict)
-
-#     return reads
-
-
 def parse_reads_string(input_string):
     reads = []
     objects = input_string.split(":")
@@ -152,11 +137,22 @@ def parse_reads_string(input_string):
         read = Read(
             read_id=read_id,
             name=read_id,
-            modality=modality,  # Assuming modality is always DNA
+            modality=modality,
             primer_id=primer_id,
             min_len=int(min_len),
             max_len=int(min_len),
             strand=strand,
+            files=[
+                File(
+                    file_id=read_id,
+                    filename=read_id,
+                    filetype="",
+                    filesize=0,
+                    url="",
+                    urltype="",
+                    md5="",
+                )
+            ],
         )
         reads.append(read)
 
