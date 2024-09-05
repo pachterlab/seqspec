@@ -2,13 +2,14 @@ import io
 import os
 import gzip
 from seqspec.Assay import Assay
-from seqspec.Region import Onlist, Region
+
 from seqspec.Read import Read
+from seqspec.Region import Region, Onlist
+
 import yaml
 import requests
 from Bio import GenBank
 from typing import Tuple, List
-from packaging import version
 
 
 def load_spec(spec_fn: str):
@@ -21,28 +22,6 @@ def load_spec_stream(spec_stream: io.IOBase):
     # set the parent id in the Assay object upon loading it
     for r in data.library_spec:
         r.set_parent_id(None)
-
-    # for backwards compatibilty, for specs < v0.3.0 set the files to empty
-    # TODO for backwards compatibility of the specs < v0.3.0, set the onlist regions with missing properties
-    if version.parse(data.seqspec_version) < version.parse("0.3.0"):
-        for r in data.sequence_spec:
-            r.set_files([])
-
-        for r in data.library_spec:
-            for lf in r.get_leaves():
-                if lf.onlist is not None:
-                    filename = lf.onlist.filename
-                    location = lf.onlist.location
-                    md5 = lf.onlist.md5
-                    lf.onlist = Onlist(
-                        filename,
-                        filetype="",
-                        filesize=0,
-                        url="",
-                        urltype="",
-                        md5=md5,
-                        location=location,
-                    )
 
     return data
 

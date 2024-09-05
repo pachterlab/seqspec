@@ -17,6 +17,7 @@ from .seqspec_onlist import setup_onlist_args, validate_onlist_args
 from .seqspec_version import setup_version_args, validate_version_args
 from .seqspec_methods import setup_methods_args, validate_methods_args
 from .seqspec_file import setup_file_args, validate_file_args
+from .seqspec_upgrade import setup_upgrade_args, validate_upgrade_args
 
 import warnings
 
@@ -55,6 +56,7 @@ def main():
         "onlist": setup_onlist_args(subparsers),
         "print": setup_print_args(subparsers),
         "split": setup_split_args(subparsers),
+        "upgrade": setup_upgrade_args(subparsers),
         "version": setup_version_args(subparsers),
     }
 
@@ -88,6 +90,7 @@ def main():
         "split": validate_split_args,
         "version": validate_version_args,
         "file": validate_file_args,
+        "upgrade": validate_upgrade_args,
         # "genbank": validate_genbank_args,
     }
     COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)

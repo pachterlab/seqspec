@@ -392,7 +392,6 @@ def format_chromap(indices, subregion_type=None):
     gdna_str = []
     for idx, region in enumerate(indices):
         rg_strand = region.pop("strand")
-        print(rg_strand)
         strand = "" if rg_strand == "pos" else ":-"
         for rgn, cuts in region.items():
             for cut in cuts:
