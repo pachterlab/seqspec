@@ -4,13 +4,24 @@ from typing import List
 from seqspec.Region import Region
 from seqspec.Read import Read
 from seqspec.Assay import Assay
+from argparse import RawTextHelpFormatter
 
 
 def setup_info_args(parser):
     subparser = parser.add_parser(
         "info",
-        description="get info about seqspec file",
+        description="""
+Get information about spec.
+
+Examples:
+seqspec info spec.yaml                          # Get meta information
+seqspec info -k modalities spec.yaml            # Get the list of modalities
+seqspec info -f json -k library_spec spec.yaml  # Get library spec in json format
+seqspec info -f json -k sequence_spec spec.yaml # Get sequence spec in json format
+---
+""",
         help="get info about seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
 
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
@@ -23,13 +34,15 @@ def setup_info_args(parser):
         default="meta",
         required=False,
     )
+    choices = ["tab", "json"]
     subparser.add_argument(
         "-f",
         metavar="FORMAT",
-        help=("The output format"),
+        help=(f"The output format, [{', '.join(choices)}] (default: tab)"),
         type=str,
         default="tab",
         required=False,
+        choices=choices,
     )
     subparser.add_argument(
         "-o",

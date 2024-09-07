@@ -3,13 +3,21 @@ import yaml
 from os import path
 from seqspec.utils import load_spec, file_exists
 from seqspec.Assay import Assay
+from argparse import RawTextHelpFormatter
 
 
 def setup_check_args(parser):
     subparser = parser.add_parser(
         "check",
-        description="validate seqspec file",
+        description="""
+Validate seqspec file against the specification schema.
+
+Examples:
+seqspec check spec.yaml
+---
+""",
         help="validate seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
     subparser.add_argument(

@@ -1,11 +1,19 @@
 from seqspec.utils import load_spec
+from argparse import RawTextHelpFormatter
 
 
 def setup_format_args(parser):
     subparser = parser.add_parser(
         "format",
-        description="format seqspec file",
+        description="""
+Automatically fill in missing fields in the spec.
+
+Examples:
+seqspec format spec.yaml # Format spec
+---
+""",
         help="format seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
     # subparser_required = subparser.add_argument_group("required arguments")
 

@@ -2,8 +2,7 @@ from seqspec.utils import load_spec, map_read_id_to_regions
 from seqspec.seqspec_find import find_by_region_id
 import warnings
 from seqspec.seqspec_file import list_files_by_file_id, list_read_files
-
-from argparse import SUPPRESS
+from argparse import SUPPRESS, RawTextHelpFormatter
 
 from seqspec.Region import (
     project_regions_to_coordinates,
@@ -15,8 +14,17 @@ from seqspec.Read import ReadCoordinate
 def setup_index_args(parser):
     subparser = parser.add_parser(
         "index",
-        description="index reads or regions in a seqspec file",
+        description="""
+Identify the position of elements in a spec.
+
+Examples:
+seqspec index -m rna -s file -t kb spec.yaml     # Index file elements in kallisto bustools format
+seqspec index -m rna -s file spec.yaml           # Index file elements corresponding to reads
+seqspec index -m rna -s read -i rna_R1 spec.yaml # Index read elements in rna_R1
+---
+""",
         help="index reads or regions in a seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file")

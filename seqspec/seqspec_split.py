@@ -1,13 +1,21 @@
 import os
 from seqspec.utils import load_spec
 from seqspec.Assay import Assay
+from argparse import RawTextHelpFormatter
 
 
 def setup_split_args(parser):
     subparser = parser.add_parser(
         "split",
-        description="split seqspec file into modalities",
+        description="""
+Split seqspec file into one file per modality.
+
+Examples:
+seqspec split -o split spec.yaml # Split spec into modalities
+---
+""",
         help="split seqspec into modalities",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
 

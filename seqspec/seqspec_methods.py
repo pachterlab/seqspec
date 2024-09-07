@@ -1,13 +1,21 @@
 from seqspec.utils import load_spec
 from seqspec.Assay import Assay
 from seqspec.Region import Region
+from argparse import RawTextHelpFormatter
 
 
 def setup_methods_args(parser):
     subparser = parser.add_parser(
         "methods",
-        description="Return methods section of sequencing specification",
+        description="""
+Return methods section of sequencing specification.
+
+Examples:
+seqspec methods -m rna spec.yaml # Return methods section for rna modality
+---
+""",
         help="Return methods section of sequencing specification",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
 

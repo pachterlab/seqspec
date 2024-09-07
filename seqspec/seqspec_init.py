@@ -4,6 +4,7 @@ from seqspec.File import File
 from seqspec.Read import Read
 from typing import List
 import newick
+from argparse import RawTextHelpFormatter
 
 # example
 
@@ -14,8 +15,15 @@ import newick
 def setup_init_args(parser):
     subparser = parser.add_parser(
         "init",
-        description="init a seqspec file",
+        description="""
+Initialize a seqspec file.
+
+Examples:
+seqspec init -o spec.yaml -n myassay -m 1 -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg" "((truseq_r1:10,barcode:16,umi:12,cdna:150)rna)" # Initialize a single modality assay
+---
+""",
         help="init a seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
     subparser_required.add_argument(
@@ -41,7 +49,12 @@ def setup_init_args(parser):
         type=str,
         default=None,
     )
-    subparser.add_argument("newick", help=("tree in newick format"))
+    subparser.add_argument(
+        "newick",
+        help=(
+            "tree in newick format (https://marvin.cs.uidaho.edu/Teaching/CS515/newickFormat.html)"
+        ),
+    )
     return subparser
 
 

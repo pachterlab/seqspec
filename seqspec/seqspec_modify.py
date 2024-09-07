@@ -1,13 +1,23 @@
 from seqspec.utils import load_spec
 from seqspec.File import File
+from argparse import RawTextHelpFormatter, SUPPRESS
+import warnings
 
 
+# TODO fix modify to use the -s selector
 def setup_modify_args(parser):
     # given a spec, a region id and a list of key value property pairs, modify the spec
     subparser = parser.add_parser(
         "modify",
-        description="Modify attributes",
+        description="""
+Modify attributes of region elements in the spec.
+
+Examples:
+seqspec modify -m rna -o mod_spec.yaml -i "R1.fastq.gz" --files "R1_1.fastq.gz,fastq,0,./fastq/R1_1.fastq.gz,local,null:R1_2.fastq.gz,fastq,0,./fastq/R1_2.fastq.gz,local,null" spec.yaml # modify the files for R1 fastq
+---
+""",
         help="Modify attributes",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
@@ -111,21 +121,38 @@ def setup_modify_args(parser):
         default=None,
     )
 
-    subparser_required.add_argument(
+    subparser.add_argument(
         "-o",
         metavar="OUT",
         help=("Path to output file"),
         type=str,
         default=None,
-        required=True,
+        required=False,
     )
     subparser_required.add_argument(
         "-r",
         metavar="READID/REGIONID",
-        help=("ID of read/region to modify"),
+        help=SUPPRESS,
         type=str,
         default=None,
-        required=True,
+        required=False,
+    )
+    subparser_required.add_argument(
+        "-i",
+        metavar="IDs",
+        help=("IDs"),
+        type=str,
+        default=None,
+        required=False,
+    )
+    choices = ["read", "region"]
+    subparser.add_argument(
+        "-s",
+        metavar="SELECTOR",
+        help=(f"Selector for ID, [{', '.join(choices)}] (default: read)"),
+        type=str,
+        default="read",
+        choices=choices,
     )
     subparser_required.add_argument(
         "-m",
@@ -140,11 +167,23 @@ def setup_modify_args(parser):
 
 
 def validate_modify_args(parser, args):
+    if args.r is not None:
+        warnings.warn(
+            "The '-r' argument is deprecated and will be removed in a future version. "
+            "Please use '-i' instead.",
+            DeprecationWarning,
+        )
+        # Optionally map the old option to the new one
+        if not args.i:
+            args.i = args.r
+
     # if everything is valid the run_format
     fn = args.yaml
     o = args.o
     modality = args.m
-    target_r = args.r
+    # target_r = args.r
+    idtype = args.s  # selector
+    ids = args.i
 
     # Read properties
     read_id = args.read_id
@@ -185,10 +224,11 @@ def validate_modify_args(parser, args):
         "min_len": min_len,
         "max_len": max_len,
     }
-    if args.region:
-        spec = run_modify_region(spec, modality, target_r, **region_kwd)
-    else:
-        spec = run_modify_read(spec, modality, target_r, **read_kwd)
+
+    if idtype == "region":
+        spec = run_modify_region(spec, modality, ids, **region_kwd)
+    elif idtype == "read":
+        spec = run_modify_read(spec, modality, ids, **read_kwd)
     # update region in spec
     # once the region is updated, update the spec
     spec.update_spec()

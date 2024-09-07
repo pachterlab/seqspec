@@ -1,12 +1,20 @@
 from seqspec.utils import load_spec
 from . import __version__
+from argparse import RawTextHelpFormatter
 
 
 def setup_version_args(parser):
     subparser = parser.add_parser(
         "version",
-        description="Get seqspec version and seqspec file version",
+        description="""
+Get seqspec version and seqspec file version.
+
+Examples:
+seqspec version spec.yaml
+---
+""",
         help="Get seqspec version and seqspec file version",
+        formatter_class=RawTextHelpFormatter,
     )
 
     subparser.add_argument("yaml", help="Sequencing specification yaml file")

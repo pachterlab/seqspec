@@ -3,13 +3,24 @@ from seqspec.Assay import Assay
 from collections import defaultdict
 from seqspec.File import File
 from typing import Dict, List, Optional
+from argparse import RawTextHelpFormatter
 
 
 def setup_file_args(parser):
     subparser = parser.add_parser(
         "file",
-        description="list files",
+        description="""
+List files present in the spec.
+
+Examples:
+seqspec file -m rna spec.yaml                          # List paired read files
+seqspec file -m rna -f interleaved spec.yaml           # List interleaved read files
+seqspec file -m rna -f list -k url spec.yaml           # List urls of all read files
+seqspec file -m rna -f list -s onlist -k all spec.yaml # List onlist files
+---
+""",
         help="list files",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
 

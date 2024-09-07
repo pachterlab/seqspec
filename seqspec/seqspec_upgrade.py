@@ -1,13 +1,21 @@
 from seqspec.utils import load_spec
 from seqspec.File import File
 from seqspec.Region import Onlist
+from argparse import RawTextHelpFormatter
 
 
 def setup_upgrade_args(parser):
     subparser = parser.add_parser(
         "upgrade",
-        description="upgrade seqspec file",
+        description="""
+Upgrade seqspec file from older versions to the current version.
+
+Examples:
+seqspec upgrade spec.yaml # Upgrade the spec file
+---
+""",
         # help="upgrade seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
     # subparser_required = subparser.add_argument_group("required arguments")
 

@@ -3,13 +3,22 @@ from seqspec.Assay import Assay
 import yaml
 import argparse
 import warnings
+from argparse import RawTextHelpFormatter
 
 
 def setup_find_args(parser):
     subparser = parser.add_parser(
         "find",
-        description="find objects in a seqspec file",
+        description="""
+Find objects in the spec.
+
+Examples:
+seqspec find -m rna -s read -i rna_R1 spec.yaml         # Find reads by id
+seqspec find -m rna -s region-type -i barcode spec.yaml # Find regions with barcode region type
+---
+""",
         help="find objects in a seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
 
@@ -108,7 +117,12 @@ def run_find(spec_fn: str, modality: str, id: str, idtype: str, o: str):
 
 # TODO implement
 def find_by_read_id(spec: Assay, modality: str, id: str):
-    return []
+    rds = []
+    reads = spec.get_seqspec(modality)
+    for r in reads:
+        if r.read_id == id:
+            rds.append(r)
+    return rds
 
 
 # TODO implement

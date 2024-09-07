@@ -6,18 +6,27 @@ import os
 from seqspec.utils import read_local_list, read_remote_list
 import itertools
 from typing import List
-from argparse import SUPPRESS
+from argparse import SUPPRESS, RawTextHelpFormatter
 import warnings
 
 
 def setup_onlist_args(parser):
     subparser = parser.add_parser(
         "onlist",
-        description="get onlist file for specific region",
+        description="""
+Get onlist file for specific region. Onlist is a list of permissible sequences for a region.
+
+Examples:
+seqspec onlist -m rna -s read -i R1.fastq.gz 10xv3.yaml    # Get onlist for the element in the R1.fastq.gz read
+seqspec onlist -m rna -s region-type -i barcode 10xv3.yaml # Get onlist for barcode region type
+---
+        """,
         help="get onlist file for specific regions",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
+
     subparser.add_argument(
         "-o",
         metavar="OUT",
@@ -34,14 +43,7 @@ def setup_onlist_args(parser):
         default="read",
         choices=choices,
     )
-    subparser_required.add_argument(
-        "-m",
-        metavar="MODALITY",
-        help=("Modality"),
-        type=str,
-        default=None,
-        required=True,
-    )
+
     subparser_required.add_argument(
         "-r",
         metavar="READ or REGION",
@@ -67,7 +69,15 @@ def setup_onlist_args(parser):
         default=None,
         required=False,
     )
-    # subparser.add_argument("--list", action="store_true", help=("List onlists"))
+    subparser_required.add_argument(
+        "-m",
+        metavar="MODALITY",
+        help=("Modality"),
+        type=str,
+        default=None,
+        required=True,
+    )
+
     return subparser
 
 

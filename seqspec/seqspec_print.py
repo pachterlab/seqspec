@@ -3,13 +3,24 @@ from seqspec.seqspec_print_html import print_seqspec_html
 import newick
 from .utils import REGION_TYPE_COLORS, complement_sequence
 from seqspec.Region import project_regions_to_coordinates
+from argparse import RawTextHelpFormatter
 
 
 def setup_print_args(parser):
     subparser = parser.add_parser(
         "print",
-        description="print seqspec file",
+        description="""
+Print sequence and/or library structure as ascii, png, or html.
+
+Examples:
+seqspec print spec.yaml                            # Print the library structure as ascii
+seqspec print -f seqspec-ascii spec.yaml           # Print the sequence and library structure as ascii
+seqspec print -f seqspec-html spec.yaml            # Print the sequence and library structure as html
+seqspec print -o spec.png -f seqspec-png spec.yaml # Print the library structure as a png
+---
+        """,
         help="print seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
     subparser.add_argument(
