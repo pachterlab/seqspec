@@ -58,6 +58,8 @@ Fields:
 - `sequence_spec`: The spec for the sequencer, an array of Read objects.
 - `library_spec`: The spec for the assay, an array of Region objects.
 
+For the library_protocol, library_kit, sequence_protocol, sequence_kit, their values can be specified as a list, one element per modality. If all modalities defined in the spec use the same protocol/kit, then only one string is needed.
+
 Example:
 
 ```yaml
@@ -73,8 +75,12 @@ modalities:
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SPLiT-seq.html
 library_protocol: SPLiT-seq
 library_kit: Custom
-sequence_protocol: Illumina NextSeq 500
-sequence_kit: Illumina NextSeq 500 High Output Kit v2.5 (150 Cycles)
+sequence_protocol: Illumina NovaSeq 6000 (EFO:0008637)
+sequence_kit:
+  - !SeqKit
+    kit_id: "NovaSeq 6000 S2 Reagent Kit v1.5 (100\u2009cycles)"
+    name: illumina
+    modality: rna
 sequence_spec: ...
 library_spec: ...
 ```
