@@ -5,15 +5,13 @@
 ![python versions](https://img.shields.io/pypi/pyversions/seqspec)
 [![license](https://img.shields.io/pypi/l/seqspec)](LICENSE)
 
-`seqspec` is a file format and tool that describe data generated from genomics experiments. Both the file format and tool [enable uniform processing](./docs/UNIFORM.md) of genomics data.
+`seqspec` is a file format that describes data generated from genomics experiments. Both the file format and `seqspec` tool [enable uniform processing](./docs/UNIFORM.md) of genomics data.
 
 A `seqspec` file contains
 
 1. Assay-level metadata such as library kit and sequencing machine,
 2. The 5'->3' annotation and position of the elements in a library molecule (e.g. barcodes, UMIs),
 3. A list of the reads generated from sequencing the library molecule.
-
-A `seqspec` file is a machine-readable YAML file that annotates the content of molecules in genomic libraries, the structure of reads generated from them, and how those are stored in files.
 
 The `seqspec` tool operates on `seqspec` files and
 
