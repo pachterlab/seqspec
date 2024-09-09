@@ -5,7 +5,7 @@
 ![python versions](https://img.shields.io/pypi/pyversions/seqspec)
 [![license](https://img.shields.io/pypi/l/seqspec)](LICENSE)
 
-`seqspec` is a file format and tool that describe data generated from genomics experiments. It enables uniform processing of genomics data.
+`seqspec` enables uniform processing of genomics data. `seqspec` is a file format and tool that describe data generated from genomics experiments.
 
 A `seqspec` file contains
 
