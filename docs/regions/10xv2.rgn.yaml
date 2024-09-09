@@ -7,9 +7,14 @@
   min_len: 16
   max_len: 16
   onlist: !Onlist
-    filename: barcode_onlist.txt
-    location: local
-    md5: 5b62453df2771f5aa856f78797f16591
+    file_id: 737K-august-2016.txt.gz
+    filename: 737K-august-2016.txt.gz
+    filetype: txt
+    filesize: 12533759
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNAv2/737K-august-2016.txt.gz
+    urltype: http
+    md5: 72aa64fd865bcda142c47d0da8370168
+    location: remote
   regions: null
 - !Region
   region_id: umi

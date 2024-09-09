@@ -1,5 +1,5 @@
 !Assay
-seqspec_version: 0.2.0
+seqspec_version: 0.3.0
 assay_id: element-adept-truseq-dual-index
 name: Example assay
 doi: https://www.elementbiosciences.com/blog/element-101-elevate-or-adept-library-preparation-for-the-aviti-system
@@ -14,37 +14,73 @@ sequence_protocol: Element Aviti
 sequence_kit: Adept Workflow
 sequence_spec:
 - !Read
-  read_id: I1.fastq.gz
+  read_id: Index 1
   name: Index 1
   modality: rna
   primer_id: truseq_read2
   min_len: 9
   max_len: 9
   strand: pos
+  files:
+  - !File
+    file_id: I1.fastq.gz
+    filename: I1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: I1.fastq.gz
+    urltype: local
+    md5: md5
 - !Read
-  read_id: I2.fastq.gz
+  read_id: Index 2
   name: Index 2
   modality: rna
   primer_id: illumina_p5
   min_len: 9
   max_len: 9
   strand: pos
+  files:
+  - !File
+    file_id: I2.fastq.gz
+    filename: I2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 - !Read
-  read_id: R1.fastq.gz
+  read_id: Read 1
   name: Read 1
   modality: rna
   primer_id: truseq_read1
   min_len: 1
   max_len: 50
   strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 - !Read
-  read_id: R2.fastq.gz
+  read_id: Read 2
   name: Read 2
   modality: rna
   primer_id: truseq_read2
   min_len: 1
   max_len: 50
   strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 library_spec:
 - !Region
   region_id: rna
@@ -76,7 +112,12 @@ library_spec:
     min_len: 9
     max_len: 9
     onlist: !Onlist
+      file_id: index5_onlist.txt
       filename: index5_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: null
       location: local
     regions: null
@@ -123,7 +164,12 @@ library_spec:
     min_len: 9
     max_len: 9
     onlist: !Onlist
+      file_id: index7_onlist.txt
       filename: index7_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: null
       location: local
     regions: null

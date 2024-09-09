@@ -8,7 +8,12 @@
   min_len: 16
   max_len: 16
   onlist: !Onlist
-    filename: barcode_onlist.txt
-    location: local
-    md5: 5b62453df2771f5aa856f78797f16591
+    file_id: 3M-february-2018.txt.gz
+    filename: 3M-february-2018.txt.gz
+    filetype: txt
+    filesize: 115512960
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNAv3/3M-february-2018.txt.gz
+    urltype: http
+    md5: 3d36d0a4021fd292b265e2b5e72aaaf3
+    location: remote
   regions: null

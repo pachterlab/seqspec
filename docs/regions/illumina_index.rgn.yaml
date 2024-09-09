@@ -7,7 +7,12 @@
   min_len: 8
   max_len: 8
   onlist: !Onlist
+    file_id: index_onlist.txt
     filename: index_onlist.txt
+    filetype: txt
+    filesize: 0
+    url: index_onlist.txt
+    urltype: local
+    md5: md5
     location: local
-    md5: 5b62453df2771f5aa856f78797f16591
   regions: null

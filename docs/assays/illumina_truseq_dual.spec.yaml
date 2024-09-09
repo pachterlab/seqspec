@@ -1,5 +1,5 @@
 !Assay
-seqspec_version: 0.2.0
+seqspec_version: 0.3.0
 assay_id: Illumina-novaseq-truseq-dual-index
 name: Example assay
 doi: https://support.illumina.com/content/dam/illumina-support/documents/documentation/system_documentation/miseq/indexed-sequencing-overview-guide-15057455-08.pdf
@@ -14,37 +14,73 @@ sequence_protocol: Illumina NovaSeq 6000
 sequence_kit: NovaSeq 6000 v1.5
 sequence_spec:
 - !Read
-  read_id: R1.fastq.gz
+  read_id: Read 1
   name: Read 1
   modality: rna
   primer_id: truseq_read1
   min_len: 1
   max_len: 98
   strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 - !Read
-  read_id: I1.fastq.gz
+  read_id: Index 1
   name: Index 1 (i7 index)
   modality: rna
   primer_id: truseq_read2
   min_len: 8
   max_len: 8
   strand: pos
+  files:
+  - !File
+    file_id: I1.fastq.gz
+    filename: I1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 - !Read
-  read_id: I2.fastq.gz
+  read_id: Index 2
   name: Index 2 (i5 index)
   modality: rna
   primer_id: truseq_read1
   min_len: 8
   max_len: 8
   strand: neg
+  files:
+  - !File
+    file_id: I2.fastq.gz
+    filename: I2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 - !Read
-  read_id: R2.fastq.gz
+  read_id: Read 2
   name: Read 2
   modality: rna
   primer_id: truseq_read2
   min_len: 1
   max_len: 98
   strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 library_spec:
 - !Region
   region_id: rna
@@ -109,7 +145,12 @@ library_spec:
     min_len: 8
     max_len: 8
     onlist: !Onlist
+      file_id: index7_onlist.txt
       filename: index7_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: null
       location: local
     regions: null

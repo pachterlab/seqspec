@@ -4,10 +4,19 @@ sequence_protocol: Oxford Nanopore
 sequence_kit: Direct RNA Sequencing Kit (SQK-RNA004)
 sequence_spec:
 - !Read
-  read_id: R1.fastq.gz
+  read_id: Read 1
   name: Read 1
   modality: oxford_nanopore_prep
   primer_id: ont_primer
   min_len: 1
   max_len: 4000000
   strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: fastq
+    filesize: 0
+    url: R1.fastq.gz
+    urltype: local
+    md5: md5

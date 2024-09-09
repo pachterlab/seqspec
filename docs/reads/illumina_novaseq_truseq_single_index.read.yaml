@@ -4,26 +4,53 @@ sequence_protocol: Illumina NovaSeq 6000
 sequence_kit: NovaSeq 6000 v1.5
 sequence_spec:
 - !Read
-  read_id: R1.fastq.gz
+  read_id: Read 1
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: truseq_read1
   min_len: 1
   max_len: 250
   strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: fastq
+    filesize: 0
+    url: R1.fastq.gz
+    urltype: local
+    md5: md5
 - !Read
-  read_id: I1.fastq.gz
+  read_id: Index 1
   name: Index 1 (i7 index)
   modality: illumina_truseq_prep
   primer_id: truseq_read2
   min_len: 8
   max_len: 8
   strand: pos
+  files:
+  - !File
+    file_id: I1.fastq.gz
+    filename: I1.fastq.gz
+    filetype: fastq
+    filesize: 0
+    url: I1.fastq.gz
+    urltype: local
+    md5: md5
 - !Read
-  read_id: R2.fastq.gz
+  read_id: Read 2
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: truseq_read2
   min_len: 1
   max_len: 250
   strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: fastq
+    filesize: 0
+    url: R2.fastq.gz
+    urltype: local
+    md5: md5
