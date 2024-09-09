@@ -1,0 +1,209 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: 10xRNAv1
+name: 10x-RNA-v1
+doi: https://www.businesswire.com/news/home/20160415005184/en/10x-Genomics-Announces-Commercial-Availability-of-Single-Cell-3%E2%80%99-Solution-at-the-AACR-Annual-Meeting-2016
+date: 15 April 2016
+description: 10x Genomics RNA assay v1
+modalities:
+- rna
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3v1.html
+library_protocol: null
+library_kit: null
+sequence_protocol: Illumina
+sequence_kit: null
+sequence_spec:
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: illumina_truseq_prep
+  primer_id: generic_primer1
+  min_len: 1
+  max_len: 250
+  strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: illumina_truseq_prep
+  primer_id: generic_primer2
+  min_len: 1
+  max_len: 250
+  strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+library_spec:
+- !Region
+  region_id: rna
+  region_type: rna
+  name: RNA
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTXNNNNNNNNNNAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 153
+  max_len: 250
+  onlist: null
+  regions:
+  - !Region
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: illumina_p5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: I2.fastq.gz
+    region_type: fastq
+    name: I2.fastq.gz
+    sequence_type: joined
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+    - !Region
+      region_id: index5
+      region_type: index5
+      name: index5
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        file_id: index5_onlist.txt
+        filename: index5_onlist.txt
+        filetype: ''
+        filesize: 0
+        url: ''
+        urltype: ''
+        md5: null
+        location: local
+      regions: null
+      parent_id: I2.fastq.gz
+    parent_id: rna
+  - !Region
+    region_id: truseq_read1
+    region_type: truseq_read1
+    name: truseq_read1
+    sequence_type: fixed
+    sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: R1.fastq.gz
+    region_type: fastq
+    name: R1.fastq.gz
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions:
+    - !Region
+      region_id: cdna
+      region_type: cdna
+      name: cdna
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      regions: null
+      parent_id: R1.fastq.gz
+    parent_id: rna
+  - !Region
+    region_id: R2.fastq.gz
+    region_type: fastq
+    name: R2.fastq.gz
+    sequence_type: random
+    sequence: NNNNNNNNNN
+    min_len: 10
+    max_len: 10
+    onlist: null
+    parent_id: rna
+    regions:
+    - !Region
+      region_id: umi
+      region_type: umi
+      name: umi
+      sequence_type: random
+      sequence: NNNNNNNNNN
+      min_len: 10
+      max_len: 10
+      onlist: null
+      regions: null
+      parent_id: R2.fastq.gz
+  - !Region
+    region_id: truseq_read2
+    region_type: truseq_read2
+    name: truseq_read2
+    sequence_type: fixed
+    sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: I1.fastq.gz
+    region_type: fastq
+    name: I1.fastq.gz
+    sequence_type: joined
+    sequence: NNNNNNNNNNNNNN
+    min_len: 14
+    max_len: 14
+    onlist: null
+    parent_id: rna
+    regions:
+    - !Region
+      region_id: barcode
+      region_type: barcode
+      name: barcode
+      sequence_type: onlist
+      sequence: NNNNNNNNNNNNNN
+      min_len: 14
+      max_len: 14
+      onlist: !Onlist
+        file_id: 737K-april-2014_rc.txt.gz
+        filename: 737K-april-2014_rc.txt.gz
+        filetype: ''
+        filesize: 0
+        url: ''
+        urltype: ''
+        md5: null
+        location: local
+      regions: null
+      parent_id: I1.fastq.gz
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: illumina_p7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: rna
+  parent_id: null

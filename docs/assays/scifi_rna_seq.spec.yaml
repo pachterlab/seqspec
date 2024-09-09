@@ -1,0 +1,217 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: null
+name: scifi-RNA-Seq
+doi: https://doi.org/10.1038/s41592-021-01153-z
+date: 31 May 2021
+description: single-cell combinatorial fluidic indexing RNA-sequencing
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/scifi-RNA-seq.html
+library_protocol: null
+library_kit: null
+sequence_protocol: null
+sequence_kit: null
+sequence_spec:
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: illumina_truseq_prep
+  primer_id: generic_primer1
+  min_len: 1
+  max_len: 250
+  strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: illumina_truseq_prep
+  primer_id: generic_primer2
+  min_len: 1
+  max_len: 250
+  strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+library_spec:
+- !Region
+  region_id: RNA
+  region_type: RNA
+  name: RNA
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNTCGTCGGCAGCGTCACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 181
+  max_len: 375
+  onlist: null
+  regions:
+  - !Region
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: illumina_p5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: bead_bc
+    region_type: bead_bc
+    name: bead_bc
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNNNNNN
+    min_len: 16
+    max_len: 16
+    onlist: !Onlist
+      file_id: bead_bc_onlist.txt
+      filename: bead_bc_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
+      md5: null
+      location: local
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: s7
+    region_type: s7
+    name: s7
+    sequence_type: fixed
+    sequence: TCGTCGGCAGCGTC
+    min_len: 14
+    max_len: 14
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: truseq_r1
+    region_type: truseq_r1
+    name: truseq_r1
+    sequence_type: fixed
+    sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: umi
+    region_type: umi
+    name: umi
+    sequence_type: random
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: rt_bc
+    region_type: rt_bc
+    name: rt_bc
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNNN
+    min_len: 13
+    max_len: 13
+    onlist: !Onlist
+      file_id: rt_bc_onlist.txt
+      filename: rt_bc_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
+      md5: null
+      location: local
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: polyT
+    region_type: polyT
+    name: polyT
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: cdna
+    region_type: cdna
+    name: cdna
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: ME
+    region_type: ME
+    name: ME
+    sequence_type: fixed
+    sequence: CTGTCTCTTATACACATCT
+    min_len: 19
+    max_len: 19
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: s7
+    region_type: s7
+    name: s7
+    sequence_type: fixed
+    sequence: CCGAGCCCACGAGAC
+    min_len: 15
+    max_len: 15
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: i7_index
+    region_type: i7_index
+    name: i7_index
+    sequence_type: onlist
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: !Onlist
+      file_id: i7_index_onlist.txt
+      filename: i7_index_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
+      md5: null
+      location: local
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: illumina_p7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: RNA
+  parent_id: null
