@@ -78,13 +78,14 @@ library_spec:
     min_len: 16
     max_len: 16
     onlist: !Onlist
-      location: remote
+      file_id: 3M-february-2018.txt.gz
       filename: 3M-february-2018.txt.gz
       filetype: txt
       filesize: 115512960
       url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNAv3/3M-february-2018.txt.gz
       urltype: http
       md5: 3d36d0a4021fd292b265e2b5e72aaaf3
+      location: remote
     regions: null
   - !Region
     parent_id: rna
@@ -104,7 +105,7 @@ library_spec:
     name: cdna
     sequence_type: random
     sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-    min_len: 1
+    min_len: 150
     max_len: 150
     onlist: null
     regions: null

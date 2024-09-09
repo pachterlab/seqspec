@@ -22,6 +22,7 @@ project:
       children:
       - file: docs/TUTORIAL.md
       - file: docs/USING_SEQSPEC.ipynb
+      - file: docs/SEQ_PRIMER.md
     - file: docs/CONTRIBUTING.md
     - file: docs/CHANGELOG.md
     

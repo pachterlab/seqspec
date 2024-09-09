@@ -78,13 +78,14 @@ library_spec:
     min_len: 16
     max_len: 16
     onlist: !Onlist
-      location: remote
+      file_id: 737K-august-2016.txt.gz
       filename: 737K-august-2016.txt.gz
       filetype: txt
       filesize: 12533759
       url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNAv2/737K-august-2016.txt.gz
       urltype: http
       md5: 72aa64fd865bcda142c47d0da8370168
+      location: remote
     regions: null
   - !Region
     parent_id: rna
