@@ -22,6 +22,8 @@ A `seqspec` file contains information about an dna library and the sequencing re
 **Note**: Developing a `seqspec` file for a published assay can be challenging, as authors often assume readers have prior knowledge of library preparation steps.
 :::
 
+This website documents example assays as well as sequence and library structures: https://www.sina.bio/seqspec-builder/
+
 # Example: SPLiT-Seq Assay
 
 Let's develop a `seqspec` for the [SPLiT-Seq assay](https://www.science.org/doi/10.1126/science.aam8999). We'll first gather information needed for the spec. Then we will figure out the library structure (the structure of the molecule placed on the sequencing machine) and the read structure (the elements contained within the FASTQ reads).
