@@ -14,7 +14,7 @@ library_protocol: 10xv2 RNA
 library_kit: Not-specified
 sequence_spec:
 - !Read
-  read_id: R1.fastq.gz
+  read_id: Read 1
   name: Read 1
   modality: rna
   primer_id: custom_primer1
@@ -30,7 +30,7 @@ sequence_spec:
     urltype: local
     md5: 0
 - !Read
-  read_id: I1.fastq.gz
+  read_id: Index 1
   name: Read 2
   modality: rna
   primer_id: custom_primer2
@@ -46,7 +46,7 @@ sequence_spec:
     urltype: local
     md5: 0
 - !Read
-  read_id: R2.fastq.gz
+  read_id: Read 2
   name: Read 2
   modality: rna
   primer_id: custom_primer2
