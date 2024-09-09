@@ -15,7 +15,7 @@ def setup_index_args(parser):
     subparser = parser.add_parser(
         "index",
         description="""
-Identify the position of elements in a spec.
+Identify the position of elements in a spec for use in downstream tools.
 
 Examples:
 seqspec index -m rna -s file -t kb spec.yaml     # Index file elements in kallisto bustools format
