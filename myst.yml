@@ -20,6 +20,7 @@ project:
       - file: docs/SPECIFICATION.md
     - title: Tutorials
       children:
+      - file: docs/TUTORIAL_SIMPLE.md
       - file: docs/TUTORIAL_COMPLEX.md
       - file: docs/USING_SEQSPEC.ipynb
       - file: docs/SEQ_PRIMER.md

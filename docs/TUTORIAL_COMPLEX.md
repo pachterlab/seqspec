@@ -1,5 +1,5 @@
 ---
-title: Build a seqspec
+title: Build a seqspec (complex)
 date: 2024-06-25
 authors:
   - name: A. Sina Booeshaghi
