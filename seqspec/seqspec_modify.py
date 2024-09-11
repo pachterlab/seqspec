@@ -10,13 +10,13 @@ def setup_modify_args(parser):
     subparser = parser.add_parser(
         "modify",
         description="""
-Modify attributes of region elements in the spec.
+Modify attributes of various elements in a seqspec file.
 
 Examples:
 seqspec modify -m rna -o mod_spec.yaml -i "R1.fastq.gz" --files "R1_1.fastq.gz,fastq,0,./fastq/R1_1.fastq.gz,local,null:R1_2.fastq.gz,fastq,0,./fastq/R1_2.fastq.gz,local,null" spec.yaml # modify the files for R1 fastq
 ---
 """,
-        help="Modify attributes",
+        help="Modify attributes of various elements in seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")

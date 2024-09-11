@@ -17,7 +17,7 @@ seqspec find -m rna -s read -i rna_R1 spec.yaml         # Find reads by id
 seqspec find -m rna -s region-type -i barcode spec.yaml # Find regions with barcode region type
 ---
 """,
-        help="find objects in a seqspec file",
+        help="Find objects in seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")

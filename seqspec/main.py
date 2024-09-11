@@ -33,7 +33,14 @@ def main():
 
     # setup parsers
     parser = argparse.ArgumentParser(
-        description=f"seqspec {__version__}: Format sequence specification files"
+        description=f"""
+seqspec {__version__}: A machine-readable file format for genomic library sequence and structure.
+
+GitHub: https://github.com/pachterlab/seqspec
+Documentation: https://pachterlab.github.io/seqspec/
+
+""",
+        formatter_class=argparse.RawTextHelpFormatter,
     )
 
     subparsers = parser.add_subparsers(

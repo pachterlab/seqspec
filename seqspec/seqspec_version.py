@@ -13,7 +13,7 @@ Examples:
 seqspec version spec.yaml
 ---
 """,
-        help="Get seqspec version and seqspec file version",
+        help="Get seqspec tool version and seqspec file version",
         formatter_class=RawTextHelpFormatter,
     )
 

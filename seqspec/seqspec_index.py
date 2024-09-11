@@ -23,7 +23,7 @@ seqspec index -m rna -s file spec.yaml           # Index file elements correspon
 seqspec index -m rna -s read -i rna_R1 spec.yaml # Index read elements in rna_R1
 ---
 """,
-        help="index reads or regions in a seqspec file",
+        help="Identify position of elements in seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")

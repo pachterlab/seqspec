@@ -100,6 +100,80 @@ The relationship between the `sequence_spec` and `library_spec` in `seqspec` is 
 
 This mapping allows the precise identification the library elements captured in each sequencing read using the `seqspec index` command.
 
+# Mapping Files to Reads
+
+Each `Read` in the `sequence_spec` can contain a list of `File` objects. The files correspond real files that contain the sequence represented by the `Read`. Practically speaking, the can refer to multiple FASTQ files from different lanes but from the same read. For example suppose a sequencing run produced Read 1 and Read 2 FASTQ files with three lanes dedicated per read. The FASTQ files often have the following naming convention
+
+Read 1
+
+1. R1_L001.fastq.gz
+2. R1_L002.fastq.gz
+3. R1_L003.fastq.gz
+
+Read 2
+
+1. R2_L001.fastq.gz
+2. R2_L002.fastq.gz
+3. R2_L003.fastq.gz
+
+And are sometimes represented as "pairs"
+
+1. R1_L001.fastq.gz, R2_L001.fastq.gz
+2. R1_L002.fastq.gz, R2_L002.fastq.gz
+3. R1_L003.fastq.gz, R2_L003.fastq.gz
+
+The `files` entry for each `Read` functions to list the files for each read **in a consistent order**. Meaning "lane 3" for Read 1, must be in the same position as "lane 3" for Read 2.
+
+```yaml
+sequence_spec:
+  - !Read
+    read_id: Read 1
+    ...
+    - files:
+      - !File
+        file_id: R1_L001.fastq.gz
+        ...
+      - !File
+        file_id: R1_L002.fastq.gz
+        ...
+      - !File
+        file_id: R1_L003.fastq.gz
+        ...
+  - !Read
+    read_id: Read 2
+    ...
+    - files:
+      - !File
+        file_id: R2_L001.fastq.gz
+        ...
+      - !File
+        file_id: R2_L002.fastq.gz
+        ...
+      - !File
+        file_id: R2_L003.fastq.gz
+        ...
+```
+
+Sometimes reads are grouped together in a single file like in the BAM file format where paired end reads are stored in one file. `seqspec` is flexible enough to handle this case. Simple repeat the File for each of the reads that are represented by that file.
+
+```yaml
+sequence_spec:
+  - !Read
+    read_id: Read 1
+    ...
+    - files:
+      - !File
+        file_id: reads.bam
+        ...
+  - !Read
+    read_id: Read 2
+    ...
+    - files:
+      - !File
+        file_id: reads.bam
+        ...
+```
+
 # Format requirements
 
 The following requirements are often sources of errors when writing a `seqspec` file.

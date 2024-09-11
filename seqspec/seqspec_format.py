@@ -12,7 +12,7 @@ Examples:
 seqspec format spec.yaml # Format spec
 ---
 """,
-        help="format seqspec file",
+        help="Autoformat seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
     # subparser_required = subparser.add_argument_group("required arguments")

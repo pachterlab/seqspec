@@ -8,13 +8,13 @@ def setup_methods_args(parser):
     subparser = parser.add_parser(
         "methods",
         description="""
-Return methods section of sequencing specification.
+Convert seqspec file into methods section.
 
 Examples:
 seqspec methods -m rna spec.yaml # Return methods section for rna modality
 ---
 """,
-        help="Return methods section of sequencing specification",
+        help="Convert seqspec file into methods section",
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")

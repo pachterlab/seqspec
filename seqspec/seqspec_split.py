@@ -14,7 +14,7 @@ Examples:
 seqspec split -o split spec.yaml # Split spec into modalities
 ---
 """,
-        help="split seqspec into modalities",
+        help="Split seqspec file by modality",
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")

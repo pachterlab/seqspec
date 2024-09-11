@@ -10,7 +10,7 @@ def setup_file_args(parser):
     subparser = parser.add_parser(
         "file",
         description="""
-List files present in the spec.
+List files present in seqspec file.
 
 Examples:
 seqspec file -m rna spec.yaml                          # List paired read files
@@ -19,7 +19,7 @@ seqspec file -m rna -f list -k url spec.yaml           # List urls of all read f
 seqspec file -m rna -f list -s onlist -k all spec.yaml # List onlist files
 ---
 """,
-        help="list files",
+        help="List files present in seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")

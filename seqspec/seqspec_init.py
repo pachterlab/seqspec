@@ -16,13 +16,13 @@ def setup_init_args(parser):
     subparser = parser.add_parser(
         "init",
         description="""
-Initialize a seqspec file.
+Generate a new seqspec file.
 
 Examples:
 seqspec init -o spec.yaml -n myassay -m 1 -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg" "((truseq_r1:10,barcode:16,umi:12,cdna:150)rna)" # Initialize a single modality assay
 ---
 """,
-        help="init a seqspec file",
+        help="Generate a new seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")

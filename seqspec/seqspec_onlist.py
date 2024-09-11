@@ -21,7 +21,7 @@ seqspec onlist -m rna -s read -i R1.fastq.gz 10xv3.yaml    # Get onlist for the 
 seqspec onlist -m rna -s region-type -i barcode 10xv3.yaml # Get onlist for barcode region type
 ---
         """,
-        help="get onlist file for specific regions",
+        help="Get onlist file for elements in seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")

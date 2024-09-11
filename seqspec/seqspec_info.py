@@ -20,7 +20,7 @@ seqspec info -f json -k library_spec spec.yaml  # Get library spec in json forma
 seqspec info -f json -k sequence_spec spec.yaml # Get sequence spec in json format
 ---
 """,
-        help="get info about seqspec file",
+        help="Get information from seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
 

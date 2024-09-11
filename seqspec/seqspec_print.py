@@ -19,7 +19,7 @@ seqspec print -f seqspec-html spec.yaml            # Print the sequence and libr
 seqspec print -o spec.png -f seqspec-png spec.yaml # Print the library structure as a png
 ---
         """,
-        help="print seqspec file",
+        help="Display the sequence and/or library structure from seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
     subparser.add_argument("yaml", help="Sequencing specification yaml file")

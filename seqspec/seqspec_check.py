@@ -16,7 +16,7 @@ Examples:
 seqspec check spec.yaml
 ---
 """,
-        help="validate seqspec file",
+        help="Validate seqspec file against specification",
         formatter_class=RawTextHelpFormatter,
     )
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
