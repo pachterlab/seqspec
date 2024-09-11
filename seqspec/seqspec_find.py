@@ -4,6 +4,7 @@ import yaml
 import argparse
 import warnings
 from argparse import RawTextHelpFormatter
+from seqspec.seqspec_file import list_files
 
 
 def setup_find_args(parser):
@@ -15,6 +16,7 @@ Find objects in the spec.
 Examples:
 seqspec find -m rna -s read -i rna_R1 spec.yaml         # Find reads by id
 seqspec find -m rna -s region-type -i barcode spec.yaml # Find regions with barcode region type
+seqspec find -m rna -s file -i r1.fastq.gz spec.yaml    # Find files with id r1.fastq.gz
 ---
 """,
         help="Find objects in seqspec file",
@@ -127,7 +129,13 @@ def find_by_read_id(spec: Assay, modality: str, id: str):
 
 # TODO implement
 def find_by_file_id(spec: Assay, modality: str, id: str):
-    return []
+    files = []
+    lf = list_files(spec, modality)
+    for k, v in lf.items():
+        for f in v:
+            if f.file_id == id:
+                files.append(f)
+    return files
 
 
 def find_by_region_id(spec: Assay, modality: str, id: str):
