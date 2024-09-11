@@ -19,7 +19,7 @@ def setup_init_args(parser):
 Generate a new seqspec file.
 
 Examples:
-seqspec init -o spec.yaml -n myassay -m 1 -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg" "((truseq_r1:10,barcode:16,umi:12,cdna:150)rna)" # Initialize a single modality assay
+seqspec init -o spec.yaml -n myassay -m rna -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg" "((truseq_r1:10,barcode:16,umi:12,cdna:150)rna)" # Initialize a single modality assay
 ---
 """,
         help="Generate a new seqspec file",
@@ -29,8 +29,13 @@ seqspec init -o spec.yaml -n myassay -m 1 -r "rna,R1.fastq.gz,truseq_r1,16,pos:r
     subparser_required.add_argument(
         "-n", metavar="NAME", type=str, help="assay name", required=True
     )
+    # -m "rna,atac"
     subparser_required.add_argument(
-        "-m", metavar="MODALITIES", type=int, help="number of modalities", required=True
+        "-m",
+        metavar="MODALITIES",
+        type=str,
+        help="list of comma-separated modalities (e.g. rna,atac)",
+        required=True,
     )
 
     # -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg"
@@ -60,7 +65,7 @@ seqspec init -o spec.yaml -n myassay -m 1 -r "rna,R1.fastq.gz,truseq_r1,16,pos:r
 
 def validate_init_args(parser, args):
     name = args.n
-    modalities = args.m
+    modalities_str = args.m
     newick_str = args.newick
     o = args.o
     reads_str = args.r
@@ -68,19 +73,20 @@ def validate_init_args(parser, args):
     if newick_str is None:
         parser.error("modality-FASTQs pairs must be provided")
 
-    return run_init(name, modalities, newick_str, reads_str, o)
+    return run_init(name, modalities_str, newick_str, reads_str, o)
 
 
-def run_init(name: str, modalities, newick_str, reads_str, o=None):
+def run_init(name: str, modalities_str, newick_str, reads_str, o=None):
+    modalities = modalities_str.split(",")
     reads = parse_reads_string(reads_str)
     tree = newick.loads(newick_str)
-    if len(tree[0].descendants) != modalities:
+    if len(tree[0].descendants) != len(modalities):
         raise ValueError(
             "Number of modalities must match number of modality-FASTQs pairs"
         )
 
     reads = parse_reads_string(reads_str)
-    spec = init(name, tree[0].descendants, reads)
+    spec = init(name, modalities, tree[0].descendants, reads)
 
     if o:
         spec.to_YAML(o)
@@ -90,16 +96,14 @@ def run_init(name: str, modalities, newick_str, reads_str, o=None):
     return
 
 
-def init(name: str, tree: List[newick.Node], reads: List[Read]):
+def init(name: str, modalities, tree: List[newick.Node], reads: List[Read]):
     # make read for each fastq
     # make region for each modality
     # add modality regions to assay
     rgns = []
-    mnames = []
     for t in tree:
         r = Region(region_id="", region_type="", name="", sequence_type="")
         rgns.append(newick_to_region(t, r))
-        mnames.append(t.name)
 
     assay = Assay(
         assay_id="",
@@ -107,7 +111,7 @@ def init(name: str, tree: List[newick.Node], reads: List[Read]):
         doi="",
         date="",
         description="",
-        modalities=mnames,
+        modalities=modalities,
         lib_struct="",
         library_kit="",
         library_protocol="",
