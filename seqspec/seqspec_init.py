@@ -19,7 +19,7 @@ def setup_init_args(parser):
 Generate a new seqspec file.
 
 Examples:
-seqspec init -o spec.yaml -n myassay -m rna -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg" "((truseq_r1:10,barcode:16,umi:12,cdna:150)rna)" # Initialize a single modality assay
+seqspec init -o spec.yaml -n myassay -m rna -r rna,R1.fastq.gz,r1_primer,16,pos:rna,R2.fastq.gz,r2_primer,100,neg "((r1_primer:0,barcode:16,umi:12,cdna:150,r2_primer:0)rna)" # Initialize a single modality assay
 ---
 """,
         help="Generate a new seqspec file",

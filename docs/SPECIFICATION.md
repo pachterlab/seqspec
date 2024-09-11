@@ -1,6 +1,6 @@
 ---
 title: Technical Specification
-date: 2024-06-25
+date: 2024-09-11
 authors:
   - name: A. Sina Booeshaghi
 ---

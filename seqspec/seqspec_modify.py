@@ -13,7 +13,9 @@ def setup_modify_args(parser):
 Modify attributes of various elements in a seqspec file.
 
 Examples:
-seqspec modify -m rna -o mod_spec.yaml -i "R1.fastq.gz" --files "R1_1.fastq.gz,fastq,0,./fastq/R1_1.fastq.gz,local,null:R1_2.fastq.gz,fastq,0,./fastq/R1_2.fastq.gz,local,null" spec.yaml # modify the files for R1 fastq
+seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --read-id renamed_rna_R1 spec.yaml                                                                                                # modify the read id
+seqspec modify -m rna -o mod_spec.yaml -s region -i rna_cell_bc --region-id renamed_rna_cell_bc spec.yaml                                                                        # modify the region id
+seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --files "R1_1.fastq.gz,fastq,0,./fastq/R1_1.fastq.gz,local,null:R1_2.fastq.gz,fastq,0,./fastq/R1_2.fastq.gz,local,null" spec.yaml # modify the files for R1 fastq
 ---
 """,
         help="Modify attributes of various elements in seqspec file",
@@ -21,13 +23,6 @@ seqspec modify -m rna -o mod_spec.yaml -i "R1.fastq.gz" --files "R1_1.fastq.gz,f
     )
     subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
-
-    subparser.add_argument(
-        "--region",
-        help=("Switch to region mode"),
-        action="store_true",
-        default=False,
-    )
 
     # Read properties
     subparser.add_argument(
@@ -106,6 +101,8 @@ seqspec modify -m rna -o mod_spec.yaml -i "R1.fastq.gz" --files "R1_1.fastq.gz,f
         type=str,
         default=None,
     )
+
+    # Read or Region properties
     subparser.add_argument(
         "--min-len",
         metavar="MINLEN",

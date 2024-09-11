@@ -14,8 +14,8 @@ def setup_info_args(parser):
 Get information about spec.
 
 Examples:
-seqspec info spec.yaml                          # Get meta information
 seqspec info -k modalities spec.yaml            # Get the list of modalities
+seqspec info -f json spec.yaml                  # Get meta information in json format
 seqspec info -f json -k library_spec spec.yaml  # Get library spec in json format
 seqspec info -f json -k sequence_spec spec.yaml # Get sequence spec in json format
 ---

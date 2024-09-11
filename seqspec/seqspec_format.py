@@ -9,7 +9,8 @@ def setup_format_args(parser):
 Automatically fill in missing fields in the spec.
 
 Examples:
-seqspec format spec.yaml # Format spec
+seqspec format spec.yaml              # Format spec and write to stdout
+seqspec format -o spec.yaml spec.yaml # Format and overwrite the spec
 ---
 """,
         help="Autoformat seqspec file",

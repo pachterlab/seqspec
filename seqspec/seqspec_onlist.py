@@ -17,8 +17,8 @@ def setup_onlist_args(parser):
 Get onlist file for specific region. Onlist is a list of permissible sequences for a region.
 
 Examples:
-seqspec onlist -m rna -s read -i R1.fastq.gz 10xv3.yaml    # Get onlist for the element in the R1.fastq.gz read
-seqspec onlist -m rna -s region-type -i barcode 10xv3.yaml # Get onlist for barcode region type
+seqspec onlist -m rna -s read -i rna_R1 spec.yaml         # Get onlist for the element in the R1.fastq.gz read
+seqspec onlist -m rna -s region-type -i barcode spec.yaml # Get onlist for barcode region type
 ---
         """,
         help="Get onlist file for elements in seqspec file",

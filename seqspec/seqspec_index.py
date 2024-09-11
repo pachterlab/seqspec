@@ -18,9 +18,10 @@ def setup_index_args(parser):
 Identify the position of elements in a spec for use in downstream tools.
 
 Examples:
-seqspec index -m rna -s file -t kb spec.yaml     # Index file elements in kallisto bustools format
-seqspec index -m rna -s file spec.yaml           # Index file elements corresponding to reads
-seqspec index -m rna -s read -i rna_R1 spec.yaml # Index read elements in rna_R1
+seqspec index -m rna -s file -t kb spec.yaml                              # Index file elements in kallisto bustools format
+seqspec index -m rna -s file spec.yaml                                    # Index file elements corresponding to reads
+seqspec index -m rna -s read -i rna_R1 spec.yaml                          # Index read elements in rna_R1
+seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Index file elements in rna reads
 ---
 """,
         help="Identify position of elements in seqspec file",
