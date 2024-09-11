@@ -69,15 +69,48 @@ The {modality} portion of the {spec.name} assay was generated on {spec.date}.
 # TODO: manage sequence/library protocol/kit for cases where each modality has different protocols/kits
 def format_library_spec(spec: Assay, m):
     leaves = spec.get_libspec(m).get_leaves()
+
+    lib_prot = None
+    if isinstance(spec.library_protocol, str):
+        lib_prot = spec.library_protocol
+    elif isinstance(spec.library_protocol, list):
+        for i in spec.library_protocol:
+            if i.modality == m:
+                lib_prot = i.protocol_id
+
+    lib_kit = None
+    if isinstance(spec.library_kit, str):
+        lib_kit = spec.library_kit
+    elif isinstance(spec.library_kit, list):
+        for i in spec.library_kit:
+            if i.modality == m:
+                lib_kit = i.kit_id
+
+    seq_prot = None
+    if isinstance(spec.sequence_protocol, str):
+        seq_prot = spec.sequence_protocol
+    elif isinstance(spec.sequence_protocol, list):
+        for i in spec.sequence_protocol:
+            if i.modality == m:
+                seq_prot = i.protocol_id
+
+    seq_kit = None
+    if isinstance(spec.sequence_kit, str):
+        seq_kit = spec.sequence_kit
+    elif isinstance(spec.sequence_kit, list):
+        for i in spec.sequence_kit:
+            if i.modality == m:
+                seq_kit = i.kit_id
+
     s = f"""
 Libary structure\n
-The library was generated using the {spec.library_protocol} library protocol and {spec.library_kit} library kit. The library contains the following elements:\n
+The library was generated using the {lib_prot} library protocol and {lib_kit} library kit. The library contains the following elements:\n
 """
     for idx, r in enumerate(leaves, 1):
         s += format_region(r, idx)
     s += f"""
-\nRead structure\n
-The library was sequenced on a {spec.sequence_protocol} using the {spec.sequence_kit} sequencing kit. The library was sequenced using the following configuration:\n
+\nSequence structure\n
+The library was sequenced on a {seq_prot} using the {seq_kit} sequencing kit. The library was sequenced using the following configuration:\n
 """
     reads = spec.get_seqspec(m)
     for idx, r in enumerate(reads, 1):
@@ -95,5 +128,13 @@ def format_region(region: Region, idx: int = 1):
 
 
 def format_read(read, idx: int = 1):
-    s = f"- {read.name}: {read.max_len} cycles on the {'positive' if read.strand == 'pos' else 'negative'} strand using the {read.primer_id} primer.\n"
+    s = f"- {read.name}: {read.max_len} cycles on the {'positive' if read.strand == 'pos' else 'negative'} strand using the {read.primer_id} primer. The following files contain the sequences in Read {idx}:\n"
+    for idx, f in enumerate(read.files, 1):
+        s += "  " + format_read_file(f, idx)
+    s = s[:-1]
+    return s
+
+
+def format_read_file(file, idx: int = 1):
+    s = f"- File {idx}: {file.filename}\n"
     return s
