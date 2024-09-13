@@ -95,7 +95,7 @@ def check(schema: Draft4Validator, spec: Assay, spec_fn: str):
 
     # check paths relative to spec_fn
     for ol in olrgns:
-        if ol.location == "local":
+        if ol.urltype == "local":
             if ol.filename[:-3] == ".gz":
                 check = path.join(path.dirname(spec_fn), ol.filename[:-3])
                 if not path.exists(check):
@@ -107,7 +107,7 @@ def check(schema: Draft4Validator, spec: Assay, spec_fn: str):
                 if not path.exists(check) and not path.exists(check_gz):
                     errors.append(f"[error {idx}] {ol.filename} does not exist")
                     idx += 1
-        elif ol.location == "remote":
+        elif ol.urltype == "http" or ol.urltype == "https" or ol.urltype == "ftp":
             # ping the link with a simple http request to check if the file exists at that URI
             if spec.seqspec_version == "0.3.0":
                 if not file_exists(ol.url):

@@ -354,7 +354,7 @@ class Onlist(yaml.YAMLObject):
         url: str,
         urltype: str,
         md5: str,
-        location: str,
+        location: Optional[str],
     ) -> None:
         super().__init__()
         self.file_id = file_id
@@ -365,7 +365,7 @@ class Onlist(yaml.YAMLObject):
         self.urltype = urltype
         self.md5 = md5
         # to depracate
-        self.location = location
+        # self.location = location
 
     def __repr__(self) -> str:
         d = {
@@ -376,7 +376,7 @@ class Onlist(yaml.YAMLObject):
             "url": self.url,
             "urltype": self.urltype,
             "md5": self.md5,
-            "location": self.location,
+            # "location": self.location,
         }
         return f"{d}"
 
@@ -389,7 +389,7 @@ class Onlist(yaml.YAMLObject):
             "url": self.url,
             "urltype": self.urltype,
             "md5": self.md5,
-            "location": self.location,
+            # "location": self.location,
         }
         return d
 

@@ -366,7 +366,6 @@
             "filesize",
             "url",
             "urltype",
-            "location",
             "md5"
           ]
         },
