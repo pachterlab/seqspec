@@ -5,6 +5,7 @@ from seqspec.File import File
 from typing import Dict, List, Optional
 from argparse import RawTextHelpFormatter
 import json
+from seqspec import seqspec_find
 
 
 def setup_file_args(parser):
@@ -14,10 +15,11 @@ def setup_file_args(parser):
 List files present in seqspec file.
 
 Examples:
-seqspec file -m rna spec.yaml                          # List paired read files
-seqspec file -m rna -f interleaved spec.yaml           # List interleaved read files
-seqspec file -m rna -f list -k url spec.yaml           # List urls of all read files
-seqspec file -m rna -f list -s onlist -k all spec.yaml # List onlist files
+seqspec file -m rna spec.yaml                                          # List paired read files
+seqspec file -m rna -f interleaved spec.yaml                           # List interleaved read files
+seqspec file -m rna -f list -k url spec.yaml                           # List urls of all read files
+seqspec file -m rna -f list -s region -k all spec.yaml                 # List all files in regions
+seqspec file -m rna -f json -s region-type -k all -i barcode spec.yaml # List files for barcode regions in json
 ---
 """,
         help="List files present in seqspec file",
@@ -49,7 +51,8 @@ seqspec file -m rna -f list -s onlist -k all spec.yaml # List onlist files
         required=True,
     )
     # the object we are using to index
-    choices = ["read", "region", "file", "onlist"]
+    # choices = ["read", "region", "file", "onlist", "region-type"]
+    choices = ["read", "region", "file", "region-type"]
     subparser.add_argument(
         "-s",
         metavar="SELECTOR",
@@ -132,16 +135,20 @@ def file(
     k: Optional[str],
 ):
     # NOTE: LIST FILES DOES NOT RESPECT ORDERING OF INPUT IDs LIST
+    # NOTE: seqspec file -s read gets the files for the read, not the files mapped from the regions associated with the read.
     LIST_FILES = {
         "read": list_read_files,
         "region": list_region_files,
         "file": list_files,
-        "onlist": list_onlist_files,
+        # "onlist": list_onlist_files,
     }
     LIST_FILES_BY_ID = {
         "read": list_files_by_read_id,
         "file": list_files_by_file_id,
+        "region": list_files_by_region_id,
+        "region-type": list_files_by_region_type,
     }
+
     if len(ids) == 0:
         # list all the files
         files = LIST_FILES[idtype](spec, modality)
@@ -208,7 +215,7 @@ def format_list_files_metadata(files: Dict[str, List[File]], fmt, k):
     return x
 
 
-def format_json_files(files: Dict[str, List[File]], fmt, k="all"):
+def format_json_files(files: Dict[str, List[File]], fmt, k):
     x = []
     for items in zip(*files.values()):
         if k == "all":
@@ -275,3 +282,27 @@ def list_files_by_file_id(spec, modality, file_ids):
                 # files[read.read_id].append(file.filename)
                 files[read.read_id].append(file)
     return files
+
+
+def list_files_by_region_id(spec, modality, file_ids):
+    files = list_region_files(spec, modality)
+
+    ids = set(file_ids)
+    new_files = defaultdict(list)
+    for region_id, files in files.items():
+        if region_id in ids:
+            new_files[region_id] += files
+    return new_files
+
+
+def list_files_by_region_type(spec, modality, file_ids):
+    files = list_region_files(spec, modality)
+
+    ids = set(file_ids)
+    new_files = defaultdict(list)
+    for region_id, files in files.items():
+        r = seqspec_find.find_by_region_id(spec, modality, region_id)[0]
+        rt = r.region_type
+        if rt in ids:
+            new_files[region_id] += files
+    return new_files
