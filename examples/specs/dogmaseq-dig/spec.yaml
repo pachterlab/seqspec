@@ -75,8 +75,8 @@ sequence_spec:
     filename: protein_R1_SRR18677644.fastq.gz
     filetype: fastq
     filesize: 18174591
-    url: fastqs/protein_R1_SRR18677644.fastq.gz
-    urltype: local
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/protein_R1_SRR18677644.fastq.gz
+    urltype: https
     md5: 2525f8bececba54232e8857f9885f870
 - !Read
   read_id: protein_R2
@@ -92,8 +92,8 @@ sequence_spec:
     filename: protein_R2_SRR18677644.fastq.gz
     filetype: fastq
     filesize: 9411964
-    url: fastqs/protein_R2_SRR18677644.fastq.gz
-    urltype: local
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/protein_R2_SRR18677644.fastq.gz
+    urltype: https
     md5: 0100a6e62ebbc2db9e9346b796662922
 - !Read
   read_id: tag_R1
@@ -109,8 +109,8 @@ sequence_spec:
     filename: tag_R1_SRR18677640.fastq.gz
     filetype: fastq
     filesize: 18034172
-    url: fastqs/tag_R1_SRR18677640.fastq.gz
-    urltype: local
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/tag_R1_SRR18677640.fastq.gz
+    urltype: https
     md5: 05cc5c1a87f0d646cb6d8b9cfca47f0f
 - !Read
   read_id: tag_R2
@@ -126,8 +126,8 @@ sequence_spec:
     filename: tag_R2_SRR18677640.fastq.gz
     filetype: fastq
     filesize: 7475374
-    url: fastqs/tag_R2_SRR18677640.fastq.gz
-    urltype: local
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/tag_R2_SRR18677640.fastq.gz
+    urltype: https
     md5: 8a364a8c74a77fae255f1650a5ff7cbb
 - !Read
   read_id: rna_R1
@@ -143,8 +143,8 @@ sequence_spec:
     filename: rna_R1_SRR18677638.fastq.gz
     filetype: fastq
     filesize: 18499436
-    url: fastqs/rna_R1_SRR18677638.fastq.gz
-    urltype: local
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/rna_R1_SRR18677638.fastq.gz
+    urltype: https
     md5: 7eb15a70da9b729b5a87e30b6596b641
 - !Read
   read_id: rna_R2
@@ -160,8 +160,8 @@ sequence_spec:
     filename: rna_R2_SRR18677638.fastq.gz
     filetype: fastq
     filesize: 45812569
-    url: fastqs/rna_R2_SRR18677638.fastq.gz
-    urltype: local
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/rna_R2_SRR18677638.fastq.gz
+    urltype: https
     md5: 5e6915770e50f72e462e5b2575089c66
 - !Read
   read_id: atac_R1
@@ -177,8 +177,8 @@ sequence_spec:
     filename: atac_R1_SRR18677642.fastq.gz
     filetype: fastq
     filesize: 40165947
-    url: fastqs/atac_R1_SRR18677642.fastq.gz
-    urltype: local
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/atac_R1_SRR18677642.fastq.gz
+    urltype: https
     md5: e1134f01b51e73ee71d391af152ef3ec
 - !Read
   read_id: atac_R2
@@ -194,8 +194,8 @@ sequence_spec:
     filename: atac_R2_SRR18677642.fastq.gz
     filetype: fastq
     filesize: 20987219
-    url: fastqs/atac_R2_SRR18677642.fastq.gz
-    urltype: local
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/atac_R2_SRR18677642.fastq.gz
+    urltype: https
     md5: 49eac34723c5d5dbaac161af5ba6bd44
 - !Read
   read_id: atac_R3
@@ -211,8 +211,8 @@ sequence_spec:
     filename: atac_R3_SRR18677642.fastq.gz
     filetype: fastq
     filesize: 36580319
-    url: fastqs/atac_R3_SRR18677642.fastq.gz
-    urltype: local
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/atac_R3_SRR18677642.fastq.gz
+    urltype: https
     md5: 603f9e06910e166ed6df6d4134147db5
 library_spec:
 - !Region
@@ -259,9 +259,9 @@ library_spec:
       location: local
       filename: RNA-737K-arc-v1.txt
       filetype: txt
-      filesize: 0
-      url: RNA-737K-arc-v1.txt
-      urltype: local
+      filesize: 2142553
+      url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
+      urltype: https
       md5: a88cd21e801ae6f9a7d9a48b67ccf693
       file_id: RNA-737K-arc-v1.txt
     regions: null
@@ -290,8 +290,8 @@ library_spec:
       filename: protein_feature_barcodes.txt
       filetype: txt
       filesize: 0
-      url: protein_feature_barcodes.txt
-      urltype: local
+      url: https://raw.githubusercontent.com/pachterlab/seqspec/devel/examples/specs/dogmaseq-dig/protein_feature_barcodes.txt
+      urltype: https
       md5: b5920c1fc1d22927607c31c96f5cf03e
       file_id: protein_feature_barcodes.txt
     regions: null
@@ -341,9 +341,9 @@ library_spec:
       location: local
       filename: RNA-737K-arc-v1.txt
       filetype: txt
-      filesize: 0
-      url: RNA-737K-arc-v1.txt
-      urltype: local
+      filesize: 2142553
+      url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
+      urltype: https
       md5: a88cd21e801ae6f9a7d9a48b67ccf693
       file_id: RNA-737K-arc-v1.txt
     regions: null
@@ -372,8 +372,8 @@ library_spec:
       filename: tag_0419_feature_barcodes.txt
       filetype: txt
       filesize: 0
-      url: tag_0419_feature_barcodes.txt
-      urltype: local
+      url: https://raw.githubusercontent.com/pachterlab/seqspec/devel/examples/specs/dogmaseq-dig/tag_0419_feature_barcodes.txt
+      urltype: https
       md5: de44ad6d5c4b9f381a352283a6831112
       file_id: tag_0419_feature_barcodes.txt
     regions: null
@@ -423,9 +423,9 @@ library_spec:
       location: local
       filename: RNA-737K-arc-v1.txt
       filetype: txt
-      filesize: 0
-      url: RNA-737K-arc-v1.txt
-      urltype: local
+      filesize: 2142553
+      url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
+      urltype: https
       md5: a88cd21e801ae6f9a7d9a48b67ccf693
       file_id: RNA-737K-arc-v1.txt
     regions: null
