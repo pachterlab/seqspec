@@ -137,6 +137,8 @@ def region_ids_in_spec(seqspec, modality, region_ids):
 def file_exists(uri):
     try:
         r = requests.head(uri)
+        if r.status_code == 302:
+            return file_exists(r.headers["Location"])
         return r.status_code == 200
     except requests.ConnectionError:
         return False

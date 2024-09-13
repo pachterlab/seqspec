@@ -118,25 +118,6 @@ def check(schema: Draft4Validator, spec: Assay, spec_fn: str):
                     errors.append(f"[error {idx}] {ol.filename} does not exist")
                     idx += 1
 
-    # get all of the regions with type fastq in the spec and check that those files exist relative to the path of the spec
-    fqrgns = []
-    for m in modes:
-        fqrgns += [i for i in spec.get_libspec(m).get_region_by_region_type("fastq")]
-        fqrgns += [
-            i for i in spec.get_libspec(m).get_region_by_region_type("fastq_link")
-        ]
-    for fqrgn in fqrgns:
-        if fqrgn.region_type == "fastq":
-            check = path.join(path.dirname(spec_fn), fqrgn.region_id)
-            if not path.exists(check):
-                errors.append(f"[error {idx}] {fqrgn.region_id} does not exist")
-                idx += 1
-        elif fqrgn.region_type == "fastq_link":
-            # ping the link with a simple http request to check if the file exists at that URI
-            if not file_exists(fqrgn.region_id):
-                errors.append(f"[error {idx}] {fqrgn.region_id} does not exist")
-                idx += 1
-
     # read ids should be unique
     read_ids = set()
     for read in spec.sequence_spec:
@@ -150,10 +131,18 @@ def check(schema: Draft4Validator, spec: Assay, spec_fn: str):
 
     # iterate through reads in sequence_spec and check that the fastq files exist
     for read in spec.sequence_spec:
-        check = path.join(path.dirname(spec_fn), read.read_id)
-        if not path.exists(check):
-            errors.append(f"[error {idx}] {read.read_id} file does not exist")
-            idx += 1
+        spec_fn = path.dirname(spec_fn)
+        for f in read.files:
+            if f.urltype == "local":
+                check = path.join(spec_fn, f.filename)
+                if not path.exists(check):
+                    errors.append(f"[error {idx}] {f.filename} does not exist")
+                    idx += 1
+            elif f.urltype == "http" or f.urltype == "https" or f.urltype == "ftp":
+                # ping the link with a simple http request to check if the file exists at that URI
+                if not file_exists(f.url):
+                    errors.append(f"[error {idx}] {f.filename} does not exist")
+                    idx += 1
 
     # check that the primer ids, strand tuple pairs are unique across all reads
     primer_strand_pairs = set()

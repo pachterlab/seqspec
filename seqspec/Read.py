@@ -16,7 +16,7 @@ class Read(yaml.YAMLObject):
         min_len: int,
         max_len: int,
         strand: str,
-        files: Optional[List["File"]] = [],
+        files: List["File"] = [],
     ) -> None:
         super().__init__()
         self.read_id = read_id
