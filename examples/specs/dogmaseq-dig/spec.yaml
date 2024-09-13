@@ -256,7 +256,6 @@ library_spec:
     min_len: 16
     max_len: 16
     onlist: !Onlist
-      location: remote
       filename: RNA-737K-arc-v1.txt
       filetype: txt
       filesize: 2142553
@@ -286,7 +285,6 @@ library_spec:
     min_len: 15
     max_len: 15
     onlist: !Onlist
-      location: remote
       filename: protein_feature_barcodes.txt
       filetype: txt
       filesize: 4662
@@ -338,7 +336,6 @@ library_spec:
     min_len: 16
     max_len: 16
     onlist: !Onlist
-      location: remote
       filename: RNA-737K-arc-v1.txt
       filetype: txt
       filesize: 2142553
@@ -368,7 +365,6 @@ library_spec:
     min_len: 15
     max_len: 15
     onlist: !Onlist
-      location: remote
       filename: tag_0419_feature_barcodes.txt
       filetype: txt
       filesize: 208
@@ -420,7 +416,6 @@ library_spec:
     min_len: 16
     max_len: 16
     onlist: !Onlist
-      location: remote
       filename: RNA-737K-arc-v1.txt
       filetype: txt
       filesize: 2142553
@@ -527,7 +522,6 @@ library_spec:
     min_len: 16
     max_len: 16
     onlist: !Onlist
-      location: remote
       filename: ATA-737K-arc-v1_rc.txt
       filetype: txt
       filesize: 2465078
