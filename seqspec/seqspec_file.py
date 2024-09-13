@@ -4,6 +4,7 @@ from collections import defaultdict
 from seqspec.File import File
 from typing import Dict, List, Optional
 from argparse import RawTextHelpFormatter
+import json
 
 
 def setup_file_args(parser):
@@ -57,7 +58,7 @@ seqspec file -m rna -f list -s onlist -k all spec.yaml # List onlist files
         default="read",
         choices=choices,
     )
-    choices = ["paired", "interleaved", "index", "list"]
+    choices = ["paired", "interleaved", "index", "list", "json"]
     subparser.add_argument(
         "-f",
         metavar="FORMAT",
@@ -153,6 +154,7 @@ def file(
         "paired": format_list_files,
         "interleaved": format_list_files,
         "index": format_list_files,
+        "json": format_json_files,
     }
 
     x = FORMAT[fmt](files, fmt, k)
@@ -204,6 +206,18 @@ def format_list_files_metadata(files: Dict[str, List[File]], fmt, k):
         x = x[:-1]
 
     return x
+
+
+def format_json_files(files: Dict[str, List[File]], fmt, k="all"):
+    x = []
+    for items in zip(*files.values()):
+        if k == "all":
+            for key, item in zip(files.keys(), items):
+                x.append(item.to_dict())
+        else:
+            for key, item in zip(files.keys(), items):
+                x.append({"file_id": item.file_id, k: getattr(item, k)})
+    return json.dumps(x, indent=4)
 
 
 def format_list_files(files: Dict[str, List[File]], fmt, k=None):
