@@ -365,13 +365,13 @@ library_spec:
     min_len: 15
     max_len: 15
     onlist: !Onlist
-      filename: tag_0419_feature_barcodes.txt
+      filename: tag_feature_barcodes.txt
       filetype: txt
       filesize: 208
-      url: https://raw.githubusercontent.com/pachterlab/seqspec/devel/examples/specs/dogmaseq-dig/tag_0419_feature_barcodes.txt
+      url: https://raw.githubusercontent.com/pachterlab/seqspec/devel/examples/specs/dogmaseq-dig/tag_feature_barcodes.txt
       urltype: https
       md5: de44ad6d5c4b9f381a352283a6831112
-      file_id: tag_0419_feature_barcodes.txt
+      file_id: tag_feature_barcodes.txt
     regions: null
     parent_id: tag
   - !Region
