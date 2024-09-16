@@ -19,28 +19,17 @@ We have multiple tutorials to get you up and running with `seqspec`:
    Discover how to manipulate `seqspec` files using the seqspec command-line tool.
    [View the tutorial](docs/USING_SEQSPEC.ipynb)
 
-<img alt="image" src="/docs/seqspec.png">
-
-```bash
-# release
-pip install seqspec
-
-# development
-pip install git+https://github.com/pachterlab/seqspec.git
-
-# verify install
-seqspec --help
-```
-
 Documentation:
 
-- [Example `seqspec` files: `https://igvf.github.io/seqspec/`](https://igvf.github.io/seqspec/)
-- [Learn about `seqspec` : `docs/DOCUMENTATION.md`](docs/SEQSPEC_FILE.md)
-- [Write a `seqspec` : `docs/TUTORIAL.md`](docs/TUTORIAL.md)
+- [Install `seqspec`: `docs/INSTALLATION.md`](docs/INSTALLATION.md)
+- [Learn about the `seqspec` file format: `docs/DOCUMENTATION.md`](docs/SEQSPEC_FILE.md)
+- [Learn about the `seqspec` tool: `docs/DOCUMENTATION.md`](docs/SEQSPEC_TOOL.md)
+- [Learn about the `seqspec` specification : `docs/SPECIFICATION.md`](docs/SPECIFICATION.md)
+- [Write a `seqspec`: `docs/TUTORIAL.md`](docs/TUTORIAL.md)
+- [View example `seqspec` files: `https://www.sina.bio/seqspec-builder/assays.html`](https://www.sina.bio/seqspec-builder/assays.html)
 - [Contribute a `seqspec` : `docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
-- [The `seqspec` specification : `docs/SPECIFICATION.md`](docs/SPECIFICATION.md)
-- [YouTube video that introduces `seqspec`](https://youtu.be/NSj6Vpzy8tU)
-- [_bioRxiv_ preprint that describes `seqspec`](https://doi.org/10.1101/2023.03.17.533215)
+- [Watch a YouTube video about `seqspec`](https://youtu.be/NSj6Vpzy8tU)
+- [Read the manuscript that describes `seqspec`](https://doi.org/10.1093/bioinformatics/btae168)
 
 The `seqspec` format and tool are described in this [publication](https://doi.org/10.1093/bioinformatics/btae168). If you use `seqspec` please cite
 
