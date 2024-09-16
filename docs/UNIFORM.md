@@ -1,5 +1,5 @@
 ---
-title: Uniform preprocessing with seqspec
+title: Standardize data processing
 date: 2024-09-07
 authors:
   - name: A. Sina Booeshaghi
