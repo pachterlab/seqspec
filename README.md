@@ -12,13 +12,9 @@
 
 We have multiple tutorials to get you up and running with `seqspec`:
 
-1. Uniform Preprocessing Tutorial
-   Learn how to use `seqspec` to standardize your genomics data preprocessing.
-   [View the tutorial](docs/UNIFORM.ipynb)
+1. Learn how to use `seqspec` to [standardize your genomics data preprocessing](docs/UNIFORM.ipynb).
 
-2. `seqspec` Tool Tutorial
-   Discover how to manipulate `seqspec` files using the seqspec command-line tool.
-   [View the tutorial](docs/USING_SEQSPEC.ipynb)
+2. Understand how to [manipulate `seqspec` files](docs/USING_SEQSPEC.ipynb) using the `seqspec` command-line tool.
 
 ## Citation
 
