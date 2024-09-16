@@ -1,5 +1,5 @@
 ---
-title: Standardize data processing
+title: Standardize processing
 date: 2024-09-07
 authors:
   - name: A. Sina Booeshaghi
