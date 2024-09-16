@@ -21,6 +21,9 @@ A `seqspec` file contains
 2. The 5'->3' annotation and position of the elements in a library molecule (e.g. barcodes, UMIs),
 3. A list of the reads generated from sequencing the library molecule.
 
+![seqspec structure](./images/seqspec.png)
+**Figure 1**: Detailed structure of a `seqspec` file.
+
 # Structure
 
 A seqspec file consists of three main components:
