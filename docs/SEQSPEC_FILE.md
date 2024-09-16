@@ -15,14 +15,14 @@ The primary goal of a `seqspec` file is to:
 2. Enable data management and tracking
 3. Simplify the interpretation and reuse of sequencing data
 
-A `seqspec` file contains
+![seqspec structure](./images/seqspec.png)
+**Figure 1**: Detailed structure of a `seqspec` file.
+
+A `seqspec` file, **Figure 1**, contains
 
 1. Assay-level metadata such as library kit and sequencing machine,
 2. The 5'->3' annotation and position of the elements in a library molecule (e.g. barcodes, UMIs),
 3. A list of the reads generated from sequencing the library molecule.
-
-![seqspec structure](./images/seqspec.png)
-**Figure 1**: Detailed structure of a `seqspec` file.
 
 # Structure
 
