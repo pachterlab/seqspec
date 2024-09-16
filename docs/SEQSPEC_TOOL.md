@@ -1,5 +1,5 @@
 ---
-title: Tool options
+title: Tool Options
 date: 2024-09-11
 authors:
   - name: A. Sina Booeshaghi
