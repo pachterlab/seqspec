@@ -20,7 +20,17 @@ We have multiple tutorials to get you up and running with `seqspec`:
    Discover how to manipulate `seqspec` files using the seqspec command-line tool.
    [View the tutorial](docs/USING_SEQSPEC.ipynb)
 
-Documentation:
+## Citation
+
+The `seqspec` format and tool are described in this [publication](https://doi.org/10.1093/bioinformatics/btae168). If you use `seqspec` please cite
+
+```
+Ali Sina Booeshaghi, Xi Chen, Lior Pachter, A machine-readable specification for genomics assays, Bioinformatics, Volume 40, Issue 4, April 2024, btae168.
+```
+
+`seqspec` was inspired by and builds off of the Teichmann Lab [Single Cell Genomics Library Structure](https://github.com/Teichlab/scg_lib_structs) by [Xi Chen](https://github.com/dbrg77).
+
+## Documentation
 
 - [Install `seqspec`: `docs/INSTALLATION.md`](docs/INSTALLATION.md)
 - [Learn about the `seqspec` file format: `docs/DOCUMENTATION.md`](docs/SEQSPEC_FILE.md)
@@ -31,11 +41,3 @@ Documentation:
 - [Contribute a `seqspec` : `docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
 - [Watch a YouTube video about `seqspec`](https://youtu.be/NSj6Vpzy8tU)
 - [Read the manuscript that describes `seqspec`](https://doi.org/10.1093/bioinformatics/btae168)
-
-The `seqspec` format and tool are described in this [publication](https://doi.org/10.1093/bioinformatics/btae168). If you use `seqspec` please cite
-
-```
-Ali Sina Booeshaghi, Xi Chen, Lior Pachter, A machine-readable specification for genomics assays, Bioinformatics, Volume 40, Issue 4, April 2024, btae168.
-```
-
-`seqspec` was inspired by and builds off of the Teichmann Lab [Single Cell Genomics Library Structure](https://github.com/Teichlab/scg_lib_structs) by [Xi Chen](https://github.com/dbrg77).
