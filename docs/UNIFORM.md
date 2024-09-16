@@ -1,5 +1,5 @@
 ---
-title: Using seqspec
+title: Uniform preprocessing with seqspec
 date: 2024-09-07
 authors:
   - name: A. Sina Booeshaghi
@@ -7,9 +7,23 @@ authors:
 
 `seqspec` enables uniform preprocessing of sequencing reads.
 
-# Single-cell/nuclei RNAseq quantification
+# Single-cell preprocessing
 
-## `kb-python (kallisto bustools)`
+Single-cell data preprocessing is the procedure where
+
+1. Sequencing reads are aligned to a reference
+2. Barcodes errors are corrected
+3. UMIs/reads are counted
+
+The goal is to produce a count matrix, where rows are cells or samples and columns are biological features such as genes, proteins, or genomic regions.
+
+There are many tools that perform single-cell RNA-sequencing preprocessing. For this tutorial we will use `kb-python` (which uses `kallisto` and `bustools`), `STARsolo`, `simpleaf` with `seqspec` to perform alignment and quantification. `kb_python` uses `kallisto` to perform read alignment and `bustools` to perform and barcode correction and UMI counting. `STARsolo` performs performs whole genome alignment and barcode error correction. Like `kb-python`, `simpleaf` uses two separate tools under the hood: `alevin` to perform read alignment and `alevin-fry` to perform barcode error correction and UMI counting.
+
+Throughout this tutorial we will use the `dogmaseq-dig` dataset which is a multimodal assay (RNA/ATAC/PROTEIN/TAG). The `seqspec` for this dataset can be found here
+
+## Single-cell/nuclei RNAseq quantification
+
+### `kb-python (kallisto bustools)`
 
 ```bash
 # standard reference
@@ -40,7 +54,7 @@ f=$(seqspec file -m rna -s read -f paired -k url spec.yaml  | tr "\t\n" "  ")
 kb count -t 32 -m 64G -x "$x" -w "$w" -i index.idx -g t2g.txt -c1 spl.t2c.txt -c2 unspl.t2c.txt --h5ad --workflow=nac -o out $f
 ```
 
-## `STARsolo`
+### `STARsolo`
 
 ```bash
 w=$(seqspec onlist -m rna -r barcode -s region-type spec.yaml)
@@ -50,7 +64,7 @@ f=$(seqspec file -m rna -s read -f paired -k url spec.yaml  | tr "\t\n" "  ")
 star --soloFeatures Gene --genomeDir index --soloType Droplet --soloCBwhitelist $w $x --readFilesIn $f
 ```
 
-## `simpleaf`
+### `simpleaf`
 
 ```bash
 mkdir -p ref
@@ -77,9 +91,9 @@ simpleaf quant -r cr-like \
 -1 R1.fastq.gz -2 R2.fastq.gz
 ```
 
-# Single-cell/nuclei TAG quantification
+## Single-cell/nuclei TAG quantification
 
-## `kb-python (kallisto bustools)`
+### `kb-python (kallisto bustools)`
 
 ```bash
 # build alignment reference
@@ -105,9 +119,9 @@ kb count \
 $f
 ```
 
-# Single-cell/nuclei PROTEIN quantification
+## Single-cell/nuclei PROTEIN quantification
 
-## `kb-python (kallisto bustools)`
+### `kb-python (kallisto bustools)`
 
 ```bash
 # build alignment reference
@@ -133,8 +147,8 @@ kb count \
 $f
 ```
 
-# Single-cell/nuclei CRISPR quantification
+## Single-cell/nuclei CRISPR quantification
 
 Note that single-cell CRISPR guide RNAs can be quantified in the same way as TAG and PROTEIN data. Simply supply the guide RNA barcode file as the “feature barcodes” file.
 
-# Single-cell/nuclei ATAC quantification
+## Single-cell/nuclei ATAC quantification
