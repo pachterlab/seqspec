@@ -1,11 +1,17 @@
 ---
-title: Tool Usage
+title: seqspec tool command options
 date: 2024-09-11
 authors:
   - name: A. Sina Booeshaghi
 ---
 
 # Usage
+
+The `seqspec` tool operates on `seqspec` files and
+
+1. Facilitates the standardization of preprocessing steps across different assays,
+2. Enables data management and tracking,
+3. Simplifies the interpretation and reuse of sequencing data.
 
 :::{important}
 The `seqspec` specification is detailed in [here](SEQSPEC_FILE.md). Please review it before using and developing `seqspec` files; knowing the structure will help in understanding how to effectively use `seqspec`.
@@ -171,12 +177,13 @@ seqspec file [-h] [-o OUT] [-i IDs] -m MODALITY [-s SELECTOR] [-f FORMAT] [-k KE
   - read
   - region
   - file
-  - onlist
+  - region-type
 - optionally, `-f FORMAT` is the format to return the list of files. Can be one of
   - paired
   - interleaved
   - index
   - list
+  - json
 - optionally, `-k KEY` is the key to display for the file (default: file_id). Can be one of
   - file_id
   - filename
@@ -207,10 +214,26 @@ $ seqspec file -m rna -f list -k url spec.yaml
 rna_R1  rna_R1_SRR18677638.fastq.gz     fastqs/rna_R1_SRR18677638.fastq.gz
 rna_R2  rna_R2_SRR18677638.fastq.gz     fastqs/rna_R2_SRR18677638.fastq.gz
 
-# List onlist files
-$ seqspec file -m rna -f list -s onlist -k all spec.yaml
-rna_cell_bc     RNA-737K-arc-v1.txt     RNA-737K-arc-v1.txt     txt     0       RNA-737K-arc-v1.txt     local   a88cd21e801ae6f9a7d9a48b67ccf693
+# List all files in regions
+$ seqspec file -m rna -f list -s region -k all spec.yaml
+rna_cell_bc     RNA-737K-arc-v1.txt     RNA-737K-arc-v1.txt     txt     2142553 https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz        https   a88cd21e801ae6f9a7d9a48b67ccf693
+
+# List files for barcode regions in json
+$ seqspec file -m rna -f json -s region-type -k all -i barcode spec.yaml
+[
+    {
+        "file_id": "RNA-737K-arc-v1.txt",
+        "filename": "RNA-737K-arc-v1.txt",
+        "filetype": "txt",
+        "filesize": 2142553,
+        "url": "https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz",
+        "urltype": "https",
+        "md5": "a88cd21e801ae6f9a7d9a48b67ccf693"
+    }
+]
 ```
+
+Note: `seqspec file -s read` gets the files for the read, not the files contained in the regions mapped to the read.
 
 ## `seqspec format`: Autoformat seqspec file
 

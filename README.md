@@ -7,17 +7,17 @@
 
 `seqspec` is a file format that describes data generated from genomics experiments. Both the file format and `seqspec` tool [enable uniform processing](./docs/UNIFORM.md) of genomics data.
 
-A `seqspec` file contains
+![alt text](docs/images/simple_file_structure.png)
 
-1. Assay-level metadata such as library kit and sequencing machine,
-2. The 5'->3' annotation and position of the elements in a library molecule (e.g. barcodes, UMIs),
-3. A list of the reads generated from sequencing the library molecule.
+We have multiple tutorials to get you up and running with `seqspec`:
 
-The `seqspec` tool operates on `seqspec` files and
+1. Uniform Preprocessing Tutorial
+   Learn how to use `seqspec` to standardize your genomics data preprocessing.
+   [View the tutorial](docs/UNIFORM.ipynb)
 
-1. Facilitates the standardization of preprocessing steps across different assays,
-2. Enables data management and tracking,
-3. Simplifies the interpretation and reuse of sequencing data.
+2. `seqspec` Tool Tutorial
+   Discover how to manipulate `seqspec` files using the seqspec command-line tool.
+   [View the tutorial](docs/USING_SEQSPEC.ipynb)
 
 <img alt="image" src="/docs/seqspec.png">
 
