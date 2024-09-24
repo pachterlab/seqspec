@@ -87,6 +87,8 @@ A list of checks performed:
 13. Check that the lengths of the `sequence` in every region object is between the `min_len` and `max_len` length.
 14. Check that the number of files in each `File` object for all `Read` objects are the same length.
 
+Below are a list of example errors one may encounter when checking a spec:
+
 ```bash
 # The "assay" value was not specified in the spec
 [error 1] None is not of type 'string' in spec['assay']
