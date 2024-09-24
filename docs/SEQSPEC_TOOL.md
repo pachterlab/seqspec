@@ -64,7 +64,28 @@ seqspec check [-h] [-o OUT] yaml
 - optionally, `-o OUT` can be used to write the output to a file.
 - `yaml` corresponds to the `seqspec` file.
 
-A list of possible errors are shown below:
+A list of checks performed:
+
+1. Check that modalities are unique
+2. Check that `region_id`s of he first level of the `library_spec` correspond to modalities (and that there is one `region` per `modality`).
+3. Check that the onlist files exist (either locally or remotely)
+4. Check that the `read_id`s in the `sequence_spec` are unique.
+5. Check that Read files exist (either locally or remotely).
+6. Check that Read `primer_id`s, strand pairs are unique across all reads.
+7. Check that the `region_id`s are unique across all regions in the `library_spec`.
+8. Check that the read modalities are in assay list of modalities.
+9. Check that the `primer_id`s for the reads in the `sequence_spec` exist as a `region_id`s in the `library_spec`.
+10. Check that the `primer_id`s for the reads exist as `region_ids` for the "leaves" of the `library_spec`.
+11. Check `sequence_type` and region annotation consistencies:
+
+- if a region has a sequence type "fixed" then it should not contain subregions
+- if a region has a sequence type "joiend" then it should contain subregions
+- if a region has a sequence type "random" then it should not contain subregions and `sequence` should be all X's
+- if a region has a sequence type "onlist" then it should have an onlist object
+
+12. Check that the `min_len` is less than the `max_len`.
+13. Check that the lengths of the `sequence` in every region object is between the `min_len` and `max_len` length.
+14. Check that the number of files in each `File` object for all `Read` objects are the same length.
 
 ```bash
 # The "assay" value was not specified in the spec
