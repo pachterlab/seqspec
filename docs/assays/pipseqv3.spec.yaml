@@ -1,0 +1,351 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: null
+name: PIPseq V3
+doi: https://doi.org/10.1038/s41587-023-01685-z
+date: 06 March 2023
+description: PIPseq V3 provided by FluentBio is the commercial version of PIP-seq.
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/PIP-seq.html
+library_protocol: null
+library_kit: null
+sequence_protocol: null
+sequence_kit: null
+sequence_spec:
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: illumina_truseq_prep
+  primer_id: generic_primer1
+  min_len: 1
+  max_len: 250
+  strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: illumina_truseq_prep
+  primer_id: generic_primer2
+  min_len: 1
+  max_len: 250
+  strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+library_spec:
+- !Region
+  region_id: RNA
+  region_type: RNA
+  name: PIPseq V3 RNA
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNATGNNNNNNGAGNNNNNNTCGAGNNNNNNNNNNNNNNNNNNNNXACTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 189
+  max_len: 489
+  onlist: null
+  regions:
+  - !Region
+    parent_id: RNA
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: Illumina P5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: RNA
+    region_id: I2.fastq.gz
+    region_type: fastq
+    name: i5 index
+    sequence_type: joined
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+    - !Region
+      parent_id: I2.fastq.gz
+      region_id: index5
+      region_type: index5
+      name: i5 index
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        file_id: index5_onlist.txt
+        filename: index5_onlist.txt
+        filetype: ''
+        filesize: 0
+        url: ''
+        urltype: ''
+        md5: null
+        location: local
+      regions: null
+  - !Region
+    parent_id: RNA
+    region_id: truseq_read1
+    region_type: truseq_read1
+    name: TruSeq Read 1
+    sequence_type: fixed
+    sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: RNA
+    region_id: R1.fastq.gz
+    region_type: fastq
+    name: Read 1 FASTQ
+    sequence_type: joined
+    sequence: NNNNNNNNATGNNNNNNGAGNNNNNNTCGAGNNNNNNNNNNNNNNNNNNNN
+    min_len: 51
+    max_len: 51
+    onlist: null
+    regions:
+    - !Region
+      parent_id: R1.fastq.gz
+      region_id: cb1
+      region_type: barcode
+      name: Cell Barcode 1
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        file_id: fb_v3_bc1.tsv
+        filename: fb_v3_bc1.tsv
+        filetype: ''
+        filesize: 0
+        url: ''
+        urltype: ''
+        md5: null
+        location: local
+      regions: null
+    - !Region
+      parent_id: R1.fastq.gz
+      region_id: linker1
+      region_type: linker
+      name: Linker1
+      sequence_type: fixed
+      sequence: ATG
+      min_len: 3
+      max_len: 3
+      onlist: null
+      regions: null
+    - !Region
+      parent_id: R1.fastq.gz
+      region_id: cb2
+      region_type: barcode
+      name: Cell Barcode 2
+      sequence_type: onlist
+      sequence: NNNNNN
+      min_len: 6
+      max_len: 6
+      onlist: !Onlist
+        file_id: fb_v3_bc2.tsv
+        filename: fb_v3_bc2.tsv
+        filetype: ''
+        filesize: 0
+        url: ''
+        urltype: ''
+        md5: null
+        location: local
+      regions: null
+    - !Region
+      parent_id: R1.fastq.gz
+      region_id: linker2
+      region_type: linker
+      name: Linker2
+      sequence_type: fixed
+      sequence: GAG
+      min_len: 3
+      max_len: 3
+      onlist: null
+      regions: null
+    - !Region
+      parent_id: R1.fastq.gz
+      region_id: cb3
+      region_type: barcode
+      name: Cell Barcode 3
+      sequence_type: onlist
+      sequence: NNNNNN
+      min_len: 6
+      max_len: 6
+      onlist: !Onlist
+        file_id: fb_v3_bc3.tsv
+        filename: fb_v3_bc3.tsv
+        filetype: ''
+        filesize: 0
+        url: ''
+        urltype: ''
+        md5: null
+        location: local
+      regions: null
+    - !Region
+      parent_id: R1.fastq.gz
+      region_id: linker3
+      region_type: linker
+      name: Linker3
+      sequence_type: fixed
+      sequence: TCGAG
+      min_len: 5
+      max_len: 5
+      onlist: null
+      regions: null
+    - !Region
+      parent_id: R1.fastq.gz
+      region_id: cb4
+      region_type: barcode
+      name: Cell Barcode 4
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        file_id: fb_v3_bc4.tsv
+        filename: fb_v3_bc4.tsv
+        filetype: ''
+        filesize: 0
+        url: ''
+        urltype: ''
+        md5: null
+        location: local
+      regions: null
+    - !Region
+      parent_id: R1.fastq.gz
+      region_id: umi
+      region_type: umi
+      name: UMI
+      sequence_type: random
+      sequence: NNNNNNNNNNNN
+      min_len: 12
+      max_len: 12
+      onlist: null
+      regions: null
+  - !Region
+    parent_id: RNA
+    region_id: R2.fastq.gz
+    region_type: fastq
+    name: Read 2 FASTQ
+    sequence_type: joined
+    sequence: XA
+    min_len: 2
+    max_len: 99
+    onlist: null
+    regions:
+    - !Region
+      parent_id: R2.fastq.gz
+      region_id: cDNA
+      region_type: cDNA
+      name: cDNA
+      sequence_type: random
+      sequence: X
+      min_len: 1
+      max_len: 98
+      onlist: null
+      regions: null
+    - !Region
+      parent_id: R2.fastq.gz
+      region_id: ligationT
+      region_type: linker
+      name: ligationT
+      sequence_type: fixed
+      sequence: A
+      min_len: 1
+      max_len: 1
+      onlist: null
+      regions: null
+  - !Region
+    parent_id: RNA
+    region_id: nextera_read2
+    region_type: nextera_read2
+    name: Nextera Read 2
+    sequence_type: fixed
+    sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions:
+    - !Region
+      parent_id: nextera_read2
+      region_id: ME2
+      region_type: ME2
+      name: ME2
+      sequence_type: fixed
+      sequence: CTGTCTCTTATACACATCT
+      min_len: 19
+      max_len: 19
+      onlist: null
+      regions: null
+    - !Region
+      parent_id: nextera_read2
+      region_id: s7
+      region_type: s7
+      name: s7
+      sequence_type: fixed
+      sequence: CCGAGCCCACGAGAC
+      min_len: 15
+      max_len: 15
+      onlist: null
+      regions: null
+  - !Region
+    parent_id: RNA
+    region_id: I1.fastq.gz
+    region_type: fastq
+    name: i7 index
+    sequence_type: joined
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+    - !Region
+      parent_id: I1.fastq.gz
+      region_id: index7
+      region_type: index7
+      name: i7 index
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        file_id: index7_onlist.txt
+        filename: index7_onlist.txt
+        filetype: ''
+        filesize: 0
+        url: ''
+        urltype: ''
+        md5: null
+        location: local
+      regions: null
+  - !Region
+    parent_id: RNA
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: Illumina P7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+  parent_id: null

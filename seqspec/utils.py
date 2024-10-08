@@ -1,13 +1,15 @@
 import io
 import os
 import gzip
-from pathlib import Path
 from seqspec.Assay import Assay
-from seqspec.Region import Onlist
-from urllib.parse import urlparse
+
+from seqspec.Read import Read
+from seqspec.Region import Region, Onlist
+
 import yaml
 import requests
 from Bio import GenBank
+from typing import Tuple, List
 
 
 def load_spec(spec_fn: str):
@@ -20,6 +22,7 @@ def load_spec_stream(spec_stream: io.IOBase):
     # set the parent id in the Assay object upon loading it
     for r in data.library_spec:
         r.set_parent_id(None)
+
     return data
 
 
@@ -33,23 +36,6 @@ def load_genbank_stream(gbk_stream: io.IOBase):
     return data
 
 
-class RegionCoordinate:
-    def __init__(self, cut_name, cut_type, start, end):
-        self.cut_name = cut_name
-        self.cut_type = cut_type
-        self.start = start
-        self.end = end
-
-    def __repr__(self):
-        return f"RegionCoordinate {self.cut_name} [{self.cut_type}]: ({self.start}, {self.end})"
-
-    def __str__(self):
-        return f"RegionCoordinate {self.cut_name} [{self.cut_type}]: ({self.start}, {self.end})"
-
-    def __eq__(self, other):
-        return self.start == other.start and self.end == other.end
-
-
 def write_read(header, seq, qual, f):
     f.write(f"{header}\n{seq}\n+\n{qual}\n")
 
@@ -59,24 +45,36 @@ def yield_onlist_contents(stream):
         yield line.strip().split()[0]
 
 
-def read_list(onlist: Onlist):
-    """Given an onlist object read the local or remote data
-    """
-    location, filename = find_onlist_file(onlist)
+def read_local_list(onlist: Onlist, base_path: str = "") -> List[str]:
+    filename = os.path.join(base_path, onlist.filename)
+    stream = open(filename, "rb")
+    # do we need to decompress?
+    if filename.endswith(".gz"):
+        stream = gzip.GzipFile(fileobj=stream)
+
+    # convert to text stream
+    stream = io.TextIOWrapper(stream)
+
+    results = []
+    for i in yield_onlist_contents(stream):
+        results.append(i)
+    stream.close()
+    return results
+
+
+def read_remote_list(onlist: Onlist, base_path: str = "") -> List[str]:
+    """Given an onlist object read the local or remote data"""
+    filename = str(onlist.filename)
+    if onlist.url:
+        filename = str(onlist.url)
 
     stream = None
     try:
         # open stream
-        if location == "remote":
-            auth = get_remote_auth_token()
-            response = requests.get(filename, stream=True, auth=auth)
-            response.raise_for_status()
-            stream = response.raw
-        elif location == "local":
-            stream = open(filename, "rb")
-        else:
-            raise ValueError(
-                "Unsupported location {}. Expected remote or local".format(location))
+        auth = get_remote_auth_token()
+        response = requests.get(filename, stream=True, auth=auth)
+        response.raise_for_status()
+        stream = response.raw
 
         # do we need to decompress?
         if filename.endswith(".gz"):
@@ -85,7 +83,10 @@ def read_list(onlist: Onlist):
         # convert to text stream
         stream = io.TextIOWrapper(stream)
 
-        results = list(yield_onlist_contents(stream))
+        results = []
+        for i in yield_onlist_contents(stream):
+            # add the new line when writing to file
+            results.append(i)
     finally:
         if stream is None:
             print("Warning: unable to open barcode file {}".format(filename))
@@ -95,27 +96,8 @@ def read_list(onlist: Onlist):
     return results
 
 
-def find_onlist_file(onlist: Onlist):
-    url = urlparse(onlist.filename)
-    pathname = Path(url.path)
-    basename = Path(pathname.name)
-    if basename.exists():
-        # we have a copy of the file in this directory
-        return ("local", str(basename))
-    elif pathname.exists():
-        # we have a path to another directory
-        return ("local", str(pathname))
-    elif url.scheme != '' and onlist.location == "remote":
-        # Should we ignore the location if there's a url scheme?
-        return ("remote", str(onlist.filename))
-    else:
-        raise FileNotFoundError(
-            "No such {} file {}".format(onlist.location, onlist.filename))
-
-
 def get_remote_auth_token():
-    """Look for authentication tokens for accessing remote resources
-    """
+    """Look for authentication tokens for accessing remote resources"""
     username = os.environ.get("IGVF_API_KEY")
     password = os.environ.get("IGVF_SECRET_KEY")
     if not (username is None or password is None):
@@ -138,6 +120,8 @@ def region_ids_in_spec(seqspec, modality, region_ids):
 def file_exists(uri):
     try:
         r = requests.head(uri)
+        if r.status_code == 302:
+            return file_exists(r.headers["Location"])
         return r.status_code == 200
     except requests.ConnectionError:
         return False
@@ -177,42 +161,34 @@ REGION_TYPE_COLORS = {
 # '#95A5A6'
 
 
-def complement_nucleotide(nucleotide):
-    complements = {
-        "A": "T",
-        "T": "A",
-        "G": "C",
-        "C": "G",
-        "R": "Y",
-        "Y": "R",
-        "S": "S",
-        "W": "W",
-        "K": "M",
-        "M": "K",
-        "B": "V",
-        "D": "H",
-        "V": "B",
-        "H": "D",
-        "N": "N",
-        "X": "X",
-    }
-    return complements.get(
-        nucleotide, "N"
-    )  # Default to 'N' if nucleotide is not recognized
-
-
-def complement_sequence(sequence):
-    return "".join(complement_nucleotide(n) for n in sequence.upper())
-
-
-def map_read_id_to_regions(spec, modality, region_id):
+def map_read_id_to_regions(
+    spec: Assay, modality: str, region_id: str
+) -> Tuple[Read, List[Region]]:
     # get all atomic elements from library
     leaves = spec.get_libspec(modality).get_leaves()
     # get the read object and primer id
-    read = [i for i in spec.sequence_spec if i.read_id == region_id][0]
+    for i in spec.sequence_spec:
+        if i.read_id == region_id:
+            read = i
+            break
+    else:
+        raise IndexError(
+            "region_id {} not found in reads {}".format(
+                region_id, [i.read_id for i in spec.sequence_spec]
+            )
+        )
     primer_id = read.primer_id
     # get the index of the primer in the list of leaves (ASSUMPTION, 5'->3' and primer is an atomic element)
-    primer_idx = [i for i, l in enumerate(leaves) if l.region_id == primer_id][0]
+    for i, l in enumerate(leaves):
+        if l.region_id == primer_id:
+            primer_idx = i
+            break
+    else:
+        raise IndexError(
+            "primer_id {} not found in regions {}".format(
+                primer_id, [leaf.region_id for leaf in leaves]
+            )
+        )
     # If we are on the opposite strand, we go in the opposite way
     if read.strand == "neg":
         rgns = leaves[:primer_idx][::-1]

@@ -1,0 +1,187 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: Drop-seq
+name: Drop-seq/Illumina
+doi: https://doi.org/10.1016/j.cell.2015.05.002
+date: 21 May 2015
+description: Droplet single cell rna seq with beads
+modalities:
+- rna
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/Drop-seq.html
+library_protocol: null
+library_kit: null
+sequence_protocol: Illumina
+sequence_kit: null
+sequence_spec:
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: illumina_truseq_prep
+  primer_id: generic_primer1
+  min_len: 1
+  max_len: 250
+  strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: illumina_truseq_prep
+  primer_id: generic_primer2
+  min_len: 1
+  max_len: 250
+  strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+library_spec:
+- !Region
+  region_id: rna
+  region_type: rna
+  name: rna
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACGCCTGTCCGCGGAAGCAGTGGTATCAACGCAGAGTACGTNNNNNNNNNNNNNNNNNNNNXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 156
+  max_len: 350
+  onlist: null
+  regions:
+  - !Region
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: illumina_p5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: r1_primer
+    region_type: primer_read1
+    name: r1_primer
+    sequence_type: fixed
+    sequence: GCCTGTCCGCGGAAGCAGTGGTATCAACGCAGAGTACGT
+    min_len: 39
+    max_len: 39
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: cell_bc
+    region_type: barcode
+    name: cell_bc
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNN
+    min_len: 12
+    max_len: 12
+    onlist: !Onlist
+      file_id: cell_bc_onlist.txt
+      filename: cell_bc_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
+      md5: null
+      location: local
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: umi
+    region_type: umi
+    name: umi
+    sequence_type: random
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: polyT
+    region_type: poly_T
+    name: polyT
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: cdna
+    region_type: cdna
+    name: cdna
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: ME
+    region_type: ME2
+    name: ME
+    sequence_type: fixed
+    sequence: CTGTCTCTTATACACATCT
+    min_len: 19
+    max_len: 19
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: s7
+    region_type: s7
+    name: s7
+    sequence_type: fixed
+    sequence: CCGAGCCCACGAGAC
+    min_len: 15
+    max_len: 15
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: i7_index
+    region_type: index7
+    name: i7_index
+    sequence_type: onlist
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: !Onlist
+      file_id: i7_index_onlist.txt
+      filename: i7_index_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
+      md5: null
+      location: local
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: illumina_p7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: rna
+  parent_id: null

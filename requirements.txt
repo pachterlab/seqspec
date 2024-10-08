@@ -3,3 +3,4 @@ jsonschema
 newick
 requests
 biopython
+packaging

@@ -1,34 +1,49 @@
 from seqspec.utils import load_spec
+from argparse import RawTextHelpFormatter
 
 
 def setup_format_args(parser):
     subparser = parser.add_parser(
         "format",
-        description="format seqspec file",
-        help="format seqspec file",
+        description="""
+Automatically fill in missing fields in the spec.
+
+Examples:
+seqspec format spec.yaml              # Format spec and write to stdout
+seqspec format -o spec.yaml spec.yaml # Format and overwrite the spec
+---
+""",
+        help="Autoformat seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
-    subparser_required = subparser.add_argument_group("required arguments")
+    # subparser_required = subparser.add_argument_group("required arguments")
 
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
-    subparser_required.add_argument(
+    subparser.add_argument(
         "-o",
         metavar="OUT",
         help=("Path to output file"),
         type=str,
         default=None,
-        required=True,
     )
     return subparser
 
 
 def validate_format_args(parser, args):
-    # if everything is valid the run_format
     fn = args.yaml
     o = args.o
-    spec = load_spec(fn)
-    run_format(spec)
-    spec.to_YAML(o)
+
+    run_format(spec_fn=fn, o=o)
 
 
-def run_format(spec):
-    spec.update_spec()
+def run_format(spec_fn, o):
+    spec = load_spec(spec_fn)
+    format(spec)
+    if o:
+        spec.to_YAML(o)
+    else:
+        print(spec.to_YAML())
+
+
+def format(spec):
+    return spec.update_spec()

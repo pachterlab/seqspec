@@ -1,15 +1,23 @@
 from jsonschema import Draft4Validator
 import yaml
 from os import path
-
 from seqspec.utils import load_spec, file_exists
+from seqspec.Assay import Assay
+from argparse import RawTextHelpFormatter
 
 
 def setup_check_args(parser):
     subparser = parser.add_parser(
         "check",
-        description="validate seqspec file",
-        help="validate seqspec file",
+        description="""
+Validate seqspec file against the specification schema.
+
+Examples:
+seqspec check spec.yaml
+---
+""",
+        help="Validate seqspec file against specification",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser.add_argument("yaml", help="Sequencing specification yaml file")
     subparser.add_argument(
@@ -23,18 +31,21 @@ def setup_check_args(parser):
 
 
 def validate_check_args(parser, args):
-    # if everything is valid the run_check
     spec_fn = args.yaml
     o = args.o
     schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
-    # schema_fn = "schema/seqspec.schema.json"
-    with open(schema_fn, "r") as stream:
-        schema = yaml.load(stream, Loader=yaml.Loader)
-    # print(schema)
 
+    return run_check(schema_fn, spec_fn, o)
+
+
+def run_check(schema_fn, spec_fn, o):
     spec = load_spec(spec_fn)
 
-    errors = run_check(schema, spec, spec_fn)  # , o)
+    with open(schema_fn, "r") as stream:
+        schema = yaml.load(stream, Loader=yaml.Loader)
+    v = Draft4Validator(schema)
+
+    errors = check(v, spec, spec_fn)
 
     if errors:
         if o:
@@ -42,19 +53,21 @@ def validate_check_args(parser, args):
                 print("\n".join(errors), file=f)
         else:
             print("\n".join(errors))
+    return errors
 
-    return
 
-
-def run_check(schema, spec, spec_fn):
+def check(schema: Draft4Validator, spec: Assay, spec_fn: str):
     errors = []
-    v = Draft4Validator(schema)
-    idx = 1
-    for idx, error in enumerate(v.iter_errors(spec.to_dict()), 1):
+    idx = 0
+
+    # with open("del.json", "w") as f:
+    #     json.dump(spec.to_dict(), f, indent=4)
+
+    for idx, error in enumerate(schema.iter_errors(spec.to_dict()), 1):
         errors.append(
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
         )
-
+    idx += 1
     # check that the modalities are unique
     if len(spec.modalities) != len(set(spec.modalities)):
         errors.append(
@@ -82,7 +95,7 @@ def run_check(schema, spec, spec_fn):
 
     # check paths relative to spec_fn
     for ol in olrgns:
-        if ol.location == "local":
+        if ol.urltype == "local":
             if ol.filename[:-3] == ".gz":
                 check = path.join(path.dirname(spec_fn), ol.filename[:-3])
                 if not path.exists(check):
@@ -94,30 +107,16 @@ def run_check(schema, spec, spec_fn):
                 if not path.exists(check) and not path.exists(check_gz):
                     errors.append(f"[error {idx}] {ol.filename} does not exist")
                     idx += 1
-        elif ol.location == "remote":
+        elif ol.urltype == "http" or ol.urltype == "https" or ol.urltype == "ftp":
             # ping the link with a simple http request to check if the file exists at that URI
-            if not file_exists(ol.filename):
-                errors.append(f"[error {idx}] {ol.filename} does not exist")
-                idx += 1
-
-    # get all of the regions with type fastq in the spec and check that those files exist relative to the path of the spec
-    fqrgns = []
-    for m in modes:
-        fqrgns += [i for i in spec.get_libspec(m).get_region_by_region_type("fastq")]
-        fqrgns += [
-            i for i in spec.get_libspec(m).get_region_by_region_type("fastq_link")
-        ]
-    for fqrgn in fqrgns:
-        if fqrgn.region_type == "fastq":
-            check = path.join(path.dirname(spec_fn), fqrgn.region_id)
-            if not path.exists(check):
-                errors.append(f"[error {idx}] {fqrgn.region_id} does not exist")
-                idx += 1
-        elif fqrgn.region_type == "fastq_link":
-            # ping the link with a simple http request to check if the file exists at that URI
-            if not file_exists(fqrgn.region_id):
-                errors.append(f"[error {idx}] {fqrgn.region_id} does not exist")
-                idx += 1
+            if spec.seqspec_version == "0.3.0":
+                if not file_exists(ol.url):
+                    errors.append(f"[error {idx}] {ol.filename} does not exist")
+                    idx += 1
+            else:
+                if not file_exists(ol.filename):
+                    errors.append(f"[error {idx}] {ol.filename} does not exist")
+                    idx += 1
 
     # read ids should be unique
     read_ids = set()
@@ -132,10 +131,18 @@ def run_check(schema, spec, spec_fn):
 
     # iterate through reads in sequence_spec and check that the fastq files exist
     for read in spec.sequence_spec:
-        check = path.join(path.dirname(spec_fn), read.read_id)
-        if not path.exists(check):
-            errors.append(f"[error {idx}] {read.read_id} file does not exist")
-            idx += 1
+        spec_fn = path.dirname(spec_fn)
+        for f in read.files:
+            if f.urltype == "local":
+                check = path.join(spec_fn, f.filename)
+                if not path.exists(check):
+                    errors.append(f"[error {idx}] {f.filename} does not exist")
+                    idx += 1
+            elif f.urltype == "http" or f.urltype == "https" or f.urltype == "ftp":
+                # ping the link with a simple http request to check if the file exists at that URI
+                if not file_exists(f.url):
+                    errors.append(f"[error {idx}] {f.filename} does not exist")
+                    idx += 1
 
     # check that the primer ids, strand tuple pairs are unique across all reads
     primer_strand_pairs = set()
@@ -270,5 +277,14 @@ def run_check(schema, spec, spec_fn):
     for m in modes:
         for rgn in [spec.get_libspec(m)]:
             errors, idx = seq_len_check(rgn, errors, idx)
+
+    # check that the number of files in each "File" object for all Read object are all the same length
+    nfiles = []
+    for read in spec.sequence_spec:
+        nfiles.append(len(read.files))
+
+    if len(set(nfiles)) != 1:
+        errors.append(f"[error {idx}] Reads must have the same number of files")
+        idx += 1
 
     return errors

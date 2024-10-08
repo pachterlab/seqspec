@@ -13,10 +13,11 @@ from seqspec.Region import (
 )
 from seqspec.utils import (
     get_remote_auth_token,
-    find_onlist_file,
     load_spec_stream,
+    map_read_id_to_regions,
     write_read,
-    read_list,
+    read_local_list,
+    read_remote_list,
     yield_onlist_contents
 )
 from seqspec import __version__
@@ -131,11 +132,15 @@ library_spec:
     parent_id: rna
 """
 
+def load_example_spec(spec_text):
+    with StringIO(spec_text) as instream:
+        spec = load_spec_stream(instream)
+    return spec
+
 
 class TestUtils(TestCase):
     def test_load_spec_stream(self):
-        with StringIO(example_spec) as instream:
-            spec = load_spec_stream(instream)
+        spec = load_example_spec(example_spec)
         self.assertEqual(spec.name, "my assay")
         head = spec.get_libspec("rna")
         self.assertEqual(len(head.regions), 5)
@@ -180,28 +185,7 @@ class TestUtils(TestCase):
         response = list(yield_onlist_contents(fake_stream))
         self.assertEqual(response, fake_onlist)
 
-    def test_find_onlist_file_local_copy(self):
-        test_dir = Path(__file__).parent
-        test_file = test_dir / "test_utils.py"
-        test_url = "https://example.com" + str(test_file)
-        test_onlist_local_copy = Onlist(test_url, "md5sum", "remote")
-        location, filename = find_onlist_file(test_onlist_local_copy)
-        self.assertEqual(location, "local")
-        self.assertEqual(filename, str(test_file))
-
-    def test_find_onlist_remote_file(self):
-        test_url = "https://example.com/test/barcode.txt.gz"
-        test_onlist_local_copy = Onlist(test_url, "md5sum", "remote")
-        location, filename = find_onlist_file(test_onlist_local_copy)
-        self.assertEqual(location, "remote")
-        self.assertEqual(filename, test_url)
-
-    def test_find_onlist_local_file(self):
-        test_url = "https://example.com/test/barcode.txt.gz"
-        test_onlist = Onlist(test_url, "md5sum", "local")
-        self.assertRaises(FileNotFoundError, find_onlist_file, test_onlist)
-
-    def test_read_list_local(self):
+    def test_read_local_list(self):
         fake_onlist = ["ATATATAT", "GCGCGCGC"]
         fake_contents = "{}\n".format("\n".join(fake_onlist))
         fake_md5 = md5(fake_contents.encode("ascii")).hexdigest()
@@ -212,11 +196,11 @@ class TestUtils(TestCase):
                 stream.write(fake_contents)
 
             onlist1 = Onlist(temp_list_filename, fake_md5, "local")
-            loaded_list = read_list(onlist1)
+            loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
 
-    def test_read_list_local_gz(self):
+    def test_read_local_list_gz(self):
         fake_onlist = ["ATATATAT", "GCGCGCGC"]
         fake_contents = "{}\n".format("\n".join(fake_onlist))
         fake_md5 = md5(fake_contents.encode("ascii")).hexdigest()
@@ -227,11 +211,11 @@ class TestUtils(TestCase):
                 stream.write(fake_contents)
 
             onlist1 = Onlist(temp_list_filename, fake_md5, "local")
-            loaded_list = read_list(onlist1)
+            loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
 
-    def test_read_list_remote(self):
+    def test_read_remote_list(self):
         fake_onlist = ["ATATATAT", "GCGCGCGC"]
         fake_contents = "{}\n".format("\n".join(fake_onlist))
         fake_md5 = md5(fake_contents.encode("ascii")).hexdigest()
@@ -250,7 +234,7 @@ class TestUtils(TestCase):
 
         with patch("requests.get", new=fake_request_get):
             onlist1 = Onlist("http://localhost/testlist.txt", fake_md5, "remote")
-            loaded_list = read_list(onlist1)
+            loaded_list = read_remote_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
 
@@ -277,3 +261,20 @@ class TestUtils(TestCase):
                 del os.environ[name]
             else:
                 os.environ[name] = previous[name]
+
+    def test_map_read_id_to_regions(self):
+        spec = load_example_spec(example_spec)
+
+        read1_id = "read1.fastq.gz"
+        read, region = map_read_id_to_regions(spec, "rna", read1_id)
+        self.assertEqual(read.read_id, read1_id)
+        self.assertEqual(len(region), 4)
+        expected_regions = [
+            (0, "cDNA"),
+            (1, "SOLiD_bc_adapter"),
+            (2, "index"),
+            (3, "p2_adapter"),
+        ]
+        for i, region_id in expected_regions:
+            self.assertEqual(region[i].region_id, region_id)
+        self.assertRaises(IndexError, map_read_id_to_regions, spec, "rna", "foo")

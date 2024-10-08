@@ -1,13 +1,26 @@
 from seqspec.utils import load_spec
 from seqspec.Assay import Assay
 import yaml
+import argparse
+import warnings
+from argparse import RawTextHelpFormatter
+from seqspec.seqspec_file import list_files
 
 
 def setup_find_args(parser):
     subparser = parser.add_parser(
         "find",
-        description="find regions in a seqspec file",
-        help="find regions in a seqspec file",
+        description="""
+Find objects in the spec.
+
+Examples:
+seqspec find -m rna -s read -i rna_R1 spec.yaml         # Find reads by id
+seqspec find -m rna -s region-type -i barcode spec.yaml # Find regions with barcode region type
+seqspec find -m rna -s file -i r1.fastq.gz spec.yaml    # Find files with id r1.fastq.gz
+---
+""",
+        help="Find objects in seqspec file",
+        formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
 
@@ -19,7 +32,17 @@ def setup_find_args(parser):
         type=str,
         default=None,
     )
-    subparser.add_argument("--rtype", help="Find by region type", action="store_true")
+    # depracate
+    subparser.add_argument("--rtype", help=argparse.SUPPRESS, action="store_true")
+    choices = ["read", "region", "file", "region-type"]
+    subparser.add_argument(
+        "-s",
+        metavar="Selector",
+        help=(f"Selector, [{','.join(choices)}] (default: region)"),
+        type=str,
+        default="region",
+        choices=choices,
+    )
     subparser_required.add_argument(
         "-m",
         metavar="MODALITY",
@@ -28,52 +51,100 @@ def setup_find_args(parser):
         default=None,
         required=True,
     )
+    # depracate -r
     subparser_required.add_argument(
         "-r",
         metavar="REGION",
-        help=("Region"),
+        help=argparse.SUPPRESS,
         type=str,
         default=None,
-        required=True,
+    )
+    subparser_required.add_argument(
+        "-i",
+        metavar="IDs",
+        help=("IDs"),
+        type=str,
+        default=None,
+        required=False,
     )
 
     return subparser
 
 
 def validate_find_args(parser, args):
-    # if everything is valid the run_find
-    # get paramters
+    # IDs
+    if args.r is not None:
+        warnings.warn(
+            "The '-r' argument is deprecated and will be removed in a future version. "
+            "Please use '-i' instead.",
+            DeprecationWarning,
+        )
+        # Optionally map the old option to the new one
+        if not args.i:
+            args.i = args.r
+
     fn = args.yaml
     m = args.m
-    r = args.r
     o = args.o
-
-    rt = args.rtype
-
-    # load spec
-    spec = load_spec(fn)
+    idtype = args.s  # selector
+    ids = args.i
 
     # run function
-    if rt:
-        regions = run_find_by_type(spec, m, r)
+    return run_find(fn, m, ids, idtype, o)
+
+
+def run_find(spec_fn: str, modality: str, id: str, idtype: str, o: str):
+    spec = load_spec(spec_fn)
+    found = []
+    if idtype == "region-type":
+        found = find_by_region_type(spec, modality, id)
+    elif idtype == "region":
+        found = find_by_region_id(spec, modality, id)
+    elif idtype == "read":
+        found = find_by_read_id(spec, modality, id)
+    elif idtype == "file":
+        found = find_by_file_id(spec, modality, id)
     else:
-        regions = run_find(spec, m, r)
+        raise ValueError(f"Unknown idtype: {idtype}")
 
     # post processing
     if o:
         with open(o, "w") as f:
-            yaml.dump(regions, f, sort_keys=False)
+            yaml.dump(found, f, sort_keys=False)
     else:
-        print(yaml.dump(regions, sort_keys=False))
+        print(yaml.dump(found, sort_keys=False))
+
+    return
 
 
-def run_find(spec: Assay, modality: str, region_id: str):
+# TODO implement
+def find_by_read_id(spec: Assay, modality: str, id: str):
+    rds = []
+    reads = spec.get_seqspec(modality)
+    for r in reads:
+        if r.read_id == id:
+            rds.append(r)
+    return rds
+
+
+# TODO implement
+def find_by_file_id(spec: Assay, modality: str, id: str):
+    files = []
+    lf = list_files(spec, modality)
+    for k, v in lf.items():
+        for f in v:
+            if f.file_id == id:
+                files.append(f)
+    return files
+
+
+def find_by_region_id(spec: Assay, modality: str, id: str):
     m = spec.get_libspec(modality)
-    regions = m.get_region_by_id(region_id)
+    regions = m.get_region_by_id(id)
     return regions
 
 
-def run_find_by_type(spec: Assay, modality: str, region_type: str):
+def find_by_region_type(spec: Assay, modality: str, id: str):
     m = spec.get_libspec(modality)
-    regions = m.get_region_by_region_type(region_type)
+    regions = m.get_region_by_region_type(id)
     return regions

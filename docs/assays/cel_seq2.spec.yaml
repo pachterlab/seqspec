@@ -1,0 +1,179 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: CEL-Seq2
+name: CEL-Seq2/Illumina
+doi: https://doi.org/10.1186/s13059-016-0938-8
+date: 28 April 2016
+description: Improvement CEL-Seq, now with UMIs! Implemented on Fluidigm's C1
+modalities:
+- rna
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html
+library_protocol: null
+library_kit: null
+sequence_protocol: Illumina
+sequence_kit: null
+sequence_spec:
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: illumina_truseq_prep
+  primer_id: generic_primer1
+  min_len: 1
+  max_len: 250
+  strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: illumina_truseq_prep
+  primer_id: generic_primer2
+  min_len: 1
+  max_len: 250
+  strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+library_spec:
+- !Region
+  region_id: rna
+  region_type: rna
+  name: rna
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNNNNNXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 132
+  max_len: 326
+  onlist: null
+  regions:
+  - !Region
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: illumina_p5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: RA5
+    region_type: linker
+    name: RA5
+    sequence_type: fixed
+    sequence: GTTCAGAGTTCTACAGTCCGACGATC
+    min_len: 26
+    max_len: 26
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: umi
+    region_type: umi
+    name: umi
+    sequence_type: random
+    sequence: NNNNNN
+    min_len: 6
+    max_len: 6
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: cell_bc
+    region_type: barcode
+    name: cell_bc
+    sequence_type: random
+    sequence: NNNNNN
+    min_len: 6
+    max_len: 6
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: poly_T
+    region_type: poly_T
+    name: poly_T
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: cDNA
+    region_type: cdna
+    name: cDNA
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: RA3
+    region_type: linker
+    name: RA3
+    sequence_type: fixed
+    sequence: TGGAATTCTCGGGTGCCAAGG
+    min_len: 21
+    max_len: 21
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: link_1
+    region_type: linker
+    name: link_1
+    sequence_type: fixed
+    sequence: AACTCCAGTCAC
+    min_len: 12
+    max_len: 12
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: sample_bc
+    region_type: index7
+    name: sample_bc
+    sequence_type: onlist
+    sequence: NNNNNN
+    min_len: 6
+    max_len: 6
+    onlist: !Onlist
+      file_id: sample_bc_onlist.txt
+      filename: sample_bc_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
+      md5: null
+      location: local
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: illumina_p7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: rna
+  parent_id: null

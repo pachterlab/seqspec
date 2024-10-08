@@ -6,7 +6,7 @@ from .seqspec_print import setup_print_args, validate_print_args
 from .seqspec_check import setup_check_args, validate_check_args
 from .seqspec_find import setup_find_args, validate_find_args
 
-from .seqspec_genbank import setup_genbank_args, validate_genbank_args
+# from .seqspec_genbank import setup_genbank_args, validate_genbank_args
 from .seqspec_modify import setup_modify_args, validate_modify_args
 from .seqspec_index import setup_index_args, validate_index_args
 from .seqspec_info import setup_info_args, validate_info_args
@@ -15,6 +15,11 @@ from .seqspec_split import setup_split_args, validate_split_args
 from .seqspec_init import setup_init_args, validate_init_args
 from .seqspec_onlist import setup_onlist_args, validate_onlist_args
 from .seqspec_version import setup_version_args, validate_version_args
+from .seqspec_methods import setup_methods_args, validate_methods_args
+from .seqspec_file import setup_file_args, validate_file_args
+from .seqspec_upgrade import setup_upgrade_args, validate_upgrade_args
+
+import warnings
 
 # Steps to add new subcommands
 # Create seqspec_subcommand.py (create setup_subcmd_args, validate_subcmd_args, run_subcmd in that file)
@@ -24,9 +29,18 @@ from .seqspec_version import setup_version_args, validate_version_args
 
 
 def main():
+    warnings.simplefilter("default", DeprecationWarning)
+
     # setup parsers
     parser = argparse.ArgumentParser(
-        description=f"seqspec {__version__}: Format sequence specification files"
+        description=f"""
+seqspec {__version__}: A machine-readable file format for genomic library sequence and structure.
+
+GitHub: https://github.com/pachterlab/seqspec
+Documentation: https://pachterlab.github.io/seqspec/
+
+""",
+        formatter_class=argparse.RawTextHelpFormatter,
     )
 
     subparsers = parser.add_subparsers(
@@ -38,17 +52,21 @@ def main():
     command_to_parser = {
         "check": setup_check_args(subparsers),
         "find": setup_find_args(subparsers),
+        "file": setup_file_args(subparsers),
         "format": setup_format_args(subparsers),
-        "genbank": setup_genbank_args(subparsers),
+        # "genbank": setup_genbank_args(subparsers),
         "index": setup_index_args(subparsers),
         "info": setup_info_args(subparsers),
         "init": setup_init_args(subparsers),
+        "methods": setup_methods_args(subparsers),
         "modify": setup_modify_args(subparsers),
         "onlist": setup_onlist_args(subparsers),
         "print": setup_print_args(subparsers),
         "split": setup_split_args(subparsers),
+        "upgrade": setup_upgrade_args(subparsers),
         "version": setup_version_args(subparsers),
     }
+
     # Show help when no arguments are given
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
@@ -73,11 +91,14 @@ def main():
         "index": validate_index_args,
         "info": validate_info_args,
         "init": validate_init_args,
+        "methods": validate_methods_args,
         "modify": validate_modify_args,
         "onlist": validate_onlist_args,
         "split": validate_split_args,
         "version": validate_version_args,
-        "genbank": validate_genbank_args,
+        "file": validate_file_args,
+        "upgrade": validate_upgrade_args,
+        # "genbank": validate_genbank_args,
     }
     COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)
 

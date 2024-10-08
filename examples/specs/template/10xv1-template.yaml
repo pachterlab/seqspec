@@ -1,0 +1,137 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: 10xv2
+name: 10xv2
+doi: https://doi.org/10.1126/science.aam8999
+date: 15 March 2018
+description: 10x Genomics v2 single-cell rnaseq
+modalities:
+- rna
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3.html
+sequence_protocol: Not-specified
+sequence_kit: Not-specified
+library_protocol: 10xv2 RNA
+library_kit: Not-specified
+sequence_spec:
+- !Read
+  read_id: Read 1
+  name: Read 1
+  modality: rna
+  primer_id: custom_primer1
+  min_len: 98
+  max_len: 98
+  strand: pos
+  files:
+  - !File
+    filename: R1.fastq.gz
+    filetype: fastq
+    filesize: 0
+    url: "./fastq/R1.fastq.gz"
+    urltype: local
+    md5: 0
+- !Read
+  read_id: Index 1
+  name: Read 2
+  modality: rna
+  primer_id: custom_primer2
+  min_len: 14
+  max_len: 14
+  strand: pos
+  files:
+  - !File
+    filename: I1.fastq.gz
+    filetype: fastq
+    filesize: 0
+    url: "./fastq/I1.fastq.gz"
+    urltype: local
+    md5: 0
+- !Read
+  read_id: Read 2
+  name: Read 2
+  modality: rna
+  primer_id: custom_primer2
+  min_len: 10
+  max_len: 10
+  strand: neg
+  files:
+  - !File
+    filename: R2.fastq.gz
+    filetype: fastq
+    filesize: 0
+    url: "./fastq/R2.fastq.gz"
+    urltype: local
+    md5: 0
+library_spec:
+- !Region
+  parent_id: null
+  region_id: rna
+  region_type: rna
+  name: rna
+  sequence_type: joined
+  sequence: AAAAAAAAAAAAAAAANNNNNNNNNNNNNNNNNNNNNNNNNNXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAAAAAAAAAAAAAAAA
+  min_len: 59
+  max_len: 208
+  onlist: null
+  regions:
+  - !Region
+    parent_id: rna
+    region_id: custom_primer1
+    region_type: custom_primer
+    name: custom_primer1
+    sequence_type: fixed
+    sequence: ''
+    min_len: 0
+    max_len: 0
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: rna
+    region_id: cdna
+    region_type: cdna
+    name: cdna
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    min_len: 1
+    max_len: 150
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: rna
+    region_id: umi
+    region_type: umi
+    name: umi
+    sequence_type: random
+    sequence: XXXXXXXXXX
+    min_len: 10
+    max_len: 10
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: rna
+    region_id: custom_primer2
+    region_type: custom_primer
+    name: custom_primer2
+    sequence_type: fixed
+    sequence: ''
+    min_len: 0
+    max_len: 0
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: rna
+    region_id: barcode
+    region_type: barcode
+    name: barcode
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNNNNNN
+    min_len: 16
+    max_len: 16
+    onlist: !Onlist
+      location: remote
+      filename: 737K-april-2014.txt.gz
+      filetype: txt
+      filesize: 11059200
+      url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNAv1/737K-april-2014.txt.gz
+      urltype: http
+      md5: 9911f5f3fbab451d79b6b38068a001f0
+    regions: null

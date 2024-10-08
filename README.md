@@ -5,11 +5,18 @@
 ![python versions](https://img.shields.io/pypi/pyversions/seqspec)
 [![license](https://img.shields.io/pypi/l/seqspec)](LICENSE)
 
-`seqspec` is a machine-readable YAML file format to describe the content of molecules in genomic libraries, the structure of reads generated from them, and how those are stored in files. It was inspired by and builds off of the Teichmann Lab [Single Cell Genomics Library Structure](https://github.com/Teichlab/scg_lib_structs) by [Xi Chen](https://github.com/dbrg77).
+`seqspec`, short for "sequence specification" (pronounced "seek-speck"), is a file format that describes data generated from genomics experiments. Both the file format and `seqspec` tool [enable uniform processing](./docs/UNIFORM.md) of genomics data.
 
-Genomic library structure depends on both the assay and sequencer (and kit) used to generate and bind the assay-specific construct to the sequencing adapters to generate a sequencing library. Therefore, a `seqspec` is specific to both a genomics assay and sequencer.
+![alt text](docs/images/simple_file_structure.png)
+**Figure 1**: Anatomy of a `seqspec` file.
 
-A list of `seqspec` examples for multiple assays and sequencers can be found on [this website](https://igvf.github.io/seqspec/). Each `spec.yaml` describes the 5'->3' "Final library structure" for the assay and sequencer and can be extended to include sequencer-specific read annotations. Sequence specification files can be formatted with the `seqspec` command line tool.
+We have multiple tutorials to get you up and running with `seqspec`:
+
+1. Learn how to use `seqspec` to [standardize your genomics data preprocessing](docs/UNIFORM.ipynb).
+
+2. Understand how to [manipulate `seqspec` files](docs/USING_SEQSPEC.ipynb) using the `seqspec` command-line tool.
+
+## Citation
 
 The `seqspec` format and tool are described in this [publication](https://doi.org/10.1093/bioinformatics/btae168). If you use `seqspec` please cite
 
@@ -17,25 +24,16 @@ The `seqspec` format and tool are described in this [publication](https://doi.or
 Ali Sina Booeshaghi, Xi Chen, Lior Pachter, A machine-readable specification for genomics assays, Bioinformatics, Volume 40, Issue 4, April 2024, btae168.
 ```
 
-<img alt="image" src="/docs/seqspec.png">
+`seqspec` was inspired by and builds off of the Teichmann Lab [Single Cell Genomics Library Structure](https://github.com/Teichlab/scg_lib_structs) by [Xi Chen](https://github.com/dbrg77).
 
-```bash
-# release
-pip install seqspec
+## Documentation
 
-# development
-pip install git+https://github.com/pachterlab/seqspec.git
-
-# verify install
-seqspec --help
-```
-
-Documentation:
-
-- [ Learn about `seqspec` : `docs/DOCUMENTATION.md`](docs/DOCUMENTATION.md)
-- [Write a `seqspec` from scratch : `docs/TUTORIAL.md`](docs/TUTORIAL.md)
-- [Write a `seqspec` from a template : `docs/TUTORIAL_FROM_TEMPLATE.md`](docs/TUTORIAL_FROM_TEMPLATE.md)
+- [Install `seqspec`: `docs/INSTALLATION.md`](docs/INSTALLATION.md)
+- [Learn about the `seqspec` file format: `docs/DOCUMENTATION.md`](docs/SEQSPEC_FILE.md)
+- [Learn about the `seqspec` tool: `docs/DOCUMENTATION.md`](docs/SEQSPEC_TOOL.md)
+- [Learn about the `seqspec` specification : `docs/SPECIFICATION.md`](docs/SPECIFICATION.md)
+- [Write a `seqspec`: `docs/TUTORIAL.md`](docs/TUTORIAL.md)
+- [View example `seqspec` files: `https://www.sina.bio/seqspec-builder/assays.html`](https://www.sina.bio/seqspec-builder/assays.html)
 - [Contribute a `seqspec` : `docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
-- [The `seqspec` specification : `docs/SPECIFICATION.md`](docs/SPECIFICATION.md)
-- [YouTube video that introduces `seqspec`](https://youtu.be/NSj6Vpzy8tU)
-- [Paper that describes `seqspec`](https://academic.oup.com/bioinformatics/article/40/4/btae168/7641535)
+- [Watch a YouTube video about `seqspec`](https://youtu.be/NSj6Vpzy8tU)
+- [Read the manuscript that describes `seqspec`](https://doi.org/10.1093/bioinformatics/btae168)

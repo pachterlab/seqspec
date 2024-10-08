@@ -1,0 +1,124 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: null
+name: 10x Genomics
+doi: https://doi.org/10.1038/nmeth.1315
+date: 06 April 2009
+description: first method to sequence the whole transcriptome (mRNA) of a single cell
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.html
+library_protocol: null
+library_kit: null
+sequence_protocol: null
+sequence_kit: null
+sequence_spec:
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: illumina_truseq_prep
+  primer_id: generic_primer1
+  min_len: 1
+  max_len: 250
+  strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: illumina_truseq_prep
+  primer_id: generic_primer2
+  min_len: 1
+  max_len: 250
+  strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+library_spec:
+- !Region
+  region_id: RNA
+  region_type: RNA
+  name: RNA
+  sequence_type: joined
+  sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGATXCGCCTTGGCCGTACAGCAGNNNNNNAGAGAATGAGGAACCCGGGGCAG
+  min_len: 90
+  max_len: 187
+  onlist: null
+  regions:
+  - !Region
+    region_id: SOLiD_P1_adaptor
+    region_type: SOLiD_P1_adaptor
+    name: SOLiD_P1_adaptor
+    sequence_type: fixed
+    sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGAT
+    min_len: 41
+    max_len: 41
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: cDNA
+    region_type: cDNA
+    name: cDNA
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: SOLiD_bc_adapter
+    region_type: SOLiD_bc_adapter
+    name: SOLiD_bc_adapter
+    sequence_type: fixed
+    sequence: CGCCTTGGCCGTACAGCAG
+    min_len: 19
+    max_len: 19
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: index
+    region_type: index
+    name: index
+    sequence_type: onlist
+    sequence: NNNNNN
+    min_len: 6
+    max_len: 6
+    onlist: !Onlist
+      file_id: index_onlist.txt
+      filename: index_onlist.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
+      md5: null
+      location: local
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: p2_adapter
+    region_type: p2_adapter
+    name: p2_adapter
+    sequence_type: fixed
+    sequence: AGAGAATGAGGAACCCGGGGCAG
+    min_len: 23
+    max_len: 23
+    onlist: null
+    regions: null
+    parent_id: RNA
+  parent_id: null

@@ -1,5 +1,5 @@
 !Assay
-seqspec_version: 0.2.0
+seqspec_version: 0.3.0
 assay_id: SPLiTSeq
 name: SPLiTSeq
 doi: https://doi.org/10.1126/science.aam8999
@@ -18,9 +18,18 @@ sequence_spec:
   name: Read 1
   modality: rna
   primer_id: Read_1_primer
-  min_len: 66
-  max_len: 66
+  min_len: 140
+  max_len: 140
   strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 - !Read
   read_id: I1.fastq.gz
   name: Index 1 (i7 index)
@@ -29,14 +38,32 @@ sequence_spec:
   min_len: 6
   max_len: 6
   strand: pos
+  files:
+  - !File
+    file_id: I1.fastq.gz
+    filename: I1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 - !Read
   read_id: R2.fastq.gz
   name: Read 2
   modality: rna
   primer_id: Read_2_primer
-  min_len: 94
-  max_len: 94
+  min_len: 86
+  max_len: 86
   strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
 library_spec:
 - !Region
   parent_id: null
@@ -103,7 +130,12 @@ library_spec:
     min_len: 6
     max_len: 15
     onlist: !Onlist
+      file_id: onlist_rt_primer.txt
       filename: onlist_rt_primer.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: 076f32ce8a96038bfc0c618da2204c77
       location: local
     regions: null
@@ -117,7 +149,12 @@ library_spec:
     min_len: 8
     max_len: 8
     onlist: !Onlist
+      file_id: onlist_round1.txt
       filename: onlist_round1.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: d3818caa32bb707c98e17aa614be58ef
       location: local
     regions: null
@@ -142,7 +179,12 @@ library_spec:
     min_len: 8
     max_len: 8
     onlist: !Onlist
+      file_id: onlist_round1.txt
       filename: onlist_round1.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: d3818caa32bb707c98e17aa614be58ef
       location: local
     regions: null
@@ -167,7 +209,12 @@ library_spec:
     min_len: 8
     max_len: 8
     onlist: !Onlist
+      file_id: onlist_round1.txt
       filename: onlist_round1.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: d3818caa32bb707c98e17aa614be58ef
       location: local
     regions: null
@@ -181,7 +228,12 @@ library_spec:
     min_len: 10
     max_len: 10
     onlist: !Onlist
+      file_id: onlist_round2.txt
       filename: onlist_round2.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: d3818caa32bb707c98e17aa614be58ef
       location: local
     regions: null
@@ -195,7 +247,12 @@ library_spec:
     min_len: 22
     max_len: 22
     onlist: !Onlist
+      file_id: onlist_round3.txt
       filename: onlist_round3.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: d3818caa32bb707c98e17aa614be58ef
       location: local
     regions: null
@@ -209,7 +266,12 @@ library_spec:
     min_len: 6
     max_len: 6
     onlist: !Onlist
+      file_id: onlist_round4.txt
       filename: onlist_round4.txt
+      filetype: ''
+      filesize: 0
+      url: ''
+      urltype: ''
       md5: 39435765800482d7ff4cea4d33fc403c
       location: local
     regions: null

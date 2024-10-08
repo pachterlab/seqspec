@@ -1,0 +1,38 @@
+- !Region
+  region_id: barcode
+  region_type: barcode
+  name: Barcode
+  sequence_type: onlist
+  sequence: NNNNNNNNNNNNNNNN
+  min_len: 16
+  max_len: 16
+  onlist: !Onlist
+    file_id: 737K-august-2016.txt.gz
+    filename: 737K-august-2016.txt.gz
+    filetype: txt
+    filesize: 12533759
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNAv2/737K-august-2016.txt.gz
+    urltype: http
+    md5: 72aa64fd865bcda142c47d0da8370168
+    location: remote
+  regions: null
+- !Region
+  region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNNNN
+  min_len: 10
+  max_len: 10
+  onlist: null
+  regions: null
+- !Region
+  region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null

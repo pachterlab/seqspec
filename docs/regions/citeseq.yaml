@@ -1,0 +1,49 @@
+- !Region
+  region_id: protein_cell_bc
+  region_type: barcode
+  name: Cell Barcode
+  sequence_type: onlist
+  sequence: NNNNNNNNNNNNNNNN
+  min_len: 16
+  max_len: 16
+  onlist: !Onlist
+    file_id: 3M-february-2018.txt.gz
+    filename: 3M-february-2018.txt.gz
+    filetype: txt
+    filesize: 115512960
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNAv3/3M-february-2018.txt.gz
+    urltype: http
+    md5: 3d36d0a4021fd292b265e2b5e72aaaf3
+    location: remote
+  regions: null
+  parent_id: protein
+- !Region
+  region_id: protein_umi
+  region_type: umi
+  name: umi
+  sequence_type: random
+  sequence: XXXXXXXXXXXX
+  min_len: 12
+  max_len: 12
+  onlist: null
+  regions: null
+  parent_id: protein
+- !Region
+  region_id: protein_seq
+  region_type: protein
+  name: protein
+  sequence_type: random
+  sequence: XXXXXXXXXXXXXXX
+  min_len: 15
+  max_len: 15
+  onlist: !Onlist
+    file_id: protein_seq.txt
+    filename: protein_seq.txt
+    filetype: txt
+    filesize: 0
+    url: protein_seq.txt
+    urltype: local
+    md5: md5
+    location: local
+  regions: null
+  parent_id: protein

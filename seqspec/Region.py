@@ -64,7 +64,7 @@ class Region(yaml.YAMLObject):
             max_l += self.max_len
         return (min_l, max_l)
 
-    def get_onlist(self):
+    def get_onlist(self) -> Optional["Onlist"]:
         return self.onlist
 
     def update_attr(self):
@@ -75,9 +75,9 @@ class Region(yaml.YAMLObject):
         self.sequence = self.get_sequence()
         self.min_len, self.max_len = self.get_len()
         if self.sequence_type == "random":
-            self.sequence = "X" * self.max_len
+            self.sequence = "X" * self.min_len
         if self.sequence_type == "onlist":
-            self.sequence = "N" * self.max_len
+            self.sequence = "N" * self.min_len
         return
 
     def __repr__(self) -> str:
@@ -129,7 +129,9 @@ class Region(yaml.YAMLObject):
                 found = r.get_region_by_id(region_id, found)
         return found
 
-    def get_region_by_region_type(self, region_type, found=[]):
+    def get_region_by_region_type(
+        self, region_type: str, found: List["Region"] = []
+    ) -> List["Region"]:
         if not found:
             found = []
         if self.region_type == region_type:
@@ -139,7 +141,7 @@ class Region(yaml.YAMLObject):
                 found = r.get_region_by_region_type(region_type, found)
         return found
 
-    def get_onlist_regions(self, found=[]):
+    def get_onlist_regions(self, found: List["Region"] = []) -> List["Region"]:
         if not found:
             found = []
         if self.onlist is not None:
@@ -149,7 +151,7 @@ class Region(yaml.YAMLObject):
                 found = r.get_onlist_regions(found)
         return found
 
-    def get_leaves(self, leaves=[]):
+    def get_leaves(self, leaves: List["Region"] = []) -> List["Region"]:
         if not leaves:
             leaves = []
         if not self.regions:
@@ -240,34 +242,6 @@ class Region(yaml.YAMLObject):
             self.sequence = complement_sequence(self.sequence)
 
 
-def complement_nucleotide(nucleotide):
-    complements = {
-        "A": "T",
-        "T": "A",
-        "G": "C",
-        "C": "G",
-        "R": "Y",
-        "Y": "R",
-        "S": "S",
-        "W": "W",
-        "K": "M",
-        "M": "K",
-        "B": "V",
-        "D": "H",
-        "V": "B",
-        "H": "D",
-        "N": "N",
-        "X": "X",
-    }
-    return complements.get(
-        nucleotide, "N"
-    )  # Default to 'N' if nucleotide is not recognized
-
-
-def complement_sequence(sequence):
-    return "".join(complement_nucleotide(n) for n in sequence.upper())
-
-
 class RegionCoordinate(Region):
     def __init__(
         self,
@@ -289,14 +263,105 @@ class RegionCoordinate(Region):
         self.start = start
         self.stop = stop
 
-    def __repr__(self):
-        return f"RegionCoordinate {self.name} [{self.region_type}]: ({self.start}, {self.stop})"
+    def __repr__(self) -> str:
+        d = {
+            "region": self.region_id,
+            "start": self.start,
+            "stop": self.stop,
+        }
+        return f"{d}"
+
+    # def __repr__(self):
+    #     return f"RegionCoordinate {self.name} [{self.region_type}]: [{self.start}, {self.stop})"
 
     def __str__(self):
-        return f"RegionCoordinate {self.name} [{self.region_type}]: ({self.start}, {self.stop})"
+        return f"RegionCoordinate {self.name} [{self.region_type}]: [{self.start}, {self.stop})"
 
     def __eq__(self, other):
         return self.start == other.start and self.stop == other.stop
+
+    def __sub__(self, other):
+        """
+        Define the subtraction between two RegionCoordinate objects.
+        rc2 - rc1 should return a new RegionCoordinate with:
+        - start as rc2.start - rc1.stop
+        - stop as rc2.stop - rc1.start
+        - min_len and max_len is max(self.start, other.start) - min(self.stop, other.stop)
+        """
+        if not isinstance(other, RegionCoordinate):
+            raise TypeError(
+                f"Unsupported operand type(s) for -: 'RegionCoordinate' and '{type(other).__name__}'"
+            )
+
+        # Case 1: self is to the left of other
+        # need to handle the case where the diff is zero but the position of other is left or right of self
+        # self - other
+        if self.stop <= other.start:
+            new_start = self.stop
+            new_stop = other.start
+
+        # Case 2: self is to the right of other
+        elif other.stop <= self.start:
+            new_start = other.stop
+            new_stop = self.start
+        else:
+            # not so obious what to do with the start and the stop for the same element
+            if self.start == other.start and self.stop == other.stop:
+                new_start = self.start
+                new_stop = self.stop
+            else:
+                raise ValueError("Subtraction is not defined.")
+
+        # Create a new RegionCoordinate object with the updated start and stop values
+        new_region = RegionCoordinate(
+            region=Region(
+                region_id=f"{self.region_id} - {other.region_id}",
+                region_type="difference",
+                name=f"{self.name} - {other.name}",
+                sequence_type="diff",
+                sequence="X",
+                min_len=0,
+                max_len=0,
+                onlist=None,
+                regions=None,
+            ),  # Assuming the region meta-data stays the same
+            start=new_start,
+            stop=new_stop,
+        )
+
+        # Set min_len and max_len
+        new_region.min_len = abs(new_region.stop - new_region.start)
+        new_region.max_len = abs(new_region.stop - new_region.start)
+        new_region.sequence = "X" * new_region.min_len
+
+        return new_region
+
+
+class RegionCoordinateDifference:
+    def __init__(
+        self,
+        obj: RegionCoordinate,
+        fixed: RegionCoordinate,
+        rgncdiff: RegionCoordinate,
+        loc: str = "",
+    ):
+        self.obj = obj
+        self.fixed = fixed
+        self.rgncdiff = rgncdiff
+        self.loc = loc
+        if obj.stop <= fixed.start:
+            self.loc = "-"
+        elif obj.start >= fixed.stop:
+            self.loc = "+"
+
+    def __repr__(self) -> str:
+        d = {
+            "obj": self.obj,
+            "fixed": self.fixed,
+            "rgncdiff": self.rgncdiff,
+            "loc": self.loc,
+        }
+        return f"{d}"
 
 
 def project_regions_to_coordinates(
@@ -315,7 +380,7 @@ def project_regions_to_coordinates(
 
 def itx_read(
     region_coordinates: List[RegionCoordinate], read_start: int, read_stop: int
-):
+) -> List[RegionCoordinate]:
     # return a list of region_coordinates intersect with read start/stop
     new_rcs = []
 
@@ -343,71 +408,81 @@ def itx_read(
 class Onlist(yaml.YAMLObject):
     yaml_tag = "!Onlist"
 
-    def __init__(self, filename: str, md5: str, location: str) -> None:
-        super().__init__()
-        self.filename = filename
-        self.md5 = md5
-        self.location = location
-
-    def __repr__(self) -> str:
-        d = {
-            "filename": self.filename,
-            "location": self.location,
-            "md5": self.md5,
-        }
-        return f"{d}"
-
-    def to_dict(self):
-        d = {
-            "filename": self.filename,
-            "location": self.location,
-            "md5": self.md5,
-        }
-        return d
-
-
-class Read(yaml.YAMLObject):
-    yaml_tag = "!Read"
-
     def __init__(
         self,
-        read_id: str,
-        name: str,
-        modality: str,
-        primer_id: str,
-        min_len: int,
-        max_len: int,
-        strand: str,
+        file_id: str,
+        filename: str,
+        filetype: str,
+        filesize: int,
+        url: str,
+        urltype: str,
+        md5: str,
+        location: Optional[str],
     ) -> None:
         super().__init__()
-        self.read_id = read_id
-        self.name = name
-        self.modality = modality
-        self.primer_id = primer_id
-        self.min_len = min_len
-        self.max_len = max_len
-        self.strand = strand
+        self.file_id = file_id
+        self.filename = filename
+        self.filetype = filetype
+        self.filesize = filesize
+        self.url = url
+        self.urltype = urltype
+        self.md5 = md5
+        # to depracate
+        # self.location = location
 
     def __repr__(self) -> str:
         d = {
-            "read_id": self.read_id,
-            "name": self.name,
-            "modality": self.modality,
-            "primer_id": self.primer_id,
-            "min_len": self.min_len,
-            "max_len": self.max_len,
-            "strand": self.strand,
+            "file_id": self.file_id,
+            "filename": self.filename,
+            "filetype": self.filetype,
+            "filesize": self.filesize,
+            "url": self.url,
+            "urltype": self.urltype,
+            "md5": self.md5,
+            # "location": self.location,
         }
         return f"{d}"
 
     def to_dict(self):
         d = {
-            "read_id": self.read_id,
-            "name": self.name,
-            "modality": self.modality,
-            "primer_id": self.primer_id,
-            "min_len": self.min_len,
-            "max_len": self.max_len,
-            "strand": self.strand,
+            "file_id": self.file_id,
+            "filename": self.filename,
+            "filetype": self.filetype,
+            "filesize": self.filesize,
+            "url": self.url,
+            "urltype": self.urltype,
+            "md5": self.md5,
+            # "location": self.location,
         }
         return d
+
+    def update_file_id(self, file_id):
+        self.file_id = file_id
+
+
+def complement_nucleotide(nucleotide):
+    complements = {
+        "A": "T",
+        "T": "A",
+        "G": "C",
+        "C": "G",
+        "R": "Y",
+        "Y": "R",
+        "S": "S",
+        "W": "W",
+        "K": "M",
+        "M": "K",
+        "B": "V",
+        "D": "H",
+        "V": "B",
+        "H": "D",
+        "N": "N",
+        "X": "X",
+    }
+    return complements.get(
+        nucleotide, "N"
+    )  # Default to 'N' if nucleotide is not recognized
+
+
+def complement_sequence(sequence):
+    return "".join(complement_nucleotide(n) for n in sequence.upper())

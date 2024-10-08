@@ -1,0 +1,160 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: null
+name: STRT-seq-C1
+doi: https://doi.org/10.1007/978-1-4939-9240-9_9
+date: 27 April 2019
+description: STRT-seq performed on microfluidics Fluidigm C1
+modalities:
+- RNA
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
+library_protocol: null
+library_kit: null
+sequence_protocol: null
+sequence_kit: null
+sequence_spec:
+- !Read
+  read_id: R1.fastq.gz
+  name: Read 1
+  modality: illumina_truseq_prep
+  primer_id: generic_primer1
+  min_len: 1
+  max_len: 250
+  strand: pos
+  files:
+  - !File
+    file_id: R1.fastq.gz
+    filename: R1.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+- !Read
+  read_id: R2.fastq.gz
+  name: Read 2
+  modality: illumina_truseq_prep
+  primer_id: generic_primer2
+  min_len: 1
+  max_len: 250
+  strand: neg
+  files:
+  - !File
+    file_id: R2.fastq.gz
+    filename: R2.fastq.gz
+    filetype: ''
+    filesize: 0
+    url: ''
+    urltype: ''
+    md5: ''
+library_spec:
+- !Region
+  region_id: RNA
+  region_type: RNA
+  name: RNA
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGATNNNNNGGGXCTGTCTCTTATACACATCTGACGCNNNNNNNNTCGTATGCCGTCTTCTGCTTG
+  min_len: 83
+  max_len: 180
+  onlist: null
+  regions:
+  - !Region
+    region_id: solexa_p1
+    region_type: solexa_p1
+    name: solexa_p1
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGA
+    min_len: 20
+    max_len: 20
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: link_1
+    region_type: link_1
+    name: link_1
+    sequence_type: fixed
+    sequence: T
+    min_len: 1
+    max_len: 1
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: umi
+    region_type: umi
+    name: umi
+    sequence_type: random
+    sequence: NNNNN
+    min_len: 5
+    max_len: 5
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: triple_G
+    region_type: triple_G
+    name: triple_G
+    sequence_type: fixed
+    sequence: GGG
+    min_len: 3
+    max_len: 3
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: cDNA
+    region_type: cDNA
+    name: cDNA
+    sequence_type: random
+    sequence: X
+    min_len: 1
+    max_len: 98
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: ME
+    region_type: ME
+    name: ME
+    sequence_type: fixed
+    sequence: CTGTCTCTTATACACATCT
+    min_len: 19
+    max_len: 19
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: link_2
+    region_type: link_2
+    name: link_2
+    sequence_type: fixed
+    sequence: GACGC
+    min_len: 5
+    max_len: 5
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: cell_bc
+    region_type: cell_bc
+    name: cell_bc
+    sequence_type: random
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions: null
+    parent_id: RNA
+  - !Region
+    region_id: solexa_p2
+    region_type: solexa_p2
+    name: solexa_p2
+    sequence_type: fixed
+    sequence: TCGTATGCCGTCTTCTGCTTG
+    min_len: 21
+    max_len: 21
+    onlist: null
+    regions: null
+    parent_id: RNA
+  parent_id: null
