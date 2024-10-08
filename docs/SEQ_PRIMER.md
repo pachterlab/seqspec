@@ -51,4 +51,9 @@ Paper describing nanopore sequencing: https://www.nature.com/articles/nbt.1495
 
 ### Strandedness
 
-Unlike Illumina, nanopore sequencing produces the direct nucleotide sequence in linear order starting at the beginning of the molecule.
+Unlike Illumina, nanopore sequencing produces the direct nucleotide sequence in linear order starting at the beginning of the molecule. [But the read generated from a molecule can start from either end and either strand](https://nanoporetech.com/document/genomic-dna-by-ligation-sqk-lsk114). And the strand can be either the top or bottom strand. So a read is produced in one of four "orientations"
+
+1. forward, top strand
+2. forward, reverse strand
+3. backward, top strand
+4. backward, reverse strand

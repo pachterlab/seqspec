@@ -1,7 +1,8 @@
 from seqspec.utils import load_spec
 from seqspec.seqspec_print_html import print_seqspec_html
 import newick
-from .utils import REGION_TYPE_COLORS, complement_sequence
+from seqspec.utils import REGION_TYPE_COLORS
+from seqspec.Region import complement_sequence
 from seqspec.Region import project_regions_to_coordinates
 from argparse import RawTextHelpFormatter
 

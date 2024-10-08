@@ -36,23 +36,6 @@ def load_genbank_stream(gbk_stream: io.IOBase):
     return data
 
 
-class RegionCoordinate:
-    def __init__(self, cut_name, cut_type, start, end):
-        self.cut_name = cut_name
-        self.cut_type = cut_type
-        self.start = start
-        self.end = end
-
-    def __repr__(self):
-        return f"RegionCoordinate {self.cut_name} [{self.cut_type}]: ({self.start}, {self.end})"
-
-    def __str__(self):
-        return f"RegionCoordinate {self.cut_name} [{self.cut_type}]: ({self.start}, {self.end})"
-
-    def __eq__(self, other):
-        return self.start == other.start and self.end == other.end
-
-
 def write_read(header, seq, qual, f):
     f.write(f"{header}\n{seq}\n+\n{qual}\n")
 
@@ -176,34 +159,6 @@ REGION_TYPE_COLORS = {
 # unused
 # '#FF8C00'
 # '#95A5A6'
-
-
-def complement_nucleotide(nucleotide):
-    complements = {
-        "A": "T",
-        "T": "A",
-        "G": "C",
-        "C": "G",
-        "R": "Y",
-        "Y": "R",
-        "S": "S",
-        "W": "W",
-        "K": "M",
-        "M": "K",
-        "B": "V",
-        "D": "H",
-        "V": "B",
-        "H": "D",
-        "N": "N",
-        "X": "X",
-    }
-    return complements.get(
-        nucleotide, "N"
-    )  # Default to 'N' if nucleotide is not recognized
-
-
-def complement_sequence(sequence):
-    return "".join(complement_nucleotide(n) for n in sequence.upper())
 
 
 def map_read_id_to_regions(

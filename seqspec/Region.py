@@ -242,34 +242,6 @@ class Region(yaml.YAMLObject):
             self.sequence = complement_sequence(self.sequence)
 
 
-def complement_nucleotide(nucleotide):
-    complements = {
-        "A": "T",
-        "T": "A",
-        "G": "C",
-        "C": "G",
-        "R": "Y",
-        "Y": "R",
-        "S": "S",
-        "W": "W",
-        "K": "M",
-        "M": "K",
-        "B": "V",
-        "D": "H",
-        "V": "B",
-        "H": "D",
-        "N": "N",
-        "X": "X",
-    }
-    return complements.get(
-        nucleotide, "N"
-    )  # Default to 'N' if nucleotide is not recognized
-
-
-def complement_sequence(sequence):
-    return "".join(complement_nucleotide(n) for n in sequence.upper())
-
-
 class RegionCoordinate(Region):
     def __init__(
         self,
@@ -291,14 +263,105 @@ class RegionCoordinate(Region):
         self.start = start
         self.stop = stop
 
-    def __repr__(self):
-        return f"RegionCoordinate {self.name} [{self.region_type}]: ({self.start}, {self.stop})"
+    def __repr__(self) -> str:
+        d = {
+            "region": self.region_id,
+            "start": self.start,
+            "stop": self.stop,
+        }
+        return f"{d}"
+
+    # def __repr__(self):
+    #     return f"RegionCoordinate {self.name} [{self.region_type}]: [{self.start}, {self.stop})"
 
     def __str__(self):
-        return f"RegionCoordinate {self.name} [{self.region_type}]: ({self.start}, {self.stop})"
+        return f"RegionCoordinate {self.name} [{self.region_type}]: [{self.start}, {self.stop})"
 
     def __eq__(self, other):
         return self.start == other.start and self.stop == other.stop
+
+    def __sub__(self, other):
+        """
+        Define the subtraction between two RegionCoordinate objects.
+        rc2 - rc1 should return a new RegionCoordinate with:
+        - start as rc2.start - rc1.stop
+        - stop as rc2.stop - rc1.start
+        - min_len and max_len is max(self.start, other.start) - min(self.stop, other.stop)
+        """
+        if not isinstance(other, RegionCoordinate):
+            raise TypeError(
+                f"Unsupported operand type(s) for -: 'RegionCoordinate' and '{type(other).__name__}'"
+            )
+
+        # Case 1: self is to the left of other
+        # need to handle the case where the diff is zero but the position of other is left or right of self
+        # self - other
+        if self.stop <= other.start:
+            new_start = self.stop
+            new_stop = other.start
+
+        # Case 2: self is to the right of other
+        elif other.stop <= self.start:
+            new_start = other.stop
+            new_stop = self.start
+        else:
+            # not so obious what to do with the start and the stop for the same element
+            if self.start == other.start and self.stop == other.stop:
+                new_start = self.start
+                new_stop = self.stop
+            else:
+                raise ValueError("Subtraction is not defined.")
+
+        # Create a new RegionCoordinate object with the updated start and stop values
+        new_region = RegionCoordinate(
+            region=Region(
+                region_id=f"{self.region_id} - {other.region_id}",
+                region_type="difference",
+                name=f"{self.name} - {other.name}",
+                sequence_type="diff",
+                sequence="X",
+                min_len=0,
+                max_len=0,
+                onlist=None,
+                regions=None,
+            ),  # Assuming the region meta-data stays the same
+            start=new_start,
+            stop=new_stop,
+        )
+
+        # Set min_len and max_len
+        new_region.min_len = abs(new_region.stop - new_region.start)
+        new_region.max_len = abs(new_region.stop - new_region.start)
+        new_region.sequence = "X" * new_region.min_len
+
+        return new_region
+
+
+class RegionCoordinateDifference:
+    def __init__(
+        self,
+        obj: RegionCoordinate,
+        fixed: RegionCoordinate,
+        rgncdiff: RegionCoordinate,
+        loc: str = "",
+    ):
+        self.obj = obj
+        self.fixed = fixed
+        self.rgncdiff = rgncdiff
+        self.loc = loc
+        if obj.stop <= fixed.start:
+            self.loc = "-"
+        elif obj.start >= fixed.stop:
+            self.loc = "+"
+
+    def __repr__(self) -> str:
+        d = {
+            "obj": self.obj,
+            "fixed": self.fixed,
+            "rgncdiff": self.rgncdiff,
+            "loc": self.loc,
+        }
+        return f"{d}"
 
 
 def project_regions_to_coordinates(
@@ -395,3 +458,31 @@ class Onlist(yaml.YAMLObject):
 
     def update_file_id(self, file_id):
         self.file_id = file_id
+
+
+def complement_nucleotide(nucleotide):
+    complements = {
+        "A": "T",
+        "T": "A",
+        "G": "C",
+        "C": "G",
+        "R": "Y",
+        "Y": "R",
+        "S": "S",
+        "W": "W",
+        "K": "M",
+        "M": "K",
+        "B": "V",
+        "D": "H",
+        "V": "B",
+        "H": "D",
+        "N": "N",
+        "X": "X",
+    }
+    return complements.get(
+        nucleotide, "N"
+    )  # Default to 'N' if nucleotide is not recognized
+
+
+def complement_sequence(sequence):
+    return "".join(complement_nucleotide(n) for n in sequence.upper())
