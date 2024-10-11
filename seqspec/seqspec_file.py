@@ -251,21 +251,18 @@ def format_json_files(files: Dict[str, List[File]], fmt, k, spec_fn="", fp=False
 def format_list_files(files: Dict[str, List[File]], fmt, k=None, spec_fn="", fp=False):
     x = ""
     if fmt == "paired":
+        x = ""
         for items in zip(*files.values()):
-            x = ""
+            t = ""
             for i in items:
                 if k:
                     attr = str(getattr(i, k))
                     if k == "url" and i.urltype == "local" and fp:
                         attr = os.path.join(os.path.dirname(spec_fn), attr)
-                    x += f"{attr}\n"
+                    t += f"{attr}\t"
                 else:
-                    x += f"{i.filename}\n"
-        # x = x[:-1]
-        #     if k:
-        #         x += "\t".join([str(getattr(i, k)) for i in items]) + "\n"
-        #     else:
-        #         x += "\t".join([i.filename for i in items]) + "\n"
+                    t += f"{i.filename}\t"
+            x += f"{t[:-1]}\n"
         x = x[:-1]
 
     elif fmt == "interleaved" or fmt == "list":
