@@ -6,6 +6,8 @@ from typing import Dict, List, Optional
 from argparse import RawTextHelpFormatter
 import json
 from seqspec import seqspec_find
+import os
+import argparse
 
 
 def setup_file_args(parser):
@@ -89,33 +91,42 @@ seqspec file -m rna -f json -s region-type -k all -i barcode spec.yaml # List fi
         choices=choices,
     )
 
+    # option to get the full path of the file
+    subparser.add_argument(
+        "--fullpath",
+        help=argparse.SUPPRESS,
+        action="store_true",
+        default=False,
+    )
+
     return subparser
 
 
 def validate_file_args(parser, args):
-    spec_fn = args.yaml
+    spec_fn = os.path.abspath(args.yaml)
     o = args.o
     m = args.m  # modality
     idtype = args.s  # selector
     fmt = args.f  # format
     ids = args.i  # ids
     k = args.k  # key
+    fp = args.fullpath
 
     if (k == "filesize" or k == "filetype" or k == "urltype" or k == "md5") and (
         fmt == "paired" or fmt == "interleaved" or fmt == "index"
     ):
         parser.error(f"-f {fmt} valid only with -k file_id, filename, url")
 
-    return run_file(spec_fn, m, ids, idtype, fmt, k, o)
+    return run_file(spec_fn, m, ids, idtype, fmt, k, o, fp=fp)
 
 
-def run_file(spec_fn, m, ids, idtype, fmt, k, o):
+def run_file(spec_fn, m, ids, idtype, fmt, k, o, fp=False):
     spec = load_spec(spec_fn)
     if ids is None:
         ids = []
     else:
         ids = ids.split(",")
-    files = file(spec, m, ids, idtype, fmt, k)
+    files = file(spec, m, ids, idtype, fmt, k, spec_fn, fp)
 
     if files:
         if o:
@@ -133,6 +144,8 @@ def file(
     idtype: str,
     fmt: str,
     k: Optional[str],
+    spec_fn: str,
+    fp: bool = False,
 ):
     # NOTE: LIST FILES DOES NOT RESPECT ORDERING OF INPUT IDs LIST
     # NOTE: seqspec file -s read gets the files for the read, not the files mapped from the regions associated with the read.
@@ -164,7 +177,7 @@ def file(
         "json": format_json_files,
     }
 
-    x = FORMAT[fmt](files, fmt, k)
+    x = FORMAT[fmt](files, fmt, k, spec_fn, fp)
     return x
 
 
@@ -196,7 +209,9 @@ def list_region_files(spec, modality):
     return list_onlist_files(spec, modality)
 
 
-def format_list_files_metadata(files: Dict[str, List[File]], fmt, k):
+def format_list_files_metadata(
+    files: Dict[str, List[File]], fmt, k, spec_fn="", fp=False
+):
     x = ""
     if k == "all":
         for items in zip(*files.values()):
@@ -215,26 +230,42 @@ def format_list_files_metadata(files: Dict[str, List[File]], fmt, k):
     return x
 
 
-def format_json_files(files: Dict[str, List[File]], fmt, k):
+def format_json_files(files: Dict[str, List[File]], fmt, k, spec_fn="", fp=False):
     x = []
     for items in zip(*files.values()):
         if k == "all":
             for key, item in zip(files.keys(), items):
-                x.append(item.to_dict())
+                d = item.to_dict()
+                if item.urltype == "local" and fp:
+                    d["url"] = os.path.join(os.path.dirname(spec_fn), d["url"])
+                x.append(d)
         else:
             for key, item in zip(files.keys(), items):
-                x.append({"file_id": item.file_id, k: getattr(item, k)})
+                attr = getattr(item, k)
+                if k == "url" and item.urltype == "local" and fp:
+                    attr = os.path.join(os.path.dirname(spec_fn), attr)
+                x.append({"file_id": item.file_id, k: attr})
     return json.dumps(x, indent=4)
 
 
-def format_list_files(files: Dict[str, List[File]], fmt, k=None):
+def format_list_files(files: Dict[str, List[File]], fmt, k=None, spec_fn="", fp=False):
     x = ""
     if fmt == "paired":
         for items in zip(*files.values()):
-            if k:
-                x += "\t".join([str(getattr(i, k)) for i in items]) + "\n"
-            else:
-                x += "\t".join([i.filename for i in items]) + "\n"
+            x = ""
+            for i in items:
+                if k:
+                    attr = str(getattr(i, k))
+                    if k == "url" and i.urltype == "local" and fp:
+                        attr = os.path.join(os.path.dirname(spec_fn), attr)
+                    x += f"{attr}\n"
+                else:
+                    x += f"{i.filename}\n"
+        # x = x[:-1]
+        #     if k:
+        #         x += "\t".join([str(getattr(i, k)) for i in items]) + "\n"
+        #     else:
+        #         x += "\t".join([i.filename for i in items]) + "\n"
         x = x[:-1]
 
     elif fmt == "interleaved" or fmt == "list":
@@ -243,6 +274,8 @@ def format_list_files(files: Dict[str, List[File]], fmt, k=None):
                 id = item.filename
                 if k:
                     id = str(getattr(item, k))
+                    if k == "url" and item.urltype == "local" and fp:
+                        id = os.path.join(os.path.dirname(spec_fn), id)
                 x += id + "\n"
         x = x[:-1]
     elif fmt == "index":
@@ -251,6 +284,8 @@ def format_list_files(files: Dict[str, List[File]], fmt, k=None):
                 id = item.filename
                 if k:
                     id = str(getattr(item, k))
+                    if k == "url" and item.urltype == "local" and fp:
+                        id = os.path.join(os.path.dirname(spec_fn), id)
                 x += id + ","
         x = x[:-1]
 
