@@ -7,7 +7,17 @@ authors:
 
 # Changelog
 
-## [0.3.0] - XXXX-XX-XX (Unreleased)
+## [0.3.1] - 2024-10-14
+
+### Added
+
+- Added an option to report the full path of the URL of files if the URL type is local.
+
+### Fixed
+
+- Fixed a bug in the seqspec file with the flag "-f paired" that was causing it to not list out all of the files correctly.
+
+## [0.3.0] - 2024-10-10
 
 ### Added
 
