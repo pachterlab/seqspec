@@ -71,6 +71,8 @@
             "massively parallel reporter assay (OBI:0002675)",
             "chromosome conformation capture-on-chip assay (OBI:0002458)",
             "single nucleus methylation chromatin conformation capture seq (NTR:0000745)",
+            "in vitro CRISPR screen using flow cytometry (OBI:0003661)",
+            "in vitro CRISPR screen using single-cell RNA-seq (OBI:0003660)",
             "Custom"
           ]
         },
@@ -141,6 +143,7 @@
             "Illumina NextSeq 2000 (EFO:0010963)",
             "Illumina NovaSeq X (NTR:0000765)",
             "PacBio RS II (EFO:0008631)",
+            "Illumina NovaSeq X (EFO:0022840)",
             "Custom"
           ]
         },
