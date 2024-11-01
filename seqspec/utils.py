@@ -119,6 +119,16 @@ def region_ids_in_spec(seqspec, modality, region_ids):
 
 def file_exists(uri):
     try:
+        if uri.startswith("https://api.data.igvf.org"):
+            auth = get_remote_auth_token()
+            if auth is None:
+                print("Warning: IGVF_API_KEY and IGVF_SECRET_KEY not set")
+            r = requests.head(uri, auth=auth)
+            if r.status_code == 307:
+                # igvf download link will redirect to a presigned amazon s3 url, HEAD request will not work.
+                r = requests.get(r.headers["Location"], headers={"Range": "bytes=0-0"})
+                return r.status_code == 206
+            return r.status_code == 200
         r = requests.head(uri)
         if r.status_code == 302:
             return file_exists(r.headers["Location"])
