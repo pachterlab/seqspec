@@ -136,7 +136,7 @@ def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
         onlist_path = os.path.join(base_path, onlist_fn)
         if os.path.exists(onlist_path):
             urltype = "local"
-        elif urltype == "http":
+        elif urltype in ["http", "https"]:
             # download the onlist to the base path and return the path
             onlist_elements = read_remote_list(onlists[0])
             onlist_path = write_onlist(onlist_elements, save_path)
@@ -147,7 +147,7 @@ def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
         for o in onlists:
             if o.urltype == "local":
                 lsts.append(read_local_list(o, base_path))
-            elif o.urltype == "http":
+            elif o.urltype in ["http", "https"]:
                 # base_path is ignored for remote onlists
                 lsts.append(read_remote_list(o, base_path))
         onlist_elements = join_onlists(lsts, fmt)
