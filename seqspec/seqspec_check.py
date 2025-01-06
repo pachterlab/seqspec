@@ -2,7 +2,6 @@ from jsonschema import Draft4Validator
 import yaml
 from os import path
 from seqspec.utils import load_spec, file_exists
-from seqspec.Assay import Assay
 from argparse import RawTextHelpFormatter
 
 
@@ -33,19 +32,13 @@ seqspec check spec.yaml
 def validate_check_args(parser, args):
     spec_fn = args.yaml
     o = args.o
-    schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
 
-    return run_check(schema_fn, spec_fn, o)
+    return run_check(spec_fn, o)
 
 
-def run_check(schema_fn, spec_fn, o):
-    spec = load_spec(spec_fn)
+def run_check(spec_fn, o):
 
-    with open(schema_fn, "r") as stream:
-        schema = yaml.load(stream, Loader=yaml.Loader)
-    v = Draft4Validator(schema)
-
-    errors = check(v, spec, spec_fn)
+    errors = check(spec_fn)
 
     if errors:
         if o:
@@ -56,14 +49,20 @@ def run_check(schema_fn, spec_fn, o):
     return errors
 
 
-def check(schema: Draft4Validator, spec: Assay, spec_fn: str):
+def check(spec_fn: str):
+    schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
+    spec = load_spec(spec_fn)
+
+    with open(schema_fn, "r") as stream:
+        schema = yaml.load(stream, Loader=yaml.Loader)
+    validator = Draft4Validator(schema)
     errors = []
     idx = 0
 
     # with open("del.json", "w") as f:
     #     json.dump(spec.to_dict(), f, indent=4)
 
-    for idx, error in enumerate(schema.iter_errors(spec.to_dict()), 1):
+    for idx, error in enumerate(validator.iter_errors(spec.to_dict()), 1):
         errors.append(
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
         )
