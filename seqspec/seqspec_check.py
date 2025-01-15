@@ -2,6 +2,7 @@ from jsonschema import Draft4Validator
 import yaml
 from os import path
 from seqspec.utils import load_spec, file_exists
+from seqspec.Assay import Assay
 from argparse import RawTextHelpFormatter
 
 
@@ -37,8 +38,9 @@ def validate_check_args(parser, args):
 
 
 def run_check(spec_fn, o):
+    spec = load_spec(spec_fn)
 
-    errors = check(spec_fn)
+    errors = check(spec)
 
     if errors:
         if o:
@@ -49,9 +51,8 @@ def run_check(spec_fn, o):
     return errors
 
 
-def check(spec_fn: str):
+def check(spec: Assay, spec_fn: str = None):
     schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
-    spec = load_spec(spec_fn)
 
     with open(schema_fn, "r") as stream:
         schema = yaml.load(stream, Loader=yaml.Loader)
