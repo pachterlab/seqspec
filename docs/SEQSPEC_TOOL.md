@@ -61,6 +61,12 @@ Check that the `seqspec` file is correctly formatted and consistent with the [sp
 seqspec check [-h] [-o OUT] yaml
 ```
 
+```python
+from seqspec.seqspec_check import run_check
+
+run_check(schema_fn: str, spec_fn: str, o: str)
+```
+
 - optionally, `-o OUT` can be used to write the output to a file.
 - `yaml` corresponds to the `seqspec` file.
 
@@ -133,6 +139,12 @@ $ seqspec check spec.yaml
 seqspec find [-h] [-o OUT] [-s Selector] -m MODALITY [-i IDs] yaml
 ```
 
+```python
+from seqspec.seqspec_find import run_find
+
+run_find(spec_fn: str, modality: str, id: str, idtype: str, o: str)
+```
+
 - optionally, `-o OUT` can be used to write the output to a file.
 - optionally, `-s Selector` is the type of the ID you are searching for (default: region). Can be one of
   - read
@@ -193,6 +205,12 @@ $ seqspec find -m rna -s region-type -i barcode spec.yaml
 
 ```bash
 seqspec file [-h] [-o OUT] [-i IDs] -m MODALITY [-s SELECTOR] [-f FORMAT] [-k KEY] yaml
+```
+
+```python
+from seqspec.seqspec_file import run_file
+
+run_file(spec_fn: str, m: str, ids: List[str], idtype: str, fmt: str, k: str, o: str, fp=False)
 ```
 
 - optionally, `-o OUT` can be used to write the output to a file.
@@ -266,6 +284,11 @@ Automatically fill in missing fields in the spec.
 seqspec format [-h] [-o OUT] yaml
 ```
 
+```python
+from seqspec.seqspec_format import run_format
+run_format(spec_fn: str, o: str)
+```
+
 - `-o OUT` the path to create the formatted `seqspec` file.
 - `yaml` corresponds to the `seqspec` file.
 
@@ -283,9 +306,14 @@ $ seqspec format -o spec.yaml spec.yaml
 
 Identify the position of elements in a spec for use in downstream tools. Returns the 0-indexed position of elements contained in a given region in the 5'->3' direction.
 
-```
+```bash
 seqspec index [-o OUT] [-t TOOL] [--rev] -m MODALITY -r REGION yaml
 seqspec index [-h] [-o OUT] [-t TOOL] [-s SELECTOR] [--rev] -m MODALITY [-i IDs] yaml
+```
+
+```python
+from seqspec.seqspec_index import run_index
+run_index(spec_fn: str, modality: str, ids: List[str], idtype: str, fmt: str, rev: str, subregion_type: str, o)
 ```
 
 - optionally, `-o OUT` can be used to write the output to a file.
@@ -340,6 +368,11 @@ $ seqspec index -m atac -t kb -s file spec.yaml
 
 ```bash
 seqspec info [-h] [-k KEY] [-f FORMAT] [-o OUT] yaml
+```
+
+```python
+from seqspec.seqspec_info import run_info
+run_info(spec_fn: str, f: str, k=None, o=None)
 ```
 
 - optionally, `-o OUT` path to write the info.
@@ -413,6 +446,11 @@ $ seqspec info -f json -k sequence_spec spec.yaml
 seqspec init [-h] -n NAME -m MODALITIES -r READS [-o OUT] newick
 ```
 
+```python
+from seqspec.seqspec_info import run_info
+run_info(spec_fn: str, f: str, k: str = None, o: str = None)
+```
+
 - optionally, `-o OUT` path to create `seqspec` file.
 - `-m MODALITIES` is a comma-separated list of modalities (e.g. rna,atac)
 - `-n NAME` is the name associated with the `seqspec` file.
@@ -432,12 +470,17 @@ $ seqspec init -n myassay -m rna -o spec.yaml -r rna,R1.fastq.gz,r1_primer,26,po
 $ seqspec init -n myassay -m rna,atac -o spec.yaml -r rna,rna_R1.fastq.gz,rna_r1_primer,26,pos:rna,rna_R2.fastq.gz,rna_r2_primer,100,neg:atac,atac_R1.fastq.gz,atac_r1_primer,100,pos:atac,atac_R2.fastq.gz,atac_r1_primer,16,neg:atac,atac_R3.fastq.gz,atac_r2_primer,100,neg "(((rna_r1_primer:0,barcode:16,umi:12,cdna:150,rna_r2_primer:0)rna),(barcode:16,atac_r1_primer:1,gdna:150,atac_r2_primer)atac)"
 ```
 
-## `seqsoec methods`: Convert seqspec file into methods section
+## `seqspec methods`: Convert seqspec file into methods section
 
 Generate a methods section from a seqspec file.
 
 ```bash
 seqspec methods [-h] -m MODALITY [-o OUT] yaml
+```
+
+```python
+from seqspec.seqspec_methods import run_methods
+run_methods(spec_fn: str, m: str, o: str)
 ```
 
 - optionally, `-o OUT` path to write the methods section.
@@ -477,6 +520,13 @@ The library was sequenced on a Illumina NovaSeq 6000 (EFO:0008637) using the Nov
 
 ```bash
 seqspec modify [-h] [--read-id READID] [--read-name READNAME] [--primer-id PRIMERID] [--strand STRAND] [--files FILES] [--region-id REGIONID] [--region-type REGIONTYPE] [--region-name REGIONNAME] [--sequence-type SEQUENCETYPE] [--sequence SEQUENCE] [--min-len MINLEN] [--max-len MAXLEN] [-o OUT] [-i IDs] [-s SELECTOR] -m MODALITY yaml
+```
+
+```python
+from seqspec.seqspec_modify import run_modify_read, run_modify_region
+
+run_modify_read(spec, modality, target_read, read_id, read_name, primer_id, min_len, max_len, strand, files)
+run_modify_region(spec, modality, target_region, region_id, region_type, name, sequence_type, sequence, min_len, max_len)
 ```
 
 Read modifications
@@ -529,6 +579,12 @@ $ seqspec modify -m atac -o mod_spec.yaml -i atac_R1 --files "R1_1.fastq.gz,fast
 seqspec onlist [-h] [-o OUT] [-s SELECTOR] [-f FORMAT] [-i IDs] -m MODALITY yaml
 ```
 
+```python
+from seqspec.seqspec_onlist import run_onlist
+
+run_onlist(spec_fn, modality, ids, idtype, fmt, o)
+```
+
 - optionally, `-o OUT` to set the path of the onlist file.
 - `-m MODALITY` is the modality in which you are searching for the region.
 - `-i ID` is the `id` of the object to search for the onlist.
@@ -561,6 +617,11 @@ Print sequence and/or library structure as ascii, png, or html.
 
 ```bash
 seqspec print [-h] [-o OUT] [-f FORMAT] yaml
+```
+
+```python
+from seqspec.seqspec_print import run_seqspec_print
+run_seqspec_print(spec_fn, fmt, o)
 ```
 
 - optionally, `-o OUT` to set the path of printed file.
@@ -651,6 +712,11 @@ $ seqspec print -o spec.png -f seqspec-png spec.yaml
 seqspec split [-h] -o OUT yaml
 ```
 
+```python
+from seqspec.seqspec_split import run_split
+run_split(spec_fn, o)
+```
+
 - optionally, `-o OUT` name prepended to split specs.
 - `yaml` corresponds to the `seqspec` file.
 
@@ -673,6 +739,11 @@ split.tag.yaml
 seqspec version [-h] [-o OUT] yaml
 ```
 
+```python
+from seqspec.seqspec_version import run_version
+run_version(spec_fn, o)
+```
+
 - optionally, `-o OUT` path to file to write output.
 - `yaml` corresponds to the `seqspec` file.
 
@@ -691,6 +762,11 @@ This is a hidden subcommand that upgrades an old version of the spec to the curr
 
 ```bash
 seqspec upgrade [-h] [-o OUT] yaml
+```
+
+```python
+from seqspec.seqspec_upgrade import run_upgrade
+run_upgrade(spec_fn, o)
 ```
 
 ### Examples
