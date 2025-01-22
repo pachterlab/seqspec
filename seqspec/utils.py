@@ -23,7 +23,7 @@ def load_spec(spec_fn: str):
         # Check if the file is gzipped by attempting to open it as such
         with gzip.open(spec_fn, "rt") as stream:
             return load_spec_stream(stream)
-    except OSError:
+    except gzip.BadGzipFile:
         # If opening as gzip fails, assume it's a regular YAML file
         with open(spec_fn, "r") as stream:
             return load_spec_stream(stream)
