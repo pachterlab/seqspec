@@ -40,7 +40,7 @@ def validate_check_args(parser, args):
 def run_check(spec_fn, o):
     spec = load_spec(spec_fn)
 
-    errors = check(spec)
+    errors = check(spec, spec_fn)
 
     if errors:
         if o:
@@ -51,7 +51,7 @@ def run_check(spec_fn, o):
     return errors
 
 
-def check(spec: Assay, spec_fn: str = None):
+def check(spec: Assay, spec_fn: str):
     schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
 
     with open(schema_fn, "r") as stream:
