@@ -13,8 +13,20 @@ from typing import Tuple, List
 
 
 def load_spec(spec_fn: str):
-    with open(spec_fn, "r") as stream:
-        return load_spec_stream(stream)
+    """
+    Reads a YAML file that may be gzipped or not.
+
+    :param spec_fn: Path to the YAML or gzipped YAML file.
+    :return: Parsed YAML content as a Assay object.
+    """
+    try:
+        # Check if the file is gzipped by attempting to open it as such
+        with gzip.open(spec_fn, "rt") as stream:
+            return load_spec_stream(stream)
+    except OSError:
+        # If opening as gzip fails, assume it's a regular YAML file
+        with open(spec_fn, "r") as stream:
+            return load_spec_stream(stream)
 
 
 def load_spec_stream(spec_stream: io.IOBase):
