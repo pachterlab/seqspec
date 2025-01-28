@@ -65,7 +65,7 @@ def check(spec: Assay, spec_fn: str, for_igvf=False):
         schema = yaml.load(stream, Loader=yaml.Loader)
     validator = Draft4Validator(schema)
     errors = []
-    idx = 1
+    idx = 0
 
     # with open("del.json", "w") as f:
     #     json.dump(spec.to_dict(), f, indent=4)
@@ -84,10 +84,10 @@ def check(spec: Assay, spec_fn: str, for_igvf=False):
                 continue
             if "['md5']" in error_path:
                 continue
+        idx += 1
         errors.append(
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
         )
-        idx += 1
     idx += 1
     # check that the modalities are unique
     if len(spec.modalities) != len(set(spec.modalities)):
