@@ -27,20 +27,27 @@ seqspec check spec.yaml
         type=str,
         default=None,
     )
+    subparser.add_argument(
+        "--for-igvf",
+        action="store_true",
+        help="Check for IGVF compatibility",
+        default=False,
+    )
     return subparser
 
 
 def validate_check_args(parser, args):
     spec_fn = args.yaml
     o = args.o
+    for_igvf = args.for_igvf
 
-    return run_check(spec_fn, o)
+    return run_check(spec_fn, o, for_igvf)
 
 
-def run_check(spec_fn, o):
+def run_check(spec_fn, o, for_igvf):
     spec = load_spec(spec_fn)
 
-    errors = check(spec, spec_fn)
+    errors = check(spec, spec_fn, for_igvf)
 
     if errors:
         if o:
@@ -51,22 +58,36 @@ def run_check(spec_fn, o):
     return errors
 
 
-def check(spec: Assay, spec_fn: str):
+def check(spec: Assay, spec_fn: str, for_igvf=False):
     schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
 
     with open(schema_fn, "r") as stream:
         schema = yaml.load(stream, Loader=yaml.Loader)
     validator = Draft4Validator(schema)
     errors = []
-    idx = 0
+    idx = 1
 
     # with open("del.json", "w") as f:
     #     json.dump(spec.to_dict(), f, indent=4)
 
-    for idx, error in enumerate(validator.iter_errors(spec.to_dict()), 1):
+    for error in validator.iter_errors(spec.to_dict()):
+        error_path = f"spec[{']['.join(repr(index) for index in error.path)}]"
+        # ignore errors that are not relevant to igvf pipeline run
+        if for_igvf:
+            if error_path in [
+                "spec['lib_struct']",
+                "spec['library_protocol']",
+                "spec['library_kit']",
+                "spec['sequence_protocol']",
+                "spec['sequence_kit']",
+            ]:
+                continue
+            if "['md5']" in error_path:
+                continue
         errors.append(
             f"[error {idx}] {error.message} in spec[{']['.join(repr(index) for index in error.path)}]"
         )
+        idx += 1
     idx += 1
     # check that the modalities are unique
     if len(spec.modalities) != len(set(spec.modalities)):
