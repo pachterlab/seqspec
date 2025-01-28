@@ -1,0 +1,198 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: 10x-ATAC-RNA-MULTI
+name: 10x-ATAC-RNA-MULTI/Illumina
+doi: https://doi.org/10.1038/s41592-019-0433-8
+date: 17 June 2019
+description: ansuman-satpathy:igvf_exp11_atac_10x4_NGS1 Single Cell Multiome ATAC
+modalities:
+- atac
+lib_struct: null
+library_protocol: single-nucleus ATAC-seq
+library_kit:
+  kit_id: 10x-ATAC-RNA-MULTI
+sequence_protocol: Illumina
+sequence_kit: NovaSeq X Series 10B Reagent
+sequence_spec:
+- !Read
+  read_id: IGVFFI1165AJSO
+  name: Read 1
+  modality: atac
+  primer_id: atac-nextera_read1
+  min_len: 50
+  max_len: 50
+  strand: pos
+  files:
+  - !File
+    file_id: IGVFFI1165AJSO
+    filename: IGVFFI1165AJSO.fastq.gz
+    filetype: ''
+    filesize: 4960657092
+    url: https://api.data.igvf.org/sequence-files/IGVFFI1165AJSO/@@download/IGVFFI1165AJSO.fastq.gz
+    urltype: https
+    md5: 1
+- !Read
+  read_id: IGVFFI2309FCAH
+  name: Index 1 (i7 index)
+  modality: atac
+  primer_id: atac-nextera_read2
+  min_len: 8
+  max_len: 8
+  strand: pos
+  files:
+  - !File
+    file_id: IGVFFI2309FCAH
+    filename: IGVFFI2309FCAH.fastq.gz
+    filetype: ''
+    filesize: 1176913287
+    url: https://api.data.igvf.org/sequence-files/IGVFFI2309FCAH/@@download/IGVFFI2309FCAH.fastq.gz
+    urltype: https
+    md5: 1f17b83b0c293ad74507cf0dde38a286
+- !Read
+  read_id: IGVFFI6229GGKZ
+  name: Read 2 (technically Index 2 (i5 index))
+  modality: atac
+  primer_id: atac-nextera_read1
+  min_len: 24
+  max_len: 24
+  strand: neg
+  files:
+  - !File
+    file_id: IGVFFI6229GGKZ
+    filename: IGVFFI6229GGKZ.fastq.gz
+    filetype: ''
+    filesize: 2696388379
+    url: https://api.data.igvf.org/sequence-files/IGVFFI6229GGKZ/@@download/IGVFFI6229GGKZ.fastq.gz
+    urltype: https
+    md5: bc9775c746941a760da73a6304c1b0bd
+- !Read
+  read_id: IGVFFI9141IFTT
+  name: Read 3 (technically Read 2)
+  modality: atac
+  primer_id: atac-nextera_read2
+  min_len: 50
+  max_len: 50
+  strand: neg
+  files:
+  - !File
+    file_id: IGVFFI9141IFTT
+    filename: IGVFFI9141IFTT.fastq.gz
+    filetype: ''
+    filesize: 4922922820
+    url: https://api.data.igvf.org/sequence-files/IGVFFI9141IFTT/@@download/IGVFFI9141IFTT.fastq.gz
+    urltype: https
+    md5: 0a8ee69e4918bb52664bbf4a3842c405
+library_spec:
+- !Region
+  parent_id: null
+  region_id: atac
+  region_type: atac
+  name: ATAC
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNCGCGTCTGTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 352
+  max_len: 352
+  onlist: null
+  regions:
+  - !Region
+    parent_id: atac
+    region_id: atac-illumina_p5
+    region_type: illumina_p5
+    name: Illumina P5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 50
+    max_len: 29
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: atac
+    region_id: atac-cell_barcode
+    region_type: barcode
+    name: R2 Cell Barcode
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNNNNNN
+    min_len: 16
+    max_len: 16
+    onlist: !Onlist
+      file_id: IGVFFI7587TJLC
+      filename: IGVFFI7587TJLC.tsv.gz
+      filetype: ''
+      filesize: 2465078
+      url: https://api.data.igvf.org/tabular-files/IGVFFI7587TJLC/@@download/IGVFFI7587TJLC.tsv.gz
+      urltype: https
+      md5: 91f5bd173373fa1815830444480236fb
+    regions: null
+  - !Region
+    parent_id: atac
+    region_id: atac-linker
+    region_type: linker
+    name: atac linker
+    sequence_type: fixed
+    sequence: CGCGTCTG
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: atac
+    region_id: atac-nextera_read1
+    region_type: nextera_read1
+    name: nextera_read1
+    sequence_type: fixed
+    sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: atac
+    region_id: gDNA
+    region_type: gdna
+    name: gDNA
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    min_len: 200
+    max_len: 200
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: atac
+    region_id: atac-nextera_read2
+    region_type: nextera_read2
+    name: nextera_read2
+    sequence_type: fixed
+    sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: null
+  - !Region
+    parent_id: atac
+    region_id: atac-index7
+    region_type: index7
+    name: ATAC index7
+    sequence_type: onlist
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: !Onlist
+      file_id: IGVFFI1608YDWY
+      filename: IGVFFI1608YDWY.csv.gz
+      filetype: ''
+      filesize: 1658
+      url: https://api.data.igvf.org/tabular-files/IGVFFI1608YDWY/@@download/IGVFFI1608YDWY.csv.gz
+      urltype: https
+      md5: 1
+    regions: null
+  - !Region
+    parent_id: atac
+    region_id: atac-illumina_p7
+    region_type: illumina_p7
+    name: Illumina P7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
