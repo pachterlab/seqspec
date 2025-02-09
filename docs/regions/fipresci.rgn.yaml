@@ -1,0 +1,76 @@
+- !Region
+  region_id: barcode
+  region_type: barcode
+  name: Barcode
+  sequence_type: onlist
+  sequence: NNNNNNNNNNNNNNNN
+  min_len: 16
+  max_len: 16
+  onlist: !Onlist
+    file_id: 737K-august-2016.txt.gz
+    filename: 737K-august-2016.txt.gz
+    filetype: txt
+    filesize: 2237432
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNA5PRIMEv2/737K-august-2016.txt.gz
+    urltype: http
+    md5: 8dc68aca20f45bd58cd3dc01603cb4a6
+    location: remote
+  regions: null
+- !Region
+  region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNNNN
+  min_len: 10
+  max_len: 10
+  onlist: null
+  regions: null
+- !Region
+  region_id: 10x5pTSO
+  region_type: 10x5pTSO
+  name: 10x 5 Prime Template Switching Oligo
+  sequence_type: fixed
+  sequence: TTTCTTATATGGG
+  min_len: 13
+  max_len: 13
+  onlist: null
+  regions: null
+- !Region
+  region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null
+- !Region
+  region_id: ME2
+  region_type: ME2
+  name: ME2
+  sequence_type: fixed
+  sequence: CTGTCTCTTATACACATCT
+  min_len: 19
+  max_len: 19
+  onlist: null
+  regions: null
+- !Region
+  region_id: tn5_barcode
+  region_type: barcode
+  name: Tn5_i7_Barcode
+  sequence_type: onlist
+  sequence: NNNNNN
+  min_len: 6
+  max_len: 6
+  onlist: !Onlist
+    file_id: tn5_i7.tsv.gz
+    filename: tn5_i7.tsv.gz
+    filetype: txt
+    filesize: 280
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/FIPRESCI/tn5_i7.tsv.gz
+    urltype: http
+    md5: 42d4897e6144dda3c5b4b2b22122da22
+    location: remote
+  regions: null

@@ -1,0 +1,30 @@
+- !Region
+  region_id: dropseq_barcode
+  region_type: barcode
+  name: Drop-seq Barcode
+  sequence_type: random
+  sequence: NNNNNNNNNNNN
+  min_len: 12
+  max_len: 12
+  onlist: null
+  regions: null
+- !Region
+  region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNN
+  min_len: 8
+  max_len: 8
+  onlist: null
+  regions: null
+- !Region
+  region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null
