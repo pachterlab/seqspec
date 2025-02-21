@@ -1,4 +1,7 @@
+from seqspec.Assay import Assay
 from seqspec.Region import Region
+from seqspec.Read import Read
+from seqspec.Read import File
 
 
 def print_seqspec_html(spec):
@@ -94,6 +97,7 @@ def atomicRegionTemplate(
       <li>onlist: {onlist}</li>
       <li> regions: {subseq}
       </li>
+    </ul>
   </details>
     """
     return s
@@ -116,21 +120,85 @@ def regionsTemplate(regions):
     return s
 
 
-def libStructTemplate(region):
+def libStructTemplate(spec, modality):
+    from seqspec.seqspec_print import libseq
+    from seqspec.Region import complement_sequence
+
+    libspec = spec.get_libspec(modality)
+    seqspec = spec.get_seqspec(modality)  # noqa
+    p, n = libseq(spec, modality)
+
+    cseq = colorSeq(libspec.get_leaves())
+    seq = "\n".join(
+        [
+            "\n".join(p),
+            cseq,
+            complement_sequence(libspec.sequence),
+            "\n".join(n),
+        ]
+    )
     s = f"""
-  <h6 style="text-align: center">{region.name}</h6>
+  <h6 style="text-align: center">{modality}</h6>
   <pre
     style="overflow-x: auto; text-align: left; background-color: #f6f8fa"
   >
-{colorSeq(region.get_leaves())}</pre>
+{seq}</pre>
     """
     return s
 
 
-def multiModalTemplate(library_spec):
-    s = "".join(
-        [libStructTemplate(v) + "\n" + regionsTemplate(v.regions) for v in library_spec]
-    )
+def atomicReadTemplate(read: Read):
+    files = "".join(atomicFileTemplate(f) for f in read.files) if read.files else ""
+
+    s = f"""
+      <details>
+        <summary>{read.name}</summary>
+        <ul>
+          <li>read_id: {read.read_id}</li>
+          <li>primer_id: {read.primer_id}</li>
+          <li>min_len: {read.min_len}</li>
+          <li>max_len: {read.max_len}</li>
+          <li>strand: {read.strand}</li>
+          <li>
+            files:
+            <ul>
+              {files}
+            </ul>
+          </li>
+        </ul>
+      </details>
+    """
+    return s
+
+
+def atomicFileTemplate(file: File):
+    s = f"""
+        <li>{file.filename} (md5: {file.md5})</li>
+    """
+    return s
+
+
+def readsTemplate(reads):
+    s = f"""<ol><li>
+    {'</li><li>'.join([atomicReadTemplate(r) for r in reads])}
+    </li></ol>"""
+    return s
+
+
+def multiModalTemplate(spec: Assay):
+    modes = spec.modalities
+    s = ""
+    for m in modes:
+        libspec = spec.get_libspec(m)
+        seqspec = spec.get_seqspec(m)
+
+        s += f"""
+          {libStructTemplate(spec, m)}
+          <h3>Sequence structure</h3>
+          {readsTemplate(seqspec)}
+          <h4>Library structure</h4>
+          {regionsTemplate(libspec.get_leaves())}
+        """
     return s
 
 
@@ -173,7 +241,7 @@ def htmlTemplate(spec):
         </div>
         <div id="library_spec">
           <h2>Final library</h2>
-          {multiModalTemplate(spec.library_spec)}
+          {multiModalTemplate(spec)}
         </div>
       </div>
     </body>

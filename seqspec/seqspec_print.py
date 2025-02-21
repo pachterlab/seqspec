@@ -71,7 +71,7 @@ def run_seqspec_print(spec_fn, fmt, o):
     s = CMD[fmt](spec)
 
     if fmt == "png":
-        return s.savefig(o, dpi=300, bbox_inches="tight")
+        return s.savefig(o, dpi=300, bbox_inches="tight")  #
 
     if o:
         with open(o, "w") as f:
@@ -84,8 +84,24 @@ def run_seqspec_print(spec_fn, fmt, o):
 def print_seqspec_ascii(spec):
     p = []
     for modality in spec.modalities:
-        p.append(libseq(spec, modality))
+        p.append(format_libseq(spec, modality, *libseq(spec, modality)))
     return "\n".join(p)
+
+
+def format_libseq(spec, modality, p, n):
+    libspec = spec.get_libspec(modality)
+
+    s = "\n".join(
+        [
+            modality,
+            "---",
+            "\n".join(p),
+            libspec.sequence,
+            complement_sequence(libspec.sequence),
+            "\n".join(n),
+        ]
+    )
+    return s
 
 
 def libseq(spec, modality):
@@ -118,18 +134,7 @@ def libseq(spec, modality):
             arrow = arrowl * "-"
 
             n.append(f"{ws}<{arrow}|({idx}) {read_id}")
-
-    s = "\n".join(
-        [
-            modality,
-            "---",
-            "\n".join(p),
-            libspec.sequence,
-            complement_sequence(libspec.sequence),
-            "\n".join(n),
-        ]
-    )
-    return s
+    return (p, n)
 
 
 def run_print(data):
