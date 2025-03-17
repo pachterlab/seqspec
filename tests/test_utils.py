@@ -39,10 +39,10 @@ sequencer: custom
 modalities:
 - rna
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.html
-library_protocol: custom 1
-library_kit: custom 2
-sequence_protocol: custom 3
-sequence_kit: custom 4
+library_protocol: "Custom"
+library_kit: "Custom"
+sequence_protocol: "Custom"
+sequence_kit: "Custom"
 sequence_spec:
 - !Read
   read_id: read1.fastq.gz
