@@ -51,8 +51,16 @@ sequence_spec:
   primer_id: SOLiD_P1_adapter
   min_len: 90
   max_len: 187
-  # this is a guess
   strand: pos
+  files:
+  - !File
+    file_id: read1
+    filename: read1.fastq.gz
+    filetype: fastq
+    filesize: 123456789
+    url: read1.fastq.gz
+    urltype: local
+    md5: 68b329da9893e34099c7d8ad5cb9c940
 - !Read
   read_id: read2.fastq.gz
   name: read2 for experiment
@@ -61,6 +69,15 @@ sequence_spec:
   min_len: 25
   max_len: 25
   strand: neg
+  files:
+  - !File
+    file_id: read2
+    filename: read2.fastq.gz
+    filetype: fastq
+    filesize: 123456789
+    url: read2.fastq.gz
+    urltype: local
+    md5: 68b329da9893e34099c7d8ad5cb9c940
 library_spec:
 - !Region
   region_id: rna
