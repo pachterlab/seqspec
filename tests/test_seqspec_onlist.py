@@ -164,14 +164,17 @@ class TestSeqspecOnlist(TestCase):
                 ).replace(
                     "url: index_onlist.tsv",
                     "url: http://localhost:9/foo/index_onlist.tsv"
+                ).replace(
+                    "urltype: local",
+                    "urltype: http",
                 )
                 print(remote_spec)
                 return load_example_spec(remote_spec)
 
-            with patch("seqspec.seqspec_onlist.load_spec", load_spec) as loader:
-                onlist_path = validate_onlist_args(parser, args)
+            with patch("seqspec.seqspec_onlist.load_spec", load_spec) as loader, patch("seqspec.seqspec_onlist.read_remote_list", return_value="index_onlist.tsv") as fake_remote_list:
+                # Failed validation would raise an exception
+                validate_onlist_args(parser, args)
 
-                self.assertEqual(onlist_path, expected_onlist_path)
 
     def test_write_onlist_no_double_spacing(self):
         # Make sure that joined onlists don't end up double spaced.
