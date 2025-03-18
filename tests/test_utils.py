@@ -28,8 +28,8 @@ from .test_region import (
     region_rna_linker_dict,
 )
 
-example_spec = f"""!Assay
-seqspec_version: { __version__ }
+example_spec = """!Assay
+seqspec_version: 0.3.0
 assay_id: test_assay
 name: my assay
 doi: https://doi.org/10.1038/nmeth.1315
