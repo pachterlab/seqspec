@@ -58,7 +58,7 @@ def read_rna_dict(read_id, min_len=0, max_len=100):
 
 class TestOnlist(TestCase):
     def test_simple_onlist(self):
-        name = "barcodes.txt"
+        filename = "barcodes.tsv"
         md5sum = "d41d8cd98f00b204e9800998ecf8427e"
         location = "local"
 
@@ -181,7 +181,7 @@ class TestRegion(TestCase):
         sequence_type = "stuff"
         sequence = "AACGTGAT"
 
-        list_name = "barcodes.txt"
+        list_name = "barcodes.tsv"
         list_md5sum = "d41d8cd98f00b204e9800998ecf8427e"
         list_location = "local"
 

@@ -49,22 +49,22 @@ class TestSeqspecOnlist(TestCase):
             self.assertEqual(len(regions), 1)
             region = regions[0]
             self.assertEqual(region.location, "local")
-            self.assertEqual(region.filename, "index_onlist.txt")
+            self.assertEqual(region.filename, "index_onlist.tsv")
             self.assertEqual(region.md5, "939cb244b4c43248fcc795bbe79599b0")
 
     def test_run_onlist_read(self):
-        with create_temporary_barcode_files(["index_onlist.txt"]):
+        with create_temporary_barcode_files(["index_onlist.tsv"]):
             spec = load_example_spec(example_spec)
             reads = run_onlist_read(spec, "rna", "read2.fastq.gz")
             self.assertEqual(len(reads), 1)
             read = reads[0]
             self.assertEqual(read.location, "local")
-            self.assertEqual(read.filename, "index_onlist.txt")
+            self.assertEqual(read.filename, "index_onlist.tsv")
             self.assertEqual(read.md5, "939cb244b4c43248fcc795bbe79599b0")
 
     def test_find_list_target_dir_local(self):
         with create_temporary_barcode_files(["index_onlist.txt"]) as tmpdir:
-            filename = os.path.join(tmpdir, "temp.txt")
+            filename = os.path.join(tmpdir, "temp.tsv")
 
             onlist1 = Onlist(filename, "d41d8cd98f00b204e9800998ecf8427e", "local")
 
@@ -124,7 +124,7 @@ class TestSeqspecOnlist(TestCase):
         self.assertEqual(joined[2], "- GGTT")
 
     def test_local_validate_onlist_args(self):
-        onlist_name = "index_onlist.txt"
+        onlist_name = "index_onlist.tsv"
         with create_temporary_barcode_files([onlist_name]) as tmpdir:
             expected_onlist_path = os.path.join(tmpdir, onlist_name)
             spec_path = os.path.join(tmpdir, "spec.yaml")
@@ -162,8 +162,8 @@ class TestSeqspecOnlist(TestCase):
                     "location: local",
                     "location: remote"
                 ).replace(
-                    "filename: index_onlist.txt",
-                    "filename: http://localhost:9/foo/index_onlist.txt"
+                    "url: index_onlist.tsv",
+                    "url: http://localhost:9/foo/index_onlist.tsv"
                 )
                 print(remote_spec)
                 return load_example_spec(remote_spec)

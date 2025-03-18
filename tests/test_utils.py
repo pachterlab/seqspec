@@ -114,7 +114,6 @@ library_spec:
     min_len: 6
     max_len: 6
     onlist: !Onlist
-      filename: index_onlist.txt
       md5: 939cb244b4c43248fcc795bbe79599b0
       location: local
     regions: null
