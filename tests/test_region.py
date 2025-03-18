@@ -52,6 +52,7 @@ def read_rna_dict(read_id, min_len=0, max_len=100):
         "min_len": min_len,
         "max_len": max_len,
         "strand": "pos",
+        "files": [],
     }
     return expected
 
