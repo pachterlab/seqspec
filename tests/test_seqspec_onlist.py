@@ -66,13 +66,13 @@ class TestSeqspecOnlist(TestCase):
         with create_temporary_barcode_files(["index_onlist.txt"]) as tmpdir:
             filename = os.path.join(tmpdir, "temp.tsv")
 
-            onlist1 = Onlist(filename, "d41d8cd98f00b204e9800998ecf8427e", "local")
+            onlist1 = Onlist("temp_id", filename, "tsv", 300, filename, "local", "d41d8cd98f00b204e9800998ecf8427e", "local")
 
             target_dir = find_list_target_dir([onlist1])
             self.assertEqual(target_dir, tmpdir)
 
     def test_find_list_target_dir_remote(self):
-        onlist1 = Onlist("http:localhost:9/temp.txt", "d41d8cd98f00b204e9800998ecf8427e", "remote")
+        onlist1 = Onlist("temp_id", "temp.tsv", "tsv", 300, "http://localhost:9/temp.tsv", "http", "d41d8cd98f00b204e9800998ecf8427e", "remote")
 
         target_dir = find_list_target_dir([onlist1])
         self.assertEqual(target_dir, os.getcwd())

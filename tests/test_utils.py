@@ -114,6 +114,12 @@ library_spec:
     min_len: 6
     max_len: 6
     onlist: !Onlist
+      file_id: onlist-1
+      filename: index_onlist.tsv
+      filetype: tsv
+      filesize: 300
+      url: index_onlist.tsv
+      urltype: local
       md5: 939cb244b4c43248fcc795bbe79599b0
       location: local
     regions: null
@@ -194,7 +200,7 @@ class TestUtils(TestCase):
             with gzip.open(temp_list_filename, "wt") as stream:
                 stream.write(fake_contents)
 
-            onlist1 = Onlist(temp_list_filename, fake_md5, "local")
+            onlist1 = Onlist("123", temp_list_filename, "tsv", 300, temp_list_filename, "local", fake_md5, "local")
             loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
@@ -209,7 +215,7 @@ class TestUtils(TestCase):
             with open(temp_list_filename, "wt") as stream:
                 stream.write(fake_contents)
 
-            onlist1 = Onlist(temp_list_filename, fake_md5, "local")
+            onlist1 = Onlist("123", temp_list_filename, "tsv", 300, temp_list_filename, "local", fake_md5, "local")
             loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
@@ -232,7 +238,8 @@ class TestUtils(TestCase):
             return response()
 
         with patch("requests.get", new=fake_request_get):
-            onlist1 = Onlist("http://localhost/testlist.txt", fake_md5, "remote")
+            url = "http://localhost/testlist.txt"
+            onlist1 = Onlist("123", "testlist.txt", "http", 300, url, "http", fake_md5, "remote")
             loaded_list = read_remote_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
