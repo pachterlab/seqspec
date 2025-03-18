@@ -239,6 +239,11 @@ class TestUtils(TestCase):
             self.assertEqual(fake_onlist, loaded_list)
 
     def test_get_igvf_auth(self):
+        # clean out the environment we inherited
+        for term in ["IGVF_SECRET_KEY", "IGVF_API_KEY"]:
+            if term in os.environ:
+                del os.environ[term]
+
         test_data = [
             (None, None, None),
             ("user", "pass", ("user", "pass")),
