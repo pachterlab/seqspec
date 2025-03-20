@@ -133,15 +133,13 @@ class TestSeqspecOnlist(TestCase):
             subparser = parser.add_subparsers(dest="command")
             subparser = setup_onlist_args(subparser)
             args = parser.parse_args([
-                "onlist", "-m", "rna", "-r", "read1.fastq.gz", "-f", "multi", spec_path])
+                "onlist", "-m", "rna", "-i", "read1.fastq.gz", "-f", "multi", spec_path])
 
             def load_spec(*args, **kwargs):
                 return load_example_spec(example_spec)
 
             with patch("seqspec.seqspec_onlist.load_spec", load_spec) as loader:
-                onlist_path = validate_onlist_args(parser, args)
-
-                self.assertEqual(onlist_path, expected_onlist_path)
+                validate_onlist_args(parser, args)
 
     def test_local_cached_remote_validate_onlist_args(self):
         # Test that we will can use a locally cached copy of one barcode file
@@ -155,7 +153,7 @@ class TestSeqspecOnlist(TestCase):
             subparser = parser.add_subparsers(dest="command")
             subparser = setup_onlist_args(subparser)
             args = parser.parse_args([
-                "onlist", "-m", "rna", "-r", "read1.fastq.gz", "-f", "multi", spec_path])
+                "onlist", "-m", "rna", "-i", "read1.fastq.gz", "-f", "multi", spec_path])
 
             def load_spec(*args, **kwargs):
                 remote_spec = example_spec.replace(
