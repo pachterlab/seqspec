@@ -1,5 +1,5 @@
 !Assay
-seqspec_version: 0.2.0
+seqspec_version: 0.3.0
 assay_id: SHARE-Seq
 name: SHARE-Seq
 doi: https://doi.org/10.1016/j.cell.2020.09.056
@@ -22,6 +22,15 @@ sequence_spec:
   min_len: 150
   max_len: 150
   strand: pos
+  files:
+  - !File
+    file_id: IGVFFI4653IBZO.fastq.gz
+    filename: IGVFFI4653IBZO.fastq.gz
+    filetype: fastq
+    filesize: 1372617129
+    url: https://api.data.igvf.org/sequence-files/IGVFFI4653IBZO/@@download/IGVFFI4653IBZO.fastq.gz
+    urltype: https
+    md5: 45969cc58c3e685c74815571d27a2b50    
 - !Read
   read_id: IGVFFI3278EOPV.fastq.gz
   name: Read 2
@@ -30,6 +39,15 @@ sequence_spec:
   min_len: 149
   max_len: 149
   strand: pos
+  files:
+  - !File
+    file_id: IGVFFI3278EOPV.fastq.gz
+    filename: IGVFFI3278EOPV.fastq.gz
+    filetype: fastq
+    filesize: 1140067655
+    url: https://api.data.igvf.org/sequence-files/IGVFFI3278EOPV/@@download/IGVFFI3278EOPV.fastq.gz
+    urltype: https
+    md5: 6d034ed99fb3319a6befe9c5cb550abb
 library_spec:
 - !Region
   region_id: atac
@@ -116,8 +134,13 @@ library_spec:
       min_len: 8
       max_len: 8
       onlist: !Onlist
-        filename: https://api.data.igvf.org/tabular-files/IGVFFI0400MBIM/@@download/IGVFFI0400MBIM.txt.gz
-        md5: 73c3fc43ddcf2c84e4731e33b1e1b5f5
+        file_id: IGVFFI0400MBIM.tsv.gz
+        filename: IGVFFI0400MBIM.tsv.gz
+        filetype: tsv
+        filesize: 668
+        url: https://api.data.igvf.org/tabular-files/IGVFFI0400MBIM/@@download/IGVFFI0400MBIM.tsv.gz
+        urltype: https
+        md5: fd324502471275874b08f2a0e9255082
         location: remote
       regions: null
       parent_id: atac-raw-cell-barcode
@@ -141,8 +164,13 @@ library_spec:
       min_len: 8
       max_len: 8
       onlist: !Onlist
-        filename: https://api.data.igvf.org/tabular-files/IGVFFI0400MBIM/@@download/IGVFFI0400MBIM.txt.gz
-        md5: 73c3fc43ddcf2c84e4731e33b1e1b5f5
+        file_id: IGVFFI0400MBIM.tsv.gz
+        filename: IGVFFI0400MBIM.tsv.gz
+        filetype: tsv
+        filesize: 668
+        url: https://api.data.igvf.org/tabular-files/IGVFFI0400MBIM/@@download/IGVFFI0400MBIM.tsv.gz
+        urltype: https
+        md5: fd324502471275874b08f2a0e9255082
         location: remote
       regions: null
       parent_id: atac-raw-cell-barcode
@@ -166,8 +194,13 @@ library_spec:
       min_len: 8
       max_len: 8
       onlist: !Onlist
-        filename: https://api.data.igvf.org/tabular-files/IGVFFI0400MBIM/@@download/IGVFFI0400MBIM.txt.gz
-        md5: 73c3fc43ddcf2c84e4731e33b1e1b5f5
+        file_id: IGVFFI0400MBIM.tsv.gz
+        filename: IGVFFI0400MBIM.tsv.gz
+        filetype: tsv
+        filesize: 668
+        url: https://api.data.igvf.org/tabular-files/IGVFFI0400MBIM/@@download/IGVFFI0400MBIM.tsv.gz
+        urltype: https
+        md5: fd324502471275874b08f2a0e9255082
         location: remote
       regions: null
       parent_id: atac-raw-cell-barcode
