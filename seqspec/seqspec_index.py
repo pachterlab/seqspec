@@ -210,7 +210,7 @@ def index(
     else:
         indices = GET_INDICES_BY_IDS[idtype](spec, modality, ids)
 
-    return FORMAT[fmt](indices, subregion_type)
+    return FORMAT[fmt](spec, indices, subregion_type)
 
 
 def get_index_by_files(spec, modality):
@@ -283,7 +283,7 @@ def get_index_by_primer(
     return {read_id: new_rcs, "strand": rdc.read.strand}
 
 
-def format_kallisto_bus(indices, subregion_type=None):
+def format_kallisto_bus(spec, indices, subregion_type=None):
     bcs = []
     umi = []
     feature = []
@@ -313,7 +313,7 @@ def format_kallisto_bus(indices, subregion_type=None):
 
 # this one should only return one string
 # TODO: return to this
-def format_seqkit_subseq(indices, subregion_type=None):
+def format_seqkit_subseq(spec, indices, subregion_type=None):
     # The x string format is start:stop (1-indexed)
     # x = ""
     # region = indices[0]
@@ -328,7 +328,7 @@ def format_seqkit_subseq(indices, subregion_type=None):
     return x
 
 
-def format_tab(indices, subregion_type=None):
+def format_tab(spec, indices, subregion_type=None):
     x = ""
     for idx, region in enumerate(indices):
         rg_strand = region.pop("strand")  # noqa
@@ -339,7 +339,7 @@ def format_tab(indices, subregion_type=None):
     return x[:-1]
 
 
-def format_starsolo(indices, subregion_type=None):
+def format_starsolo(spec, indices, subregion_type=None):
     bcs = []
     umi = []
     cdna = []
@@ -359,7 +359,7 @@ def format_starsolo(indices, subregion_type=None):
     return x
 
 
-def format_simpleaf(indices, subregion_type=None):
+def format_simpleaf(spec, indices, subregion_type=None):
     x = ""
     xl = []
     for idx, region in enumerate(indices):
@@ -379,7 +379,7 @@ def format_simpleaf(indices, subregion_type=None):
     return "".join(xl)
 
 
-def format_zumis(indices, subregion_type=None):
+def format_zumis(spec, indices, subregion_type=None):
     xl = []
     for idx, region in enumerate(indices):
         rg_strand = region.pop("strand")  # noqa
@@ -408,8 +408,8 @@ def stable_deduplicate_fqs(fqs):
     return deduplicated_fqs
 
 
-def format_chromap(indices, subregion_type=None):
     bc_fqs = []
+def format_chromap(spec, indices, subregion_type=None):
     bc_str = []
     gdna_fqs = []
     gdna_str = []
@@ -477,7 +477,7 @@ def filter_groupby_region_type(g, keep=["umi", "barcode", "cdna"]):
     return g
 
 
-def format_relative(indices, subregion_type=None):
+def format_relative(spec, indices, subregion_type=None):
     x = ""
     d = []
     for idx, region in enumerate(indices):
@@ -601,7 +601,7 @@ def format_splitcode_row(obj, rgncdiffs, idx=0, rev=False, complement=False):
     return {"region_type": obj.region_type, "fmt": e}
 
 
-def format_splitcode(indices, subregion_type=None):
+def format_splitcode(spec, indices, subregion_type=None):
     # extraction based on fixed sequences
     # extraction based on onlist sequences
     # umi - bc3 - link2 - bc2 - link1 - bc1 - read
