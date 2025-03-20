@@ -1,0 +1,217 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: Evercode-WT-v2-single-index
+name: Parse Evercode WT v2 using single illumina multiplex index
+doi: https://www.protocols.io/view/evercode-wt-mega-v2-2-1-8epv5xxrng1b/v1?step=21
+date: 08 November 2023
+description: split-pool ligation-based transcriptome sequencing
+modalities:
+- rna
+lib_struct: https://igvf.github.io/seqspec/
+library_protocol: single-nucleus RNA sequencing assay (OBI:0003109)
+library_kit: Evercode WT v2.0.1 single index
+sequence_protocol: Illumina NextSeq 2000 (EFO:0010963)
+sequence_kit: NextSeq 1000/2000 P3 Reagent Kit
+sequence_spec:
+- !Read
+  read_id: IGVFFI0800JAPD.fastq.gz
+  name: Read 1 fastq for IGVFFI0800JAPD
+  modality: rna
+  primer_id: truseq_read1
+  min_len: 140
+  max_len: 140
+  strand: pos
+  files:
+  - !File
+    file_id: IGVFFI0800JAPD
+    filename: IGVFFI0800JAPD.fastq.gz
+    filetype: fastq
+    filesize: 11645547818
+    url: https://api.data.igvf.org/sequence-files/IGVFFI0800JAPD/@@download/IGVFFI0800JAPD.fastq.gz
+    urltype: https
+    md5: 243fb7c21baeedd32453c2f6c395eb9c
+- !Read
+  read_id: IGVFFI5241MPKQ.fastq.gz
+  name: Read 2 fastq for IGVFFI5241MPKQ
+  modality: rna
+  primer_id: truseq_read2
+  min_len: 86
+  max_len: 86
+  strand: neg
+  files:
+  - !File
+    file_id: IGVFFI5241MPKQ
+    filename: IGVFFI5241MPKQ.fastq.gz
+    filetype: fastq
+    filesize: 6292907166
+    url: https://api.data.igvf.org/sequence-files/IGVFFI5241MPKQ/@@download/IGVFFI5241MPKQ.fastq.gz
+    urltype: https
+    md5: d9d9e5e4d4cfa4e8f954575dfb935a8d
+library_spec:
+- !Region
+  region_id: rna
+  region_type: named
+  name: rna
+  sequence_type: joined
+  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXNNNNNNNNATCCACGTGCTTGAGACTGTGGNNNNNNNNGTGGCCGATGTTTCGCATCGGCGTACGACTNNNNNNNNXXXXXXXXXXGTGACTGGAGTTCAGACGTGTGCTCTTCCGATCTXXXXXXXXATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 350
+  max_len: 350
+  onlist: null
+  parent_id: null
+  regions:
+  - !Region
+    region_id: illumina_p5
+    region_type: illumina_p5
+    name: Illumina P5
+    sequence_type: fixed
+    sequence: AATGATACGGCGACCACCGAGATCTACAC
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: truseq_read1
+    region_type: truseq_read1
+    name: Truseq Single Index Read 1
+    sequence_type: fixed
+    sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 29
+    max_len: 29
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: IGVFFI0800JAPD
+    region_type: cdna
+    name: Read 1 cDNA sequence
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    min_len: 140
+    max_len: 140
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: barcode-1
+    region_type: barcode
+    name: barcode-1
+    sequence_type: onlist
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: !Onlist
+      file_id: IGVFFI0924TKJO
+      filename: IGVFFI0924TKJO.tsv.gz
+      filetype: tsv
+      filesize: 339
+      location: remote
+      url: https://api.data.igvf.org/tabular-files/IGVFFI0924TKJO/@@download/IGVFFI0924TKJO.tsv.gz
+      urltype: https
+      md5: 6d5016e63f121b6a64fb3907dd83f358
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: linker-1
+    region_type: linker
+    name: linker-1
+    sequence_type: fixed
+    sequence: ATCCACGTGCTTGAGACTGTGG
+    min_len: 22
+    max_len: 22
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: barcode-2
+    region_type: barcode
+    name: barcode-2
+    sequence_type: onlist
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: !Onlist
+      file_id: IGVFFI1138MCVX
+      filename: IGVFFI1138MCVX.tsv.gz
+      filetype: tsv
+      filesize: 341
+      location: remote
+      url: https://api.data.igvf.org/tabular-files/IGVFFI1138MCVX/@@download/IGVFFI1138MCVX.tsv.gz
+      urltype: https
+      md5: 1452e8ef104e6edf686fab8956172072
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: linker-2
+    region_type: linker
+    name: linker-2
+    sequence_type: fixed
+    sequence: GTGGCCGATGTTTCGCATCGGCGTACGACT
+    min_len: 30
+    max_len: 30
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: barcode-3
+    region_type: barcode
+    name: barcode-3
+    sequence_type: onlist
+    sequence: NNNNNNNN
+    min_len: 8
+    max_len: 8
+    onlist: !Onlist
+      file_id: IGVFFI1138MCVX
+      filename: IGVFFI1138MCVX.tsv.gz
+      filetype: tsv
+      filesize: 341
+      location: remote
+      url: https://api.data.igvf.org/tabular-files/IGVFFI1138MCVX/@@download/IGVFFI1138MCVX.tsv.gz
+      urltype: https
+      md5: 1452e8ef104e6edf686fab8956172072
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: umi
+    region_type: umi
+    name: umi
+    sequence_type: random
+    sequence: XXXXXXXXXX
+    min_len: 10
+    max_len: 10
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: truseq_read2
+    region_type: truseq_read2
+    name: Truseq Read 2
+    sequence_type: fixed
+    sequence: GTGACTGGAGTTCAGACGTGTGCTCTTCCGATCT
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: index7
+    region_type: index7
+    name: Illumina barcode BC4
+    sequence_type: random
+    sequence: XXXXXXXX
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions: null
+    parent_id: rna
+  - !Region
+    region_id: illumina_p7
+    region_type: illumina_p7
+    name: Illumina P7
+    sequence_type: fixed
+    sequence: ATCTCGTATGCCGTCTTCTGCTTG
+    min_len: 24
+    max_len: 24
+    onlist: null
+    regions: null
+    parent_id: rna

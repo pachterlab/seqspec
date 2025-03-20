@@ -1,0 +1,174 @@
+!Assay
+seqspec_version: 0.2.0
+assay_id: SHARE-Seq
+name: SHARE-Seq
+doi: https://doi.org/10.1016/j.cell.2020.09.056
+date: 23 October 2020
+description: Simultaneous high-throughput atac and rna expression in the same single
+  cell
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SHARE-seq.html
+modalities:
+- atac
+library_protocol: Any
+library_kit: Illumina Truseq Dual Index
+sequence_protocol: Illumina NovaSeq 6000
+sequence_kit: NovaSeq 6000 v1.5
+sequence_spec:
+- !Read
+  read_id: IGVFFI4653IBZO
+  name: Read 1
+  modality: atac
+  primer_id: atac-truseq_read1
+  min_len: 150
+  max_len: 150
+  strand: pos
+- !Read
+  read_id: IGVFFI3278EOPV
+  name: Read 2
+  modality: atac
+  primer_id: atac-truseq_read2
+  min_len: 149
+  max_len: 149
+  strand: pos
+library_spec:
+- !Region
+  region_id: atac
+  region_type: atac
+  name: atac
+  sequence_type: joined
+  sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
+  min_len: 299
+  max_len: 299
+  onlist: null
+  regions:
+  - !Region
+    region_id: atac-truseq_read1
+    region_type: truseq_read1
+    name: Truseq Read 1
+    sequence_type: fixed
+    sequence: null
+    min_len: 0
+    max_len: 0
+    onlist: null
+    regions: null
+    parent_id: atac
+  - !Region
+    region_id: atac-gdna-1
+    region_type: gdna
+    name: Genomic DNA
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    min_len: 150
+    max_len: 150
+    onlist: null
+    regions: null
+    parent_id: atac
+  - !Region
+    region_id: atac-truseq_read2
+    region_type: truseq_read2
+    name: Truseq Read 2
+    sequence_type: fixed
+    sequence: null
+    min_len: 0
+    max_len: 0
+    onlist: null
+    regions: null
+    parent_id: atac
+  - !Region
+    region_id: atac-gdna-2
+    region_type: gdna
+    name: Genomic DNA
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    min_len: 50
+    max_len: 50
+    onlist: null
+    regions: null
+    parent_id: atac
+  - !Region
+    region_id: atac-raw-cell-barcode
+    region_type: named
+    name: atac Raw Cell Barcode
+    sequence_type: joined
+    sequence: TCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
+    min_len: 99
+    max_len: 99
+    onlist: null
+    parent_id: atac
+    regions:
+    - !Region
+      region_id: atac-linker1
+      region_type: linker
+      name: atac linker1
+      sequence_type: fixed
+      sequence: TCGGACGATCATGGG
+      min_len: 15
+      max_len: 15
+      onlist: null
+      regions: null
+      parent_id: atac-raw-cell-barcode
+    - !Region
+      region_id: atac-cell-barcode1
+      region_type: barcode
+      name: atac Cell Barcode 1
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: https://api.data.igvf.org/tabular-files/IGVFFI0400MBIM/@@download/IGVFFI0400MBIM.txt.gz
+        md5: 73c3fc43ddcf2c84e4731e33b1e1b5f5
+        location: remote
+      regions: null
+      parent_id: atac-raw-cell-barcode
+    - !Region
+      region_id: atac-linker2
+      region_type: linker
+      name: linker2
+      sequence_type: fixed
+      sequence: CAAGTATGCAGCGCGCTCAAGCACGTGGAT
+      min_len: 30
+      max_len: 30
+      onlist: null
+      regions: null
+      parent_id: atac-raw-cell-barcode
+    - !Region
+      region_id: atac-cell-barcode2
+      region_type: barcode
+      name: atac Cell Barcode 2
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: https://api.data.igvf.org/tabular-files/IGVFFI0400MBIM/@@download/IGVFFI0400MBIM.txt.gz
+        md5: 73c3fc43ddcf2c84e4731e33b1e1b5f5
+        location: remote
+      regions: null
+      parent_id: atac-raw-cell-barcode
+    - !Region
+      region_id: atac-linker3
+      region_type: linker
+      name: linker3
+      sequence_type: fixed
+      sequence: AGTCGTACGCCGATGCGAAACATCGGCCAC
+      min_len: 30
+      max_len: 30
+      onlist: null
+      regions: null
+      parent_id: atac-raw-cell-barcode
+    - !Region
+      region_id: atac-cell-barcode3
+      region_type: barcode
+      name: atac Cell Barcode 3
+      sequence_type: onlist
+      sequence: NNNNNNNN
+      min_len: 8
+      max_len: 8
+      onlist: !Onlist
+        filename: https://api.data.igvf.org/tabular-files/IGVFFI0400MBIM/@@download/IGVFFI0400MBIM.txt.gz
+        md5: 73c3fc43ddcf2c84e4731e33b1e1b5f5
+        location: remote
+      regions: null
+      parent_id: atac-raw-cell-barcode
+  parent_id: null
