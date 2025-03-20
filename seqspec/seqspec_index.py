@@ -171,7 +171,7 @@ def run_index(
     else:
         print(x)
 
-    return
+    return x
 
 
 def index(
