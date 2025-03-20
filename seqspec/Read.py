@@ -90,6 +90,11 @@ class Read(yaml.YAMLObject):
                     return self
         return None
 
+    def get_filenames(self):
+        """Returns the filenames attached to this Read object
+        """
+        return [getattr(f, "filename", None) for f in getattr(self, "files", [])]
+
 
 class ReadCoordinate:
     def __init__(self, read: Read, rcv: List[RegionCoordinate]) -> None:

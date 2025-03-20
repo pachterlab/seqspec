@@ -408,10 +408,10 @@ def stable_deduplicate_fqs(fqs):
     return deduplicated_fqs
 
 
-    bc_fqs = []
 def format_chromap(spec, indices, subregion_type=None):
+    bc_read_ids = []
     bc_str = []
-    gdna_fqs = []
+    gdna_read_ids = []
     gdna_str = []
     for idx, region in enumerate(indices):
         rg_strand = region.pop("strand")
@@ -419,21 +419,24 @@ def format_chromap(spec, indices, subregion_type=None):
         for rgn, cuts in region.items():
             for cut in cuts:
                 if cut.region_type.upper() == "BARCODE":
-                    bc_fqs.append(rgn)
+                    bc_read_ids.append(rgn)
                     bc_str.append(f"bc:{cut.start}:{cut.stop-1}{strand}")
                     pass
                 elif cut.region_type.upper() == "GDNA":
-                    gdna_fqs.append(rgn)
+                    gdna_read_ids.append(rgn)
                     gdna_str.append(f"{cut.start}:{cut.stop-1}")
-    if len(set(bc_fqs)) > 1:
+    if len(set(bc_read_ids)) > 1:
         raise Exception("chromap only supports barcodes from one fastq")
-    if len(set(gdna_fqs)) > 2:
+    if len(set(gdna_read_ids)) > 2:
         raise Exception("chromap only supports genomic dna from two fastqs")
 
-    barcode_fq = bc_fqs[0]
-    deduplicated_gdna_fqs = stable_deduplicate_fqs(gdna_fqs)
-    read1_fq = deduplicated_gdna_fqs[0]
-    read2_fq = deduplicated_gdna_fqs[1]
+    barcode_read = spec.get_read(bc_read_ids[0])
+    barcode_fq = ",".join(barcode_read.get_filenames())
+    deduplicated_gdna_read_ids = stable_deduplicate_fqs(gdna_read_ids)
+    read1_read = spec.get_read(deduplicated_gdna_read_ids[0])
+    read2_read = spec.get_read(deduplicated_gdna_read_ids[1])
+    read1_fq = ",".join(read1_read.get_filenames())
+    read2_fq = ",".join(read2_read.get_filenames())
     read_str = ",".join([f"r{idx}:{ele}" for idx, ele in enumerate(gdna_str, 1)])
     bc_str = ",".join(bc_str)
 
