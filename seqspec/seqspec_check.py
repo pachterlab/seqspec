@@ -68,27 +68,17 @@ def run_check(spec_fn, o, s):
     return errors
 
 
-IGVF_FILTERS = {
-    "check_schema": [
-        "'lib_struct'",
-        "'library_protocol'",
-        "'library_kit'",
-        "'sequence_protocol'",
-        "'sequence_kit'",
-        "'md5'",
-    ],
-}
-IGVF_ONLIST_SKIP_FILTERS = {
-    "check_schema": [
-        "'lib_struct'",
-        "'library_protocol'",
-        "'library_kit'",
-        "'sequence_protocol'",
-        "'sequence_kit'",
-        "'md5'",
-    ],
-    "check_onlist_files_exist": ["onlist"],
-}
+IGVF_FILTERS = [
+    {"error_type": "check_schema", "error_object": "'lib_struct'"},
+    {"error_type": "check_schema", "error_object": "'library_protocol'"},
+    {"error_type": "check_schema", "error_object": "'library_kit'"},
+    {"error_type": "check_schema", "error_object": "'sequence_protocol'"},
+    {"error_type": "check_schema", "error_object": "'sequence_kit'"},
+    {"error_type": "check_schema", "error_object": "'md5'"},
+]
+IGVF_ONLIST_SKIP_FILTERS = IGVF_FILTERS + [
+    {"error_type": "check_onlist_files_exist", "error_object": "onlist"}
+]
 
 
 def filter_errors(errors, filter_type):
@@ -97,14 +87,20 @@ def filter_errors(errors, filter_type):
         filters = IGVF_FILTERS
     elif filter_type == "igvf_onlist_skip":
         filters = IGVF_ONLIST_SKIP_FILTERS
+
     if filters:
         ferrors = []
-        for i in errors:
-            error_type = i["error_type"]
-            error_object = i["error_object"]
-            if error_type in filters and error_object in filters[error_type]:
-                continue
-            ferrors.append(i)
+        for error in errors:
+            # Check if this specific error combination exists in the filters
+            should_filter = any(
+                error["error_type"] == filter_item["error_type"]
+                and error["error_object"] == filter_item["error_object"]
+                for filter_item in filters
+            )
+
+            # Only keep errors that don't match our filter criteria
+            if not should_filter:
+                ferrors.append(error)
         return ferrors
     else:
         return errors
