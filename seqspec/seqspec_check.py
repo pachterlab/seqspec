@@ -32,7 +32,7 @@ seqspec check spec.yaml
         help=("Skip checks"),
         type=str,
         default=None,
-        choices=["igvf"],
+        choices=["igvf", "igvf_onlist_skip"],
     )
 
     subparser.add_argument("yaml", help="Sequencing specification yaml file", type=str)
@@ -54,6 +54,8 @@ def run_check(spec_fn, o, s):
     errors = check(spec, spec_fn)
     if s == "igvf":
         errors = filter_errors(errors, "igvf")
+    elif s == "igvf_onlist_skip":
+        errors = filter_errors(errors, "igvf_onlist_skip")
 
     if errors:
         if o:
@@ -67,23 +69,38 @@ def run_check(spec_fn, o, s):
 
 
 IGVF_FILTERS = [
-    {"error_type": "check_schema", "error_object": "lib_struct"},
-    {"error_type": "check_schema", "error_object": "library_protocol"},
-    {"error_type": "check_schema", "error_object": "library_kit"},
-    {"error_type": "check_schema", "error_object": "sequence_protocol"},
-    {"error_type": "check_schema", "error_object": "sequence_kit"},
-    {"error_type": "check_schema", "error_object": "md5"},
+    {"error_type": "check_schema", "error_object": "'lib_struct'"},
+    {"error_type": "check_schema", "error_object": "'library_protocol'"},
+    {"error_type": "check_schema", "error_object": "'library_kit'"},
+    {"error_type": "check_schema", "error_object": "'sequence_protocol'"},
+    {"error_type": "check_schema", "error_object": "'sequence_kit'"},
+    {"error_type": "check_schema", "error_object": "'md5'"},
+]
+IGVF_ONLIST_SKIP_FILTERS = IGVF_FILTERS + [
+    {"error_type": "check_onlist_files_exist", "error_object": "onlist"}
 ]
 
 
 def filter_errors(errors, filter_type):
+    filters = None
     if filter_type == "igvf":
-        et = set([i["error_type"] for i in IGVF_FILTERS])
-        eo = set([i["error_object"] for i in IGVF_FILTERS])
+        filters = IGVF_FILTERS
+    elif filter_type == "igvf_onlist_skip":
+        filters = IGVF_ONLIST_SKIP_FILTERS
+
+    if filters:
         ferrors = []
-        for i in errors:
-            if i["error_type"] not in et and i["error_object"] not in eo:
-                ferrors.append(i)
+        for error in errors:
+            # Check if this specific error combination exists in the filters
+            should_filter = any(
+                error["error_type"] == filter_item["error_type"]
+                and error["error_object"] == filter_item["error_object"]
+                for filter_item in filters
+            )
+
+            # Only keep errors that don't match our filter criteria
+            if not should_filter:
+                ferrors.append(error)
         return ferrors
     else:
         return errors
