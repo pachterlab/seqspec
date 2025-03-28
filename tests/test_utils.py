@@ -28,8 +28,8 @@ from .test_region import (
     region_rna_linker_dict,
 )
 
-example_spec = f"""!Assay
-seqspec_version: { __version__ }
+example_spec = """!Assay
+seqspec_version: 0.3.0
 assay_id: test_assay
 name: my assay
 doi: https://doi.org/10.1038/nmeth.1315
@@ -39,10 +39,10 @@ sequencer: custom
 modalities:
 - rna
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.html
-library_protocol: custom 1
-library_kit: custom 2
-sequence_protocol: custom 3
-sequence_kit: custom 4
+library_protocol: "Custom"
+library_kit: "Custom"
+sequence_protocol: "Custom"
+sequence_kit: "Custom"
 sequence_spec:
 - !Read
   read_id: read1.fastq.gz
@@ -51,8 +51,16 @@ sequence_spec:
   primer_id: SOLiD_P1_adapter
   min_len: 90
   max_len: 187
-  # this is a guess
   strand: pos
+  files:
+  - !File
+    file_id: read1
+    filename: read1.fastq.gz
+    filetype: fastq
+    filesize: 123456789
+    url: read1.fastq.gz
+    urltype: local
+    md5: 68b329da9893e34099c7d8ad5cb9c940
 - !Read
   read_id: read2.fastq.gz
   name: read2 for experiment
@@ -61,6 +69,15 @@ sequence_spec:
   min_len: 25
   max_len: 25
   strand: neg
+  files:
+  - !File
+    file_id: read2
+    filename: read2.fastq.gz
+    filetype: fastq
+    filesize: 123456789
+    url: read2.fastq.gz
+    urltype: local
+    md5: 68b329da9893e34099c7d8ad5cb9c940
 library_spec:
 - !Region
   region_id: rna
@@ -114,7 +131,12 @@ library_spec:
     min_len: 6
     max_len: 6
     onlist: !Onlist
-      filename: index_onlist.txt
+      file_id: onlist-1
+      filename: index_onlist.tsv
+      filetype: tsv
+      filesize: 300
+      url: index_onlist.tsv
+      urltype: local
       md5: 939cb244b4c43248fcc795bbe79599b0
       location: local
     regions: null
@@ -195,7 +217,7 @@ class TestUtils(TestCase):
             with gzip.open(temp_list_filename, "wt") as stream:
                 stream.write(fake_contents)
 
-            onlist1 = Onlist(temp_list_filename, fake_md5, "local")
+            onlist1 = Onlist("123", temp_list_filename, "tsv", 300, temp_list_filename, "local", fake_md5, "local")
             loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
@@ -210,7 +232,7 @@ class TestUtils(TestCase):
             with open(temp_list_filename, "wt") as stream:
                 stream.write(fake_contents)
 
-            onlist1 = Onlist(temp_list_filename, fake_md5, "local")
+            onlist1 = Onlist("123", temp_list_filename, "tsv", 300, temp_list_filename, "local", fake_md5, "local")
             loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
@@ -233,12 +255,18 @@ class TestUtils(TestCase):
             return response()
 
         with patch("requests.get", new=fake_request_get):
-            onlist1 = Onlist("http://localhost/testlist.txt", fake_md5, "remote")
+            url = "http://localhost/testlist.txt"
+            onlist1 = Onlist("123", "testlist.txt", "http", 300, url, "http", fake_md5, "remote")
             loaded_list = read_remote_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
 
     def test_get_igvf_auth(self):
+        # clean out the environment we inherited
+        for term in ["IGVF_SECRET_KEY", "IGVF_API_KEY"]:
+            if term in os.environ:
+                del os.environ[term]
+
         test_data = [
             (None, None, None),
             ("user", "pass", ("user", "pass")),

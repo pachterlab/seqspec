@@ -32,24 +32,13 @@ class Read(yaml.YAMLObject):
         self.files = files
 
     def __repr__(self) -> str:
-        d = {
-            "read_id": self.read_id,
-            "name": self.name,
-            "modality": self.modality,
-            "primer_id": self.primer_id,
-            "min_len": self.min_len,
-            "max_len": self.max_len,
-            "strand": self.strand,
-            "files": self.files,
-        }
+        d = self.to_dict()
         return f"{d}"
 
     def to_dict(self):
         # TODO is this necessary for backwards compatibility?
-        if self.files:
-            files = [i.to_dict() for i in self.files]
-        else:
-            files = []
+        files = getattr(self, "files", [])
+        files = [i.to_dict() for i in files]
         d = {
             "read_id": self.read_id,
             "name": self.name,

@@ -201,9 +201,10 @@ def plot_png(assay, modalities, modes, nmodes, lengths):
     plt.rcParams.update({"font.size": fsize})
 
     fig, ax = plt.subplots(
-        figsize=(10, 1 * nmodes), nrows=nmodes, constrained_layout=True
+        figsize=(10, 1 * nmodes), nrows=nmodes
     )
-    fig.suptitle(assay)
+    title_offset = 0.98 if nmodes > 1 else 1.2
+    fig.suptitle(assay, y=title_offset)
     rts = []
     for m, ax in zip(modes, fig.get_axes()):
         # get leaves
@@ -245,7 +246,7 @@ def plot_png(assay, modalities, modes, nmodes, lengths):
         ax.autoscale()
 
         # since all axes use the same scale, set the xlim to be 0 to the max length
-        ax.set(**{"xlim": (0, max(lengths))})
+        ax.set(**{"xlim": (0, max(lengths)), "ylim": (0, 1)})
 
         # hide the spines
         for spine in ["right", "top", "left", "bottom"]:

@@ -24,26 +24,18 @@ class File(yaml.YAMLObject):
         self.md5 = md5
 
     def __repr__(self) -> str:
-        d = {
-            "file_id": self.file_id,
-            "filename": self.filename,
-            "filetype": self.filetype,
-            "filesize": self.filesize,
-            "url": self.url,
-            "urltype": self.urltype,
-            "md5": self.md5,
-        }
+        d = self.to_dict()
         return f"{d}"
 
     def to_dict(self):
         d = {
-            "file_id": self.file_id,
-            "filename": self.filename,
-            "filetype": self.filetype,
-            "filesize": self.filesize,
-            "url": self.url,
-            "urltype": self.urltype,
-            "md5": self.md5,
+            "file_id": getattr(self, "file_id", None),
+            "filename": getattr(self, "filename", None),
+            "filetype": getattr(self, "filetype", None),
+            "filesize": getattr(self, "filesize", None),
+            "url": getattr(self, "url", None),
+            "urltype": getattr(self, "urltype", None),
+            "md5": getattr(self, "md5", None),
         }
         return d
 

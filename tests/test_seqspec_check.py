@@ -49,4 +49,4 @@ class TestSeqspecCheck(TestCase):
             with patch("os.path.exists") as path_exists:
                 path_exists.return_value = True
                 errors = validate_check_args(None, args)
-                self.assertEqual(errors, None)
+                self.assertEqual(errors, [])

@@ -52,21 +52,37 @@ def read_rna_dict(read_id, min_len=0, max_len=100):
         "min_len": min_len,
         "max_len": max_len,
         "strand": "pos",
+        "files": [],
     }
     return expected
 
 
 class TestOnlist(TestCase):
     def test_simple_onlist(self):
-        name = "barcodes.txt"
+        file_id = "123"
+        filename = "barcodes.tsv"
+        filetype = "tsv"
+        filesize = 300
+        url = filename
+        urltype = "file"
         md5sum = "d41d8cd98f00b204e9800998ecf8427e"
         location = "local"
 
-        permit = Onlist(name, md5sum, location)
+        permit = Onlist(
+            file_id, filename, filetype, filesize, url, "file", md5sum, location
+        )
 
         self.assertEqual(
             permit.to_dict(),
-            {"filename": name, "md5": md5sum, "location": location},
+            {
+                "file_id": file_id,
+                "filename": filename,
+                "filetype": filetype,
+                "filesize": filesize,
+                "url": url,
+                "urltype": urltype,
+                "md5": md5sum,
+            },
         )
 
 
@@ -181,11 +197,16 @@ class TestRegion(TestCase):
         sequence_type = "stuff"
         sequence = "AACGTGAT"
 
-        list_name = "barcodes.txt"
+        list_id = "123"
+        list_name = "barcodes.tsv"
+        list_type = "tsv"
+        list_size = 300
+        list_url = list_name
+        list_urltype = "file"
         list_md5sum = "d41d8cd98f00b204e9800998ecf8427e"
         list_location = "local"
 
-        permited = Onlist(list_name, list_md5sum, list_location)
+        permited = Onlist(list_id, list_name, list_type, list_size, list_url, list_urltype, list_md5sum, list_location)
 
         r = Region(
             region_name,
@@ -202,8 +223,12 @@ class TestRegion(TestCase):
             "name": region_name,
             "sequence_type": sequence_type,
             "onlist": {
+                "file_id": list_id,
                 "filename": list_name,
-                "location": list_location,
+                "filetype": list_type,
+                "filesize": list_size,
+                "url": list_name,
+                "urltype": list_urltype,
                 "md5": list_md5sum,
             },
             "sequence": sequence,

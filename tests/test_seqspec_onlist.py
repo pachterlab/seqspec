@@ -49,30 +49,30 @@ class TestSeqspecOnlist(TestCase):
             self.assertEqual(len(regions), 1)
             region = regions[0]
             self.assertEqual(region.location, "local")
-            self.assertEqual(region.filename, "index_onlist.txt")
+            self.assertEqual(region.filename, "index_onlist.tsv")
             self.assertEqual(region.md5, "939cb244b4c43248fcc795bbe79599b0")
 
     def test_run_onlist_read(self):
-        with create_temporary_barcode_files(["index_onlist.txt"]):
+        with create_temporary_barcode_files(["index_onlist.tsv"]):
             spec = load_example_spec(example_spec)
             reads = run_onlist_read(spec, "rna", "read2.fastq.gz")
             self.assertEqual(len(reads), 1)
             read = reads[0]
             self.assertEqual(read.location, "local")
-            self.assertEqual(read.filename, "index_onlist.txt")
+            self.assertEqual(read.filename, "index_onlist.tsv")
             self.assertEqual(read.md5, "939cb244b4c43248fcc795bbe79599b0")
 
     def test_find_list_target_dir_local(self):
         with create_temporary_barcode_files(["index_onlist.txt"]) as tmpdir:
-            filename = os.path.join(tmpdir, "temp.txt")
+            filename = os.path.join(tmpdir, "temp.tsv")
 
-            onlist1 = Onlist(filename, "d41d8cd98f00b204e9800998ecf8427e", "local")
+            onlist1 = Onlist("temp_id", filename, "tsv", 300, filename, "local", "d41d8cd98f00b204e9800998ecf8427e", "local")
 
             target_dir = find_list_target_dir([onlist1])
             self.assertEqual(target_dir, tmpdir)
 
     def test_find_list_target_dir_remote(self):
-        onlist1 = Onlist("http:localhost:9/temp.txt", "d41d8cd98f00b204e9800998ecf8427e", "remote")
+        onlist1 = Onlist("temp_id", "temp.tsv", "tsv", 300, "http://localhost:9/temp.tsv", "http", "d41d8cd98f00b204e9800998ecf8427e", "remote")
 
         target_dir = find_list_target_dir([onlist1])
         self.assertEqual(target_dir, os.getcwd())
@@ -124,7 +124,7 @@ class TestSeqspecOnlist(TestCase):
         self.assertEqual(joined[2], "- GGTT")
 
     def test_local_validate_onlist_args(self):
-        onlist_name = "index_onlist.txt"
+        onlist_name = "index_onlist.tsv"
         with create_temporary_barcode_files([onlist_name]) as tmpdir:
             expected_onlist_path = os.path.join(tmpdir, onlist_name)
             spec_path = os.path.join(tmpdir, "spec.yaml")
@@ -133,15 +133,13 @@ class TestSeqspecOnlist(TestCase):
             subparser = parser.add_subparsers(dest="command")
             subparser = setup_onlist_args(subparser)
             args = parser.parse_args([
-                "onlist", "-m", "rna", "-r", "read1.fastq.gz", "-f", "multi", spec_path])
+                "onlist", "-m", "rna", "-i", "read1.fastq.gz", "-f", "multi", spec_path])
 
             def load_spec(*args, **kwargs):
                 return load_example_spec(example_spec)
 
             with patch("seqspec.seqspec_onlist.load_spec", load_spec) as loader:
-                onlist_path = validate_onlist_args(parser, args)
-
-                self.assertEqual(onlist_path, expected_onlist_path)
+                validate_onlist_args(parser, args)
 
     def test_local_cached_remote_validate_onlist_args(self):
         # Test that we will can use a locally cached copy of one barcode file
@@ -155,23 +153,26 @@ class TestSeqspecOnlist(TestCase):
             subparser = parser.add_subparsers(dest="command")
             subparser = setup_onlist_args(subparser)
             args = parser.parse_args([
-                "onlist", "-m", "rna", "-r", "read1.fastq.gz", "-f", "multi", spec_path])
+                "onlist", "-m", "rna", "-i", "read1.fastq.gz", "-f", "multi", spec_path])
 
             def load_spec(*args, **kwargs):
                 remote_spec = example_spec.replace(
                     "location: local",
                     "location: remote"
                 ).replace(
-                    "filename: index_onlist.txt",
-                    "filename: http://localhost:9/foo/index_onlist.txt"
+                    "url: index_onlist.tsv",
+                    "url: http://localhost:9/foo/index_onlist.tsv"
+                ).replace(
+                    "urltype: local",
+                    "urltype: http",
                 )
                 print(remote_spec)
                 return load_example_spec(remote_spec)
 
-            with patch("seqspec.seqspec_onlist.load_spec", load_spec) as loader:
-                onlist_path = validate_onlist_args(parser, args)
+            with patch("seqspec.seqspec_onlist.load_spec", load_spec) as loader, patch("seqspec.seqspec_onlist.read_remote_list", return_value="index_onlist.tsv") as fake_remote_list:
+                # Failed validation would raise an exception
+                validate_onlist_args(parser, args)
 
-                self.assertEqual(onlist_path, expected_onlist_path)
 
     def test_write_onlist_no_double_spacing(self):
         # Make sure that joined onlists don't end up double spaced.
