@@ -2,6 +2,7 @@ from seqspec.utils import load_spec
 from seqspec.File import File
 from seqspec.Region import Onlist
 from argparse import RawTextHelpFormatter
+from seqspec import get_version
 
 
 def setup_upgrade_args(parser):
@@ -53,14 +54,14 @@ def upgrade(spec, version):
         "0.1.0": upgrade_0_1_0_to_0_3_0,
         "0.1.1": upgrade_0_1_1_to_0_3_0,
         "0.2.0": upgrade_0_2_0_to_0_3_0,
-        "0.3.0": upgrade_0_3_0_to_0_3_0,
+        get_version(): no_upgrade,
     }
 
     u = UPGRADE[version](spec)
     return u
 
 
-def upgrade_0_3_0_to_0_3_0(spec):
+def no_upgrade(spec):
     return spec
 
 
@@ -100,7 +101,7 @@ def upgrade_0_2_0_to_0_3_0(spec):
                     md5=md5,
                     location=location,
                 )
-    spec.seqspec_version = "0.3.0"
+    spec.seqspec_version = get_version()
     return spec
 
 

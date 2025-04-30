@@ -124,6 +124,9 @@ def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
     }
 
     onlists = CMD[idtype](spec, modality, ids)
+    print("idtype:", idtype)
+    print("modality:", modality)
+    print("ids:", ids)
 
     if len(onlists) == 0:
         raise ValueError(f"No onlist found for {modality}, {idtype}, {ids}")
@@ -162,6 +165,7 @@ def run_onlist_region_type(
     spec: Assay, modality: str, region_type: str
 ) -> List[Onlist]:
     regions = find_by_region_type(spec, modality, region_type)
+    print("regions:", regions)
     onlists: List[Onlist] = []
     for r in regions:
         ol = r.get_onlist()
@@ -182,15 +186,27 @@ def run_onlist_region(spec: Assay, modality: str, region_id: str) -> List[Onlist
 
 def run_onlist_read(spec: Assay, modality: str, read_id: str) -> List[Onlist]:
     (read, rgns) = map_read_id_to_regions(spec, modality, read_id)
+    print("read:", read)
+    print()
+    print("rgns:", rgns)
+    print()
     # convert regions to region coordinates
     rcs = project_regions_to_coordinates(rgns)
+    print("rcs:", rcs)
+    print()
     # intersect read with region coordinates
     new_rcs = itx_read(rcs, 0, read.max_len)
+    print("new_rcs:", new_rcs)
+    print("reads mex len:", read.max_len)
+    print()
 
     onlists: List[Onlist] = []
     for r in new_rcs:
         ol = r.get_onlist()
         if ol:
+            print("region:", r)
+            print("onlist:", ol)
+            print()
             onlists.append(ol)
 
     return onlists
