@@ -4,6 +4,7 @@ from os import path
 from seqspec.utils import load_spec, file_exists
 from seqspec.Assay import Assay
 from argparse import RawTextHelpFormatter
+from seqspec import get_version
 
 
 def setup_check_args(parser):
@@ -79,6 +80,7 @@ IGVF_FILTERS = [
 IGVF_ONLIST_SKIP_FILTERS = IGVF_FILTERS + [
     {"error_type": "check_onlist_files_exist", "error_object": "onlist"}
 ]
+
 
 def filter_errors(errors, filter_type):
     filters = None
@@ -200,7 +202,7 @@ def check(spec: Assay, spec_fn: str):
                         idx += 1
             elif ol.urltype == "http" or ol.urltype == "https" or ol.urltype == "ftp":
                 # ping the link with a simple http request to check if the file exists at that URI
-                if spec.seqspec_version == "0.3.0":
+                if spec.seqspec_version == get_version():
                     if not file_exists(ol.url):
                         errobj = {
                             "error_type": "check_onlist_files_exist",

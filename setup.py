@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+import seqspec
 
 
 def read(path):
@@ -10,7 +11,7 @@ long_description = read("README.md")
 
 setup(
     name="seqspec",
-    version="0.3.1",
+    version=seqspec.get_version(),
     url="https://github.com/sbooeshaghi/seqspec",
     author="Sina Booeshaghi",
     author_email="abooesha@caltech.edu",
