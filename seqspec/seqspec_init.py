@@ -1,18 +1,24 @@
+"""Init module for seqspec CLI.
+
+This module provides functionality to generate new seqspec files from a newick tree format.
+"""
+from pathlib import Path
+from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
+from typing import List
+
+import newick
 from seqspec.Assay import Assay
 from seqspec.Region import Region
 from seqspec.File import File
 from seqspec.Read import Read
-from typing import List
-import newick
-from argparse import RawTextHelpFormatter
 
 # example
-
-
-# seqspec init -n myassay -m 1 -o spec.yaml "(((barcode:16,umi:12)r1.fastq.gz,(cdna:150)r2.fastq.gz)rna)"
-# seqspec init -n myassay -m 1 -o spec.yaml -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg" "((truseq_r1:10,barcode:16,umi:12,cdna:150)rna)"
+# seqspec init -n myassay -m 1 -o spec.yaml "(((barcode:16,umi:12)r1.fastq.gz,(cdna:150)r2.fastq.gz)rna)" # seqspec init -n myassay -m 1 -o spec.yaml -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg" " ((truseq_r1:10,barcode:16,umi:12,cdna:150)rna)"
 # seqspec init -n myassay -m 2 -o spec.yaml "(((barcode:16,umi:12)r1.fastq.gz,(cdna:150)r2.fastq.gz)rna,((barcode:16)r1.fastq.gz,(gdna:150)r2.fastq.gz,(gdna:150)r3.fastq.gz)atac)"
-def setup_init_args(parser):
+
+
+def setup_init_args(parser) -> ArgumentParser:
+    """Create and configure the init command subparser."""
     subparser = parser.add_parser(
         "init",
         description="""
@@ -27,85 +33,92 @@ seqspec init -o spec.yaml -n myassay -m rna -r rna,R1.fastq.gz,r1_primer,16,pos:
     )
     subparser_required = subparser.add_argument_group("required arguments")
     subparser_required.add_argument(
-        "-n", metavar="NAME", type=str, help="assay name", required=True
+        "-n", "--name", metavar="NAME", type=str, help="Assay name", required=True
     )
-    # -m "rna,atac"
     subparser_required.add_argument(
         "-m",
+        "--modalities",
         metavar="MODALITIES",
         type=str,
-        help="list of comma-separated modalities (e.g. rna,atac)",
+        help="List of comma-separated modalities (e.g. rna,atac)",
         required=True,
     )
 
     # -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg"
     subparser_required.add_argument(
         "-r",
+        "--reads",
         metavar="READS",
         type=str,
-        help="list of modalities, reads, primer_ids, lengths, and strand (e.g. modality,fastq_name,primer_id,len,strand:...)",
+        help="List of modalities, reads, primer_ids, lengths, and strand (e.g. modality,fastq_name,primer_id,len,strand:...)",
         required=True,
     )
 
     subparser.add_argument(
         "-o",
+        "--output",
         metavar="OUT",
-        help=("Path to output file"),
-        type=str,
+        help="Path to output file",
+        type=Path,
         default=None,
     )
     subparser.add_argument(
         "newick",
-        help=(
-            "tree in newick format (https://marvin.cs.uidaho.edu/Teaching/CS515/newickFormat.html)"
-        ),
+        help="Tree in newick format (https://marvin.cs.uidaho.edu/Teaching/CS515/newickFormat.html)",
     )
     return subparser
 
 
-def validate_init_args(parser, args):
-    name = args.n
-    modalities_str = args.m
-    newick_str = args.newick
-    o = args.o
-    reads_str = args.r
+def validate_init_args(parser: ArgumentParser, args: Namespace) -> None:
+    """Validate the init command arguments."""
+    if not args.newick:
+        parser.error("Newick tree must be provided")
 
-    if newick_str is None:
-        parser.error("modality-FASTQs pairs must be provided")
-
-    return run_init(name, modalities_str, newick_str, reads_str, o)
+    if args.output and args.output.exists() and not args.output.is_file():
+        parser.error(f"Output path exists but is not a file: {args.output}")
 
 
-def run_init(name: str, modalities_str, newick_str, reads_str, o=None):
-    modalities = modalities_str.split(",")
-    reads = parse_reads_string(reads_str)
-    tree = newick.loads(newick_str)
+def run_init(parser: ArgumentParser, args: Namespace) -> None:
+    """Run the init command."""
+    validate_init_args(parser, args)
+
+    modalities = args.modalities.split(",")
+    reads = parse_reads_string(args.reads)
+    tree = newick.loads(args.newick)
+
     if len(tree[0].descendants) != len(modalities):
         raise ValueError(
             "Number of modalities must match number of modality-FASTQs pairs"
         )
 
-    reads = parse_reads_string(reads_str)
-    spec = init(name, modalities, tree[0].descendants, reads)
+    spec = init(args.name, modalities, tree[0].descendants, reads)
 
-    if o:
-        spec.to_YAML(o)
+    if args.output:
+        spec.to_YAML(args.output)
     else:
         print(spec.to_YAML())
 
-    return
 
+def init(
+    name: str, modalities: List[str], tree: List[newick.Node], reads: List[Read]
+) -> Assay:
+    """Initialize a new seqspec specification.
 
-def init(name: str, modalities, tree: List[newick.Node], reads: List[Read]):
-    # make read for each fastq
-    # make region for each modality
-    # add modality regions to assay
-    rgns = []
-    for t in tree:
-        r = Region(region_id="", region_type="", name="", sequence_type="")
-        rgns.append(newick_to_region(t, r))
+    Args:
+        name: Name of the assay.
+        modalities: List of modalities.
+        tree: Newick tree nodes.
+        reads: List of read specifications.
 
-    assay = Assay(
+    Returns:
+        Initialized Assay object.
+    """
+    regions = []
+    for node in tree:
+        region = Region(region_id="", region_type="", name="", sequence_type="")
+        regions.append(newick_to_region(node, region))
+
+    return Assay(
         assay_id="",
         name=name,
         doi="",
@@ -118,59 +131,79 @@ def init(name: str, modalities, tree: List[newick.Node], reads: List[Read]):
         sequence_kit="",
         sequence_protocol="",
         sequence_spec=reads,
-        library_spec=rgns,
+        library_spec=regions,
     )
-    return assay
 
 
-def newick_to_region(
-    node, region=Region(region_id="", region_type="", name="", sequence_type="")
-):
+def newick_to_region(node: newick.Node, region: Region) -> Region:
+    """Convert a newick node to a Region object.
+
+    Args:
+        node: Newick tree node.
+        region: Base region object to populate.
+
+    Returns:
+        Populated Region object.
+    """
     region.region_id = node.name
     region.name = node.name
 
-    if len(node.descendants) == 0:
+    if not node.descendants:
         region.min_len = int(node.length)
         region.max_len = int(node.length)
         return region
+
     region.regions = []
-    for n in node.descendants:
+    for descendant in node.descendants:
         region.regions.append(
             newick_to_region(
-                n,
-                Region(region_id=n.name, region_type="", name=n.name, sequence_type=""),
+                descendant,
+                Region(
+                    region_id=descendant.name,
+                    region_type="",
+                    name=descendant.name,
+                    sequence_type="",
+                ),
             )
         )
     return region
 
 
-def parse_reads_string(input_string):
-    reads = []
-    objects = input_string.split(":")
-    for obj in objects:
-        parts = obj.split(",")
-        modality, read_id, primer_id, min_len, strand = parts
+def parse_reads_string(input_string: str) -> List[Read]:
+    """Parse a string of read specifications into Read objects.
 
-        read = Read(
-            read_id=read_id,
-            name=read_id,
-            modality=modality,
-            primer_id=primer_id,
-            min_len=int(min_len),
-            max_len=int(min_len),
-            strand=strand,
-            files=[
-                File(
-                    file_id=read_id,
-                    filename=read_id,
-                    filetype="",
-                    filesize=0,
-                    url="",
-                    urltype="",
-                    md5="",
-                )
-            ],
+    Args:
+        input_string: String containing read specifications in format
+            "modality,read_id,primer_id,min_len,strand:..."
+
+    Returns:
+        List of Read objects.
+    """
+    reads = []
+    for obj in input_string.split(":"):
+        modality, read_id, primer_id, min_len, strand = obj.split(",")
+
+        reads.append(
+            Read(
+                read_id=read_id,
+                name=read_id,
+                modality=modality,
+                primer_id=primer_id,
+                min_len=int(min_len),
+                max_len=int(min_len),
+                strand=strand,
+                files=[
+                    File(
+                        file_id=read_id,
+                        filename=read_id,
+                        filetype="",
+                        filesize=0,
+                        url="",
+                        urltype="",
+                        md5="",
+                    )
+                ],
+            )
         )
-        reads.append(read)
 
     return reads

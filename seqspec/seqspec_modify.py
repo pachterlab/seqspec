@@ -1,12 +1,19 @@
-from seqspec.utils import load_spec
-from seqspec.File import File
-from argparse import RawTextHelpFormatter, SUPPRESS
+"""Modify module for seqspec.
+
+This module provides functionality to modify attributes of various elements in seqspec files.
+"""
+from pathlib import Path
+from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
+from typing import List, Optional
 import warnings
 
+from seqspec.utils import load_spec
+from seqspec.File import File
+from seqspec.Assay import Assay
 
-# TODO fix modify to use the -s selector
-def setup_modify_args(parser):
-    # given a spec, a region id and a list of key value property pairs, modify the spec
+
+def setup_modify_args(parser) -> ArgumentParser:
+    """Create and configure the modify command subparser."""
     subparser = parser.add_parser(
         "modify",
         description="""
@@ -22,34 +29,34 @@ seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --files "R1_1.fastq.gz,fastq,0,
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
-    subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=str)
 
     # Read properties
     subparser.add_argument(
         "--read-id",
         metavar="READID",
-        help=("New ID of read"),
+        help="New ID of read",
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--read-name",
         metavar="READNAME",
-        help=("New name of read"),
+        help="New name of read",
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--primer-id",
         metavar="PRIMERID",
-        help=("New ID of primer"),
+        help="New ID of primer",
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--strand",
         metavar="STRAND",
-        help=("New strand"),
+        help="New strand",
         type=str,
         default=None,
     )
@@ -59,45 +66,44 @@ seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --files "R1_1.fastq.gz,fastq,0,
     subparser.add_argument(
         "--files",
         metavar="FILES",
-        help=("New files, (filename,filetype,filesize,url,urltype,md5:...)"),
+        help="New files, (filename,filetype,filesize,url,urltype,md5:...)",
         type=str,
         default=None,
     )
 
     # Region properties
-
     subparser.add_argument(
         "--region-id",
         metavar="REGIONID",
-        help=("New ID of region"),
+        help="New ID of region",
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--region-type",
         metavar="REGIONTYPE",
-        help=("New type of region"),
+        help="New type of region",
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--region-name",
         metavar="REGIONNAME",
-        help=("New name of region"),
+        help="New name of region",
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--sequence-type",
         metavar="SEQUENCETYPE",
-        help=("New type of sequence"),
+        help="New type of sequence",
         type=str,
         default=None,
     )
     subparser.add_argument(
         "--sequence",
         metavar="SEQUENCE",
-        help=("New sequence"),
+        help="New sequence",
         type=str,
         default=None,
     )
@@ -106,25 +112,25 @@ seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --files "R1_1.fastq.gz,fastq,0,
     subparser.add_argument(
         "--min-len",
         metavar="MINLEN",
-        help=("Min region length"),
+        help="Min region length",
         type=int,
         default=None,
     )
     subparser.add_argument(
         "--max-len",
         metavar="MAXLEN",
-        help=("Max region length"),
+        help="Max region length",
         type=int,
         default=None,
     )
 
     subparser.add_argument(
         "-o",
+        "--output",
         metavar="OUT",
-        help=("Path to output file"),
-        type=str,
+        help="Path to output file",
+        type=Path,
         default=None,
-        required=False,
     )
     subparser_required.add_argument(
         "-r",
@@ -132,38 +138,38 @@ seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --files "R1_1.fastq.gz,fastq,0,
         help=SUPPRESS,
         type=str,
         default=None,
-        required=False,
     )
     subparser_required.add_argument(
         "-i",
         metavar="IDs",
-        help=("IDs"),
+        help="IDs",
         type=str,
         default=None,
-        required=False,
     )
     choices = ["read", "region"]
     subparser.add_argument(
         "-s",
+        "--selector",
         metavar="SELECTOR",
-        help=(f"Selector for ID, [{', '.join(choices)}] (default: read)"),
+        help=f"Selector for ID, [{', '.join(choices)}] (default: read)",
         type=str,
         default="read",
         choices=choices,
     )
     subparser_required.add_argument(
         "-m",
+        "--modality",
         metavar="MODALITY",
-        help=("Modality of the assay"),
+        help="Modality of the assay",
         type=str,
-        default=None,
         required=True,
     )
 
     return subparser
 
 
-def validate_modify_args(parser, args):
+def validate_modify_args(parser: ArgumentParser, args: Namespace) -> None:
+    """Validate the modify command arguments."""
     if args.r is not None:
         warnings.warn(
             "The '-r' argument is deprecated and will be removed in a future version. "
@@ -174,103 +180,99 @@ def validate_modify_args(parser, args):
         if not args.i:
             args.i = args.r
 
-    # if everything is valid the run_format
-    fn = args.yaml
-    o = args.o
-    modality = args.m
-    # target_r = args.r
-    idtype = args.s  # selector
-    ids = args.i
+    if not Path(args.yaml).exists():
+        parser.error(f"Input file does not exist: {args.yaml}")
+
+    if args.output and args.output.exists() and not args.output.is_file():
+        parser.error(f"Output path exists but is not a file: {args.output}")
+
+
+def run_modify(parser: ArgumentParser, args: Namespace) -> None:
+    """Run the modify command."""
+    validate_modify_args(parser, args)
+
+    spec = load_spec(args.yaml)
 
     # Read properties
-    read_id = args.read_id
-    read_name = args.read_name
-    primer_id = args.primer_id
-    strand = args.strand
-    files = args.files
+    read_kwd = {
+        "read_id": args.read_id,
+        "read_name": args.read_name,
+        "primer_id": args.primer_id,
+        "min_len": args.min_len,
+        "max_len": args.max_len,
+        "strand": args.strand,
+        "files": args.files,
+    }
 
     # Region properties
-    region_id = args.region_id
-    region_type = args.region_type
-    region_name = args.region_name
-    sequence_type = args.sequence_type
-    sequence = args.sequence
-
-    # Read and Region properties
-    min_len = args.min_len
-    max_len = args.max_len
-
-    spec = load_spec(fn)
-
-    read_kwd = {
-        "read_id": read_id,
-        "read_name": read_name,
-        "primer_id": primer_id,
-        "min_len": min_len,
-        "max_len": max_len,
-        "strand": strand,
-        "files": files,
-    }
-
     region_kwd = {
-        "region_id": region_id,
-        "region_type": region_type,
-        "name": region_name,
-        "sequence_type": sequence_type,
-        "sequence": sequence,
-        "min_len": min_len,
-        "max_len": max_len,
+        "region_id": args.region_id,
+        "region_type": args.region_type,
+        "name": args.region_name,
+        "sequence_type": args.sequence_type,
+        "sequence": args.sequence,
+        "min_len": args.min_len,
+        "max_len": args.max_len,
     }
 
-    if idtype == "region":
-        spec = run_modify_region(spec, modality, ids, **region_kwd)
-    elif idtype == "read":
-        spec = run_modify_read(spec, modality, ids, **read_kwd)
-    # update region in spec
-    # once the region is updated, update the spec
+    if args.selector == "region":
+        spec = run_modify_region(spec, args.modality, args.i, **region_kwd)
+    elif args.selector == "read":
+        spec = run_modify_read(spec, args.modality, args.i, **read_kwd)
+
+    # Update spec
     spec.update_spec()
-    if o:
-        spec.to_YAML(o)
+
+    if args.output:
+        args.output.write_text(spec.to_YAML())
     else:
         print(spec.to_YAML())
 
 
 def run_modify_read(
-    spec,
-    modality,
-    target_read,
-    read_id,
-    read_name,
-    primer_id,
-    min_len,
-    max_len,
-    strand,
-    files,
-):
+    spec: Assay,
+    modality: str,
+    target_read: str,
+    read_id: Optional[str] = None,
+    read_name: Optional[str] = None,
+    primer_id: Optional[str] = None,
+    min_len: Optional[int] = None,
+    max_len: Optional[int] = None,
+    strand: Optional[str] = None,
+    files: Optional[str] = None,
+) -> Assay:
+    """Modify read properties in spec."""
     reads = spec.get_seqspec(modality)
     if files:
-        files = parse_files_string(files)
+        files_list = parse_files_string(files)
     for r in reads:
         if r.read_id == target_read:
             r.update_read_by_id(
-                read_id, read_name, modality, primer_id, min_len, max_len, strand, files
+                read_id,
+                read_name,
+                modality,
+                primer_id,
+                min_len,
+                max_len,
+                strand,
+                files_list,
             )
-
     return spec
 
 
 def run_modify_region(
-    spec,
-    modality,
-    target_region,
-    region_id,
-    region_type,
-    name,
-    sequence_type,
-    sequence,
-    min_len,
-    max_len,
-):
+    spec: Assay,
+    modality: str,
+    target_region: str,
+    region_id: Optional[str] = None,
+    region_type: Optional[str] = None,
+    name: Optional[str] = None,
+    sequence_type: Optional[str] = None,
+    sequence: Optional[str] = None,
+    min_len: Optional[int] = None,
+    max_len: Optional[int] = None,
+) -> Assay:
+    """Modify region properties in spec."""
     spec.get_libspec(modality).update_region_by_id(
         target_region,
         region_id,
@@ -281,27 +283,23 @@ def run_modify_region(
         min_len,
         max_len,
     )
-
     return spec
 
 
-# filename,filetype,filesize,url,urltype,md5:...
-def parse_files_string(input_string):
+def parse_files_string(input_string: str) -> List[File]:
+    """Parse files string into list of File objects. # filename,filetype,filesize,url,urltype,md5:..."""
     files = []
-    objects = input_string.split(":")
-    for obj in objects:
-        parts = obj.split(",")
-        filename, filetype, filesize, url, urltype, md5 = parts
-
-        file = File(
-            file_id=filename,
-            filename=filename,
-            filetype=filetype,
-            filesize=int(filesize),
-            url=url,
-            urltype=urltype,
-            md5=md5,
+    for f in input_string.split(":"):
+        filename, filetype, filesize, url, urltype, md5 = f.split(",")
+        files.append(
+            File(
+                file_id=filename,
+                filename=filename,
+                filetype=filetype,
+                filesize=int(filesize),
+                url=url,
+                urltype=urltype,
+                md5=md5,
+            )
         )
-        files.append(file)
-
     return files

@@ -1,13 +1,23 @@
+"""Find module for seqspec CLI.
+
+This module provides functionality to search for objects within seqspec files.
+"""
+from pathlib import Path
+from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
+import warnings
+import yaml
+from typing import List
+
 from seqspec.utils import load_spec
 from seqspec.Assay import Assay
-import yaml
-import argparse
-import warnings
-from argparse import RawTextHelpFormatter
-from seqspec.seqspec_file import list_files
+from seqspec.Read import Read
+from seqspec.Region import Region
+from seqspec.File import File
+from seqspec.seqspec_file import list_all_files
 
 
-def setup_find_args(parser):
+def setup_find_args(parser) -> ArgumentParser:
+    """Create and configure the find command subparser."""
     subparser = parser.add_parser(
         "find",
         description="""
@@ -24,45 +34,48 @@ seqspec find -m rna -s file -i r1.fastq.gz spec.yaml    # Find files with id r1.
     )
     subparser_required = subparser.add_argument_group("required arguments")
 
-    subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
     subparser.add_argument(
         "-o",
+        "--output",
         metavar="OUT",
-        help=("Path to output file"),
-        type=str,
+        help="Path to output file",
+        type=Path,
         default=None,
     )
     # depracate
-    subparser.add_argument("--rtype", help=argparse.SUPPRESS, action="store_true")
+    subparser.add_argument("--rtype", help=SUPPRESS, action="store_true")
     choices = ["read", "region", "file", "region-type"]
     subparser.add_argument(
         "-s",
-        metavar="Selector",
-        help=(f"Selector, [{','.join(choices)}] (default: region)"),
+        "--selector",
+        metavar="SELECTOR",
+        help=f"Selector, [{','.join(choices)}] (default: region)",
         type=str,
         default="region",
         choices=choices,
     )
     subparser_required.add_argument(
         "-m",
+        "--modality",
         metavar="MODALITY",
-        help=("Modality"),
+        help="Modality",
         type=str,
-        default=None,
         required=True,
     )
     # depracate -r
     subparser_required.add_argument(
         "-r",
         metavar="REGION",
-        help=argparse.SUPPRESS,
+        help=SUPPRESS,
         type=str,
         default=None,
     )
     subparser_required.add_argument(
         "-i",
-        metavar="IDs",
-        help=("IDs"),
+        "--id",
+        metavar="ID",
+        help="ID to search for",
         type=str,
         default=None,
         required=False,
@@ -71,8 +84,14 @@ seqspec find -m rna -s file -i r1.fastq.gz spec.yaml    # Find files with id r1.
     return subparser
 
 
-def validate_find_args(parser, args):
-    # IDs
+def validate_find_args(parser: ArgumentParser, args: Namespace) -> None:
+    """Validate the find command arguments."""
+    if not Path(args.yaml).exists():
+        parser.error(f"Input file does not exist: {args.yaml}")
+
+    if args.output and Path(args.output).exists() and not Path(args.output).is_file():
+        parser.error(f"Output path exists but is not a file: {args.output}")
+
     if args.r is not None:
         warnings.warn(
             "The '-r' argument is deprecated and will be removed in a future version. "
@@ -80,45 +99,47 @@ def validate_find_args(parser, args):
             DeprecationWarning,
         )
         # Optionally map the old option to the new one
-        if not args.i:
-            args.i = args.r
-
-    fn = args.yaml
-    m = args.m
-    o = args.o
-    idtype = args.s  # selector
-    ids = args.i
-
-    # run function
-    return run_find(fn, m, ids, idtype, o)
+        if not args.id:
+            args.id = args.r
 
 
-def run_find(spec_fn: str, modality: str, id: str, idtype: str, o: str):
-    spec = load_spec(spec_fn)
+def run_find(parser: ArgumentParser, args: Namespace) -> None:
+    """Run the find command."""
+    validate_find_args(parser, args)
+
+    spec = load_spec(args.yaml)
     found = []
-    if idtype == "region-type":
-        found = find_by_region_type(spec, modality, id)
-    elif idtype == "region":
-        found = find_by_region_id(spec, modality, id)
-    elif idtype == "read":
-        found = find_by_read_id(spec, modality, id)
-    elif idtype == "file":
-        found = find_by_file_id(spec, modality, id)
+
+    if args.selector == "region-type":
+        found = find_by_region_type(spec, args.modality, args.id)
+    elif args.selector == "region":
+        found = find_by_region_id(spec, args.modality, args.id)
+    elif args.selector == "read":
+        found = find_by_read_id(spec, args.modality, args.id)
+    elif args.selector == "file":
+        found = find_by_file_id(spec, args.modality, args.id)
     else:
-        raise ValueError(f"Unknown idtype: {idtype}")
+        raise ValueError(f"Unknown selector: {args.selector}")
 
     # post processing
-    if o:
-        with open(o, "w") as f:
+    if args.output:
+        with open(args.output, "w") as f:
             yaml.dump(found, f, sort_keys=False)
     else:
         print(yaml.dump(found, sort_keys=False))
 
-    return
 
+def find_by_read_id(spec: Assay, modality: str, id: str) -> List[Read]:
+    """Find reads by their ID.
 
-# TODO implement
-def find_by_read_id(spec: Assay, modality: str, id: str):
+    Args:
+        spec: The seqspec specification.
+        modality: The modality to search in.
+        id: The read ID to search for.
+
+    Returns:
+        A list of Read objects matching the ID.
+    """
     rds = []
     reads = spec.get_seqspec(modality)
     for r in reads:
@@ -127,10 +148,19 @@ def find_by_read_id(spec: Assay, modality: str, id: str):
     return rds
 
 
-# TODO implement
-def find_by_file_id(spec: Assay, modality: str, id: str):
+def find_by_file_id(spec: Assay, modality: str, id: str) -> List[File]:
+    """Find files by their ID.
+
+    Args:
+        spec: The seqspec specification.
+        modality: The modality to search in.
+        id: The file ID to search for.
+
+    Returns:
+        A list of File objects matching the ID.
+    """
     files = []
-    lf = list_files(spec, modality)
+    lf = list_all_files(spec, modality)
     for k, v in lf.items():
         for f in v:
             if f.file_id == id:
@@ -138,13 +168,33 @@ def find_by_file_id(spec: Assay, modality: str, id: str):
     return files
 
 
-def find_by_region_id(spec: Assay, modality: str, id: str):
+def find_by_region_id(spec: Assay, modality: str, id: str) -> List[Region]:
+    """Find regions by their ID.
+
+    Args:
+        spec: The seqspec specification.
+        modality: The modality to search in.
+        id: The region ID to search for.
+
+    Returns:
+        A list of Region objects matching the ID.
+    """
     m = spec.get_libspec(modality)
     regions = m.get_region_by_id(id)
     return regions
 
 
-def find_by_region_type(spec: Assay, modality: str, id: str):
+def find_by_region_type(spec: Assay, modality: str, id: str) -> List[Region]:
+    """Find regions by their type.
+
+    Args:
+        spec: The seqspec specification.
+        modality: The modality to search in.
+        id: The region type to search for.
+
+    Returns:
+        A list of Region objects matching the type.
+    """
     m = spec.get_libspec(modality)
     regions = m.get_region_by_region_type(id)
     return regions

@@ -1,19 +1,27 @@
+"""Index module for seqspec CLI.
+
+This module provides functionality to identify the position of elements in a spec for use in downstream tools.
+"""
+from pathlib import Path
+from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
+import warnings
+from typing import List, Optional
+
 from seqspec.utils import load_spec, map_read_id_to_regions
 from seqspec.seqspec_find import find_by_region_id
-import warnings
 from seqspec.seqspec_file import list_files_by_file_id, list_read_files
-from argparse import SUPPRESS, RawTextHelpFormatter
-from seqspec.Region import complement_sequence
-from seqspec.Region import RegionCoordinateDifference
-
 from seqspec.Region import (
+    complement_sequence,
+    RegionCoordinateDifference,
     project_regions_to_coordinates,
     itx_read,
 )
 from seqspec.Read import ReadCoordinate
+from seqspec.Assay import Assay
 
 
-def setup_index_args(parser):
+def setup_index_args(parser) -> ArgumentParser:
+    """Create and configure the index command subparser."""
     subparser = parser.add_parser(
         "index",
         description="""
@@ -30,12 +38,13 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
-    subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
     subparser.add_argument(
         "-o",
+        "--output",
         metavar="OUT",
-        help=("Path to output file"),
-        type=str,
+        help="Path to output file",
+        type=Path,
         default=None,
     )
 
@@ -50,6 +59,7 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
     choices = [
         "chromap",
         "kb",
+        "kb-single",
         "relative",
         "seqkit",
         "simpleaf",
@@ -60,8 +70,9 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
     ]
     subparser.add_argument(
         "-t",
+        "--tool",
         metavar="TOOL",
-        help=(f"Tool, [{', '.join(choices)}] (default: tab)"),
+        help=f"Tool, [{', '.join(choices)}] (default: tab)",
         default="tab",
         type=str,
         choices=choices,
@@ -70,8 +81,9 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
     choices = ["read", "region", "file"]
     subparser.add_argument(
         "-s",
+        "--selector",
         metavar="SELECTOR",
-        help=(f"Selector for ID, [{', '.join(choices)}] (default: read)"),
+        help=f"Selector for ID, [{', '.join(choices)}] (default: read)",
         type=str,
         default="read",
         choices=choices,
@@ -90,16 +102,17 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
 
     subparser_required.add_argument(
         "-m",
+        "--modality",
         metavar="MODALITY",
-        help=("Modality"),
+        help="Modality",
         type=str,
-        default=None,
         required=True,
     )
     subparser_required.add_argument(
         "-i",
+        "--ids",
         metavar="IDs",
-        help=("IDs"),
+        help="IDs",
         type=str,
         default=None,
         required=False,
@@ -114,7 +127,8 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
     return subparser
 
 
-def validate_index_args(parser, args):
+def validate_index_args(parser: ArgumentParser, args: Namespace) -> None:
+    """Validate the index command arguments."""
     if args.r is not None:
         warnings.warn(
             "The '-r' argument is deprecated and will be removed in a future version. "
@@ -122,8 +136,8 @@ def validate_index_args(parser, args):
             DeprecationWarning,
         )
         # Optionally map the old option to the new one
-        if not args.i:
-            args.i = args.r
+        if not args.ids:
+            args.ids = args.r
     if args.region:
         warnings.warn(
             "The '--region' argument is deprecated and will be removed in a future version. "
@@ -131,61 +145,67 @@ def validate_index_args(parser, args):
             DeprecationWarning,
         )
 
-    fn = args.yaml
-    m = args.m
-    ids = args.i  # this can be a list of ids (reads, regions, or files)
-    t = args.t
-    o = args.o
-    subregion_type = args.subregion_type
-    rev = args.rev
-    idtype = args.s
+    if not Path(args.yaml).exists():
+        parser.error(f"Input file does not exist: {args.yaml}")
 
-    if ids is None and (idtype == "read" or idtype == "region"):
+    if args.output and Path(args.output).exists() and not Path(args.output).is_file():
+        parser.error(f"Output path exists but is not a file: {args.output}")
+
+    if args.ids is None and (args.selector == "read" or args.selector == "region"):
         parser.error("Must specify ids with -i for -s read or -s region")
 
-    return run_index(fn, m, ids, idtype, t, rev, subregion_type, o=o)
 
+def run_index(parser: ArgumentParser, args: Namespace) -> None:
+    """Run the index command."""
+    validate_index_args(parser, args)
 
-def run_index(
-    spec_fn,
-    modality,
-    ids,
-    idtype,
-    fmt,
-    rev,
-    subregion_type,
-    o,
-):
-    spec = load_spec(spec_fn)
-    if ids is None:
-        ids = []
+    spec = load_spec(args.yaml)
+    ids = args.ids.split(",") if args.ids else []
+
+    result = index(
+        spec,
+        args.modality,
+        ids,
+        args.selector,
+        args.tool,
+        args.rev,
+        args.subregion_type,
+    )
+
+    if args.output:
+        with open(args.output, "w") as f:
+            print(result, file=f)
     else:
-        ids = ids.split(",")
-
-    x = index(spec, modality, ids, idtype, fmt, rev, subregion_type)
-
-    # post processing
-    if o:
-        with open(o, "w") as f:
-            print(x, file=f)
-    else:
-        print(x)
-
-    return
+        print(result)
 
 
 def index(
-    spec,
-    modality,
-    ids,
-    idtype,
-    fmt,
-    rev=False,
-    subregion_type=None,
-):
+    spec: Assay,
+    modality: str,
+    ids: List[str],
+    idtype: str,
+    fmt: str,
+    rev: bool = False,
+    subregion_type: Optional[str] = None,
+) -> str:
+    """Get index information from the spec.
+
+    Args:
+        spec: The seqspec specification.
+        modality: The modality to index.
+        ids: List of IDs to index.
+        idtype: Type of ID (read, region, file).
+        fmt: Output format.
+        rev: Whether to return 3'->5' region order.
+        subregion_type: Optional subregion type.
+
+    Returns:
+        Formatted index information.
+    """
     FORMAT = {
         "chromap": format_chromap,
         "kb": format_kallisto_bus,
+        "kb-single": format_kallisto_bus_force_single,
         "relative": format_relative,
         "seqkit": format_seqkit_subseq,
         "simpleaf": format_simpleaf,
@@ -205,7 +225,7 @@ def index(
         "read": get_index_by_read_ids,
     }
 
-    if len(ids) == 0:
+    if not ids:
         indices = GET_INDICES[idtype](spec, modality)
     else:
         indices = GET_INDICES_BY_IDS[idtype](spec, modality, ids)
@@ -306,6 +326,43 @@ def format_kallisto_bus(indices, subregion_type=None):
         umi.append("-1,-1,-1")
     if len(bcs) == 0:
         bcs.append("-1,-1,-1")
+
+    x = ",".join(bcs) + ":" + ",".join(umi) + ":" + ",".join(feature)
+    return x
+
+
+def format_kallisto_bus_force_single(indices, subregion_type=None):
+    bcs = []
+    umi = []
+    feature = []
+    longest_feature = None
+    max_length = 0
+
+    for idx, region in enumerate(indices):
+        rg_strand = region.pop("strand")  # noqa
+        for rgn, cuts in region.items():
+            for cut in cuts:
+                if cut.region_type.upper() == "BARCODE":
+                    bcs.append(f"{idx},{cut.start},{cut.stop}")
+                elif cut.region_type.upper() == "UMI":
+                    umi.append(f"{idx},{cut.start},{cut.stop}")
+                elif (
+                    cut.region_type.upper() == "CDNA"
+                    or cut.region_type.upper() == "GDNA"
+                    or cut.region_type.upper() == "PROTEIN"
+                    or cut.region_type.upper() == "TAG"
+                ):
+                    length = cut.stop - cut.start
+                    if length > max_length:
+                        max_length = length
+                        longest_feature = f"{idx},{cut.start},{cut.stop}"
+
+    if len(umi) == 0:
+        umi.append("-1,-1,-1")
+    if len(bcs) == 0:
+        bcs.append("-1,-1,-1")
+    if longest_feature:
+        feature.append(longest_feature)
 
     x = ",".join(bcs) + ":" + ",".join(umi) + ":" + ",".join(feature)
     return x

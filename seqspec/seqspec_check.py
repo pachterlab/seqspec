@@ -1,12 +1,20 @@
+"""Check module for seqspec CLI.
+
+This module provides functionality to validate seqspec files against the specification schema.
+"""
+from pathlib import Path
+from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
+
 from jsonschema import Draft4Validator
 import yaml
 from os import path
+
 from seqspec.utils import load_spec, file_exists
 from seqspec.Assay import Assay
-from argparse import RawTextHelpFormatter
 
 
 def setup_check_args(parser):
+    """Create and configure the check command subparser."""
     subparser = parser.add_parser(
         "check",
         description="""
@@ -21,45 +29,51 @@ seqspec check spec.yaml
     )
     subparser.add_argument(
         "-o",
+        "--output",
         metavar="OUT",
-        help=("Path to output file"),
-        type=str,
+        help="Path to output file",
+        type=Path,
         default=None,
     )
     subparser.add_argument(
         "-s",
+        "--skip",
         metavar="SKIP",
-        help=("Skip checks"),
+        help="Skip checks",
         type=str,
         default=None,
         choices=["igvf", "igvf_onlist_skip"],
     )
 
-    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=str)
+    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
 
     return subparser
 
 
-def validate_check_args(parser, args):
-    spec_fn = args.yaml
-    o = args.o
-    s = args.s
+def validate_check_args(parser: ArgumentParser, args: Namespace) -> None:
+    """Validate the check command arguments."""
+    if not Path(args.yaml).exists():
+        parser.error(f"Input file does not exist: {args.yaml}")
 
-    return run_check(spec_fn, o, s)
+    if args.output and Path(args.output).exists() and not Path(args.output).is_file():
+        parser.error(f"Output path exists but is not a file: {args.output}")
 
 
-def run_check(spec_fn, o, s):
-    spec = load_spec(spec_fn)
+def run_check(parser: ArgumentParser, args: Namespace):
+    """Run the check command."""
+    validate_check_args(parser, args)
 
-    errors = check(spec, spec_fn)
-    if s == "igvf":
+    spec = load_spec(args.yaml)
+    errors = check(spec, args.yaml)
+
+    if args.skip == "igvf":
         errors = filter_errors(errors, "igvf")
-    elif s == "igvf_onlist_skip":
+    elif args.skip == "igvf_onlist_skip":
         errors = filter_errors(errors, "igvf_onlist_skip")
 
     if errors:
-        if o:
-            with open(o, "w") as f:
+        if args.output:
+            with open(args.output, "w") as f:
                 for idx, e in enumerate(errors, 1):
                     print(format_error(e, idx), file=f)
         else:

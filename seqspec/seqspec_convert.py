@@ -1,16 +1,21 @@
-from seqspec.utils import load_genbank
+"""Convert module for seqspec CLI.
+
+This module provides functionality to convert between different formats (seqspec, genbank, token).
+"""
+from pathlib import Path
+from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
 import json
-from seqspec.Region import Region
-from seqspec.Assay import Assay
-from seqspec.utils import load_spec
 import numpy as np
 from typing import Dict, List, Tuple
-from os import path
-from pathlib import Path
+import os
+
+from seqspec.utils import load_genbank, load_spec
+from seqspec.Region import Region
+from seqspec.Assay import Assay
 
 
-schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
-
+# Load schema and constants
+schema_fn = os.path.join(os.path.dirname(__file__), "schema/seqspec.schema.json")
 with open(schema_fn, "r") as f:
     schema = json.load(f)
 REGION_TYPES = schema["$defs"]["region"]["properties"]["region_type"]["enum"]
@@ -18,51 +23,96 @@ MODALITIES = schema["properties"]["modalities"]["items"]["enum"]
 SEQUENCE_TYPES = schema["$defs"]["region"]["properties"]["sequence_type"]["enum"]
 
 
-def setup_convert_args(parser):
+def setup_convert_args(parser) -> ArgumentParser:
+    """Create and configure the convert command subparser."""
     subparser = parser.add_parser(
         "convert",
-        description="get genbank about seqspec file",
-        help="get genbank about seqspec file",
+        description="""
+Convert between different formats (seqspec, genbank, token).
+
+Examples:
+seqspec convert -ifmt seqspec -ofmt token spec.yaml -o output_dir  # Convert seqspec to token format
+seqspec convert -ifmt genbank -ofmt seqspec input.gb -o spec.yaml  # Convert genbank to seqspec
+---
+""",
+        help="Convert between different formats",
+        formatter_class=RawTextHelpFormatter,
     )
     choices = ["genbank", "seqspec", "token"]
     subparser.add_argument(
-        "-ifmt", help="Input format", type=str, default="seqspec", choices=choices
+        "-ifmt",
+        "--input-format",
+        help="Input format",
+        type=str,
+        default="seqspec",
+        choices=choices,
     )
     subparser.add_argument(
-        "-ofmt", help="Output format", type=str, default="token", choices=choices
+        "-ofmt",
+        "--output-format",
+        help="Output format",
+        type=str,
+        default="token",
+        choices=choices,
     )
-
     subparser.add_argument(
         "-o",
+        "--output",
         metavar="OUT",
-        help=("Path to output file"),
-        type=str,
+        help="Path to output file or directory",
+        type=Path,
         default=None,
         required=False,
     )
     subparser.add_argument(
-        "input_file", metavar="IN", help="Path to input file", type=str
+        "input_file",
+        metavar="IN",
+        help="Path to input file",
+        type=Path,
     )
     return subparser
 
 
-def validate_convert_args(parser, args):
-    # if everything is valid the run_convert
-    fn = args.input_file
-    ifmt = args.ifmt
-    ofmt = args.ofmt
-    o = args.o
+def validate_convert_args(parser: ArgumentParser, args: Namespace) -> None:
+    """Validate the convert command arguments."""
+    if not Path(args.input_file).exists():
+        parser.error(f"Input file does not exist: {args.input_file}")
 
-    cnv = run_convert(fn, ifmt, ofmt, o)
-    print(cnv)
+    if args.output and Path(args.output).exists():
+        if args.output_format == "token":
+            if not Path(args.output).is_dir():
+                parser.error(
+                    f"Output path exists but is not a directory: {args.output}"
+                )
+        else:
+            if not Path(args.output).is_file():
+                parser.error(f"Output path exists but is not a file: {args.output}")
 
-    # if o:
-    #     spec.to_YAML(o)
-    # else:
-    #     print(json.dumps(spec, sort_keys=False, indent=4))
+
+def run_convert(parser: ArgumentParser, args: Namespace) -> None:
+    """Run the convert command."""
+    validate_convert_args(parser, args)
+
+    CONVERT = {
+        ("genbank", "seqspec"): gb_to_seqspec,
+        ("seqspec", "token"): seqspec_to_token,
+    }
+
+    file = load_input_file(args.input_file, args.input_format)
+    result = CONVERT[(args.input_format, args.output_format)](file)
+
+    if args.output:
+        if args.output_format == "token":
+            save_tokenized_spec(*result, str(args.output))  # noqa
+        else:
+            # Handle other output formats here
+            pass
+    else:
+        return result
 
 
-def load_input_file(fn, ifmt):
+def load_input_file(fn: Path, ifmt: str):
+    """Load input file based on format."""
     LOAD = {
         "genbank": load_genbank,
         "seqspec": load_spec,
@@ -123,20 +173,6 @@ def save_tokenized_spec(
             f.write(f"{feature}\n")
 
 
-def run_convert(fn, ifmt, ofmt, o):
-    CONVERT = {
-        ("genbank", "seqspec"): gb_to_seqspec,
-        ("seqspec", "token"): seqspec_to_token,
-    }
-    file = load_input_file(fn, ifmt)
-    c = CONVERT[(ifmt, ofmt)](file)
-    if o:
-        save_tokenized_spec(*c, o)
-    else:
-        return c
-    return
-
-
 def seqspec_to_token(spec):
     # for each modalitiy, make a dictionary of regions
     specs_regions = {}
@@ -167,14 +203,6 @@ def tokenize_specs(
     n_region_type_features = len(REGION_TYPES)
     n_sequence_type_features = len(SEQUENCE_TYPES)
 
-    # Total features = one-hot encodings + numerical features
-    total_features = (
-        n_modality_features  # modality one-hot
-        + n_region_type_features  # region_type one-hot
-        + n_sequence_type_features  # sequence_type one-hot
-        + 2  # min_len, max_len
-    )
-
     # Total features = one-hot encodings + numerical features + position
     total_features = (
         n_modality_features  # modality one-hot
@@ -184,6 +212,8 @@ def tokenize_specs(
         + 1  # position in region list (1-based)
     )
 
+    # features = get_feature_names()
+
     rows = []  # Will hold our feature vectors
     row_identifiers = []  # Will hold (spec_id, modality, region_type) tuples
 
@@ -192,7 +222,7 @@ def tokenize_specs(
             # Enumerate regions to get position (1-based)
             for position, region in enumerate(regions, start=1):
                 # Create feature vector for this region
-                feature_vector = np.zeros(total_features)
+                feature_vector = np.zeros(total_features).astype(int)
                 current_idx = 0
 
                 # Add modality one-hot

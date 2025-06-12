@@ -1,16 +1,27 @@
-from seqspec.Assay import Assay
-from seqspec.Region import project_regions_to_coordinates, itx_read, Onlist
-from seqspec.utils import load_spec, map_read_id_to_regions
-from seqspec.seqspec_find import find_by_region_type, find_by_region_id
+"""Onlist module for seqspec CLI.
+
+This module provides functionality to generate and manage onlist files for seqspec regions.
+"""
+from pathlib import Path
+from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
+import warnings
 import os
-from seqspec.utils import read_local_list, read_remote_list
 import itertools
 from typing import List
-from argparse import SUPPRESS, RawTextHelpFormatter
-import warnings
+
+from seqspec.Assay import Assay
+from seqspec.Region import project_regions_to_coordinates, itx_read, Onlist
+from seqspec.utils import (
+    load_spec,
+    map_read_id_to_regions,
+    read_local_list,
+    read_remote_list,
+)
+from seqspec.seqspec_find import find_by_region_type, find_by_region_id
 
 
-def setup_onlist_args(parser):
+def setup_onlist_args(parser) -> ArgumentParser:
+    """Create and configure the onlist command subparser."""
     subparser = parser.add_parser(
         "onlist",
         description="""
@@ -25,20 +36,22 @@ seqspec onlist -m rna -s region-type -i barcode spec.yaml # Get onlist for barco
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
-    subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
 
     subparser.add_argument(
         "-o",
+        "--output",
         metavar="OUT",
-        help=("Path to output file"),
-        type=str,
+        help="Path to output file",
+        type=Path,
         default=None,
     )
     choices = ["read", "region", "region-type"]
     subparser.add_argument(
         "-s",
+        "--selector",
         metavar="SELECTOR",
-        help=(f"Selector for ID, [{', '.join(choices)}] (default: read)"),
+        help=f"Selector for ID, [{', '.join(choices)}] (default: read)",
         type=str,
         default="read",
         choices=choices,
@@ -55,6 +68,7 @@ seqspec onlist -m rna -s region-type -i barcode spec.yaml # Get onlist for barco
     format_choices = ["product", "multi"]
     subparser.add_argument(
         "-f",
+        "--format",
         metavar="FORMAT",
         type=str,
         default="product",
@@ -63,16 +77,18 @@ seqspec onlist -m rna -s region-type -i barcode spec.yaml # Get onlist for barco
     )
     subparser_required.add_argument(
         "-i",
-        metavar="IDs",
-        help=("IDs"),
+        "--id",
+        metavar="ID",
+        help="ID to search for",
         type=str,
         default=None,
         required=False,
     )
     subparser_required.add_argument(
         "-m",
+        "--modality",
         metavar="MODALITY",
-        help=("Modality"),
+        help="Modality",
         type=str,
         default=None,
         required=True,
@@ -81,7 +97,14 @@ seqspec onlist -m rna -s region-type -i barcode spec.yaml # Get onlist for barco
     return subparser
 
 
-def validate_onlist_args(parser, args):
+def validate_onlist_args(parser: ArgumentParser, args: Namespace) -> None:
+    """Validate the onlist command arguments."""
+    if not Path(args.yaml).exists():
+        parser.error(f"Input file does not exist: {args.yaml}")
+
+    if args.output and Path(args.output).exists() and not Path(args.output).is_file():
+        parser.error(f"Output path exists but is not a file: {args.output}")
+
     if args.r is not None:
         warnings.warn(
             "The '-r' argument is deprecated and will be removed in a future version. "
@@ -89,32 +112,26 @@ def validate_onlist_args(parser, args):
             DeprecationWarning,
         )
         # Optionally map the old option to the new one
-        if not args.i:
-            args.i = args.r
-
-    fn = args.yaml
-    m = args.m
-    ids = args.i
-    fmt = args.f
-    o = args.o
-    idtype = args.s
-
-    return run_onlist(fn, m, ids, idtype, fmt, o)
+        if not args.id:
+            args.id = args.r
 
 
-def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
+def run_onlist(parser: ArgumentParser, args: Namespace) -> None:
+    """Run the onlist command."""
+    validate_onlist_args(parser, args)
+
     # the base path is the path to the spec file
-    base_path = os.path.dirname(os.path.abspath(spec_fn))
+    base_path = args.yaml.parent.absolute()
 
     # set the save path if it exists
-    if o:
-        save_path = os.path.abspath(o)
+    if args.output:
+        save_path = args.output
     else:
         # otherwise the save path is the same path as the spec
-        save_path = os.path.join(base_path, "onlist_joined.txt")
+        save_path = base_path / "onlist_joined.txt"
 
     # load spec
-    spec = load_spec(spec_fn)
+    spec = load_spec(args.yaml)
     # if number of barcodes > 1 then we need to join them
 
     CMD = {
@@ -123,18 +140,20 @@ def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
         "read": run_onlist_read,
     }
 
-    onlists = CMD[idtype](spec, modality, ids)
+    onlists = CMD[args.selector](spec, args.modality, args.id)
 
     if len(onlists) == 0:
-        raise ValueError(f"No onlist found for {modality}, {idtype}, {ids}")
+        raise ValueError(
+            f"No onlist found for {args.modality}, {args.selector}, {args.id}"
+        )
 
     # for only one onlist we can just return the path
     # if only one, its remote and we save it to the base path
     elif len(onlists) == 1:
         urltype = onlists[0].urltype
-        onlist_fn = os.path.basename(onlists[0].filename)
-        onlist_path = os.path.join(base_path, onlist_fn)
-        if os.path.exists(onlist_path):
+        onlist_fn = Path(onlists[0].filename).name
+        onlist_path = base_path / onlist_fn
+        if onlist_path.exists():
             urltype = "local"
         elif urltype in ["http", "https"]:
             # download the onlist to the base path and return the path
@@ -150,12 +169,11 @@ def run_onlist(spec_fn, modality, ids, idtype, fmt, o):
             elif o.urltype in ["http", "https"]:
                 # base_path is ignored for remote onlists
                 lsts.append(read_remote_list(o, base_path))
-        onlist_elements = join_onlists(lsts, fmt)
+        onlist_elements = join_onlists(lsts, args.format)
         onlist_path = write_onlist(onlist_elements, save_path)
 
     # print the path to the onlist
     print(onlist_path)
-    return
 
 
 def run_onlist_region_type(
@@ -174,7 +192,9 @@ def run_onlist_region(spec: Assay, modality: str, region_id: str) -> List[Onlist
     regions = find_by_region_id(spec, modality, region_id)
     onlists: List[Onlist] = []
     for r in regions:
-        onlists.append(r.get_onlist())
+        ol = r.get_onlist()
+        if ol:
+            onlists.append(ol)
     if len(onlists) == 0:
         raise ValueError(f"No onlist found for region {region_id}")
     return onlists
