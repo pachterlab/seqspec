@@ -6,7 +6,7 @@ from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
 import warnings
 import yaml
-from typing import List
+from typing import List, Optional, Union
 
 from seqspec.utils import load_spec
 from seqspec.Assay import Assay
@@ -103,25 +103,48 @@ def validate_find_args(parser: ArgumentParser, args: Namespace) -> None:
             args.id = args.r
 
 
+def seqspec_find(
+    spec: Assay, selector: str, modality: str, id: Optional[str] = None
+) -> Union[List[Read], List[Region], List[File]]:
+    """Core functionality to find objects in a seqspec file.
+
+    Args:
+        spec: The Assay object to search in
+        selector: Type of object to search for (read, region, file, region-type)
+        modality: The modality to search in
+        id: The ID to search for (optional)
+
+    Returns:
+        List of found objects matching the search criteria:
+        - List[Read] for "read" selector
+        - List[Region] for "region" and "region-type" selectors
+        - List[File] for "file" selector
+        - Empty list for unknown selectors
+    """
+    FIND = {
+        "region-type": find_by_region_type,
+        "region": find_by_region_id,
+        "read": find_by_read_id,
+        "file": find_by_file_id,
+    }
+
+    if selector not in FIND:
+        warnings.warn(
+            f"Unknown selector '{selector}'. Valid selectors are: {', '.join(FIND.keys())}"
+        )
+        return []
+
+    return FIND[selector](spec, modality, id)
+
+
 def run_find(parser: ArgumentParser, args: Namespace) -> None:
     """Run the find command."""
     validate_find_args(parser, args)
 
     spec = load_spec(args.yaml)
-    found = []
+    found = seqspec_find(spec, args.selector, args.modality, args.id)
 
-    if args.selector == "region-type":
-        found = find_by_region_type(spec, args.modality, args.id)
-    elif args.selector == "region":
-        found = find_by_region_id(spec, args.modality, args.id)
-    elif args.selector == "read":
-        found = find_by_read_id(spec, args.modality, args.id)
-    elif args.selector == "file":
-        found = find_by_file_id(spec, args.modality, args.id)
-    else:
-        raise ValueError(f"Unknown selector: {args.selector}")
-
-    # post processing
+    # Handle output
     if args.output:
         with open(args.output, "w") as f:
             yaml.dump(found, f, sort_keys=False)
@@ -129,7 +152,7 @@ def run_find(parser: ArgumentParser, args: Namespace) -> None:
         print(yaml.dump(found, sort_keys=False))
 
 
-def find_by_read_id(spec: Assay, modality: str, id: str) -> List[Read]:
+def find_by_read_id(spec: Assay, modality: str, id: Optional[str]) -> List[Read]:
     """Find reads by their ID.
 
     Args:
@@ -141,6 +164,8 @@ def find_by_read_id(spec: Assay, modality: str, id: str) -> List[Read]:
         A list of Read objects matching the ID.
     """
     rds = []
+    if id is None:
+        return rds
     reads = spec.get_seqspec(modality)
     for r in reads:
         if r.read_id == id:
@@ -148,7 +173,7 @@ def find_by_read_id(spec: Assay, modality: str, id: str) -> List[Read]:
     return rds
 
 
-def find_by_file_id(spec: Assay, modality: str, id: str) -> List[File]:
+def find_by_file_id(spec: Assay, modality: str, id: Optional[str]) -> List[File]:
     """Find files by their ID.
 
     Args:
@@ -160,6 +185,8 @@ def find_by_file_id(spec: Assay, modality: str, id: str) -> List[File]:
         A list of File objects matching the ID.
     """
     files = []
+    if id is None:
+        return files
     lf = list_all_files(spec, modality)
     for k, v in lf.items():
         for f in v:
@@ -168,7 +195,7 @@ def find_by_file_id(spec: Assay, modality: str, id: str) -> List[File]:
     return files
 
 
-def find_by_region_id(spec: Assay, modality: str, id: str) -> List[Region]:
+def find_by_region_id(spec: Assay, modality: str, id: Optional[str]) -> List[Region]:
     """Find regions by their ID.
 
     Args:
@@ -179,12 +206,14 @@ def find_by_region_id(spec: Assay, modality: str, id: str) -> List[Region]:
     Returns:
         A list of Region objects matching the ID.
     """
+    if id is None:
+        return []
     m = spec.get_libspec(modality)
     regions = m.get_region_by_id(id)
     return regions
 
 
-def find_by_region_type(spec: Assay, modality: str, id: str) -> List[Region]:
+def find_by_region_type(spec: Assay, modality: str, id: Optional[str]) -> List[Region]:
     """Find regions by their type.
 
     Args:
@@ -195,6 +224,8 @@ def find_by_region_type(spec: Assay, modality: str, id: str) -> List[Region]:
     Returns:
         A list of Region objects matching the type.
     """
+    if id is None:
+        return []
     m = spec.get_libspec(modality)
     regions = m.get_region_by_region_type(id)
     return regions

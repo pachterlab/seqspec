@@ -128,55 +128,23 @@ def validate_file_args(parser: ArgumentParser, args: Namespace) -> None:
         )
 
 
-def run_file(parser: ArgumentParser, args: Namespace) -> None:
-    """Run the file command."""
-    validate_file_args(parser, args)
-
-    spec = load_spec(args.yaml)
-    ids = args.ids.split(",") if args.ids else []
-
-    files = list_files(
-        spec,
-        args.modality,
-        ids,
-        args.selector,
-        args.format,
-        args.key,
-        args.yaml,
-        args.fullpath,
-    )
-
-    if files:
-        if args.output:
-            args.output.write_text(str(files))
-        else:
-            print(files)
-
-
-def list_files(
+def seqspec_file(
     spec: Assay,
     modality: str,
-    ids: List[str],
-    idtype: str,
-    fmt: str,
-    k: str,
-    spec_fn: Path,
-    fp: bool = False,
-) -> str:
-    """List files based on the given parameters.
+    ids: Optional[List[str]] = None,
+    selector: str = "read",
+) -> Dict[str, List[File]]:
+    """Core functionality to list files from a seqspec.
 
     Args:
-        spec: The seqspec specification.
-        modality: The modality to list files for.
-        ids: List of IDs to filter by.
-        idtype: Type of ID to filter by (read, region, file, region-type).
-        fmt: Output format (paired, interleaved, index, list, json).
-        k: Key to use for output (file_id, filename, etc.).
-        spec_fn: Path to the spec file.
-        fp: Whether to use full paths for local files.
+        spec: The Assay object to operate on
+        spec_fn: Path to the spec file, used for relative path resolution
+        modality: The modality to list files for
+        ids: Optional list of IDs to filter by
+        selector: Type of ID to filter by (read, region, file, region-type)
 
     Returns:
-        Formatted string containing the file information.
+        Dictionary mapping IDs to lists of File objects
     """
     # NOTE: LIST FILES DOES NOT RESPECT ORDERING OF INPUT IDs LIST
     # NOTE: seqspec file -s read gets the files for the read, not the files mapped from the regions associated with the read.
@@ -193,24 +161,46 @@ def list_files(
         "region-type": list_files_by_region_type,
     }
 
-    FORMAT = {
-        "list": format_list_files_metadata,
-        "paired": format_list_files,
-        "interleaved": format_list_files,
-        "index": format_list_files,
-        "json": format_json_files,
-    }
-
     # Get files based on whether we're filtering by IDs
     if not ids:
         # list all files
-        files = LIST_FILES[idtype](spec, modality)
+        return LIST_FILES[selector](spec, modality)
     else:
         # list files by id
-        files = LIST_FILES_BY_ID[idtype](spec, modality, ids)
+        return LIST_FILES_BY_ID[selector](spec, modality, ids)
 
-    # Format the output
-    return FORMAT[fmt](files, fmt, k, spec_fn, fp)
+
+def run_file(parser: ArgumentParser, args: Namespace) -> None:
+    """Run the file command."""
+    validate_file_args(parser, args)
+
+    spec = load_spec(args.yaml)
+    ids = args.ids.split(",") if args.ids else []
+
+    files = seqspec_file(
+        spec=spec,
+        modality=args.modality,
+        ids=ids,
+        selector=args.selector,
+    )
+
+    if files:
+        FORMAT = {
+            "list": format_list_files_metadata,
+            "paired": format_list_files,
+            "interleaved": format_list_files,
+            "index": format_list_files,
+            "json": format_json_files,
+        }
+
+        result = FORMAT[args.format](
+            files, args.format, args.key, Path(args.yaml), args.fullpath
+        )
+
+        if args.output:
+            args.output.write_text(str(result))
+        else:
+            print(result)
 
 
 def list_read_files(spec: Assay, modality: str) -> Dict[str, List[File]]:

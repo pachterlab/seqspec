@@ -1,8 +1,6 @@
 from seqspec.utils import load_spec
 import json
-from typing import List
-from seqspec.Region import Region
-from seqspec.Read import Read
+from typing import Dict
 from seqspec.Assay import Assay
 from argparse import RawTextHelpFormatter, ArgumentParser, Namespace
 from pathlib import Path
@@ -74,105 +72,215 @@ def run_info(parser: ArgumentParser, args: Namespace) -> None:
     validate_info_args(parser, args)
 
     spec = load_spec(args.yaml)
-    CMD = {
+
+    if args.key:
+        # Extract data
+        info = seqspec_info(spec, args.key)
+        # Format info
+        result = format_info(info, args.key, args.format)
+
+        if args.output:
+            with open(args.output, "w") as f:
+                if args.format == "json":
+                    f.write(result)
+                else:
+                    print(result, file=f)
+        else:
+            print(result)
+
+
+def seqspec_info(spec: Assay, key: str) -> Dict:
+    """Get information from the spec based on the key.
+
+    Args:
+        spec: The Assay object to get info from
+        key: The type of information to retrieve (modalities, meta, sequence_spec, library_spec)
+
+    Returns:
+        Dictionary containing the requested information
+
+    Raises:
+        KeyError: If the requested key is not supported
+    """
+    INFO_FUNCS = {
         "modalities": seqspec_info_modalities,
-        "meta": seqspec_info,
+        "meta": seqspec_info_meta,
         "sequence_spec": seqspec_info_sequence_spec,
         "library_spec": seqspec_info_library_spec,
     }
-    s = ""
-    if args.key:
-        s = CMD[args.key](spec, args.format)
-
-    if args.output:
-        with open(args.output, "w") as f:
-            json.dump(s, f, sort_keys=False, indent=4)
-    else:
-        print(s)
+    if key not in INFO_FUNCS:
+        raise KeyError(
+            f"Unsupported info key: {key}. Must be one of {list(INFO_FUNCS.keys())}"
+        )
+    return INFO_FUNCS[key](spec)
 
 
-def seqspec_info(spec: Assay, fmt: str) -> str:
-    """Get meta information about the spec."""
-    s = format_info(spec, fmt)
-    return s
+def format_info(info: Dict, key: str, fmt: str = "tab") -> str:
+    """Format information based on the key and format.
+
+    Args:
+        info: Dictionary containing the information to format
+        key: The type of information to format (modalities, meta, sequence_spec, library_spec)
+        fmt: Output format (tab or json)
+
+    Returns:
+        Formatted string
+
+    Raises:
+        KeyError: If the requested key is not supported
+    """
+    FORMAT_FUNCS = {
+        "modalities": format_modalities,
+        "meta": format_meta,
+        "sequence_spec": format_sequence_spec,
+        "library_spec": format_library_spec,
+    }
+    if key not in FORMAT_FUNCS:
+        raise KeyError(
+            f"Unsupported format key: {key}. Must be one of {list(FORMAT_FUNCS.keys())}"
+        )
+    return FORMAT_FUNCS[key](info, fmt)
 
 
-def seqspec_info_library_spec(spec: Assay, fmt: str) -> str:
-    """Get library specification information."""
-    modalities = spec.list_modalities()
-    s = ""
-    for m in modalities:
-        libspec = spec.get_libspec(m)
-        s += format_library_spec(m, libspec.get_leaves(), fmt)
-    return s
+def seqspec_info_meta(spec: Assay) -> Dict:
+    """Get meta information about the spec.
 
+    Args:
+        spec: The Assay object to get info from
 
-def seqspec_info_sequence_spec(spec: Assay, fmt: str) -> str:
-    """Get sequence specification information."""
-    reads = format_sequence_spec(spec.sequence_spec, fmt)
-    return reads
-
-
-def seqspec_info_modalities(spec: Assay, fmt: str) -> str:
-    """Get list of modalities."""
-    modalities = format_modalities(spec.list_modalities(), fmt)
-    return modalities
-
-
-def format_info(spec: Assay, fmt: str = "tab") -> str:
-    """Format meta information."""
+    Returns:
+        Dictionary containing meta information
+    """
     sd = spec.to_dict()
     del sd["library_spec"]
     del sd["sequence_spec"]
     del sd["modalities"]
-    s = ""
+    return {"meta": sd}
+
+
+def seqspec_info_library_spec(spec: Assay) -> Dict:
+    """Get library specification information.
+
+    Args:
+        spec: The Assay object to get info from
+
+    Returns:
+        Dictionary containing library specifications by modality
+    """
+    modalities = spec.list_modalities()
+    result = {}
+    for m in modalities:
+        libspec = spec.get_libspec(m)
+        result[m] = libspec.get_leaves()
+    return {"library_spec": result}
+
+
+def seqspec_info_sequence_spec(spec: Assay) -> Dict:
+    """Get sequence specification information.
+
+    Args:
+        spec: The Assay object to get info from
+
+    Returns:
+        Dictionary containing sequence specifications
+    """
+    return {"sequence_spec": spec.sequence_spec}
+
+
+def seqspec_info_modalities(spec: Assay) -> Dict:
+    """Get list of modalities.
+
+    Args:
+        spec: The Assay object to get info from
+
+    Returns:
+        Dictionary containing list of modalities
+    """
+    return {"modalities": spec.list_modalities()}
+
+
+def format_meta(info: Dict, fmt: str = "tab") -> str:
+    """Format meta information.
+
+    Args:
+        info: Dictionary containing meta information from seqspec_info_meta
+        fmt: Output format (tab or json)
+
+    Returns:
+        Formatted string
+    """
     if fmt == "tab":
-        for k, v in sd.items():
-            s += f"{v}\t"
-        s = s[:-1]
+        return "\t".join(str(v) for v in info["meta"].values())
     elif fmt == "json":
-        s = json.dumps(sd, sort_keys=False, indent=4)
-    return s
+        return json.dumps(info["meta"], sort_keys=False, indent=4)
+    return ""
 
 
-def format_modalities(modalities: List[str], fmt: str = "tab") -> str:
-    """Format list of modalities."""
-    s = ""
+def format_modalities(info: Dict, fmt: str = "tab") -> str:
+    """Format list of modalities.
+
+    Args:
+        info: Dictionary containing modalities from seqspec_info_modalities
+        fmt: Output format (tab or json)
+
+    Returns:
+        Formatted string
+    """
     if fmt == "tab":
-        s = "\t".join(modalities)
+        return "\t".join(info["modalities"])
     elif fmt == "json":
-        s = json.dumps(modalities, sort_keys=False, indent=4)
-    return s
+        return json.dumps(info["modalities"], sort_keys=False, indent=4)
+    return ""
 
 
-def format_sequence_spec(sequence_spec: List[Read], fmt: str = "tab") -> str:
-    """Format sequence specification."""
-    s = ""
+def format_sequence_spec(info: Dict, fmt: str = "tab") -> str:
+    """Format sequence specification.
+
+    Args:
+        info: Dictionary containing sequence specs from seqspec_info_sequence_spec
+        fmt: Output format (tab or json)
+
+    Returns:
+        Formatted string
+    """
     if fmt == "tab":
-        # format the output as a table
-        for r in sequence_spec:
+        lines = []
+        for r in info["sequence_spec"]:
             files = ",".join([i.file_id for i in r.files]) if r.files else ""
-            s += f"{r.modality}\t{r.read_id}\t{r.strand}\t{r.min_len}\t{r.max_len}\t{r.primer_id}\t{r.name}\t{files}\n"
-        s = s[:-1]
+            lines.append(
+                f"{r.modality}\t{r.read_id}\t{r.strand}\t{r.min_len}\t{r.max_len}\t{r.primer_id}\t{r.name}\t{files}"
+            )
+        return "\n".join(lines)
     elif fmt == "json":
-        s = json.dumps([i.to_dict() for i in sequence_spec], sort_keys=False, indent=4)
-    return s
-
-
-def format_library_spec(
-    modality: str, library_spec: List[Region], fmt: str = "tab"
-) -> str:
-    """Format library specification."""
-    s = ""
-    if fmt == "tab":
-        for r in library_spec:
-            file = None
-            if r.onlist:
-                file = r.onlist.filename
-            s += f"{modality}\t{r.region_id}\t{r.region_type}\t{r.name}\t{r.sequence_type}\t{r.sequence}\t{r.min_len}\t{r.max_len}\t{file}\n"
-        s = s[:-1]
-    elif fmt == "json":
-        s = json.dumps(
-            {modality: [i.to_dict() for i in library_spec]}, sort_keys=False, indent=4
+        return json.dumps(
+            [i.to_dict() for i in info["sequence_spec"]], sort_keys=False, indent=4
         )
-    return s
+    return ""
+
+
+def format_library_spec(info: Dict, fmt: str = "tab") -> str:
+    """Format library specification.
+
+    Args:
+        info: Dictionary containing library specs from seqspec_info_library_spec
+        fmt: Output format (tab or json)
+
+    Returns:
+        Formatted string
+    """
+    if fmt == "tab":
+        lines = []
+        for modality, regions in info["library_spec"].items():
+            for r in regions:
+                file = r.onlist.filename if r.onlist else None
+                lines.append(
+                    f"{modality}\t{r.region_id}\t{r.region_type}\t{r.name}\t{r.sequence_type}\t{r.sequence}\t{r.min_len}\t{r.max_len}\t{file}"
+                )
+        return "\n".join(lines)
+    elif fmt == "json":
+        return json.dumps(
+            {m: [i.to_dict() for i in r] for m, r in info["library_spec"].items()},
+            sort_keys=False,
+            indent=4,
+        )
+    return ""

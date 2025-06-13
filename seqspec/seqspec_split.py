@@ -4,7 +4,7 @@ This module provides functionality to split seqspec files into one file per moda
 """
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
-from typing import List, Dict, Any
+from typing import List
 
 from seqspec.utils import load_spec
 from seqspec.Assay import Assay
@@ -52,15 +52,24 @@ def run_split(parser: ArgumentParser, args: Namespace) -> None:
     validate_split_args(parser, args)
 
     spec = load_spec(args.yaml)
-    specs = split(spec, args.output)
+    specs = seqspec_split(spec)
 
-    for spec_info in specs:
-        output_path = args.output / f"{spec_info['prefix']}{spec_info['modality']}.yaml"
-        spec_info["spec"].to_YAML(output_path)
+    prefix = "spec." if args.output.name == "" else f"{args.output.name}."
+    for spec_m in specs:
+        modality = spec_m.list_modalities()[0]
+        output_path = args.output / f"{prefix}{modality}.yaml"
+        spec_m.to_YAML(output_path)
 
 
-def split(spec: Assay, output_dir: Path) -> List[Dict[str, Any]]:
-    """Split spec into one file per modality."""
+def seqspec_split(spec: Assay) -> List[Assay]:
+    """Split spec into one file per modality.
+
+    Args:
+        spec: The Assay object to split
+
+    Returns:
+        List of Assay objects, each containing a single modality
+    """
     specs = []
     modalities = spec.list_modalities()
 
@@ -84,8 +93,6 @@ def split(spec: Assay, output_dir: Path) -> List[Dict[str, Any]]:
         }
         spec_m = Assay(**info)
         spec_m.update_spec()
-
-        prefix = "spec." if output_dir.name == "" else f"{output_dir.name}."
-        specs.append({"prefix": prefix, "spec": spec_m, "modality": modality})
+        specs.append(spec_m)
 
     return specs

@@ -53,7 +53,6 @@ seqspec init -o spec.yaml -n myassay -m rna -r rna,R1.fastq.gz,r1_primer,16,pos:
         help="List of modalities, reads, primer_ids, lengths, and strand (e.g. modality,fastq_name,primer_id,len,strand:...)",
         required=True,
     )
-
     subparser.add_argument(
         "-o",
         "--output",
@@ -84,39 +83,38 @@ def run_init(parser: ArgumentParser, args: Namespace) -> None:
 
     modalities = args.modalities.split(",")
     reads = parse_reads_string(args.reads)
-    tree = newick.loads(args.newick)
+    regions = newick_to_regions(args.newick)
 
-    if len(tree[0].descendants) != len(modalities):
-        raise ValueError(
-            "Number of modalities must match number of modality-FASTQs pairs"
-        )
-
-    spec = init(args.name, modalities, tree[0].descendants, reads)
+    spec = seqspec_init(args.name, modalities, regions, reads)
+    yaml_str = spec.to_YAML()
+    if yaml_str is None:
+        raise ValueError("Failed to generate YAML string from assay")
 
     if args.output:
-        spec.to_YAML(args.output)
+        args.output.write_text(yaml_str)
     else:
-        print(spec.to_YAML())
+        print(yaml_str)
 
 
-def init(
-    name: str, modalities: List[str], tree: List[newick.Node], reads: List[Read]
+def seqspec_init(
+    name: str, modalities: List[str], regions: List[Region], reads: List[Read]
 ) -> Assay:
     """Initialize a new seqspec specification.
 
     Args:
-        name: Name of the assay.
-        modalities: List of modalities.
-        tree: Newick tree nodes.
-        reads: List of read specifications.
+        name: Name of the assay
+        modalities: List of modalities
+        regions: List of Region objects
+        reads: List of read specifications
 
     Returns:
-        Initialized Assay object.
+        Initialized Assay object
+
+    Raises:
+        ValueError: If number of modalities doesn't match number of regions
     """
-    regions = []
-    for node in tree:
-        region = Region(region_id="", region_type="", name="", sequence_type="")
-        regions.append(newick_to_region(node, region))
+    if len(regions) != len(modalities):
+        raise ValueError("Number of modalities must match number of regions")
 
     return Assay(
         assay_id="",
@@ -135,15 +133,39 @@ def init(
     )
 
 
+def newick_to_regions(newick_str: str) -> List[Region]:
+    """Convert a newick string to a list of Region objects.
+
+    Args:
+        newick_str: Newick format string representing the library structure
+
+    Returns:
+        List of Region objects
+
+    Raises:
+        ValueError: If newick string is invalid
+    """
+    try:
+        tree = newick.loads(newick_str)
+    except Exception as e:
+        raise ValueError(f"Invalid newick string: {e}")
+
+    regions = []
+    for node in tree[0].descendants:
+        region = Region(region_id="", region_type="", name="", sequence_type="")
+        regions.append(newick_to_region(node, region))
+    return regions
+
+
 def newick_to_region(node: newick.Node, region: Region) -> Region:
     """Convert a newick node to a Region object.
 
     Args:
-        node: Newick tree node.
-        region: Base region object to populate.
+        node: Newick tree node
+        region: Base region object to populate
 
     Returns:
-        Populated Region object.
+        Populated Region object
     """
     region.region_id = node.name
     region.name = node.name
@@ -177,7 +199,7 @@ def parse_reads_string(input_string: str) -> List[Read]:
             "modality,read_id,primer_id,min_len,strand:..."
 
     Returns:
-        List of Read objects.
+        List of Read objects
     """
     reads = []
     for obj in input_string.split(":"):

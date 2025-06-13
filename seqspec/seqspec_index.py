@@ -5,7 +5,7 @@ This module provides functionality to identify the position of elements in a spe
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
 import warnings
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 from seqspec.utils import load_spec, map_read_id_to_regions
 from seqspec.seqspec_find import find_by_region_id
@@ -155,52 +155,52 @@ def validate_index_args(parser: ArgumentParser, args: Namespace) -> None:
         parser.error("Must specify ids with -i for -s read or -s region")
 
 
-def run_index(parser: ArgumentParser, args: Namespace) -> None:
-    """Run the index command."""
-    validate_index_args(parser, args)
-
-    spec = load_spec(args.yaml)
-    ids = args.ids.split(",") if args.ids else []
-
-    result = index(
-        spec,
-        args.modality,
-        ids,
-        args.selector,
-        args.tool,
-        args.rev,
-        args.subregion_type,
-    )
-
-    if args.output:
-        with open(args.output, "w") as f:
-            print(result, file=f)
-    else:
-        print(result)
-
-
-def index(
+def seqspec_index(
     spec: Assay,
     modality: str,
     ids: List[str],
     idtype: str,
-    fmt: str,
     rev: bool = False,
-    subregion_type: Optional[str] = None,
-) -> str:
-    """Get index information from the spec.
+) -> List[Dict[str, Any]]:
+    """Core functionality to get index information from the spec.
 
     Args:
-        spec: The seqspec specification.
-        modality: The modality to index.
-        ids: List of IDs to index.
-        idtype: Type of ID (read, region, file).
-        fmt: Output format.
-        rev: Whether to return 3'->5' region order.
-        subregion_type: Optional subregion type.
+        spec: The Assay object to index
+        modality: The modality to index
+        ids: List of IDs to index
+        idtype: Type of ID (read, region, file)
+        rev: Whether to return 3'->5' region order
 
     Returns:
-        Formatted index information.
+        List of index dictionaries containing region coordinates and strand information
+    """
+    GET_INDICES = {
+        "file": get_index_by_files,
+    }
+
+    GET_INDICES_BY_IDS = {
+        "file": get_index_by_file_ids,
+        "region": get_index_by_region_ids,
+        "read": get_index_by_read_ids,
+    }
+
+    if not ids:
+        return GET_INDICES[idtype](spec, modality)
+    return GET_INDICES_BY_IDS[idtype](spec, modality, ids)
+
+
+def format_index(
+    indices: List[Dict[str, Any]], fmt: str, subregion_type: Optional[str] = None
+) -> str:
+    """Format index information into a specific output format.
+
+    Args:
+        indices: List of index dictionaries from seqspec_index
+        fmt: Output format to use
+        subregion_type: Optional subregion type for filtering
+
+    Returns:
+        Formatted index information as a string
     """
     FORMAT = {
         "chromap": format_chromap,
@@ -215,22 +215,37 @@ def index(
         "zumis": format_zumis,
     }
 
-    GET_INDICES = {
-        "file": get_index_by_files,
-    }
-
-    GET_INDICES_BY_IDS = {
-        "file": get_index_by_file_ids,
-        "region": get_index_by_region_ids,
-        "read": get_index_by_read_ids,
-    }
-
-    if not ids:
-        indices = GET_INDICES[idtype](spec, modality)
-    else:
-        indices = GET_INDICES_BY_IDS[idtype](spec, modality, ids)
+    if fmt not in FORMAT:
+        warnings.warn(
+            f"Unknown format '{fmt}'. Valid formats are: {', '.join(FORMAT.keys())}"
+        )
+        return ""
 
     return FORMAT[fmt](indices, subregion_type)
+
+
+def run_index(parser: ArgumentParser, args: Namespace) -> None:
+    """Run the index command."""
+    validate_index_args(parser, args)
+
+    spec = load_spec(args.yaml)
+    ids = args.ids.split(",") if args.ids else []
+
+    indices = seqspec_index(
+        spec,
+        args.modality,
+        ids,
+        args.selector,
+        args.rev,
+    )
+
+    result = format_index(indices, args.tool, args.subregion_type)
+
+    if args.output:
+        with open(args.output, "w") as f:
+            print(result, file=f)
+    else:
+        print(result)
 
 
 def get_index_by_files(spec, modality):

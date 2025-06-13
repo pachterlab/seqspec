@@ -4,6 +4,7 @@ This module provides functionality to validate seqspec files against the specifi
 """
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
+from typing import List, Dict, Optional
 
 from jsonschema import Draft4Validator
 import yaml
@@ -59,26 +60,43 @@ def validate_check_args(parser: ArgumentParser, args: Namespace) -> None:
         parser.error(f"Output path exists but is not a file: {args.output}")
 
 
+def format_error(errobj, idx=0):
+    return f"[error {idx}] {errobj['error_message']}"
+
+
+def seqspec_check(
+    spec: Assay, spec_fn: str, filter_type: Optional[str] = None
+) -> List[Dict]:
+    """Core functionality to check a seqspec and return filtered errors.
+
+    Args:
+        spec: The Assay object to check
+        spec_fn: Path to the spec file, used for relative path resolution
+        filter_type: Optional filter type to apply to errors (e.g. "igvf", "igvf_onlist_skip")
+
+    Returns:
+        List of error dictionaries
+    """
+    errors = check(spec, spec_fn)
+    if filter_type:
+        errors = filter_errors(errors, filter_type)
+    return errors
+
+
 def run_check(parser: ArgumentParser, args: Namespace):
     """Run the check command."""
     validate_check_args(parser, args)
 
     spec = load_spec(args.yaml)
-    errors = check(spec, args.yaml)
+    errors = seqspec_check(spec, args.yaml, args.skip)
 
-    if args.skip == "igvf":
-        errors = filter_errors(errors, "igvf")
-    elif args.skip == "igvf_onlist_skip":
-        errors = filter_errors(errors, "igvf_onlist_skip")
-
-    if errors:
-        if args.output:
-            with open(args.output, "w") as f:
-                for idx, e in enumerate(errors, 1):
-                    print(format_error(e, idx), file=f)
-        else:
+    if args.output:
+        with open(args.output, "w") as f:
             for idx, e in enumerate(errors, 1):
-                print(format_error(e, idx))
+                print(format_error(e, idx), file=f)
+    else:
+        for idx, e in enumerate(errors, 1):
+            print(format_error(e, idx))
     return errors
 
 
@@ -118,10 +136,6 @@ def filter_errors(errors, filter_type):
         return ferrors
     else:
         return errors
-
-
-def format_error(errobj, idx=0):
-    return f"[error {idx}] {errobj['error_message']}"
 
 
 def check(spec: Assay, spec_fn: str):

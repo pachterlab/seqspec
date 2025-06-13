@@ -4,7 +4,7 @@ This module provides functionality to get seqspec tool version and seqspec file 
 """
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
-
+from typing import Dict
 from seqspec.utils import load_spec
 from seqspec.Assay import Assay
 from . import __version__
@@ -52,16 +52,29 @@ def run_version(parser: ArgumentParser, args: Namespace) -> None:
     validate_version_args(parser, args)
 
     spec = load_spec(args.yaml)
-    version_info = version(spec)
+    vinfo = seqspec_version(spec)
+    finfo = format_version(vinfo)
 
     if args.output:
-        args.output.write_text(version_info)
+        args.output.write_text(finfo)
     else:
-        print(version_info)
+        print(finfo)
 
 
-def version(spec: Assay) -> str:
+def seqspec_version(spec: Assay) -> Dict:
     """Get version information for spec and tool."""
     version = spec.seqspec_version
     tool_version = __version__
-    return f"seqspec version: {tool_version}\nseqspec file version: {version}"
+    return {"file_version": version, "tool_version": tool_version}
+
+
+def format_version(vinfo: Dict) -> str:
+    """Format version information into a string.
+
+    Args:
+        vinfo: Dictionary containing file_version and tool_version
+
+    Returns:
+        Formatted string with version information
+    """
+    return f"seqspec version: {vinfo['tool_version']}\nseqspec file version: {vinfo['file_version']}"

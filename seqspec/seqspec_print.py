@@ -98,16 +98,7 @@ def run_print(parser: ArgumentParser, args: Namespace) -> None:
     validate_print_args(parser, args)
 
     spec = load_spec(args.yaml)
-
-    # Map format to print function
-    format_to_function = {
-        "library-ascii": print_library_ascii,
-        "seqspec-html": print_seqspec_html,
-        "seqspec-png": print_seqspec_png,
-        "seqspec-ascii": print_seqspec_ascii,
-    }
-
-    result = format_to_function[args.format](spec)
+    result = seqspec_print(spec, args.format)
 
     if args.format == "seqspec-png":
         result.savefig(args.output, dpi=300, bbox_inches="tight")
@@ -116,6 +107,35 @@ def run_print(parser: ArgumentParser, args: Namespace) -> None:
             print(result, file=f)
     else:
         print(result)
+
+
+def seqspec_print(spec: Assay, fmt: str):
+    """Print sequence specification in the specified format.
+
+    Args:
+        spec: The seqspec specification to print
+        fmt: The format to print in (library-ascii, seqspec-html, seqspec-png, seqspec-ascii)
+
+    Returns:
+        The formatted output (string or matplotlib figure)
+
+    Raises:
+        ValueError: If format is not supported
+    """
+    # Map format to print function
+    format_to_function = {
+        "library-ascii": print_library_ascii,
+        "seqspec-html": print_seqspec_html,
+        "seqspec-png": print_seqspec_png,
+        "seqspec-ascii": print_seqspec_ascii,
+    }
+
+    if fmt not in format_to_function:
+        raise ValueError(
+            f"Unsupported format: {fmt}. Must be one of {list(format_to_function.keys())}"
+        )
+
+    return format_to_function[fmt](spec)
 
 
 def print_seqspec_ascii(spec: Assay) -> str:

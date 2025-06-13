@@ -53,7 +53,7 @@ def run_upgrade(parser: ArgumentParser, args: Namespace) -> None:
 
     spec = load_spec(args.yaml)
     version = spec.seqspec_version
-    upgraded_spec = upgrade(spec, version)
+    upgraded_spec = seqspec_upgrade(spec, version)
 
     if args.output:
         args.output.write_text(upgraded_spec.to_YAML())
@@ -61,7 +61,7 @@ def run_upgrade(parser: ArgumentParser, args: Namespace) -> None:
         print(upgraded_spec.to_YAML())
 
 
-def upgrade(spec: Assay, version: str) -> Assay:
+def seqspec_upgrade(spec: Assay, version: str) -> Assay:
     """Upgrade spec to current version."""
     UPGRADE = {
         "0.0.0": upgrade_0_0_0_to_0_3_0,
@@ -70,6 +70,11 @@ def upgrade(spec: Assay, version: str) -> Assay:
         "0.2.0": upgrade_0_2_0_to_0_3_0,
         "0.3.0": upgrade_0_3_0_to_0_3_0,
     }
+
+    if version not in UPGRADE:
+        raise ValueError(
+            f"Unsupported version: {version}. Must be one of {list(UPGRADE.keys())}"
+        )
 
     return UPGRADE[version](spec)
 
@@ -102,7 +107,6 @@ def upgrade_0_2_0_to_0_3_0(spec: Assay) -> Assay:
         for lf in r.get_leaves():
             if lf.onlist is not None:
                 filename = lf.onlist.filename
-                # location = lf.onlist.location
                 md5 = lf.onlist.md5
                 lf.onlist = Onlist(
                     file_id=filename,
@@ -112,7 +116,6 @@ def upgrade_0_2_0_to_0_3_0(spec: Assay) -> Assay:
                     url="",
                     urltype="",
                     md5=md5,
-                    # location=location,
                 )
     spec.seqspec_version = "0.3.0"
     return spec
