@@ -1,0 +1,98 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm>=7.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seqspec"
+dynamic = ["version"]
+description = "A tool for working with sequencing specifications"
+readme = "README.md"
+requires-python = ">=3.6,<3.13"
+license = {text = "MIT"}
+authors = [
+    {name = "Sina Booeshaghi", email = "abooesha@caltech.edu"}
+]
+maintainers = [
+    {name = "Sina Booeshaghi", email = "abooesha@caltech.edu"}
+]
+keywords = ["bioinformatics", "sequencing", "specifications"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "jsonschema",
+    "newick",
+    "requests",
+    "biopython",
+    "packaging",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "tox",
+    "pre-commit",
+    "flake8",
+    "build",
+    "setuptools_scm>=7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/sbooeshaghi/seqspec"
+Repository = "https://github.com/sbooeshaghi/seqspec.git"
+
+[project.scripts]
+seqspec = "seqspec.main:main"
+
+[tool.setuptools]
+packages = ["seqspec"]
+package-dir = {"" = "."}
+
+[tool.setuptools.package-data]
+"seqspec" = ["schema/*"]
+
+[tool.setuptools_scm]
+write_to = "seqspec/__init__.py"
+write_to_template = '__version__ = "{version}"\n'
+version_scheme = "python-simplified-semver"
+local_scheme = "node-and-timestamp"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "--cov=seqspec"
+
+[tool.coverage.run]
+source = ["seqspec"]
+omit = ["tests/*"]
+
+[tool.flake8]
+exclude = [".git", ".github", "__pycache__", "build", "dist"]
+max-line-length = 88
+extend-ignore = ["E203", "E501"]
+
+[tool.tox]
+env_list = ["py{311,312,313}"]
+skip_missing_interpreters = true
+
+[tool.tox.env]
+commands = ["pytest --cov=seqspec {posargs:tests}"]
+deps = [
+    "pytest",
+    "pytest-cov",
+    "matplotlib >= 3.4.0",
+] 
