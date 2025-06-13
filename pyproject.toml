@@ -8,13 +8,9 @@ dynamic = ["version"]
 description = "A tool for working with sequencing specifications"
 readme = "README.md"
 requires-python = ">=3.6,<3.13"
-license = {text = "MIT"}
-authors = [
-    {name = "Sina Booeshaghi", email = "abooesha@caltech.edu"}
-]
-maintainers = [
-    {name = "Sina Booeshaghi", email = "abooesha@caltech.edu"}
-]
+license = { text = "MIT" }
+authors = [{ name = "Sina Booeshaghi", email = "abooesha@caltech.edu" }]
+maintainers = [{ name = "Sina Booeshaghi", email = "abooesha@caltech.edu" }]
 keywords = ["bioinformatics", "sequencing", "specifications"]
 classifiers = [
     "Environment :: Console",
@@ -60,14 +56,13 @@ seqspec = "seqspec.main:main"
 
 [tool.setuptools]
 packages = ["seqspec"]
-package-dir = {"" = "."}
+package-dir = { "" = "." }
 
 [tool.setuptools.package-data]
 "seqspec" = ["schema/*"]
 
 [tool.setuptools_scm]
 write_to = "seqspec/__init__.py"
-write_to_template = '__version__ = "{version}"\n'
 version_scheme = "python-simplified-semver"
 local_scheme = "node-and-timestamp"
 
@@ -91,8 +86,4 @@ skip_missing_interpreters = true
 
 [tool.tox.env]
 commands = ["pytest --cov=seqspec {posargs:tests}"]
-deps = [
-    "pytest",
-    "pytest-cov",
-    "matplotlib >= 3.4.0",
-] 
+deps = ["pytest", "pytest-cov", "matplotlib >= 3.4.0"]
