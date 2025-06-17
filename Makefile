@@ -4,9 +4,11 @@ clean:
 	rm -rf build
 	rm -rf dist
 	rm -rf seqspec.egg-info
+	rm -rf seqspec.egg_info
 	rm -rf docs/_build
 	rm -rf docs/api
 	rm -rf .coverage
+	rm -rf _build
 
 # Build both the source distribution and wheel distribution
 build:

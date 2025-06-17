@@ -7,7 +7,7 @@ name = "seqspec"
 dynamic = ["version"]
 description = "A tool for working with sequencing specifications"
 readme = "README.md"
-requires-python = ">=3.6,<3.13"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Sina Booeshaghi", email = "abooesha@caltech.edu" }]
 maintainers = [{ name = "Sina Booeshaghi", email = "abooesha@caltech.edu" }]
@@ -17,10 +17,6 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -34,6 +30,8 @@ dependencies = [
     "requests",
     "biopython",
     "packaging",
+    "mcp",
+    "matplotlib",
 ]
 
 [project.optional-dependencies]
