@@ -63,7 +63,7 @@ package-dir = { "" = "." }
 [tool.setuptools_scm]
 write_to = "seqspec/__init__.py"
 version_scheme = "python-simplified-semver"
-local_scheme = "node-and-timestamp"
+local_scheme = "node-and-date"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
