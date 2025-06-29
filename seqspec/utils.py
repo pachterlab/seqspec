@@ -1,41 +1,138 @@
+import gzip
 import io
 import os
-import gzip
-from seqspec.Assay import Assay
+import re
+from pathlib import Path
+from typing import IO, List, Optional, Tuple, Union
 
-from seqspec.Read import Read
-from seqspec.Region import Region, Onlist
-
-import yaml
 import requests
+import yaml
 from Bio import GenBank
-from typing import Tuple, List
+
+from seqspec.Assay import Assay
+from seqspec.File import File
+from seqspec.Read import Read
+from seqspec.Region import Onlist, Region
+
+# def strip_yaml_tags(yaml_str: str) -> str:
+#     """
+#     Removes leading YAML tags like !Assay or !Read from the input string.
+#     """
+#     return re.sub(r'^ *!(\w+)', '', yaml_str, flags=re.MULTILINE)
 
 
-def load_spec(spec_fn: str):
+# def safe_load_strip_tags(stream: Union[str, IO, Path]):
+#     """
+#     Reads a YAML string or file-like object, strips YAML tags,
+#     and safely loads it using yaml.safe_load().
+#     """
+#     if isinstance(stream, (str, Path)):
+#         with open(stream, "r") as f:
+#             raw = f.read()
+#     else:
+#         raw = stream.read()
+
+#     cleaned = strip_yaml_tags(raw)
+#     return yaml.safe_load(cleaned)
+
+# def load_spec(spec_fn: str):
+#     try:
+#         with gzip.open(spec_fn, "rt") as stream:
+#             return load_spec_stream(stream)
+#     except gzip.BadGzipFile:
+#         with open(spec_fn, "r") as stream:
+#             return load_spec_stream(stream)
+
+
+# def load_spec_stream(spec_stream: IO):
+#     data_dict = safe_load_strip_tags(spec_stream)
+#     assay = Assay(**data_dict)
+
+#     for r in assay.library_spec:
+#         r.set_parent_id(None)
+
+#     return assay
+
+
+# --- Known tags to strip from the YAML ---
+KNOWN_TAGS = [
+    "!Assay",
+    "!File",
+    "!LibProtocol",
+    "!LibKit",
+    "!SeqProtocol",
+    "!SeqKit",
+    "!Read",
+    "!Onlist",
+    "!Region",
+]
+
+# Regex pattern to match known tags in all common positions
+TAG_PATTERN = re.compile(
+    r"""(?x)  # verbose mode
+    (^|\s|:)      # start of line, whitespace, or mapping colon
+    ("""
+    + "|".join(re.escape(tag) for tag in KNOWN_TAGS)
+    + r""")
+    (?=\s|$|[:\[\]{},])  # followed by space, end of line, or YAML structure characters
     """
-    Reads a YAML file that may be gzipped or not.
+)
 
-    :param spec_fn: Path to the YAML or gzipped YAML file.
-    :return: Parsed YAML content as a Assay object.
+
+def strip_yaml_tags(yaml_str: str) -> str:
+    """
+    Removes known YAML tags from anywhere in the input YAML text.
+    """
+    return TAG_PATTERN.sub(r"\1", yaml_str)
+
+
+def safe_load_strip_tags(stream: Union[str, Path, IO]) -> dict:
+    """
+    Reads a YAML string or file-like object, strips known YAML tags,
+    and safely loads it using yaml.safe_load().
+    """
+    if isinstance(stream, (str, Path)):
+        with open(stream, "r") as f:
+            raw = f.read()
+    else:
+        raw = stream.read()
+
+    cleaned = strip_yaml_tags(raw)
+    return yaml.safe_load(cleaned)
+
+
+def load_spec(spec_fn: Union[str, Path]) -> Assay:
+    """
+    Loads a YAML or gzipped YAML spec file, strips tags, and constructs an Assay object.
     """
     try:
-        # Check if the file is gzipped by attempting to open it as such
         with gzip.open(spec_fn, "rt") as stream:
             return load_spec_stream(stream)
     except gzip.BadGzipFile:
-        # If opening as gzip fails, assume it's a regular YAML file
         with open(spec_fn, "r") as stream:
             return load_spec_stream(stream)
 
 
-def load_spec_stream(spec_stream: io.IOBase):
-    data: Assay = yaml.load(spec_stream, Loader=yaml.Loader)
-    # set the parent id in the Assay object upon loading it
-    for r in data.library_spec:
-        r.set_parent_id(None)
+def load_spec_stream(spec_stream: IO) -> Assay:
+    """
+    Parses a YAML stream, strips tags, and returns a validated Assay object.
+    """
+    data_dict = safe_load_strip_tags(spec_stream)
+    assay = Assay(**data_dict)
 
-    return data
+    # optional postprocessing
+    for r in assay.library_spec:
+        r.set_parent_id("")
+    return assay
+
+
+def yaml_safe_dump(obj):
+    if isinstance(obj, list):
+        return [o.model_dump() if hasattr(o, "model_dump") else o for o in obj]
+    elif hasattr(obj, "model_dump"):
+        return obj.model_dump()
+    else:
+        return obj
 
 
 def load_genbank(gbk_fn: str):
@@ -44,12 +141,29 @@ def load_genbank(gbk_fn: str):
 
 
 def load_genbank_stream(gbk_stream: io.IOBase):
-    data: GenBank = GenBank.read(gbk_stream)
+    data: GenBank = GenBank.read(gbk_stream)  # type: ignore
     return data
 
 
 def write_read(header, seq, qual, f):
     f.write(f"{header}\n{seq}\n+\n{qual}\n")
+
+
+def write_pydantic_to_file_or_stdout(
+    resource: Union[
+        Read, File, Region, Assay, List[Read], List[File], List[Region], Assay
+    ],
+    output: Optional[Path],
+) -> None:
+    """Write spec to file or stdout."""
+    dump = yaml_safe_dump(resource)
+
+    # Handle output
+    if output:
+        with open(output, "w") as f:
+            yaml.dump(dump, f, sort_keys=False)
+    else:
+        print(yaml.dump(dump, sort_keys=False))
 
 
 def yield_onlist_contents(stream):
@@ -201,8 +315,8 @@ def map_read_id_to_regions(
         )
     primer_id = read.primer_id
     # get the index of the primer in the list of leaves (ASSUMPTION, 5'->3' and primer is an atomic element)
-    for i, l in enumerate(leaves):
-        if l.region_id == primer_id:
+    for i, leaf in enumerate(leaves):
+        if leaf.region_id == primer_id:
             primer_idx = i
             break
     else:

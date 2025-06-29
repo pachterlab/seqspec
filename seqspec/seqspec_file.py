@@ -2,16 +2,17 @@
 
 This module provides functionality to list and format files present in seqspec files.
 """
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
-from typing import Dict, List, Optional
-from collections import defaultdict
-import json
 
-from seqspec.utils import load_spec
+import json
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from collections import defaultdict
+from pathlib import Path
+from typing import Dict, List, Optional
+
+from seqspec import seqspec_find
 from seqspec.Assay import Assay
 from seqspec.File import File
-from seqspec import seqspec_find
+from seqspec.utils import load_spec
 
 
 def setup_file_args(parser) -> ArgumentParser:

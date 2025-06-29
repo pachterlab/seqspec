@@ -2,11 +2,14 @@
 
 This module provides functionality to get seqspec tool version and seqspec file version.
 """
+
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
 from typing import Dict
-from seqspec.utils import load_spec
+
 from seqspec.Assay import Assay
+from seqspec.utils import load_spec
+
 from . import __version__
 
 

@@ -3,19 +3,21 @@
 This module provides functionality to print sequence and/or library structure
 in various formats (ascii, png, html).
 """
-from typing import List, Any
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
-import newick
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
-import matplotlib.patches as mpatches
 
-from seqspec.utils import load_spec, REGION_TYPE_COLORS
-from seqspec.seqspec_print_html import print_seqspec_html
-from seqspec.Region import complement_sequence
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from pathlib import Path
+from typing import Any, List
+
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
+import newick
+from matplotlib.patches import Rectangle
+
 from seqspec.Assay import Assay
+from seqspec.Region import complement_sequence
+from seqspec.seqspec_print_html import print_seqspec_html
 from seqspec.seqspec_print_utils import libseq
+from seqspec.utils import REGION_TYPE_COLORS, load_spec
 
 
 def setup_print_args(parser) -> ArgumentParser:

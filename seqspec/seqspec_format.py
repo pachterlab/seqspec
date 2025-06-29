@@ -3,11 +3,12 @@
 This module provides functionality to automatically format and fill in missing fields
 in a seqspec specification file.
 """
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
 
-from seqspec.utils import load_spec
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from pathlib import Path
+
 from seqspec.Assay import Assay
+from seqspec.utils import load_spec
 
 
 def setup_format_args(parser) -> ArgumentParser:

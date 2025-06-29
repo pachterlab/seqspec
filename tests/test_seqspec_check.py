@@ -8,6 +8,7 @@ from seqspec.seqspec_check import (
     setup_check_args,
     validate_check_args,
 )
+
 from .test_utils import example_spec
 
 

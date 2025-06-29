@@ -2,15 +2,19 @@
 
 This module provides functionality to generate new seqspec files from a newick tree format.
 """
+
+import warnings
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
 from typing import List
 
 import newick
+
 from seqspec.Assay import Assay
-from seqspec.Region import Region
 from seqspec.File import File
 from seqspec.Read import Read
+from seqspec.Region import Region
+from seqspec.utils import write_pydantic_to_file_or_stdout
 
 # example
 # seqspec init -n myassay -m 1 -o spec.yaml "(((barcode:16,umi:12)r1.fastq.gz,(cdna:150)r2.fastq.gz)rna)" # seqspec init -n myassay -m 1 -o spec.yaml -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg" " ((truseq_r1:10,barcode:16,umi:12,cdna:150)rna)"
@@ -18,85 +22,101 @@ from seqspec.Read import Read
 
 
 def setup_init_args(parser) -> ArgumentParser:
-    """Create and configure the init command subparser."""
+    """Create and configure the init command subparser (simple draft creator)."""
     subparser = parser.add_parser(
         "init",
         description="""
-Generate a new seqspec file.
+Generate a new *empty* seqspec draft (meta-Regions only).
 
-Examples:
-seqspec init -o spec.yaml -n myassay -m rna -r rna,R1.fastq.gz,r1_primer,16,pos:rna,R2.fastq.gz,r2_primer,100,neg "((r1_primer:0,barcode:16,umi:12,cdna:150,r2_primer:0)rna)" # Initialize a single modality assay
----
+Example:
+    seqspec init -n myassay -m rna,atac -o spec.yaml
 """,
-        help="Generate a new seqspec file",
+        help="Generate a new empty seqspec file",
         formatter_class=RawTextHelpFormatter,
     )
-    subparser_required = subparser.add_argument_group("required arguments")
-    subparser_required.add_argument(
-        "-n", "--name", metavar="NAME", type=str, help="Assay name", required=True
-    )
-    subparser_required.add_argument(
+    req = subparser.add_argument_group("required arguments")
+    req.add_argument("-n", "--name", required=True, help="Assay name")
+    req.add_argument(
         "-m",
         "--modalities",
-        metavar="MODALITIES",
-        type=str,
-        help="List of comma-separated modalities (e.g. rna,atac)",
         required=True,
+        help="Comma-separated list of modalities (e.g. rna,atac)",
     )
-
-    # -r "rna,R1.fastq.gz,truseq_r1,16,pos:rna,R2.fastq.gz,truseq_r2,100,neg"
-    subparser_required.add_argument(
-        "-r",
-        "--reads",
-        metavar="READS",
-        type=str,
-        help="List of modalities, reads, primer_ids, lengths, and strand (e.g. modality,fastq_name,primer_id,len,strand:...)",
-        required=True,
-    )
+    subparser.add_argument("--doi", default="", help="DOI of the assay")
+    subparser.add_argument("--description", default="", help="Short description")
+    subparser.add_argument("--date", default="", help="Date (YYYY-MM-DD)")
     subparser.add_argument(
-        "-o",
-        "--output",
-        metavar="OUT",
-        help="Path to output file",
-        type=Path,
-        default=None,
-    )
-    subparser.add_argument(
-        "newick",
-        help="Tree in newick format (https://marvin.cs.uidaho.edu/Teaching/CS515/newickFormat.html)",
+        "-o", "--output", type=Path, metavar="OUT", help="Output YAML (default stdout)"
     )
     return subparser
 
 
-def validate_init_args(parser: ArgumentParser, args: Namespace) -> None:
-    """Validate the init command arguments."""
-    if not args.newick:
-        parser.error("Newick tree must be provided")
-
-    if args.output and args.output.exists() and not args.output.is_file():
-        parser.error(f"Output path exists but is not a file: {args.output}")
+def validate_init_args(
+    _: ArgumentParser, args: Namespace
+) -> None:  # simple draft needs no extra checks
+    if not args.name:
+        raise ValueError("Assay name is required")
+    if not args.modalities:
+        raise ValueError("Modalities must be provided")
 
 
 def run_init(parser: ArgumentParser, args: Namespace) -> None:
-    """Run the init command."""
+    """Run the simplified init command."""
     validate_init_args(parser, args)
 
-    modalities = args.modalities.split(",")
-    reads = parse_reads_string(args.reads)
-    regions = newick_to_regions(args.newick)
+    modalities = [m.strip() for m in args.modalities.split(",") if m.strip()]
+    spec = seqspec_init(args.name, args.doi, args.date, args.description, modalities)
+    # Build empty assay with meta Regions only
 
-    spec = seqspec_init(args.name, modalities, regions, reads)
-    yaml_str = spec.to_YAML()
-    if yaml_str is None:
-        raise ValueError("Failed to generate YAML string from assay")
+    write_pydantic_to_file_or_stdout(spec, args.output)
 
-    if args.output:
-        args.output.write_text(yaml_str)
-    else:
-        print(yaml_str)
+
+# -----------------------------------------------------------------------------
+# Deprecated legacy (newick-based) helpers – kept for reference only
+# -----------------------------------------------------------------------------
+
+
+warnings.warn(
+    "The newick-based seqspec init format is deprecated and will be removed in a future release.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 def seqspec_init(
+    name: str, doi: str, date: str, description: str, modalities: List[str]
+) -> Assay:
+    meta_regions: List[Region] = [
+        Region(
+            region_id=mod, region_type="meta", name=mod, sequence_type="", regions=None
+        )
+        for mod in modalities
+    ]
+
+    spec = Assay(
+        assay_id="",
+        name=name,
+        doi=doi,
+        date=date,
+        description=description,
+        modalities=modalities,
+        lib_struct="",
+        sequence_protocol=None,
+        sequence_kit=None,
+        library_protocol=None,
+        library_kit=None,
+        sequence_spec=[],
+        library_spec=meta_regions,
+    )
+    spec.update_spec()
+    return spec
+
+
+# The following functions are **deprecated** and unused by the current CLI
+# but remain in the file for backward compatibility / reference.
+
+
+def old_seqspec_init(
     name: str, modalities: List[str], regions: List[Region], reads: List[Read]
 ) -> Assay:
     """Initialize a new seqspec specification.

@@ -1,11 +1,11 @@
 from unittest import TestCase
 
-from seqspec.Region import (
-    project_regions_to_coordinates,
-    Region,
-    Onlist,
-)
 from seqspec.Read import Read
+from seqspec.Region import (
+    Onlist,
+    Region,
+    project_regions_to_coordinates,
+)
 
 
 def region_rna_joined_dict(region_id, regions=[]):
@@ -206,7 +206,16 @@ class TestRegion(TestCase):
         list_md5sum = "d41d8cd98f00b204e9800998ecf8427e"
         list_location = "local"
 
-        permited = Onlist(list_id, list_name, list_type, list_size, list_url, list_urltype, list_md5sum, list_location)
+        permited = Onlist(
+            list_id,
+            list_name,
+            list_type,
+            list_size,
+            list_url,
+            list_urltype,
+            list_md5sum,
+            list_location,
+        )
 
         r = Region(
             region_name,

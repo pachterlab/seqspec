@@ -2,14 +2,14 @@
 
 This module provides functionality to modify attributes of various elements in seqspec files.
 """
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
-from typing import List, Optional
-import warnings
 
-from seqspec.utils import load_spec
-from seqspec.File import File
+import json
+from argparse import SUPPRESS, ArgumentParser, Namespace, RawTextHelpFormatter
+from pathlib import Path
+from typing import List
+
 from seqspec.Assay import Assay
+from seqspec.utils import load_spec, write_pydantic_to_file_or_stdout
 
 
 def setup_modify_args(parser) -> ArgumentParser:
@@ -17,12 +17,17 @@ def setup_modify_args(parser) -> ArgumentParser:
     subparser = parser.add_parser(
         "modify",
         description="""
-Modify attributes of various elements in a seqspec file.
+Modify attributes of various elements in a seqspec file using JSON objects.
 
 Examples:
-seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --read-id renamed_rna_R1 spec.yaml                                                                                                # modify the read id
-seqspec modify -m rna -o mod_spec.yaml -s region -i rna_cell_bc --region-id renamed_rna_cell_bc spec.yaml                                                                        # modify the region id
-seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --files "R1_1.fastq.gz,fastq,0,./fastq/R1_1.fastq.gz,local,null:R1_2.fastq.gz,fastq,0,./fastq/R1_2.fastq.gz,local,null" spec.yaml # modify the files for R1 fastq
+seqspec modify -m rna -o mod_spec.yaml -s read -k '[{"read_id": "rna_R1", "name": "renamed_rna_R1"}]' spec.yaml
+seqspec modify -m rna -o mod_spec.yaml -s region -k '[{"region_id": "rna_cell_bc", "name": "renamed_rna_cell_bc"}]' spec.yaml
+seqspec modify -m rna -o mod_spec.yaml -s file -k '[{"file_id": "R1.fastq.gz", "url": "./fastq/R1.fastq.gz"}]' spec.yaml
+seqspec modify -m rna -o mod_spec.yaml -s seqkit -k '[{"kit_id": "NovaSeq_kit", "name": "Updated NovaSeq Kit"}]' spec.yaml
+seqspec modify -m rna -o mod_spec.yaml -s seqprotocol -k '[{"protocol_id": "Illumina_NovaSeq", "name": "Updated Protocol"}]' spec.yaml
+seqspec modify -m rna -o mod_spec.yaml -s libkit -k '[{"kit_id": "Truseq_kit", "name": "Updated Truseq Kit"}]' spec.yaml
+seqspec modify -m rna -o mod_spec.yaml -s libprotocol -k '[{"protocol_id": "10x_protocol", "name": "Updated 10x Protocol"}]' spec.yaml
+seqspec modify -m rna -o mod_spec.yaml -s assay -k '[{"assay_id": "my_assay", "name": "Updated Assay Name"}]' spec.yaml
 ---
 """,
         help="Modify attributes of various elements in seqspec file",
@@ -31,97 +36,13 @@ seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --files "R1_1.fastq.gz,fastq,0,
     subparser_required = subparser.add_argument_group("required arguments")
     subparser.add_argument("yaml", help="Sequencing specification yaml file", type=str)
 
-    # Read properties
-    subparser.add_argument(
-        "--read-id",
-        metavar="READID",
-        help="New ID of read",
+    subparser_required.add_argument(
+        "-k",
+        "--keys",
+        metavar="KEYS",
+        help="JSON array of objects to modify. Each object must include an id field (read_id, region_id, file_id, kit_id, protocol_id, or assay_id).",
         type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "--read-name",
-        metavar="READNAME",
-        help="New name of read",
-        type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "--primer-id",
-        metavar="PRIMERID",
-        help="New ID of primer",
-        type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "--strand",
-        metavar="STRAND",
-        help="New strand",
-        type=str,
-        default=None,
-    )
-
-    # files to insert into the read
-    # format: filename,filetype,filesize,url,urltype,md5:...
-    subparser.add_argument(
-        "--files",
-        metavar="FILES",
-        help="New files, (filename,filetype,filesize,url,urltype,md5:...)",
-        type=str,
-        default=None,
-    )
-
-    # Region properties
-    subparser.add_argument(
-        "--region-id",
-        metavar="REGIONID",
-        help="New ID of region",
-        type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "--region-type",
-        metavar="REGIONTYPE",
-        help="New type of region",
-        type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "--region-name",
-        metavar="REGIONNAME",
-        help="New name of region",
-        type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "--sequence-type",
-        metavar="SEQUENCETYPE",
-        help="New type of sequence",
-        type=str,
-        default=None,
-    )
-    subparser.add_argument(
-        "--sequence",
-        metavar="SEQUENCE",
-        help="New sequence",
-        type=str,
-        default=None,
-    )
-
-    # Read or Region properties
-    subparser.add_argument(
-        "--min-len",
-        metavar="MINLEN",
-        help="Min region length",
-        type=int,
-        default=None,
-    )
-    subparser.add_argument(
-        "--max-len",
-        metavar="MAXLEN",
-        help="Max region length",
-        type=int,
-        default=None,
+        required=True,
     )
 
     subparser.add_argument(
@@ -132,21 +53,30 @@ seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --files "R1_1.fastq.gz,fastq,0,
         type=Path,
         default=None,
     )
+    # subparser_required.add_argument(
+    #     "-r",
+    #     metavar="READID/REGIONID",
+    #     help=SUPPRESS,
+    #     type=str,
+    #     default=None,
+    # )
     subparser_required.add_argument(
-        "-r",
-        metavar="READID/REGIONID",
+        "-i",
+        metavar="IDs",
         help=SUPPRESS,
         type=str,
         default=None,
     )
-    subparser_required.add_argument(
-        "-i",
-        metavar="IDs",
-        help="IDs",
-        type=str,
-        default=None,
-    )
-    choices = ["read", "region"]
+    choices = [
+        "read",
+        "region",
+        "file",
+        "seqkit",
+        "seqprotocol",
+        "libkit",
+        "libprotocol",
+        "assay",
+    ]
     subparser.add_argument(
         "-s",
         "--selector",
@@ -170,15 +100,6 @@ seqspec modify -m rna -o mod_spec.yaml -i rna_R1 --files "R1_1.fastq.gz,fastq,0,
 
 def validate_modify_args(parser: ArgumentParser, args: Namespace) -> None:
     """Validate the modify command arguments."""
-    if args.r is not None:
-        warnings.warn(
-            "The '-r' argument is deprecated and will be removed in a future version. "
-            "Please use '-i' instead.",
-            DeprecationWarning,
-        )
-        # Optionally map the old option to the new one
-        if not args.i:
-            args.i = args.r
 
     if not Path(args.yaml).exists():
         parser.error(f"Input file does not exist: {args.yaml}")
@@ -190,116 +111,163 @@ def validate_modify_args(parser: ArgumentParser, args: Namespace) -> None:
 def run_modify(parser: ArgumentParser, args: Namespace) -> None:
     """Run the modify command."""
     validate_modify_args(parser, args)
-
+    # todo enable updating id with args.id
     spec = load_spec(args.yaml)
 
-    # Read properties
-    read_kwd = {
-        "read_id": args.read_id,
-        "read_name": args.read_name,
-        "primer_id": args.primer_id,
-        "min_len": args.min_len,
-        "max_len": args.max_len,
-        "strand": args.strand,
-        "files": args.files,
+    keys = json.loads(args.keys)  # list of dicts
+
+    UPDATE = {
+        "read": seqspec_modify_read,
+        "region": seqspec_modify_region,
+        "file": seqspec_modify_files,
+        "seqkit": seqspec_modify_seqkit,
+        "seqprotocol": seqspec_modify_seqprotocol,
+        "libkit": seqspec_modify_libkit,
+        "libprotocol": seqspec_modify_libprotocol,
+        "assay": seqspec_modify_assay,
     }
 
-    # Region properties
-    region_kwd = {
-        "region_id": args.region_id,
-        "region_type": args.region_type,
-        "name": args.region_name,
-        "sequence_type": args.sequence_type,
-        "sequence": args.sequence,
-        "min_len": args.min_len,
-        "max_len": args.max_len,
-    }
-
-    if args.selector == "region":
-        spec = run_modify_region(spec, args.modality, args.i, **region_kwd)
-    elif args.selector == "read":
-        spec = run_modify_read(spec, args.modality, args.i, **read_kwd)
+    spec = UPDATE.get(args.selector, lambda x: None)[spec, args.modality, keys]
 
     # Update spec
     spec.update_spec()
 
-    if args.output:
-        args.output.write_text(spec.to_YAML())
-    else:
-        print(spec.to_YAML())
+    write_pydantic_to_file_or_stdout(spec, args.output)
 
 
-def run_modify_read(
-    spec: Assay,
-    modality: str,
-    target_read: str,
-    read_id: Optional[str] = None,
-    read_name: Optional[str] = None,
-    primer_id: Optional[str] = None,
-    min_len: Optional[int] = None,
-    max_len: Optional[int] = None,
-    strand: Optional[str] = None,
-    files: Optional[str] = None,
-) -> Assay:
-    """Modify read properties in spec."""
+def seqspec_modify_read(spec: Assay, modality: str, new_reads: List[dict]) -> Assay:
+    """Modify read properties in spec using new read objects."""
     reads = spec.get_seqspec(modality)
-    if files:
-        files_list = parse_files_string(files)
-    for r in reads:
-        if r.read_id == target_read:
-            r.update_read_by_id(
-                read_id,
-                read_name,
-                modality,
-                primer_id,
-                min_len,
-                max_len,
-                strand,
-                files_list,
-            )
+    for new_read_data in new_reads:
+        read_id = new_read_data.get("read_id")
+        if not read_id:
+            continue
+        for read in reads:
+            if read.read_id == read_id:
+                # Update only the fields that are provided
+                for field, value in new_read_data.items():
+                    if value is not None and hasattr(read, field):
+                        setattr(read, field, value)
+                break
     return spec
 
 
-def run_modify_region(
-    spec: Assay,
-    modality: str,
-    target_region: str,
-    region_id: Optional[str] = None,
-    region_type: Optional[str] = None,
-    name: Optional[str] = None,
-    sequence_type: Optional[str] = None,
-    sequence: Optional[str] = None,
-    min_len: Optional[int] = None,
-    max_len: Optional[int] = None,
+def seqspec_modify_region(spec: Assay, modality: str, new_regions: List[dict]) -> Assay:
+    """Modify region properties in spec using new region objects."""
+    libspec = spec.get_libspec(modality)
+    for new_region_data in new_regions:
+        region_id = new_region_data.get("region_id")
+        if not region_id:
+            continue
+        matching_regions = libspec.get_region_by_id(region_id)
+        for region in matching_regions:
+            # Update only the fields that are provided
+            for field, value in new_region_data.items():
+                if value is not None and hasattr(region, field):
+                    setattr(region, field, value)
+    return spec
+
+
+def seqspec_modify_files(spec: Assay, modality: str, new_files: List[dict]) -> Assay:
+    """Modify file properties in spec using new file objects."""
+    reads = spec.get_seqspec(modality)
+    for new_file_data in new_files:
+        file_id = new_file_data.get("file_id")
+        if not file_id:
+            continue
+        for read in reads:
+            for file in read.files:
+                if file.file_id == file_id:
+                    # Update only the fields that are provided
+                    for field, value in new_file_data.items():
+                        if value is not None and hasattr(file, field):
+                            setattr(file, field, value)
+                    break
+    return spec
+
+
+def seqspec_modify_seqkit(spec: Assay, modality: str, new_seqkits: List[dict]) -> Assay:
+    """Modify sequence kit properties in spec."""
+    if isinstance(spec.sequence_kit, list):
+        for new_seqkit_data in new_seqkits:
+            kit_id = new_seqkit_data.get("kit_id")
+            if not kit_id:
+                continue
+            for seqkit in spec.sequence_kit:
+                if seqkit.kit_id == kit_id:
+                    # Update only the fields that are provided
+                    for field, value in new_seqkit_data.items():
+                        if value is not None and hasattr(seqkit, field):
+                            setattr(seqkit, field, value)
+                    break
+    return spec
+
+
+def seqspec_modify_seqprotocol(
+    spec: Assay, modality: str, new_seqprotocols: List[dict]
 ) -> Assay:
-    """Modify region properties in spec."""
-    spec.get_libspec(modality).update_region_by_id(
-        target_region,
-        region_id,
-        region_type,
-        name,
-        sequence_type,
-        sequence,
-        min_len,
-        max_len,
-    )
+    """Modify sequence protocol properties in spec."""
+    if isinstance(spec.sequence_protocol, list):
+        for new_seqprotocol_data in new_seqprotocols:
+            protocol_id = new_seqprotocol_data.get("protocol_id")
+            if not protocol_id:
+                continue
+            for seqprotocol in spec.sequence_protocol:
+                if seqprotocol.protocol_id == protocol_id:
+                    # Update only the fields that are provided
+                    for field, value in new_seqprotocol_data.items():
+                        if value is not None and hasattr(seqprotocol, field):
+                            setattr(seqprotocol, field, value)
+                    break
     return spec
 
 
-def parse_files_string(input_string: str) -> List[File]:
-    """Parse files string into list of File objects. # filename,filetype,filesize,url,urltype,md5:..."""
-    files = []
-    for f in input_string.split(":"):
-        filename, filetype, filesize, url, urltype, md5 = f.split(",")
-        files.append(
-            File(
-                file_id=filename,
-                filename=filename,
-                filetype=filetype,
-                filesize=int(filesize),
-                url=url,
-                urltype=urltype,
-                md5=md5,
-            )
-        )
-    return files
+def seqspec_modify_libkit(spec: Assay, modality: str, new_libkits: List[dict]) -> Assay:
+    """Modify library kit properties in spec."""
+    if isinstance(spec.library_kit, list):
+        for new_libkit_data in new_libkits:
+            kit_id = new_libkit_data.get("kit_id")
+            if not kit_id:
+                continue
+            for libkit in spec.library_kit:
+                if libkit.kit_id == kit_id:
+                    # Update only the fields that are provided
+                    for field, value in new_libkit_data.items():
+                        if value is not None and hasattr(libkit, field):
+                            setattr(libkit, field, value)
+                    break
+    return spec
+
+
+def seqspec_modify_libprotocol(
+    spec: Assay, modality: str, new_libprotocols: List[dict]
+) -> Assay:
+    """Modify library protocol properties in spec."""
+    if isinstance(spec.library_protocol, list):
+        for new_libprotocol_data in new_libprotocols:
+            protocol_id = new_libprotocol_data.get("protocol_id")
+            if not protocol_id:
+                continue
+            for libprotocol in spec.library_protocol:
+                if libprotocol.protocol_id == protocol_id:
+                    # Update only the fields that are provided
+                    for field, value in new_libprotocol_data.items():
+                        if value is not None and hasattr(libprotocol, field):
+                            setattr(libprotocol, field, value)
+                    break
+    return spec
+
+
+def seqspec_modify_assay(
+    spec: Assay, modality: str, new_assay_data: List[dict]
+) -> Assay:
+    """Modify assay properties in spec."""
+    for data in new_assay_data:
+        assay_id = data.get("assay_id")
+        if not assay_id or assay_id != spec.assay_id:
+            continue
+        # Update only the fields that are provided
+        for field, value in data.items():
+            if value is not None and hasattr(spec, field):
+                setattr(spec, field, value)
+    return spec

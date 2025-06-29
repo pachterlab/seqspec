@@ -2,22 +2,23 @@
 
 This module provides functionality to generate and manage onlist files for seqspec regions.
 """
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
-import warnings
-import os
+
 import itertools
+import os
+import warnings
+from argparse import SUPPRESS, ArgumentParser, Namespace, RawTextHelpFormatter
+from pathlib import Path
 from typing import List
 
 from seqspec.Assay import Assay
-from seqspec.Region import project_regions_to_coordinates, itx_read, Onlist
+from seqspec.Region import Onlist, itx_read, project_regions_to_coordinates
+from seqspec.seqspec_find import find_by_region_id, find_by_region_type
 from seqspec.utils import (
     load_spec,
     map_read_id_to_regions,
     read_local_list,
     read_remote_list,
 )
-from seqspec.seqspec_find import find_by_region_type, find_by_region_id
 
 
 def setup_onlist_args(parser) -> ArgumentParser:

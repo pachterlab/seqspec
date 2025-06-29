@@ -2,17 +2,18 @@
 
 This module provides functionality to convert between different formats (seqspec, genbank, token).
 """
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
+
 import json
-import numpy as np
-from typing import Dict, List, Tuple
 import os
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from pathlib import Path
+from typing import Dict, List, Tuple
 
-from seqspec.utils import load_genbank, load_spec
-from seqspec.Region import Region
+import numpy as np
+
 from seqspec.Assay import Assay
-
+from seqspec.Region import Region
+from seqspec.utils import load_genbank, load_spec
 
 # Load schema and constants
 schema_fn = os.path.join(os.path.dirname(__file__), "schema/seqspec.schema.json")
@@ -103,7 +104,7 @@ def run_convert(parser: ArgumentParser, args: Namespace) -> None:
 
     if args.output:
         if args.output_format == "token":
-            save_tokenized_spec(*result, str(args.output))  # noqa
+            save_tokenized_spec(*result, str(args.output))  # type: ignore
         else:
             # Handle other output formats here
             pass
@@ -186,7 +187,7 @@ def seqspec_to_token(spec):
 
 
 def tokenize_specs(
-    specs_regions: Dict[str, Dict[str, List[Dict]]]
+    specs_regions: Dict[str, Dict[str, List[Dict]]],
 ) -> Tuple[np.ndarray, List[Tuple[str, str, str]]]:
     """
     Convert specs into a single matrix where each row represents a complete region specification
@@ -262,19 +263,19 @@ def gb_to_seqspec(gb):
     regions = convert(filled_regions)
     reads = []
     spec = Assay(
-        "genbank",
-        "illumina",
-        "genbank thing",
-        "doi",
-        "date",
-        ["source"],
-        "description",
-        "",
-        "",
-        "",
-        "",
-        reads,
-        regions,
+        assay_id="genbank",
+        name="illumina",
+        doi="doi",
+        date="date",
+        description="description",
+        modalities=["source"],
+        lib_struct="",
+        sequence_protocol="",
+        sequence_kit="",
+        library_protocol="",
+        library_kit="",
+        sequence_spec=reads,
+        library_spec=regions,
     )
     return spec
 
@@ -373,7 +374,7 @@ def fill_gaps(seq, regions, parent_start=0, parent_stop=0):
 
         # Check for gap and insert a filler
         if i < len(regions) - 1 and region["stop"] < regions[i + 1]["start"]:
-            filler_id = f'filler_{region["id"]}_{regions[i+1]["id"]}'
+            filler_id = f"filler_{region['id']}_{regions[i + 1]['id']}"
             start = region["stop"]
             stop = regions[i + 1]["start"]
             s = seq[start:stop]
@@ -417,15 +418,14 @@ def convert(regions):
     new_regions = []
     for r in regions:
         rgn = Region(
-            r["id"],
-            "",
-            r["label"],
-            "fixed",
-            r["seq"],
-            r["length"],
-            r["length"],
-            None,
-            None,
+            region_id=r["id"],
+            region_type="",
+            name=r["label"],
+            sequence_type="fixed",
+            sequence=r["seq"],
+            min_len=r["length"],
+            max_len=r["length"],
+            onlist=None,
         )
         if len(r["regions"]) > 0:
             rgn.regions = convert(r["regions"])

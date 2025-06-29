@@ -1,5 +1,4 @@
 from io import StringIO
-
 from unittest import TestCase
 
 from matplotlib.figure import Figure

@@ -1,15 +1,14 @@
 import json
 from unittest import TestCase
-import yaml
-from seqspec.Region import Region
-from seqspec.Assay import Assay
 
 from seqspec import __version__
+from seqspec.Assay import Assay
+from seqspec.Region import Region
 
 from .test_region import (
     region_rna_joined_dict,
-    region_rna_umi_dict,
     region_rna_linker_dict,
+    region_rna_umi_dict,
 )
 
 

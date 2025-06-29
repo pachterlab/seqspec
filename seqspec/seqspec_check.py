@@ -2,16 +2,17 @@
 
 This module provides functionality to validate seqspec files against the specification schema.
 """
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
-from typing import List, Dict, Optional
 
-from jsonschema import Draft4Validator
-import yaml
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from os import path
+from pathlib import Path
+from typing import Dict, List, Optional
 
-from seqspec.utils import load_spec, file_exists
+import yaml
+from jsonschema import Draft4Validator
+
 from seqspec.Assay import Assay
+from seqspec.utils import file_exists, load_spec
 
 
 def setup_check_args(parser):

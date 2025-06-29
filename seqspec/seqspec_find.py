@@ -2,18 +2,18 @@
 
 This module provides functionality to search for objects within seqspec files.
 """
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
+
 import warnings
-import yaml
+from argparse import SUPPRESS, ArgumentParser, Namespace, RawTextHelpFormatter
+from pathlib import Path
 from typing import List, Optional, Union
 
-from seqspec.utils import load_spec
 from seqspec.Assay import Assay
+from seqspec.File import File
 from seqspec.Read import Read
 from seqspec.Region import Region
-from seqspec.File import File
 from seqspec.seqspec_file import list_all_files
+from seqspec.utils import load_spec, write_pydantic_to_file_or_stdout
 
 
 def setup_find_args(parser) -> ArgumentParser:
@@ -121,6 +121,7 @@ def seqspec_find(
         - List[File] for "file" selector
         - Empty list for unknown selectors
     """
+
     FIND = {
         "region-type": find_by_region_type,
         "region": find_by_region_id,
@@ -142,14 +143,10 @@ def run_find(parser: ArgumentParser, args: Namespace) -> None:
     validate_find_args(parser, args)
 
     spec = load_spec(args.yaml)
+
     found = seqspec_find(spec, args.selector, args.modality, args.id)
 
-    # Handle output
-    if args.output:
-        with open(args.output, "w") as f:
-            yaml.dump(found, f, sort_keys=False)
-    else:
-        print(yaml.dump(found, sort_keys=False))
+    write_pydantic_to_file_or_stdout(found, args.output)
 
 
 def find_by_read_id(spec: Assay, modality: str, id: Optional[str]) -> List[Read]:

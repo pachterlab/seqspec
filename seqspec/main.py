@@ -3,29 +3,33 @@
 This module provides the main entry point for the seqspec command-line interface.
 It handles argument parsing, command routing, and execution of subcommands.
 """
+
 import sys
 import warnings
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
-from typing import Dict, Callable, Any
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from typing import Any, Callable, Dict
 
 from . import __version__
+from .seqspec_check import run_check, setup_check_args
+from .seqspec_convert import run_convert, setup_convert_args
+from .seqspec_file import run_file, setup_file_args
+from .seqspec_find import run_find, setup_find_args
 
 # Import subcommand modules
-from .seqspec_format import setup_format_args, run_format
-from .seqspec_print import setup_print_args, run_print
-from .seqspec_check import setup_check_args, run_check
-from .seqspec_find import setup_find_args, run_find
-from .seqspec_convert import setup_convert_args, run_convert
-from .seqspec_modify import setup_modify_args, run_modify
-from .seqspec_index import setup_index_args, run_index
-from .seqspec_info import setup_info_args, run_info
-from .seqspec_split import setup_split_args, run_split
-from .seqspec_init import setup_init_args, run_init
-from .seqspec_onlist import setup_onlist_args, run_onlist
-from .seqspec_version import setup_version_args, run_version
-from .seqspec_methods import setup_methods_args, run_methods
-from .seqspec_file import setup_file_args, run_file
-from .seqspec_upgrade import setup_upgrade_args, run_upgrade
+from .seqspec_format import run_format, setup_format_args
+from .seqspec_index import run_index, setup_index_args
+from .seqspec_info import run_info, setup_info_args
+from .seqspec_init import run_init, setup_init_args
+
+# from .seqspec_build import setup_build_args, run_build
+from .seqspec_insert import run_insert, setup_insert_args
+from .seqspec_methods import run_methods, setup_methods_args
+from .seqspec_modify import run_modify, setup_modify_args
+from .seqspec_onlist import run_onlist, setup_onlist_args
+from .seqspec_print import run_print, setup_print_args
+from .seqspec_split import run_split, setup_split_args
+from .seqspec_upgrade import run_upgrade, setup_upgrade_args
+from .seqspec_version import run_version, setup_version_args
 
 
 def setup_parser():
@@ -66,6 +70,8 @@ Documentation: https://pachterlab.github.io/seqspec/
         "split": setup_split_args(subparsers),
         "upgrade": setup_upgrade_args(subparsers),
         "version": setup_version_args(subparsers),
+        # "build": setup_build_args(subparsers),
+        "insert": setup_insert_args(subparsers),
     }
 
     return parser, command_to_parser
@@ -119,6 +125,8 @@ def main() -> None:
         "file": run_file,
         "upgrade": run_upgrade,
         "convert": run_convert,
+        # "build": run_build,
+        "insert": run_insert,
     }
 
     try:

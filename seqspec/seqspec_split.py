@@ -2,12 +2,13 @@
 
 This module provides functionality to split seqspec files into one file per modality.
 """
+
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
 from typing import List
 
-from seqspec.utils import load_spec
 from seqspec.Assay import Assay
+from seqspec.utils import load_spec, write_pydantic_to_file_or_stdout
 
 
 def setup_split_args(parser) -> ArgumentParser:
@@ -58,7 +59,8 @@ def run_split(parser: ArgumentParser, args: Namespace) -> None:
     for spec_m in specs:
         modality = spec_m.list_modalities()[0]
         output_path = args.output / f"{prefix}{modality}.yaml"
-        spec_m.to_YAML(output_path)
+        write_pydantic_to_file_or_stdout(spec_m, output_path)
+        # spec_m.to_YAML(output_path)
 
 
 def seqspec_split(spec: Assay) -> List[Assay]:

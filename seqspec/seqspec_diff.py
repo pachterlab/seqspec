@@ -2,13 +2,14 @@
 
 This module provides functionality to compare two seqspec files and identify differences.
 """
-from pathlib import Path
+
 from argparse import ArgumentParser, Namespace
+from pathlib import Path
 from typing import List
 
-from seqspec.utils import load_spec
 from seqspec.Assay import Assay
 from seqspec.Region import Region
+from seqspec.utils import load_spec
 
 
 def setup_diff_args(parser) -> ArgumentParser:

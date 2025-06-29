@@ -1,31 +1,33 @@
 import gzip
-from hashlib import md5
-from io import StringIO, BytesIO
 import os
-from pathlib import Path
+from hashlib import md5
+from io import BytesIO, StringIO
 from tempfile import TemporaryDirectory
-from requests import HTTPError
 from unittest import TestCase
 from unittest.mock import patch
 
+from requests import HTTPError
+
 from seqspec.Region import (
-    Region, RegionCoordinate, Onlist, project_regions_to_coordinates
+    Onlist,
+    Region,
+    RegionCoordinate,
+    project_regions_to_coordinates,
 )
 from seqspec.utils import (
     get_remote_auth_token,
     load_spec_stream,
     map_read_id_to_regions,
-    write_read,
     read_local_list,
     read_remote_list,
-    yield_onlist_contents
+    write_read,
+    yield_onlist_contents,
 )
-from seqspec import __version__
 
 from .test_region import (
     region_rna_joined_dict,
-    region_rna_umi_dict,
     region_rna_linker_dict,
+    region_rna_umi_dict,
 )
 
 example_spec = """!Assay
@@ -154,6 +156,7 @@ library_spec:
     parent_id: rna
 """
 
+
 def load_example_spec(spec_text):
     with StringIO(spec_text) as instream:
         spec = load_spec_stream(instream)
@@ -217,7 +220,16 @@ class TestUtils(TestCase):
             with gzip.open(temp_list_filename, "wt") as stream:
                 stream.write(fake_contents)
 
-            onlist1 = Onlist("123", temp_list_filename, "tsv", 300, temp_list_filename, "local", fake_md5, "local")
+            onlist1 = Onlist(
+                "123",
+                temp_list_filename,
+                "tsv",
+                300,
+                temp_list_filename,
+                "local",
+                fake_md5,
+                "local",
+            )
             loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
@@ -232,7 +244,16 @@ class TestUtils(TestCase):
             with open(temp_list_filename, "wt") as stream:
                 stream.write(fake_contents)
 
-            onlist1 = Onlist("123", temp_list_filename, "tsv", 300, temp_list_filename, "local", fake_md5, "local")
+            onlist1 = Onlist(
+                "123",
+                temp_list_filename,
+                "tsv",
+                300,
+                temp_list_filename,
+                "local",
+                fake_md5,
+                "local",
+            )
             loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
@@ -256,7 +277,9 @@ class TestUtils(TestCase):
 
         with patch("requests.get", new=fake_request_get):
             url = "http://localhost/testlist.txt"
-            onlist1 = Onlist("123", "testlist.txt", "http", 300, url, "http", fake_md5, "remote")
+            onlist1 = Onlist(
+                "123", "testlist.txt", "http", 300, url, "http", fake_md5, "remote"
+            )
             loaded_list = read_remote_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)

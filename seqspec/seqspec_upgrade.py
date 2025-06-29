@@ -2,13 +2,14 @@
 
 This module provides functionality to upgrade seqspec files from older versions to the current version.
 """
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace
 
-from seqspec.utils import load_spec
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from pathlib import Path
+
+from seqspec.Assay import Assay
 from seqspec.File import File
 from seqspec.Region import Onlist
-from seqspec.Assay import Assay
+from seqspec.utils import load_spec
 
 
 def setup_upgrade_args(parser) -> ArgumentParser:

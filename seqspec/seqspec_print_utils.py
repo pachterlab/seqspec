@@ -2,7 +2,9 @@
 
 This module contains shared functionality used by both seqspec_print.py and seqspec_print_html.py.
 """
+
 from typing import List, Tuple
+
 from seqspec.Assay import Assay
 from seqspec.Region import complement_sequence, project_regions_to_coordinates
 
@@ -29,7 +31,9 @@ def libseq(spec: Assay, modality: str) -> Tuple[List[str], List[str]]:
         read_len = read.max_len
         read_id = read.read_id
         primer_id = read.primer_id
-        primer_idx = [i for i, l in enumerate(leaves) if l.region_id == primer_id][0]
+        primer_idx = [
+            i for i, leaf in enumerate(leaves) if leaf.region_id == primer_id
+        ][0]
         primer_pos = cuts[primer_idx]
 
         if read.strand == "pos":

@@ -1,43 +1,47 @@
-import yaml
+from pathlib import Path
+from typing import Optional
+
+from pydantic import BaseModel
+
+from seqspec.llmtools import LLMInput
 
 
-class File(yaml.YAMLObject):
-    yaml_tag = "!File"
-
-    def __init__(
-        self,
-        file_id: str,
-        filename: str,
-        filetype: str,
-        filesize: int,
-        url: str,
-        urltype: str,
-        md5: str,
-    ) -> None:
-        super().__init__()
-        self.file_id = file_id
-        self.filename = filename
-        self.filetype = filetype
-        self.filesize = filesize
-        self.url = url
-        self.urltype = urltype
-        self.md5 = md5
+class File(BaseModel):
+    file_id: str
+    filename: str
+    filetype: str
+    filesize: int
+    url: str
+    urltype: str
+    md5: str
 
     def __repr__(self) -> str:
-        d = self.to_dict()
-        return f"{d}"
+        return str(self.model_dump())
 
     def to_dict(self):
-        d = {
-            "file_id": getattr(self, "file_id", None),
-            "filename": getattr(self, "filename", None),
-            "filetype": getattr(self, "filetype", None),
-            "filesize": getattr(self, "filesize", None),
-            "url": getattr(self, "url", None),
-            "urltype": getattr(self, "urltype", None),
-            "md5": getattr(self, "md5", None),
-        }
-        return d
+        return self.model_dump()
 
-    def update_file_id(self, file_id):
+    def update_file_id(self, file_id: str):
         self.file_id = file_id
+
+
+class FileInput(LLMInput):
+    file_id: Optional[str]
+    filename: Optional[str]
+    filetype: Optional[str]
+    filesize: Optional[int]
+    url: Optional[str]
+    urltype: Optional[str]
+    md5: Optional[str]
+
+    def to_file(self) -> File:
+        return File(
+            file_id=self.file_id or (Path(self.filename).name if self.filename else ""),
+            filename=self.filename or "",
+            filetype=self.filetype
+            or (Path(self.filename).suffix.lstrip(".") if self.filename else ""),
+            filesize=self.filesize or 0,
+            url=self.url or "",
+            urltype=self.urltype or "local",
+            md5=self.md5 or "",
+        )

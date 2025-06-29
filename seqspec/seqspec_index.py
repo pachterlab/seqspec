@@ -2,22 +2,23 @@
 
 This module provides functionality to identify the position of elements in a spec for use in downstream tools.
 """
-from pathlib import Path
-from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
-import warnings
-from typing import List, Optional, Dict, Any
 
-from seqspec.utils import load_spec, map_read_id_to_regions
-from seqspec.seqspec_find import find_by_region_id
-from seqspec.seqspec_file import list_files_by_file_id, list_read_files
-from seqspec.Region import (
-    complement_sequence,
-    RegionCoordinateDifference,
-    project_regions_to_coordinates,
-    itx_read,
-)
-from seqspec.Read import ReadCoordinate
+import warnings
+from argparse import SUPPRESS, ArgumentParser, Namespace, RawTextHelpFormatter
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 from seqspec.Assay import Assay
+from seqspec.Read import ReadCoordinate
+from seqspec.Region import (
+    RegionCoordinateDifference,
+    complement_sequence,
+    itx_read,
+    project_regions_to_coordinates,
+)
+from seqspec.seqspec_file import list_files_by_file_id, list_read_files
+from seqspec.seqspec_find import find_by_region_id
+from seqspec.utils import load_spec, map_read_id_to_regions
 
 
 def setup_index_args(parser) -> ArgumentParser:
@@ -395,7 +396,7 @@ def format_seqkit_subseq(indices, subregion_type=None):
     for rgn, cuts in region.items():
         for cut in cuts:
             if cut.region_type == subregion_type:
-                x = f"{cut.start+1}:{cut.stop}\n"
+                x = f"{cut.start + 1}:{cut.stop}\n"
 
     return x
 
@@ -437,13 +438,13 @@ def format_simpleaf(indices, subregion_type=None):
     for idx, region in enumerate(indices):
         rg_strand = region.pop("strand")  # noqa
         fn = idx
-        x = f"{fn+1}{{"
+        x = f"{fn + 1}{{"
         for rgn, cuts in region.items():
             for cut in cuts:
                 if cut.region_type.upper() == "BARCODE":
-                    x += f"b[{cut.stop-cut.start}]"
+                    x += f"b[{cut.stop - cut.start}]"
                 elif cut.region_type.upper() == "UMI":
-                    x += f"u[{cut.stop-cut.start}]"
+                    x += f"u[{cut.stop - cut.start}]"
                 elif cut.region_type.upper() == "CDNA":
                     x += f"r[{cut.stop - cut.start}]"
             x += "x:}"
@@ -492,11 +493,11 @@ def format_chromap(indices, subregion_type=None):
             for cut in cuts:
                 if cut.region_type.upper() == "BARCODE":
                     bc_fqs.append(rgn)
-                    bc_str.append(f"bc:{cut.start}:{cut.stop-1}{strand}")
+                    bc_str.append(f"bc:{cut.start}:{cut.stop - 1}{strand}")
                     pass
                 elif cut.region_type.upper() == "GDNA":
                     gdna_fqs.append(rgn)
-                    gdna_str.append(f"{cut.start}:{cut.stop-1}")
+                    gdna_str.append(f"{cut.start}:{cut.stop - 1}")
     if len(set(bc_fqs)) > 1:
         raise Exception("chromap only supports barcodes from one fastq")
     if len(set(gdna_fqs)) > 2:

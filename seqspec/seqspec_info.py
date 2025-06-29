@@ -1,9 +1,10 @@
-from seqspec.utils import load_spec
 import json
-from typing import Dict
-from seqspec.Assay import Assay
-from argparse import RawTextHelpFormatter, ArgumentParser, Namespace
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
+from typing import Dict
+
+from seqspec.Assay import Assay
+from seqspec.utils import load_spec
 
 
 def setup_info_args(parser) -> ArgumentParser:
@@ -171,7 +172,8 @@ def seqspec_info_library_spec(spec: Assay) -> Dict:
     result = {}
     for m in modalities:
         libspec = spec.get_libspec(m)
-        result[m] = libspec.get_leaves()
+        leaves = libspec.get_leaves()
+        result[m] = leaves if leaves else []
     return {"library_spec": result}
 
 
@@ -253,7 +255,7 @@ def format_sequence_spec(info: Dict, fmt: str = "tab") -> str:
         return "\n".join(lines)
     elif fmt == "json":
         return json.dumps(
-            [i.to_dict() for i in info["sequence_spec"]], sort_keys=False, indent=4
+            [i.model_dump() for i in info["sequence_spec"]], sort_keys=False, indent=4
         )
     return ""
 
@@ -279,7 +281,7 @@ def format_library_spec(info: Dict, fmt: str = "tab") -> str:
         return "\n".join(lines)
     elif fmt == "json":
         return json.dumps(
-            {m: [i.to_dict() for i in r] for m, r in info["library_spec"].items()},
+            {m: [i.model_dump() for i in r] for m, r in info["library_spec"].items()},
             sort_keys=False,
             indent=4,
         )

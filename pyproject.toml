@@ -33,6 +33,7 @@ dependencies = [
     "packaging",
     # "mcp",
     "matplotlib",
+    "pydantic",
 ]
 
 [project.optional-dependencies]
@@ -41,9 +42,9 @@ dev = [
     "pytest-cov",
     "tox",
     "pre-commit",
-    "flake8",
     "build",
     "setuptools_scm>=7.0",
+    "ruff",
 ]
 
 [project.urls]
@@ -74,10 +75,24 @@ addopts = "--cov=seqspec"
 source = ["seqspec"]
 omit = ["tests/*"]
 
-[tool.flake8]
-exclude = [".git", ".github", "__pycache__", "build", "dist"]
-max-line-length = 88
-extend-ignore = ["E203", "E501"]
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+exclude = [
+  ".git",
+  "__pycache__",
+  "build",
+  "dist",
+  ".venv",
+  ".mypy_cache",
+  ".github",
+  "examples",
+  "tests"
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501", "E203"]
 
 [tool.tox]
 env_list = ["py{312,313,314,315}"]

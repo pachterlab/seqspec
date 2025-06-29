@@ -1,4 +1,4 @@
-from seqspec.seqspec import Region, Join, Assay
+from seqspec.seqspec import Assay, Join, Region
 
 # sci-rna-sequence
 illumina_p5 = Region(

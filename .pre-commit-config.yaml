@@ -1,12 +1,7 @@
 repos:
-- repo: https://github.com/psf/black
-  rev: 22.10.0
-  hooks:
-  - id: black
-- repo: https://github.com/PyCQA/flake8
-  rev: 6.1.0
-  hooks:
-  - id: flake8
-    additional_dependencies:
-      - flake8-black
-    language_version: python3
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.1 # or the latest stable version
+    hooks:
+      - id: ruff
+        args: [--fix] # Automatically fix lint issues where possible
+      - id: ruff-format
