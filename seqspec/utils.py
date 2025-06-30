@@ -121,8 +121,8 @@ def load_spec_stream(spec_stream: IO) -> Assay:
     assay = Assay(**data_dict)
 
     # optional postprocessing
-    for r in assay.library_spec:
-        r.set_parent_id("")
+    # for r in assay.library_spec:
+    #     r.set_parent_id("")
     return assay
 
 

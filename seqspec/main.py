@@ -11,17 +11,12 @@ from typing import Any, Callable, Dict
 
 from . import __version__
 from .seqspec_check import run_check, setup_check_args
-from .seqspec_convert import run_convert, setup_convert_args
 from .seqspec_file import run_file, setup_file_args
 from .seqspec_find import run_find, setup_find_args
-
-# Import subcommand modules
 from .seqspec_format import run_format, setup_format_args
 from .seqspec_index import run_index, setup_index_args
 from .seqspec_info import run_info, setup_info_args
 from .seqspec_init import run_init, setup_init_args
-
-# from .seqspec_build import setup_build_args, run_build
 from .seqspec_insert import run_insert, setup_insert_args
 from .seqspec_methods import run_methods, setup_methods_args
 from .seqspec_modify import run_modify, setup_modify_args
@@ -59,10 +54,11 @@ Documentation: https://pachterlab.github.io/seqspec/
         "find": setup_find_args(subparsers),
         "file": setup_file_args(subparsers),
         "format": setup_format_args(subparsers),
-        "convert": setup_convert_args(subparsers),
+        # "convert": setup_convert_args(subparsers),
         "index": setup_index_args(subparsers),
         "info": setup_info_args(subparsers),
         "init": setup_init_args(subparsers),
+        "insert": setup_insert_args(subparsers),
         "methods": setup_methods_args(subparsers),
         "modify": setup_modify_args(subparsers),
         "onlist": setup_onlist_args(subparsers),
@@ -70,8 +66,6 @@ Documentation: https://pachterlab.github.io/seqspec/
         "split": setup_split_args(subparsers),
         "upgrade": setup_upgrade_args(subparsers),
         "version": setup_version_args(subparsers),
-        # "build": setup_build_args(subparsers),
-        "insert": setup_insert_args(subparsers),
     }
 
     return parser, command_to_parser
@@ -124,8 +118,7 @@ def main() -> None:
         "version": run_version,
         "file": run_file,
         "upgrade": run_upgrade,
-        "convert": run_convert,
-        # "build": run_build,
+        # "convert": run_convert,
         "insert": run_insert,
     }
 

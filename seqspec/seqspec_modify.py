@@ -127,8 +127,7 @@ def run_modify(parser: ArgumentParser, args: Namespace) -> None:
         "assay": seqspec_modify_assay,
     }
 
-    spec = UPDATE.get(args.selector, lambda x: None)[spec, args.modality, keys]
-
+    spec: Assay = UPDATE.get(args.selector, lambda x: None)(spec, args.modality, keys)
     # Update spec
     spec.update_spec()
 
@@ -165,7 +164,7 @@ def seqspec_modify_region(spec: Assay, modality: str, new_regions: List[dict]) -
             for field, value in new_region_data.items():
                 if value is not None and hasattr(region, field):
                     setattr(region, field, value)
-    return spec
+    return spec.model_copy()
 
 
 def seqspec_modify_files(spec: Assay, modality: str, new_files: List[dict]) -> Assay:

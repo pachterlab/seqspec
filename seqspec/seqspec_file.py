@@ -9,7 +9,6 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from seqspec import seqspec_find
 from seqspec.Assay import Assay
 from seqspec.File import File
 from seqspec.utils import load_spec
@@ -384,7 +383,9 @@ def list_files_by_region_type(
     ids = set(region_types)
     new_files = defaultdict(list)
     for region_id, region_files in files.items():
-        r = seqspec_find.find_by_region_id(spec, modality, region_id)[0]
+        m = spec.get_libspec(modality)
+        regions = m.get_region_by_id(region_id)
+        r = regions[0]
         if r.region_type in ids:
             new_files[region_id].extend(region_files)
     return new_files
