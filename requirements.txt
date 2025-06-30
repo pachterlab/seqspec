@@ -4,3 +4,4 @@ newick
 requests
 biopython
 packaging
+matplotlib>=3.4.0

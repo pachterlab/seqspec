@@ -417,7 +417,7 @@ class Onlist(yaml.YAMLObject):
         url: str,
         urltype: str,
         md5: str,
-        location: Optional[str],
+        # location: Optional[str],
     ) -> None:
         super().__init__()
         self.file_id = file_id
