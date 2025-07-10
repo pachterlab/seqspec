@@ -3,7 +3,7 @@ seqspec_version: 0.3.0
 assay_id: 10xRNA5prime
 name: 10x-RNA-5prime
 doi: https://doi.org/10.1038/ncomms14049
-date: null
+date: "2016-08-01"
 description: 10x 5 prime single-cell RNA-seq
 modalities:
 - rna
@@ -112,7 +112,7 @@ library_spec:
       filesize: 0
       url: ''
       urltype: ''
-      md5: null
+      md5: ''
       location: local
     regions: null
     parent_id: rna
@@ -175,7 +175,7 @@ library_spec:
       filesize: 0
       url: ''
       urltype: ''
-      md5: null
+      md5: ''
       location: local
     regions: null
     parent_id: rna
