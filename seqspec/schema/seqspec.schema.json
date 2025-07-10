@@ -36,7 +36,14 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["dna", "rna", "tag", "protein", "atac", "crispr"]
+        "enum": [
+          "dna",
+          "rna",
+          "tag",
+          "protein",
+          "atac",
+          "crispr"
+        ]
       }
     },
     "lib_struct": {
@@ -81,11 +88,23 @@
           "items": {
             "type": "object",
             "properties": {
-              "protocol_id": { "type": "string" },
-              "name": { "type": ["string", "null"] },
-              "modality": { "type": "string" }
+              "protocol_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "modality": {
+                "type": "string"
+              }
             },
-            "required": ["protocol_id", "modality"],
+            "required": [
+              "protocol_id",
+              "modality"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -103,11 +122,23 @@
           "items": {
             "type": "object",
             "properties": {
-              "kit_id": { "type": "string" },
-              "name": { "type": ["string", "null"] },
-              "modality": { "type": "string" }
+              "kit_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "modality": {
+                "type": "string"
+              }
             },
-            "required": ["kit_id", "modality"],
+            "required": [
+              "kit_id",
+              "modality"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -152,11 +183,23 @@
           "items": {
             "type": "object",
             "properties": {
-              "protocol_id": { "type": "string" },
-              "name": { "type": ["string", "null"] },
-              "modality": { "type": "string" }
+              "protocol_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "modality": {
+                "type": "string"
+              }
             },
-            "required": ["protocol_id", "modality"],
+            "required": [
+              "protocol_id",
+              "modality"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -212,11 +255,23 @@
           "items": {
             "type": "object",
             "properties": {
-              "kit_id": { "type": "string" },
-              "name": { "type": ["string", "null"] },
-              "modality": { "type": "string" }
+              "kit_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "modality": {
+                "type": "string"
+              }
             },
-            "required": ["kit_id", "modality"],
+            "required": [
+              "kit_id",
+              "modality"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -268,6 +323,7 @@
           "enum": [
             "atac",
             "barcode",
+            "bead_TSO",
             "cdna",
             "crispr",
             "custom_primer",
@@ -304,7 +360,12 @@
         "sequence_type": {
           "description": "The type of the sequence",
           "type": "string",
-          "enum": ["fixed", "random", "onlist", "joined"]
+          "enum": [
+            "fixed",
+            "random",
+            "onlist",
+            "joined"
+          ]
         },
         "sequence": {
           "description": "The sequence",
@@ -324,7 +385,10 @@
         },
         "onlist": {
           "description": "The file containing the sequence if seq_type = onlist",
-          "type": ["object", "null"],
+          "type": [
+            "object",
+            "null"
+          ],
           "properties": {
             "file_id": {
               "description": "filename",
@@ -349,12 +413,20 @@
             "urltype": {
               "description": "type of file path",
               "type": "string",
-              "enum": ["local", "ftp", "http", "https"]
+              "enum": [
+                "local",
+                "ftp",
+                "http",
+                "https"
+              ]
             },
             "location": {
               "description": "location of onlist",
               "type": "string",
-              "enum": ["local", "remote"]
+              "enum": [
+                "local",
+                "remote"
+              ]
             },
             "md5": {
               "description": "md5sum for the file pointed to by filename",
@@ -445,7 +517,10 @@
         },
         "strand": {
           "type": "string",
-          "enum": ["pos", "neg"],
+          "enum": [
+            "pos",
+            "neg"
+          ],
           "description": "The strand orientation of the read, either positive ('pos') or negative ('neg')."
         },
         "files": {
@@ -477,7 +552,12 @@
               "urltype": {
                 "description": "type of file path",
                 "type": "string",
-                "enum": ["local", "ftp", "http", "https"]
+                "enum": [
+                  "local",
+                  "ftp",
+                  "http",
+                  "https"
+                ]
               },
               "md5": {
                 "description": "md5sum for the file pointed to by filename",
