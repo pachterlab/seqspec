@@ -163,6 +163,7 @@
             "enum": [
               "atac",
               "barcode",
+              "bead_TSO",
               "cdna",
               "crispr",
               "custom_primer",
