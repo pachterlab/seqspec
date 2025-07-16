@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 from contextlib import contextmanager
-from io import StringIO
 import os
 from tempfile import TemporaryDirectory
 from unittest import TestCase
@@ -12,7 +11,6 @@ from seqspec.seqspec_onlist import (
     join_onlists,
     join_product_onlist,
     join_multi_onlist,
-    join_onlists,
     run_onlist_region,
     run_onlist_read,
     setup_onlist_args,
@@ -33,7 +31,7 @@ def create_temporary_barcode_files(filenames):
             os.chdir(tmpdir)
             for name in filenames:
                 filename = os.path.join(tmpdir, name)
-                with open(filename, "wt") as outstream:
+                with open(filename, "wt"):
                     pass
             yield tmpdir
     finally:
@@ -66,13 +64,29 @@ class TestSeqspecOnlist(TestCase):
         with create_temporary_barcode_files(["index_onlist.txt"]) as tmpdir:
             filename = os.path.join(tmpdir, "temp.tsv")
 
-            onlist1 = Onlist("temp_id", filename, "tsv", 300, filename, "local", "d41d8cd98f00b204e9800998ecf8427e", "local")
+            onlist1 = Onlist(
+                "temp_id",
+                filename,
+                "tsv",
+                300,
+                filename,
+                "local",
+                "d41d8cd98f00b204e9800998ecf8427e",
+            )
 
             target_dir = find_list_target_dir([onlist1])
             self.assertEqual(target_dir, tmpdir)
 
     def test_find_list_target_dir_remote(self):
-        onlist1 = Onlist("temp_id", "temp.tsv", "tsv", 300, "http://localhost:9/temp.tsv", "http", "d41d8cd98f00b204e9800998ecf8427e", "remote")
+        onlist1 = Onlist(
+            "temp_id",
+            "temp.tsv",
+            "tsv",
+            300,
+            "http://localhost:9/temp.tsv",
+            "http",
+            "d41d8cd98f00b204e9800998ecf8427e",
+        )
 
         target_dir = find_list_target_dir([onlist1])
         self.assertEqual(target_dir, os.getcwd())
@@ -126,57 +140,80 @@ class TestSeqspecOnlist(TestCase):
     def test_local_validate_onlist_args(self):
         onlist_name = "index_onlist.tsv"
         with create_temporary_barcode_files([onlist_name]) as tmpdir:
-            expected_onlist_path = os.path.join(tmpdir, onlist_name)
             spec_path = os.path.join(tmpdir, "spec.yaml")
 
             parser = ArgumentParser()
             subparser = parser.add_subparsers(dest="command")
             subparser = setup_onlist_args(subparser)
-            args = parser.parse_args([
-                "onlist", "-m", "rna", "-i", "read1.fastq.gz", "-f", "multi", spec_path])
+            args = parser.parse_args(
+                [
+                    "onlist",
+                    "-m",
+                    "rna",
+                    "-i",
+                    "read1.fastq.gz",
+                    "-f",
+                    "multi",
+                    spec_path,
+                ]
+            )
 
             def load_spec(*args, **kwargs):
                 return load_example_spec(example_spec)
 
-            with patch("seqspec.seqspec_onlist.load_spec", load_spec) as loader:
-                validate_onlist_args(parser, args)
+            with patch("seqspec.seqspec_onlist.load_spec", load_spec):
+                with patch("pathlib.Path.exists", return_value=True):
+                    validate_onlist_args(parser, args)
 
     def test_local_cached_remote_validate_onlist_args(self):
         # Test that we will can use a locally cached copy of one barcode file
         # even if it is marked remote.
         onlist_name = "index_onlist.txt"
         with create_temporary_barcode_files([onlist_name]) as tmpdir:
-            expected_onlist_path = os.path.join(tmpdir, onlist_name)
             spec_path = os.path.join(tmpdir, "spec.yaml")
 
             parser = ArgumentParser()
             subparser = parser.add_subparsers(dest="command")
             subparser = setup_onlist_args(subparser)
-            args = parser.parse_args([
-                "onlist", "-m", "rna", "-i", "read1.fastq.gz", "-f", "multi", spec_path])
+            args = parser.parse_args(
+                [
+                    "onlist",
+                    "-m",
+                    "rna",
+                    "-i",
+                    "read1.fastq.gz",
+                    "-f",
+                    "multi",
+                    spec_path,
+                ]
+            )
 
             def load_spec(*args, **kwargs):
-                remote_spec = example_spec.replace(
-                    "location: local",
-                    "location: remote"
-                ).replace(
-                    "url: index_onlist.tsv",
-                    "url: http://localhost:9/foo/index_onlist.tsv"
-                ).replace(
-                    "urltype: local",
-                    "urltype: http",
+                remote_spec = (
+                    example_spec.replace("location: local", "location: remote")
+                    .replace(
+                        "url: index_onlist.tsv",
+                        "url: http://localhost:9/foo/index_onlist.tsv",
+                    )
+                    .replace(
+                        "urltype: local",
+                        "urltype: http",
+                    )
                 )
                 print(remote_spec)
                 return load_example_spec(remote_spec)
 
-            with patch("seqspec.seqspec_onlist.load_spec", load_spec) as loader, patch("seqspec.seqspec_onlist.read_remote_list", return_value="index_onlist.tsv") as fake_remote_list:
-                # Failed validation would raise an exception
-                validate_onlist_args(parser, args)
-
+            with patch("seqspec.seqspec_onlist.load_spec", load_spec), patch(
+                "seqspec.seqspec_onlist.read_remote_list",
+                return_value="index_onlist.tsv",
+            ):
+                with patch("pathlib.Path.exists", return_value=True):
+                    # Failed validation would raise an exception
+                    validate_onlist_args(parser, args)
 
     def test_write_onlist_no_double_spacing(self):
         # Make sure that joined onlists don't end up double spaced.
-        
+
         onlists = [
             ["AAAA", "TTTT"],
             ["GGGG", "CCCC", "GGTT"],

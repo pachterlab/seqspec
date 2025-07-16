@@ -80,7 +80,7 @@ def seqspec_check(
     Returns:
         List of error dictionaries
     """
-    errors = check(spec, spec_fn)
+    errors = check(spec, spec_fn, filter_type)
     if filter_type:
         errors = filter_errors(errors, filter_type)
     return errors
@@ -103,24 +103,14 @@ def run_check(parser: ArgumentParser, args: Namespace):
     return errors
 
 
-IGVF_FILTERS = [
-    {"error_type": "check_schema", "error_object": "'lib_struct'"},
-    {"error_type": "check_schema", "error_object": "'library_protocol'"},
-    {"error_type": "check_schema", "error_object": "'library_kit'"},
-    {"error_type": "check_schema", "error_object": "'sequence_protocol'"},
-    {"error_type": "check_schema", "error_object": "'sequence_kit'"},
-    {"error_type": "check_schema", "error_object": "'md5'"},
-]
-IGVF_ONLIST_SKIP_FILTERS = IGVF_FILTERS + [
+IGVF_ONLIST_SKIP_FILTERS = [
     {"error_type": "check_onlist_files_exist", "error_object": "onlist"}
 ]
 
 
 def filter_errors(errors, filter_type):
     filters = None
-    if filter_type == "igvf":
-        filters = IGVF_FILTERS
-    elif filter_type == "igvf_onlist_skip":
+    if filter_type == "igvf_onlist_skip":
         filters = IGVF_ONLIST_SKIP_FILTERS
 
     if filters:
@@ -141,10 +131,19 @@ def filter_errors(errors, filter_type):
         return errors
 
 
-def check(spec: Assay, spec_fn: str):
+def check(spec: Assay, spec_fn: str, skip: str = None):
     # Variety of checks against schema
     def check_schema(spec: Assay, spec_fn: str, errors=[], idx=0):
-        schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
+        if skip == "igvf":
+            schema_fn = path.join(
+                path.dirname(__file__), "schema/seqspec_igvf.schema.json"
+            )
+        elif skip == "igvf_onlist_skip":
+            schema_fn = path.join(
+                path.dirname(__file__), "schema/seqspec_igvf_onlist_skip.schema.json"
+            )
+        else:
+            schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
         with open(schema_fn, "r") as stream:
             schema = yaml.load(stream, Loader=yaml.Loader)
         validator = Draft4Validator(schema)

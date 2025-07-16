@@ -66,11 +66,8 @@ class TestOnlist(TestCase):
         url = filename
         urltype = "file"
         md5sum = "d41d8cd98f00b204e9800998ecf8427e"
-        location = "local"
 
-        permit = Onlist(
-            file_id, filename, filetype, filesize, url, "file", md5sum, location
-        )
+        permit = Onlist(file_id, filename, filetype, filesize, url, "file", md5sum)
 
         self.assertEqual(
             permit.to_dict(),
@@ -204,9 +201,16 @@ class TestRegion(TestCase):
         list_url = list_name
         list_urltype = "file"
         list_md5sum = "d41d8cd98f00b204e9800998ecf8427e"
-        list_location = "local"
 
-        permited = Onlist(list_id, list_name, list_type, list_size, list_url, list_urltype, list_md5sum, list_location)
+        permited = Onlist(
+            list_id,
+            list_name,
+            list_type,
+            list_size,
+            list_url,
+            list_urltype,
+            list_md5sum,
+        )
 
         r = Region(
             region_name,
