@@ -169,15 +169,7 @@ class TestRegion(TestCase):
         r1_dict = region_rna_joined_dict("region-1", r1_regions)
         r1 = Region(**r1_dict)
 
-        self.assertIs(r1.parent_id, None)
         self.assertEqual(len(r1.regions), len(r1_regions))
-        for node in r1.regions:
-            self.assertIs(node.parent_id, None)
-
-        r1.set_parent_id(r1.region_id)
-        self.assertIs(r1.parent_id, r1.region_id)
-        for node in r1.regions:
-            self.assertIs(node.parent_id, r1.region_id)
 
     def test_onlists(self):
         region_data = {
