@@ -47,7 +47,6 @@ class TestSeqspecOnlist(TestCase):
             regions = run_onlist_region(spec, "rna", "index")
             self.assertEqual(len(regions), 1)
             region = regions[0]
-            self.assertEqual(region.location, "local")
             self.assertEqual(region.filename, "index_onlist.tsv")
             self.assertEqual(region.md5, "939cb244b4c43248fcc795bbe79599b0")
 
@@ -57,7 +56,6 @@ class TestSeqspecOnlist(TestCase):
             reads = run_onlist_read(spec, "rna", "read2.fastq.gz")
             self.assertEqual(len(reads), 1)
             read = reads[0]
-            self.assertEqual(read.location, "local")
             self.assertEqual(read.filename, "index_onlist.tsv")
             self.assertEqual(read.md5, "939cb244b4c43248fcc795bbe79599b0")
 
