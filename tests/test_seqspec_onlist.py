@@ -22,7 +22,8 @@ from .test_utils import example_spec, load_example_spec
 
 
 @contextmanager
-def create_temporary_barcode_files(filenames):
+def create_temporary_empty_files(filenames):
+    """Creates a list file filenames in a temporary directory"""
     if isinstance(filenames, str):
         filenames = [filenames]
 
@@ -41,7 +42,7 @@ def create_temporary_barcode_files(filenames):
 
 class TestSeqspecOnlist(TestCase):
     def test_run_onlist_region(self):
-        with create_temporary_barcode_files(["index_onlist.txt"]):
+        with create_temporary_empty_files(["index_onlist.txt"]):
             spec = load_example_spec(example_spec)
             # returns the one local barcode path
             regions = run_onlist_region(spec, "rna", "index")
@@ -51,7 +52,7 @@ class TestSeqspecOnlist(TestCase):
             self.assertEqual(region.md5, "939cb244b4c43248fcc795bbe79599b0")
 
     def test_run_onlist_read(self):
-        with create_temporary_barcode_files(["index_onlist.tsv"]):
+        with create_temporary_empty_files(["index_onlist.tsv"]):
             spec = load_example_spec(example_spec)
             reads = run_onlist_read(spec, "rna", "read2.fastq.gz")
             self.assertEqual(len(reads), 1)
@@ -60,7 +61,7 @@ class TestSeqspecOnlist(TestCase):
             self.assertEqual(read.md5, "939cb244b4c43248fcc795bbe79599b0")
 
     def test_find_list_target_dir_local(self):
-        with create_temporary_barcode_files(["index_onlist.txt"]) as tmpdir:
+        with create_temporary_empty_files(["index_onlist.txt"]) as tmpdir:
             filename = os.path.join(tmpdir, "temp.tsv")
 
             onlist1 = Onlist(**{
@@ -138,7 +139,7 @@ class TestSeqspecOnlist(TestCase):
 
     def test_local_validate_onlist_args(self):
         onlist_name = "index_onlist.tsv"
-        with create_temporary_barcode_files([onlist_name]) as tmpdir:
+        with create_temporary_empty_files([onlist_name, "spec.yaml"]) as tmpdir:
             expected_onlist_path = os.path.join(tmpdir, onlist_name)
             spec_path = os.path.join(tmpdir, "spec.yaml")
 
@@ -168,7 +169,7 @@ class TestSeqspecOnlist(TestCase):
         # Test that we will can use a locally cached copy of one barcode file
         # even if it is marked remote.
         onlist_name = "index_onlist.txt"
-        with create_temporary_barcode_files([onlist_name]) as tmpdir:
+        with create_temporary_empty_files([onlist_name]) as tmpdir:
             expected_onlist_path = os.path.join(tmpdir, onlist_name)
             spec_path = os.path.join(tmpdir, "spec.yaml")
 
