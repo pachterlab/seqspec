@@ -193,7 +193,7 @@ def run_onlist_region(spec: Assay, modality: str, region_id: str) -> List[Onlist
     regions = find_by_region_id(spec, modality, region_id)
     onlists: List[Onlist] = []
     for r in regions:
-        ol = r.get_onlist()
+        ol = r.onlist
         if ol:
             onlists.append(ol)
     if len(onlists) == 0:
@@ -210,7 +210,7 @@ def run_onlist_read(spec: Assay, modality: str, read_id: str) -> List[Onlist]:
 
     onlists: List[Onlist] = []
     for r in new_rcs:
-        ol = r.get_onlist()
+        ol = r.onlist
         if ol:
             onlists.append(ol)
 
