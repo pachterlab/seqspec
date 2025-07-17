@@ -98,6 +98,6 @@ ignore = ["E501", "E203"]
 env_list = ["py{312,313,314,315}"]
 skip_missing_interpreters = true
 
-[tool.tox.env]
-commands = ["pytest --cov=seqspec {posargs:tests}"]
+[tool.tox.env_run_base]
+commands = [["pytest", "--cov=seqspec", "{posargs:tests}"]]
 deps = ["pytest", "pytest-cov", "matplotlib >= 3.4.0"]
