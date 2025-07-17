@@ -31,8 +31,8 @@ class TestSeqspecCheck(TestCase):
         cmdline = ["check", "-o", output_name, spec_name]
         args = parser.parse_args(cmdline)
 
-        self.assertEqual(args.o, output_name)
-        self.assertEqual(args.yaml, spec_name)
+        self.assertEqual(args.output, Path(output_name))
+        self.assertEqual(args.yaml, Path(spec_name))
 
     def test_validate_check_args_files_exist(self):
         parser = create_stub_check_parser()
