@@ -71,18 +71,7 @@ class TestOnlist(TestCase):
         }
         permit = Onlist(**expected)
 
-        self.assertEqual(
-            permit.to_dict(),
-            {
-                "file_id": file_id,
-                "filename": filename,
-                "filetype": filetype,
-                "filesize": filesize,
-                "url": url,
-                "urltype": urltype,
-                "md5": md5sum,
-            },
-        )
+        self.assertEqual(permit.dict(), expected)
 
 
 class TestRegion(TestCase):
@@ -202,13 +191,25 @@ class TestRegion(TestCase):
             "regions": None,
         }
 
-        self.assertEqual(r.to_dict(), expected)
+        filename = "barcodes.tsv"
+        onlist_data = {
+            "file_id": "123",
+            "filename": filename,
+            "filetype": "tsv",
+            "filesize": 300,
+            "url": filename,
+            "urltype": "file",
+            "md5": "d41d8cd98f00b204e9800998ecf8427e",
+        }
 
-        # should to_dict() and repr() look the same?
-        # the code currently returns region: [] for to_dict
-        # and region: None for repr()
-        expected["regions"] = None
-        self.assertEqual(repr(r), repr(expected))
+        permitted = Onlist(**onlist_data)
+
+        r = Region(**region_data, onlist=permitted)
+
+        expected = region_data.copy()
+        expected["onlist"] = onlist_data
+
+        self.assertEqual(r.dict(), expected)
 
 
 class TestRegionCoordinates(TestCase):
