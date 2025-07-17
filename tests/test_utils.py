@@ -184,8 +184,30 @@ class TestUtils(TestCase):
         r_linker_min += r_umi_max
         r_linker_max += r_linker_max
 
-        umi_region = RegionCoordinate(r_umi, r_umi_min, r_umi_max)
-        linker_region = RegionCoordinate(r_linker, r_linker_min, r_linker_max)
+        umi_region = RegionCoordinate(
+            region_id=r_umi.region_id,
+            region_type=r_umi.region_type,
+            name=r_umi.name,
+            sequence_type=r_umi.sequence_type,
+            sequence=r_umi.sequence,
+            min_len=r_umi.min_len,
+            max_len=r_umi.max_len,
+            onlist=r_umi.onlist,
+            regions=r_umi.regions,
+            start=r_umi_min,
+            stop=r_umi_max)
+        linker_region = RegionCoordinate(
+            region_id=r_linker.region_id,
+            region_type=r_linker.region_type,
+            name=r_linker.name,
+            sequence_type=r_linker.sequence_type,
+            sequence=r_linker.sequence,
+            min_len=r_linker.min_len,
+            max_len=r_linker.max_len,
+            onlist=r_linker.onlist,
+            regions=r_linker.regions,
+            start=r_linker_min,
+            stop=r_linker_max)
 
         cuts = project_regions_to_coordinates(r_expected.regions)
         self.assertEqual(cuts, [umi_region, linker_region])
@@ -220,16 +242,15 @@ class TestUtils(TestCase):
             with gzip.open(temp_list_filename, "wt") as stream:
                 stream.write(fake_contents)
 
-            onlist1 = Onlist(
-                "123",
-                temp_list_filename,
-                "tsv",
-                300,
-                temp_list_filename,
-                "local",
-                fake_md5,
-                "local",
-            )
+            onlist1 = Onlist(**{
+                "file_id": "123",
+                "filename": temp_list_filename,
+                "filetype": "tsv",
+                "filesize": 300,
+                "url": temp_list_filename,
+                "urltype": "local",
+                "md5": fake_md5,
+            })
             loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
@@ -244,16 +265,15 @@ class TestUtils(TestCase):
             with open(temp_list_filename, "wt") as stream:
                 stream.write(fake_contents)
 
-            onlist1 = Onlist(
-                "123",
-                temp_list_filename,
-                "tsv",
-                300,
-                temp_list_filename,
-                "local",
-                fake_md5,
-                "local",
-            )
+            onlist1 = Onlist(**{
+                "file_id": "123",
+                "filename": temp_list_filename,
+                "filetype": "tsv",
+                "filesize": 300,
+                "url": temp_list_filename,
+                "urltype": "local",
+                "md5": fake_md5,
+            })
             loaded_list = read_local_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)
@@ -277,9 +297,15 @@ class TestUtils(TestCase):
 
         with patch("requests.get", new=fake_request_get):
             url = "http://localhost/testlist.txt"
-            onlist1 = Onlist(
-                "123", "testlist.txt", "http", 300, url, "http", fake_md5, "remote"
-            )
+            onlist1 = Onlist(**{
+                "file_id": "123",
+                "filename": "testlist.txt",
+                "filetype": "tsv",
+                "filesize": 300,
+                "url": url,
+                "urltype": "http",
+                "md5": fake_md5,
+            })
             loaded_list = read_remote_list(onlist1)
 
             self.assertEqual(fake_onlist, loaded_list)

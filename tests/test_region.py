@@ -59,18 +59,17 @@ def read_rna_dict(read_id, min_len=0, max_len=100):
 
 class TestOnlist(TestCase):
     def test_simple_onlist(self):
-        file_id = "123"
         filename = "barcodes.tsv"
-        filetype = "tsv"
-        filesize = 300
-        url = filename
-        urltype = "file"
-        md5sum = "d41d8cd98f00b204e9800998ecf8427e"
-        location = "local"
-
-        permit = Onlist(
-            file_id, filename, filetype, filesize, url, "file", md5sum, location
-        )
+        expected = {
+            "file_id": "123",
+            "filename": filename,
+            "filetype": "tsv",
+            "filesize": 300,
+            "url": filename,
+            "urltype": "file",
+            "md5": "d41d8cd98f00b204e9800998ecf8427e",
+        }
+        permit = Onlist(**expected)
 
         self.assertEqual(
             permit.to_dict(),
@@ -192,58 +191,15 @@ class TestRegion(TestCase):
             self.assertIs(node.parent_id, r1.region_id)
 
     def test_onlists(self):
-        region_name = "region-1"
-        region_type = "linker"
-        sequence_type = "stuff"
-        sequence = "AACGTGAT"
-
-        list_id = "123"
-        list_name = "barcodes.tsv"
-        list_type = "tsv"
-        list_size = 300
-        list_url = list_name
-        list_urltype = "file"
-        list_md5sum = "d41d8cd98f00b204e9800998ecf8427e"
-        list_location = "local"
-
-        permited = Onlist(
-            list_id,
-            list_name,
-            list_type,
-            list_size,
-            list_url,
-            list_urltype,
-            list_md5sum,
-            list_location,
-        )
-
-        r = Region(
-            region_name,
-            region_type,
-            region_name,
-            sequence_type,
-            sequence=sequence,
-            onlist=permited,
-        )
-
-        expected = {
-            "region_id": region_name,
-            "region_type": region_type,
-            "name": region_name,
-            "sequence_type": sequence_type,
-            "onlist": {
-                "file_id": list_id,
-                "filename": list_name,
-                "filetype": list_type,
-                "filesize": list_size,
-                "url": list_name,
-                "urltype": list_urltype,
-                "md5": list_md5sum,
-            },
-            "sequence": sequence,
-            "min_len": 0,
+        region_data = {
+            "region_id": "region-id-1",
+            "region_type": "linker",
+            "name": "region-1",
+            "sequence_type": "stuff",
+            "sequence": "AACGTGAT",
+            "min_len": 50,
             "max_len": 1024,
-            "regions": [],
+            "regions": None,
         }
 
         self.assertEqual(r.to_dict(), expected)
