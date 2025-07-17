@@ -169,9 +169,10 @@ class TestSeqspecOnlist(TestCase):
         # Test that we will can use a locally cached copy of one barcode file
         # even if it is marked remote.
         onlist_name = "index_onlist.txt"
-        with create_temporary_empty_files([onlist_name]) as tmpdir:
+        spec_name = "spec.yaml"
+        with create_temporary_empty_files([onlist_name, spec_name]) as tmpdir:
             expected_onlist_path = os.path.join(tmpdir, onlist_name)
-            spec_path = os.path.join(tmpdir, "spec.yaml")
+            spec_path = os.path.join(tmpdir, spec_name)
 
             parser = ArgumentParser()
             subparser = parser.add_subparsers(dest="command")

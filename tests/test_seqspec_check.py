@@ -34,7 +34,7 @@ class TestSeqspecCheck(TestCase):
         self.assertEqual(args.o, output_name)
         self.assertEqual(args.yaml, spec_name)
 
-    def test_validate_check_args(self):
+    def test_validate_check_args_files_exist(self):
         parser = create_stub_check_parser()
 
         with TemporaryDirectory(prefix="seqspec_check_") as tmpdir:
@@ -47,7 +47,13 @@ class TestSeqspecCheck(TestCase):
             args = parser.parse_args(cmdline)
 
             # ignore testing if the files barcode & fastq files exist
-            with patch("os.path.exists") as path_exists:
-                path_exists.return_value = True
-                errors = validate_check_args(None, args)
-                self.assertEqual(errors, [])
+            validate_check_args(parser, args)
+
+    def test_validate_check_args_files_missing(self):
+        parser = create_stub_check_parser()
+
+        with TemporaryDirectory(prefix="seqspec_check_") as tmpdir:
+            target = Path(tmpdir) / "spec.yaml"
+            cmdline = ["check", str(target)]
+            args = parser.parse_args(cmdline)
+            self.assertRaises(SystemExit, validate_check_args, parser, args)
