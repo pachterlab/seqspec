@@ -131,11 +131,11 @@ class TestRegion(TestCase):
             set([r_umi_dict["region_type"], r_linker_dict["region_type"]]),
         )
 
-        # 0 & 1024 are the default min & max
+        # 0 & 1024 are the default min & max, it does not recurse to update the lengths
         self.assertEqual(r_expected.min_len, 0)
-        self.assertEqual(r_expected.max_len, 1024 * len(r_expected.regions))
+        self.assertEqual(r_expected.max_len, 1024)
 
-        # update_attr just sums up all the mins & maxes
+        # update_attr searches through regions to sums up all the mins & maxes
         r_expected.update_attr()
         self.assertEqual(r_expected.min_len, 0)
         self.assertEqual(r_expected.max_len, 1024 * len(r_expected.get_leaves()))
