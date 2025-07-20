@@ -67,14 +67,14 @@ class ReadCoordinate(BaseModel):
 
 
 class ReadInput(LLMInput):
-    read_id: Optional[str]
-    name: Optional[str]
-    modality: Optional[str]
-    primer_id: Optional[str]
-    min_len: Optional[int]
-    max_len: Optional[int]
-    strand: Optional[str]
-    files: Optional[List[FileInput]] = []
+    read_id: Optional[str] = None
+    name: Optional[str] = None
+    modality: Optional[str] = None
+    primer_id: Optional[str] = None
+    min_len: Optional[int] = None
+    max_len: Optional[int] = None
+    strand: Optional[str] = None
+    files: Optional[List[FileInput]] = None
 
     def to_read(self) -> Read:
         return Read(

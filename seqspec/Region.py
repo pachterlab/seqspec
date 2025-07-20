@@ -61,13 +61,13 @@ class Onlist(BaseModel):
 
 
 class OnlistInput(LLMInput):
-    file_id: Optional[str]
-    filename: Optional[str]
-    filetype: Optional[str]
-    filesize: Optional[int]
-    url: Optional[str]
-    urltype: Optional[str]
-    md5: Optional[str]
+    file_id: Optional[str] = None
+    filename: Optional[str] = None
+    filetype: Optional[str] = None
+    filesize: Optional[int] = None
+    url: Optional[str] = None
+    urltype: Optional[str] = None
+    md5: Optional[str] = None
 
     def to_onlist(self) -> Onlist:
         return Onlist(
@@ -249,32 +249,40 @@ Region.model_rebuild()
 
 
 class RegionInput(LLMInput):
-    region_id: Optional[str]
-    region_type: Optional[Union[str, RegionType]]
-    name: Optional[str]
-    sequence_type: Optional[Union[str, SequenceType]]
-    sequence: Optional[str]
-    min_len: Optional[int]
-    max_len: Optional[int]
-    onlist: Optional[OnlistInput]
-    # regions: Optional[List["RegionInput"]] = None
-    # parent_id: Optional[str]
+    region_id: Optional[str] = None
+    region_type: Optional[Union[str, RegionType]] = None
+    name: Optional[str] = None
+    sequence_type: Optional[Union[str, SequenceType]] = None
+    sequence: Optional[str] = None
+    min_len: Optional[int] = None
+    max_len: Optional[int] = None
+    onlist: Optional[OnlistInput] = None
+    regions: Optional[List["RegionInput"]] = None
 
     def to_region(self) -> Region:
-        length = self.min_len or self.max_len or 0
+        # Handle length defaults properly
+        min_len = self.min_len if self.min_len is not None else 0
+        max_len = self.max_len if self.max_len is not None else min_len or 1024
+
+        # Handle sequence type and sequence generation
         seq_type = self.sequence_type or "fixed"
-        sequence = "X" * length if seq_type == "random" else self.sequence or ""
+        if seq_type == "random":
+            sequence = "X" * min_len
+        elif seq_type == "onlist":
+            sequence = "N" * min_len
+        else:
+            sequence = self.sequence or ""
+
         return Region(
             region_id=self.region_id or "",
             region_type=self.region_type or self.region_id or "",
             name=self.name or self.region_id or "",
             sequence_type=seq_type,
             sequence=sequence,
-            min_len=length,
-            max_len=length,
+            min_len=min_len,
+            max_len=max_len,
             onlist=self.onlist.to_onlist() if self.onlist else None,
-            regions=None,  # [r.to_region() for r in self.regions] if self.regions else None,
-            # parent_id=self.parent_id,
+            regions=[r.to_region() for r in self.regions] if self.regions else None,
         )
 
 

@@ -118,11 +118,9 @@ def load_spec_stream(spec_stream: IO) -> Assay:
     Parses a YAML stream, strips tags, and returns a validated Assay object.
     """
     data_dict = safe_load_strip_tags(spec_stream)
-    assay = Assay(**data_dict)
+    from seqspec.Assay import AssayInput
 
-    # optional postprocessing
-    # for r in assay.library_spec:
-    #     r.set_parent_id("")
+    assay = AssayInput(**data_dict).to_assay()
     return assay
 
 

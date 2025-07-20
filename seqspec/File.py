@@ -26,13 +26,13 @@ class File(BaseModel):
 
 
 class FileInput(LLMInput):
-    file_id: Optional[str]
-    filename: Optional[str]
-    filetype: Optional[str]
-    filesize: Optional[int]
-    url: Optional[str]
-    urltype: Optional[str]
-    md5: Optional[str]
+    file_id: Optional[str] = None
+    filename: Optional[str] = None
+    filetype: Optional[str] = None
+    filesize: Optional[int] = None
+    url: Optional[str] = None
+    urltype: Optional[str] = None
+    md5: Optional[str] = None
 
     def to_file(self) -> File:
         return File(
