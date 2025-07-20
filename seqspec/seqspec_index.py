@@ -314,7 +314,7 @@ def get_index_by_primer(
     rcs = project_regions_to_coordinates(rgns)
 
     new_rcs = itx_read(rcs, 0, read.max_len)
-    rdc = ReadCoordinate(read, new_rcs)
+    rdc = ReadCoordinate(read=read, rcv=new_rcs)
 
     return {read_id: new_rcs, "strand": rdc.read.strand}
 
@@ -526,7 +526,7 @@ def compute_relative(rcs):
         for rgnc2 in rcs:
             diff = rgnc1 - rgnc2
             # obj - fixed
-            d.append(RegionCoordinateDifference(rgnc1, rgnc2, diff))
+            d.append(RegionCoordinateDifference(obj=rgnc1, fixed=rgnc2, rgncdiff=diff))
 
     return d
 

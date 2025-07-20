@@ -163,6 +163,10 @@ class Region(BaseModel):
                 r.get_onlist_regions(found)
         return found
 
+    def get_onlist(self) -> Optional[Onlist]:
+        """Get the onlist associated with this region."""
+        return self.onlist
+
     def get_leaves(self, leaves: Optional[List["Region"]] = None) -> List["Region"]:
         # print(leaves)
         if leaves is None:
@@ -348,12 +352,14 @@ def itx_read(
     for rc in region_coordinates:
         if read_start >= rc.stop or read_stop <= rc.start:
             continue
-        rc = rc.copy()
-        if read_start >= rc.start:
-            rc.start = read_start
-        if read_stop < rc.stop:
-            rc.stop = read_stop
-        new_rcs.append(rc)
+        # Create a new RegionCoordinate instance using model_copy
+        rc_copy = rc.model_copy(deep=True)
+        if read_start >= rc_copy.start:
+            rc_copy.start = read_start
+        if read_stop < rc_copy.stop:
+            rc_copy.stop = read_stop
+        new_rcs.append(rc_copy)
+
     return new_rcs
 
 

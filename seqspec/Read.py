@@ -56,7 +56,7 @@ class Read(BaseModel):
 
     def get_read_by_file_id(self, file_id: str):
         for f in self.files:
-            if f.filename == file_id:
+            if f.file_id == file_id:
                 return self
         return None
 
