@@ -88,7 +88,7 @@ def run_check(parser: ArgumentParser, args: Namespace):
     """Run the check command."""
     validate_check_args(parser, args)
 
-    spec = load_spec(args.yaml)
+    spec = load_spec(args.yaml, strict=False)
     errors = seqspec_check(spec, args.yaml, args.skip)
 
     if args.output:
@@ -587,6 +587,7 @@ def check(spec: Assay, spec_fn: str):
         "check_read_file_count": check_read_file_count,
     }
     for k, v in checks.items():
+        # print(k)
         errors, idx = v(spec, spec_fn, errors, idx)
 
     return errors

@@ -8,6 +8,7 @@ from typing import IO, List, Optional, Tuple, Union
 import requests
 import yaml
 from Bio import GenBank
+from pydantic import ValidationError
 
 from seqspec.Assay import Assay
 from seqspec.File import File
@@ -101,16 +102,81 @@ def safe_load_strip_tags(stream: Union[str, Path, IO]) -> dict:
     return yaml.safe_load(cleaned)
 
 
-def load_spec(spec_fn: Union[str, Path]) -> Assay:
+def format_pydantic_validation_object(error_path: str) -> str:
+    """
+    Converts a Pydantic validation error path to Python dictionary access notation.
+
+    Args:
+        error_path: Path like 'library_spec.0.regions.1.onlist.url'
+
+    Returns:
+        Python dictionary access notation like "spec['library_spec'][0]['regions'][1]['onlist']['url']"
+    """
+    if not error_path:
+        return "spec"
+
+    parts = error_path.split(".")
+    result = "spec"
+
+    for part in parts:
+        # Check if part is a number (array index)
+        if part.isdigit():
+            result += f"[{part}]"
+        else:
+            result += f"['{part}']"
+
+    return result
+
+
+def load_spec(spec_fn: Union[str, Path], strict=True) -> Assay:
     """
     Loads a YAML or gzipped YAML spec file, strips tags, and constructs an Assay object.
+    If strict=True and validation fails, prints all errors and raises an exception.
     """
-    try:
+    # Check if the file is gzip by reading the magic number
+    with open(spec_fn, "rb") as f:
+        magic = f.read(2)
+
+    if magic == b"\x1f\x8b":
         with gzip.open(spec_fn, "rt") as stream:
-            return load_spec_stream(stream)
-    except gzip.BadGzipFile:
+            data_dict = safe_load_strip_tags(stream)
+    else:
         with open(spec_fn, "r") as stream:
-            return load_spec_stream(stream)
+            data_dict = safe_load_strip_tags(stream)
+
+    if strict:
+        try:
+            assay = Assay(**data_dict)
+            return assay
+        except ValidationError as e:
+            verrors = e.errors()
+            errors = []
+            for idx, err in enumerate(verrors, 1):
+                # err['loc'] is a tuple of the error path, join with dots for readability
+                err_path = ".".join(str(x) for x in err.get("loc", []))
+                err_type = err.get("type", "unknown")
+                err_msg = err.get("msg", "")
+                # Compose a descriptive error message
+                errors.append(
+                    {
+                        "error_type": err_type,
+                        "error_message": err_msg,
+                        "error_object": format_pydantic_validation_object(err_path),
+                        "full_error": err,
+                    }
+                )
+
+            for idx, error in enumerate(errors, 1):
+                print(
+                    f"[error {idx}] {error['error_message']} in {error['error_object']}"
+                )
+            raise ValueError(
+                "Invalid spec. Correct errors then verify spec with `seqspec format` and `seqspec check`."
+            )
+    else:
+        from seqspec.Assay import AssayInput
+
+        return AssayInput(**data_dict).to_assay()
 
 
 def load_spec_stream(spec_stream: IO) -> Assay:

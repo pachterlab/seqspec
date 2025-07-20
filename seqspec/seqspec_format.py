@@ -72,7 +72,7 @@ def run_format(parser: ArgumentParser, args: Namespace) -> None:
     """
     validate_format_args(parser, args)
 
-    spec = load_spec(args.yaml)
+    spec = load_spec(args.yaml, strict=False)
     format_spec(spec)
 
     if args.output:
