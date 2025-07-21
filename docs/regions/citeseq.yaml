@@ -1,12 +1,11 @@
-- !Region
-  region_id: protein_cell_bc
+- region_id: protein_cell_bc
   region_type: barcode
   name: Cell Barcode
   sequence_type: onlist
   sequence: NNNNNNNNNNNNNNNN
   min_len: 16
   max_len: 16
-  onlist: !Onlist
+  onlist:
     file_id: 3M-february-2018.txt.gz
     filename: 3M-february-2018.txt.gz
     filetype: txt
@@ -17,8 +16,7 @@
     location: remote
   regions: null
   parent_id: protein
-- !Region
-  region_id: protein_umi
+- region_id: protein_umi
   region_type: umi
   name: umi
   sequence_type: random
@@ -28,15 +26,14 @@
   onlist: null
   regions: null
   parent_id: protein
-- !Region
-  region_id: protein_seq
+- region_id: protein_seq
   region_type: protein
   name: protein
   sequence_type: random
   sequence: XXXXXXXXXXXXXXX
   min_len: 15
   max_len: 15
-  onlist: !Onlist
+  onlist:
     file_id: protein_seq.txt
     filename: protein_seq.txt
     filetype: txt

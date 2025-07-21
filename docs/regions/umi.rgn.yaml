@@ -1,5 +1,4 @@
-- !Region
-  region_id: umi
+- region_id: umi
   region_type: umi
   name: Unique Molecular Identifier
   sequence_type: random

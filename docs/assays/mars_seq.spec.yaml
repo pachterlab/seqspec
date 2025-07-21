@@ -1,6 +1,5 @@
-!Assay
 seqspec_version: 0.3.0
-assay_id: null
+assay_id: ''
 name: MARS-seq
 doi: https://doi.org/10.1038/s41596-019-0164-4
 date: 17 May 2019
@@ -9,13 +8,12 @@ description: indexed sorting combined with single-cell RNA sequencing (technical
 modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/MARS-seq.html
-library_protocol: null
-library_kit: null
-sequence_protocol: null
-sequence_kit: null
+sequence_protocol: []
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -23,16 +21,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -40,27 +36,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: RNA
+- region_id: RNA
   region_type: RNA
   name: RNA
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNXXNNNNNNNNNNAGATCGGAAGAGCACACGTCTGAACTCCAGTCACATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNXXXXXXNNNNNNAGATCGGAAGAGCACACGTCTGAACTCCAGTCACATCTCGTATGCCGTCTTCTGCTTG
   min_len: 144
   max_len: 338
   onlist: null
   regions:
-  - !Region
-    region_id: illumina_p5
+  - region_id: illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -69,9 +62,7 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: truseq_r1
+  - region_id: truseq_r1
     region_type: truseq_r1
     name: truseq_r1
     sequence_type: fixed
@@ -80,28 +71,23 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: plate_bc
+  - region_id: plate_bc
     region_type: plate_bc
     name: plate_bc
     sequence_type: onlist
     sequence: NNNNNNN
     min_len: 7
     max_len: 7
-    onlist: !Onlist
+    onlist:
       file_id: plate_bc_onlist.txt
       filename: plate_bc_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: cdna
+  - region_id: cdna
     region_type: cdna
     name: cdna
     sequence_type: random
@@ -110,9 +96,7 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: polyA
+  - region_id: polyA
     region_type: polyA
     name: polyA
     sequence_type: random
@@ -121,39 +105,32 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: umi
+  - region_id: umi
     region_type: umi
     name: umi
     sequence_type: random
-    sequence: NNNN
+    sequence: XXXX
     min_len: 4
     max_len: 4
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: cell_bc
+  - region_id: cell_bc
     region_type: cell_bc
     name: cell_bc
     sequence_type: onlist
     sequence: NNNNNN
     min_len: 6
     max_len: 6
-    onlist: !Onlist
+    onlist:
       file_id: cell_bc_onlist.txt
       filename: cell_bc_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: truseq_r2
+  - region_id: truseq_r2
     region_type: truseq_r2
     name: truseq_r2
     sequence_type: fixed
@@ -162,9 +139,7 @@ library_spec:
     max_len: 34
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: illumina_p7
+  - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -173,5 +148,3 @@ library_spec:
     max_len: 33
     onlist: null
     regions: null
-    parent_id: RNA
-  parent_id: null

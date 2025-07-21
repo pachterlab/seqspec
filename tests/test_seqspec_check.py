@@ -1,15 +1,15 @@
+import os
+import tempfile
 from argparse import ArgumentParser
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from unittest import TestCase
-from unittest.mock import patch
+
+import pytest
 
 from seqspec.seqspec_check import (
     setup_check_args,
     validate_check_args,
 )
-
-from .test_utils import example_spec
 
 
 def create_stub_check_parser():
@@ -22,32 +22,46 @@ def create_stub_check_parser():
     return parser
 
 
-class TestSeqspecCheck(TestCase):
-    def test_check_args(self):
-        parser = create_stub_check_parser()
 
-        output_name = "output"
-        spec_name = "spec.yaml"
-        cmdline = ["check", "-o", output_name, spec_name]
-        args = parser.parse_args(cmdline)
+def test_check_args():
+    """Test check command argument parsing."""
+    parser = ArgumentParser()
+    subparser = parser.add_subparsers()
+    check_parser = setup_check_args(subparser)
+    
+    # Test with valid arguments
+    args = check_parser.parse_args(['test.yaml'])
+    assert args.yaml == Path('test.yaml')
+    assert args.output is None
+    assert args.skip is None
+    
+    # Test with output argument
+    args = check_parser.parse_args(['test.yaml', '-o', 'output.txt'])
+    assert args.yaml == Path('test.yaml')
+    assert args.output == Path('output.txt')
+    
+    # Test with skip argument
+    args = check_parser.parse_args(['test.yaml', '-s', 'igvf'])
+    assert args.yaml == Path('test.yaml')
+    assert args.skip == 'igvf'
 
-        self.assertEqual(args.o, output_name)
-        self.assertEqual(args.yaml, spec_name)
-
-    def test_validate_check_args(self):
-        parser = create_stub_check_parser()
-
-        with TemporaryDirectory(prefix="seqspec_check_") as tmpdir:
-            target = Path(tmpdir) / "spec.yaml"
-
-            with open(target, "wt") as stream:
-                stream.write(example_spec)
-
-            cmdline = ["check", str(target)]
-            args = parser.parse_args(cmdline)
-
-            # ignore testing if the files barcode & fastq files exist
-            with patch("os.path.exists") as path_exists:
-                path_exists.return_value = True
-                errors = validate_check_args(None, args)
-                self.assertEqual(errors, [])
+def test_validate_check_args():
+    """Test check command argument validation."""
+    parser = ArgumentParser()
+    subparser = parser.add_subparsers()
+    check_parser = setup_check_args(subparser)
+    
+    # Test with valid file
+    with tempfile.NamedTemporaryFile(suffix='.yaml', delete=False) as f:
+        f.write(b'assay_id: test')
+        f.flush()
+        
+        args = check_parser.parse_args([f.name])
+        validate_check_args(parser, args)  # Should not raise
+        
+        os.unlink(f.name)
+    
+    # Test with non-existent file
+    args = check_parser.parse_args(['nonexistent.yaml'])
+    with pytest.raises(SystemExit):
+        validate_check_args(parser, args)

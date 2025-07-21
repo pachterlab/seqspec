@@ -21,7 +21,7 @@
   region_type: umi
   name: Unique Molecular Identifier
   sequence_type: random
-  sequence: NNNNNNNNNNNN
+  sequence: XXXXXXXXXXXX
   min_len: 12
   max_len: 12
   onlist: null

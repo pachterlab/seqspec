@@ -1,5 +1,4 @@
-- !Region
-  region_id: truseq_read2
+- region_id: truseq_read2
   region_type: truseq_read2
   name: Truseq Read 2
   sequence_type: fixed

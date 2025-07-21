@@ -1,6 +1,5 @@
-!Assay
 seqspec_version: 0.3.0
-assay_id: null
+assay_id: ''
 name: ISSAAC-seq
 doi: https://doi.org/10.1038/s41592-022-01601-4
 date: 15 September 2020
@@ -10,13 +9,12 @@ modalities:
 - RNA
 - ATAC
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/ISSAAC-seq.html
-library_protocol: null
-library_kit: null
-sequence_protocol: null
-sequence_kit: null
+sequence_protocol: []
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -24,16 +22,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -41,28 +37,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: RNA
+- region_id: RNA
   region_type: RNA
   name: ISSAAC-seq RNA
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXNNNNNNNNNNAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
-  min_len: 155
-  max_len: 455
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  min_len: 156
+  max_len: 444
   onlist: null
   regions:
-  - !Region
-    parent_id: RNA
-    region_id: RNA-illumina_p5
+  - region_id: RNA-illumina_p5
     region_type: illumina_p5
     name: Illumina P5
     sequence_type: fixed
@@ -71,9 +63,7 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-  - !Region
-    parent_id: RNA
-    region_id: RNA-I2.fastq.gz
+  - region_id: RNA-I2.fastq.gz
     region_type: fastq
     name: Index 2
     sequence_type: joined
@@ -82,28 +72,23 @@ library_spec:
     max_len: 16
     onlist: null
     regions:
-    - !Region
-      parent_id: RNA-I2.fastq.gz
-      region_id: RNA-cell_bc
+    - region_id: RNA-cell_bc
       region_type: barcode
       name: Cell Barcode
       sequence_type: onlist
       sequence: NNNNNNNNNNNNNNNN
       min_len: 16
       max_len: 16
-      onlist: !Onlist
+      onlist:
         file_id: 737K-cratac-v1.txt.gz
         filename: 737K-cratac-v1.txt.gz
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
-        md5: null
-        location: local
+        urltype: local
+        md5: ''
       regions: null
-  - !Region
-    parent_id: RNA
-    region_id: RNA-nextera_read1
+  - region_id: RNA-nextera_read1
     region_type: nextera_read1
     name: Nextera Read 1
     sequence_type: fixed
@@ -112,9 +97,7 @@ library_spec:
     max_len: 33
     onlist: null
     regions:
-    - !Region
-      parent_id: RNA-nextera_read1
-      region_id: RNA-s5
+    - region_id: RNA-s5
       region_type: s5
       name: s5
       sequence_type: fixed
@@ -123,9 +106,7 @@ library_spec:
       max_len: 14
       onlist: null
       regions: null
-    - !Region
-      parent_id: RNA-nextera_read1
-      region_id: RNA-ME1
+    - region_id: RNA-ME1
       region_type: ME1
       name: ME1
       sequence_type: fixed
@@ -134,9 +115,7 @@ library_spec:
       max_len: 19
       onlist: null
       regions: null
-  - !Region
-    parent_id: RNA
-    region_id: RNA-R1.fastq.gz
+  - region_id: RNA-R1.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
     sequence_type: random
@@ -145,9 +124,7 @@ library_spec:
     max_len: 150
     onlist: null
     regions:
-    - !Region
-      parent_id: RNA-R1.fastq.gz
-      region_id: cDNA
+    - region_id: cDNA
       region_type: cDNA
       name: cDNA
       sequence_type: random
@@ -156,20 +133,16 @@ library_spec:
       max_len: 150
       onlist: null
       regions: null
-  - !Region
-    parent_id: RNA
-    region_id: RNA-R2.fastq.gz
+  - region_id: RNA-R2.fastq.gz
     region_type: fastq
     name: Read 2 FASTQ
     sequence_type: joined
-    sequence: X
+    sequence: XXXXXXXXXXX
     min_len: 11
     max_len: 150
     onlist: null
     regions:
-    - !Region
-      parent_id: RNA-R2.fastq.gz
-      region_id: poly_A
+    - region_id: poly_A
       region_type: poly_A
       name: poly_A
       sequence_type: random
@@ -178,20 +151,16 @@ library_spec:
       max_len: 140
       onlist: null
       regions: null
-    - !Region
-      parent_id: RNA-R2.fastq.gz
-      region_id: UMI
+    - region_id: UMI
       region_type: umi
       name: umi
       sequence_type: random
-      sequence: NNNNNNNNNN
+      sequence: XXXXXXXXXX
       min_len: 10
       max_len: 10
       onlist: null
       regions: null
-  - !Region
-    parent_id: RNA
-    region_id: RNA-truseq_read2
+  - region_id: RNA-truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
     sequence_type: fixed
@@ -200,9 +169,7 @@ library_spec:
     max_len: 34
     onlist: null
     regions: null
-  - !Region
-    parent_id: RNA
-    region_id: RNA-I1.fastq.gz
+  - region_id: RNA-I1.fastq.gz
     region_type: fastq
     name: Index 1
     sequence_type: joined
@@ -211,28 +178,23 @@ library_spec:
     max_len: 8
     onlist: null
     regions:
-    - !Region
-      parent_id: RNA-I1.fastq.gz
-      region_id: RNA-index7
+    - region_id: RNA-index7
       region_type: index7
       name: Sample index
       sequence_type: onlist
       sequence: NNNNNNNN
       min_len: 8
       max_len: 8
-      onlist: !Onlist
+      onlist:
         file_id: index7_onlist.txt
         filename: index7_onlist.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
-        md5: null
-        location: local
+        urltype: local
+        md5: ''
       regions: null
-  - !Region
-    parent_id: RNA
-    region_id: RNA-illumina_p7
+  - region_id: RNA-illumina_p7
     region_type: illumina_p7
     name: Illumina P7
     sequence_type: fixed
@@ -241,20 +203,16 @@ library_spec:
     max_len: 24
     onlist: null
     regions: null
-  parent_id: null
-- !Region
-  region_id: ATAC
+- region_id: ATAC
   region_type: ATAC
   name: ATAC
   sequence_type: joined
   sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 146
-  max_len: 446
+  max_len: 444
   onlist: null
   regions:
-  - !Region
-    parent_id: ATAC
-    region_id: ATAC-illumina_p5
+  - region_id: ATAC-illumina_p5
     region_type: illumina_p5
     name: Illumina P5
     sequence_type: fixed
@@ -263,9 +221,7 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-  - !Region
-    parent_id: ATAC
-    region_id: ATAC-I2.fastq.gz
+  - region_id: ATAC-I2.fastq.gz
     region_type: fastq
     name: Index 2
     sequence_type: joined
@@ -274,28 +230,23 @@ library_spec:
     max_len: 16
     onlist: null
     regions:
-    - !Region
-      parent_id: ATAC-I2.fastq.gz
-      region_id: ATAC-cell_bc
+    - region_id: ATAC-cell_bc
       region_type: barcode
       name: Cell Barcode
       sequence_type: onlist
       sequence: NNNNNNNNNNNNNNNN
       min_len: 16
       max_len: 16
-      onlist: !Onlist
+      onlist:
         file_id: 737K-cratac-v1.txt.gz
         filename: 737K-cratac-v1.txt.gz
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
-        md5: null
-        location: local
+        urltype: local
+        md5: ''
       regions: null
-  - !Region
-    parent_id: ATAC
-    region_id: ATAC-nextera_read1
+  - region_id: ATAC-nextera_read1
     region_type: nextera_read1
     name: Nextera Read 1
     sequence_type: fixed
@@ -304,9 +255,7 @@ library_spec:
     max_len: 33
     onlist: null
     regions:
-    - !Region
-      parent_id: ATAC-nextera_read1
-      region_id: ATAC-s5
+    - region_id: ATAC-s5
       region_type: s5
       name: s5
       sequence_type: fixed
@@ -315,9 +264,7 @@ library_spec:
       max_len: 14
       onlist: null
       regions: null
-    - !Region
-      parent_id: ATAC-nextera_read1
-      region_id: ME1
+    - region_id: ME1
       region_type: ME1
       name: ME1
       sequence_type: fixed
@@ -326,9 +273,7 @@ library_spec:
       max_len: 19
       onlist: null
       regions: null
-  - !Region
-    parent_id: ATAC
-    region_id: ATAC-R1.fastq.gz
+  - region_id: ATAC-R1.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
     sequence_type: random
@@ -337,9 +282,7 @@ library_spec:
     max_len: 150
     onlist: null
     regions:
-    - !Region
-      parent_id: ATAC-R1.fastq.gz
-      region_id: gDNA-1
+    - region_id: gDNA-1
       region_type: gDNA
       name: gDNA 1
       sequence_type: random
@@ -348,9 +291,7 @@ library_spec:
       max_len: 150
       onlist: null
       regions: null
-  - !Region
-    parent_id: ATAC
-    region_id: ATAC-R2.fastq.gz
+  - region_id: ATAC-R2.fastq.gz
     region_type: fastq
     name: Read 2 FASTQ
     sequence_type: random
@@ -359,9 +300,7 @@ library_spec:
     max_len: 150
     onlist: null
     regions:
-    - !Region
-      parent_id: ATAC-R2.fastq.gz
-      region_id: gDNA-2
+    - region_id: gDNA-2
       region_type: gDNA
       name: gDNA 2
       sequence_type: random
@@ -370,9 +309,7 @@ library_spec:
       max_len: 150
       onlist: null
       regions: null
-  - !Region
-    parent_id: ATAC
-    region_id: ATAC-nextera_read2
+  - region_id: ATAC-nextera_read2
     region_type: nextera_read2
     name: Nextera Read 2
     sequence_type: fixed
@@ -381,9 +318,7 @@ library_spec:
     max_len: 34
     onlist: null
     regions:
-    - !Region
-      parent_id: ATAC-nextera_read2
-      region_id: ATAC-ME2
+    - region_id: ATAC-ME2
       region_type: ME2
       name: ME2
       sequence_type: fixed
@@ -392,9 +327,7 @@ library_spec:
       max_len: 19
       onlist: null
       regions: null
-    - !Region
-      parent_id: ATAC-nextera_read2
-      region_id: ATAC-s7
+    - region_id: ATAC-s7
       region_type: s7
       name: s7
       sequence_type: fixed
@@ -403,9 +336,7 @@ library_spec:
       max_len: 15
       onlist: null
       regions: null
-  - !Region
-    parent_id: ATAC
-    region_id: ATAC-I1.fastq.gz
+  - region_id: ATAC-I1.fastq.gz
     region_type: fastq
     name: Index 1
     sequence_type: joined
@@ -414,28 +345,23 @@ library_spec:
     max_len: 8
     onlist: null
     regions:
-    - !Region
-      parent_id: ATAC-I1.fastq.gz
-      region_id: ATAC-index7
+    - region_id: ATAC-index7
       region_type: index7
       name: Sample index
       sequence_type: onlist
       sequence: NNNNNNNN
       min_len: 8
       max_len: 8
-      onlist: !Onlist
+      onlist:
         file_id: index7_onlist.txt
         filename: index7_onlist.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
-        md5: null
-        location: local
+        urltype: local
+        md5: ''
       regions: null
-  - !Region
-    parent_id: ATAC
-    region_id: ATAC-illumina_p7
+  - region_id: ATAC-illumina_p7
     region_type: illumina_p7
     name: Illumina P7
     sequence_type: fixed
@@ -444,4 +370,3 @@ library_spec:
     max_len: 24
     onlist: null
     regions: null
-  parent_id: null

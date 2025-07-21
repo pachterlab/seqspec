@@ -1,5 +1,4 @@
-- !Region
-  region_id: nextera_read1
+- region_id: nextera_read1
   region_type: nextera_read1
   name: nextera_read1
   sequence_type: fixed
@@ -8,8 +7,7 @@
   max_len: 33
   onlist:
   regions:
-    - !Region
-      region_id: s5
+    - region_id: s5
       region_type: s5
       name: s5
       sequence_type: fixed
@@ -18,8 +16,7 @@
       max_len: 14
       onlist:
       regions:
-    - !Region
-      region_id: ME1
+    - region_id: ME1
       region_type: ME1
       name: ME1
       sequence_type: fixed

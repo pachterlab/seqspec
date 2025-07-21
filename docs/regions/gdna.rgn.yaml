@@ -1,5 +1,4 @@
-- !Region
-  region_id: gDNA
+- region_id: gDNA
   region_type: gDNA
   name: Genomic DNA
   sequence_type: random

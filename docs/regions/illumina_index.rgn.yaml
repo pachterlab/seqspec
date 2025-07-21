@@ -1,12 +1,11 @@
-- !Region
-  region_id: index
+- region_id: index
   region_type: index
   name: index
   sequence_type: onlist
   sequence: NNNNNNNN
   min_len: 8
   max_len: 8
-  onlist: !Onlist
+  onlist:
     file_id: index_onlist.txt
     filename: index_onlist.txt
     filetype: txt

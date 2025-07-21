@@ -1,6 +1,5 @@
-!Assay
 seqspec_version: 0.3.0
-assay_id: null
+assay_id: ''
 name: sci-RNA-seq3
 doi: https://doi.org/10.1038/s41586-019-0969-x
 date: 20 February 2019
@@ -8,13 +7,12 @@ description: combinatorial single-cell RNA-seq 3
 modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq3.html
-library_protocol: null
-library_kit: null
-sequence_protocol: null
-sequence_kit: null
+sequence_protocol: []
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -22,16 +20,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -39,27 +35,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: RNA
+- region_id: RNA
   region_type: RNA
   name: RNA
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNXCAGAGCNNNNNNNNNNNNNNNNNNXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNCAGAGCXXXXXXXXNNNNNNNNNNXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 175
   max_len: 370
   onlist: null
   regions:
-  - !Region
-    region_id: illumina_p5
+  - region_id: illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -68,28 +61,23 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: i5
+  - region_id: i5
     region_type: i5
     name: i5
     sequence_type: onlist
     sequence: NNNNNNNNNN
     min_len: 10
     max_len: 10
-    onlist: !Onlist
+    onlist:
       file_id: i5_onlist.txt
       filename: i5_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: truseq_read_1_adapter
+  - region_id: truseq_read_1_adapter
     region_type: truseq_read_1_adapter
     name: truseq_read_1_adapter
     sequence_type: fixed
@@ -98,38 +86,32 @@ library_spec:
     max_len: 33
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: read_1
+  - region_id: read_1
     region_type: read_1
     name: read_1
     sequence_type: joined
-    sequence: NNNNNNNNNXCAGAGCNNNNNNNNNNNNNNNNNN
+    sequence: NNNNNNNNNCAGAGCXXXXXXXXNNNNNNNNNN
     min_len: 33
     max_len: 34
     onlist: null
     regions:
-    - !Region
-      region_id: hairpin_barcode
+    - region_id: hairpin_barcode
       region_type: hairpin_barcode
       name: hairpin_barcode
       sequence_type: onlist
-      sequence: NNNNNNNNNX
+      sequence: NNNNNNNNN
       min_len: 9
       max_len: 10
-      onlist: !Onlist
+      onlist:
         file_id: hairpin_bc_onlist.txt
         filename: hairpin_bc_onlist.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
-        md5: null
-        location: local
+        urltype: local
+        md5: ''
       regions: null
-      parent_id: read_1
-    - !Region
-      region_id: hairpin_adapter
+    - region_id: hairpin_adapter
       region_type: hairpin_adapter
       name: truseq_read_1_adapter
       sequence_type: fixed
@@ -138,40 +120,32 @@ library_spec:
       max_len: 6
       onlist: null
       regions: null
-      parent_id: read_1
-    - !Region
-      region_id: umi
+    - region_id: umi
       region_type: umi
       name: umi
       sequence_type: random
-      sequence: NNNNNNNN
+      sequence: XXXXXXXX
       min_len: 8
       max_len: 8
       onlist: null
       regions: null
-      parent_id: read_1
-    - !Region
-      region_id: cell_bc
+    - region_id: cell_bc
       region_type: cell_bc
       name: cell_bc
       sequence_type: onlist
       sequence: NNNNNNNNNN
       min_len: 10
       max_len: 10
-      onlist: !Onlist
+      onlist:
         file_id: cell_bc_onlist.txt
         filename: cell_bc_onlist.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
-        md5: null
-        location: local
+        urltype: local
+        md5: ''
       regions: null
-      parent_id: read_1
-    parent_id: RNA
-  - !Region
-    region_id: poly_T
+  - region_id: poly_T
     region_type: poly_T
     name: poly_T
     sequence_type: random
@@ -180,9 +154,7 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: read_2
+  - region_id: read_2
     region_type: read_2
     name: read_2
     sequence_type: random
@@ -191,9 +163,7 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: i7_primer
+  - region_id: i7_primer
     region_type: i7_primer
     name: i7_primer
     sequence_type: joined
@@ -202,8 +172,7 @@ library_spec:
     max_len: 34
     onlist: null
     regions:
-    - !Region
-      region_id: ME
+    - region_id: ME
       region_type: ME
       name: ME
       sequence_type: fixed
@@ -212,9 +181,7 @@ library_spec:
       max_len: 19
       onlist: null
       regions: null
-      parent_id: i7_primer
-    - !Region
-      region_id: s7
+    - region_id: s7
       region_type: s7
       name: s7
       sequence_type: fixed
@@ -223,29 +190,23 @@ library_spec:
       max_len: 15
       onlist: null
       regions: null
-      parent_id: i7_primer
-    parent_id: RNA
-  - !Region
-    region_id: i7
+  - region_id: i7
     region_type: i7
     name: i7
     sequence_type: onlist
     sequence: NNNNNNNNNN
     min_len: 10
     max_len: 10
-    onlist: !Onlist
+    onlist:
       file_id: i7_onlist.txt
       filename: i7_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: illumina_p7
+  - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -254,5 +215,3 @@ library_spec:
     max_len: 24
     onlist: null
     regions: null
-    parent_id: RNA
-  parent_id: null

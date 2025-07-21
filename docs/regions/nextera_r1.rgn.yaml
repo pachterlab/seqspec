@@ -1,5 +1,4 @@
-- !Region
-  region_id: nextera_read1
+- region_id: nextera_read1
   region_type: nextera_read1
   name: Nextera Read 1
   sequence_type: fixed

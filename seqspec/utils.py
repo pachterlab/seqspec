@@ -361,6 +361,7 @@ REGION_TYPE_COLORS = {
 # '#95A5A6'
 
 
+# NOTE: I think region_id should actually be read_id
 def map_read_id_to_regions(
     spec: Assay, modality: str, region_id: str
 ) -> Tuple[Read, List[Region]]:

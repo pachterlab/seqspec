@@ -1,4 +1,3 @@
-!Assay
 seqspec_version: 0.3.0
 assay_id: DOGMAseq-DIG
 name: DOGMAseq-DIG/Illumina
@@ -16,13 +15,12 @@ modalities:
 - rna
 - atac
 lib_struct: ''
-library_protocol: null
-library_kit: null
 sequence_protocol: Illumina NovaSeq 6000 (S2 Reagent Kit v1.5)
-sequence_kit: null
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -30,16 +28,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -47,287 +43,239 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: protein
+- region_id: protein
   region_type: protein
   name: protein
   sequence_type: joined
-  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+  sequence: NNNNNNNNNNNNNNNNXXXXXXXXXXXXXXXXXXXXXXXXXXX
   min_len: 43
   max_len: 43
   onlist: null
   regions:
-  - !Region
-    region_id: protein_R1_SRR18677644.fastq.gz
+  - region_id: protein_R1_SRR18677644.fastq.gz
     region_type: fastq
     name: Read 1
     sequence_type: joined
-    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    sequence: NNNNNNNNNNNNNNNNXXXXXXXXXXXX
     min_len: 28
     max_len: 28
     onlist: null
-    parent_id: protein
     regions:
-    - !Region
-      region_id: protein_cell_bc
+    - region_id: protein_cell_bc
       region_type: barcode
       name: Cell Barcode
       sequence_type: onlist
       sequence: NNNNNNNNNNNNNNNN
       min_len: 16
       max_len: 16
-      onlist: !Onlist
+      onlist:
         file_id: RNA-737K-arc-v1.txt
         filename: RNA-737K-arc-v1.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
+        urltype: local
         md5: a88cd21e801ae6f9a7d9a48b67ccf693
-        location: local
       regions: null
-      parent_id: protein_R1_SRR18677644.fastq.gz
-    - !Region
-      region_id: protein_umi
+    - region_id: protein_umi
       region_type: umi
       name: umi
       sequence_type: random
-      sequence: NNNNNNNNNNNN
+      sequence: XXXXXXXXXXXX
       min_len: 12
       max_len: 12
       onlist: null
       regions: null
-      parent_id: protein_R1_SRR18677644.fastq.gz
-  - !Region
-    region_id: protein_R2_SRR18677644.fastq.gz
+  - region_id: protein_R2_SRR18677644.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
     sequence_type: joined
-    sequence: NNNNNNNNNNNNNNN
+    sequence: XXXXXXXXXXXXXXX
     min_len: 15
     max_len: 15
     onlist: null
     regions:
-    - !Region
-      region_id: protein_seq
+    - region_id: protein_seq
       region_type: protein
       name: protein
       sequence_type: random
-      sequence: NNNNNNNNNNNNNNN
+      sequence: XXXXXXXXXXXXXXX
       min_len: 15
       max_len: 15
-      onlist: !Onlist
+      onlist:
         file_id: protein_feature_barcodes.txt
         filename: protein_feature_barcodes.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
+        urltype: local
         md5: b5920c1fc1d22927607c31c96f5cf03e
-        location: local
       regions: null
-      parent_id: protein_R2_SRR18677644.fastq.gz
-    parent_id: protein
-  parent_id: null
-- !Region
-  region_id: tag
+- region_id: tag
   region_type: tag
   name: tag
   sequence_type: joined
-  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+  sequence: NNNNNNNNNNNNNNNNXXXXXXXXXXXXXXXXXXXXXXXXXXX
   min_len: 43
   max_len: 43
   onlist: null
   regions:
-  - !Region
-    region_id: tag_R1_SRR18677640.fastq.gz
+  - region_id: tag_R1_SRR18677640.fastq.gz
     region_type: fastq
     name: Read 1
     sequence_type: joined
-    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    sequence: NNNNNNNNNNNNNNNNXXXXXXXXXXXX
     min_len: 28
     max_len: 28
     onlist: null
-    parent_id: tag
     regions:
-    - !Region
-      region_id: tag_cell_bc
+    - region_id: tag_cell_bc
       region_type: barcode
       name: Cell Barcode
       sequence_type: onlist
       sequence: NNNNNNNNNNNNNNNN
       min_len: 16
       max_len: 16
-      onlist: !Onlist
+      onlist:
         file_id: RNA-737K-arc-v1.txt
         filename: RNA-737K-arc-v1.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
+        urltype: local
         md5: a88cd21e801ae6f9a7d9a48b67ccf693
-        location: local
       regions: null
-      parent_id: tag_R1_SRR18677640.fastq.gz
-    - !Region
-      region_id: tag_umi
+    - region_id: tag_umi
       region_type: umi
       name: umi
       sequence_type: random
-      sequence: NNNNNNNNNNNN
+      sequence: XXXXXXXXXXXX
       min_len: 12
       max_len: 12
       onlist: null
       regions: null
-      parent_id: tag_R1_SRR18677640.fastq.gz
-  - !Region
-    region_id: tag_R2_SRR18677640.fastq.gz
+  - region_id: tag_R2_SRR18677640.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
     sequence_type: joined
-    sequence: NNNNNNNNNNNNNNN
+    sequence: XXXXXXXXXXXXXXX
     min_len: 15
     max_len: 15
     onlist: null
     regions:
-    - !Region
-      region_id: tag_seq
+    - region_id: tag_seq
       region_type: tag
       name: tag sequence
       sequence_type: random
-      sequence: NNNNNNNNNNNNNNN
+      sequence: XXXXXXXXXXXXXXX
       min_len: 15
       max_len: 15
-      onlist: !Onlist
+      onlist:
         file_id: tag_0419_feature_barcodes.txt
         filename: tag_0419_feature_barcodes.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
+        urltype: local
         md5: de44ad6d5c4b9f381a352283a6831112
-        location: local
       regions: null
-      parent_id: tag_R2_SRR18677640.fastq.gz
-    parent_id: tag
-  parent_id: null
-- !Region
-  region_id: rna
+- region_id: rna
   region_type: rna
   name: rna
   sequence_type: joined
-  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+  sequence: NNNNNNNNNNNNNNNNXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   min_len: 130
   max_len: 130
   onlist: null
   regions:
-  - !Region
-    region_id: rna_R1_SRR18677638.fastq.gz
+  - region_id: rna_R1_SRR18677638.fastq.gz
     region_type: fastq
     name: Read 1 fastq
     sequence_type: joined
-    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    sequence: NNNNNNNNNNNNNNNNXXXXXXXXXXXX
     min_len: 28
     max_len: 28
     onlist: null
-    parent_id: rna
     regions:
-    - !Region
-      region_id: rna_cell_bc
+    - region_id: rna_cell_bc
       region_type: barcode
       name: Cell Barcode
       sequence_type: onlist
       sequence: NNNNNNNNNNNNNNNN
       min_len: 16
       max_len: 16
-      onlist: !Onlist
+      onlist:
         file_id: RNA-737K-arc-v1.txt
         filename: RNA-737K-arc-v1.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
+        urltype: local
         md5: a88cd21e801ae6f9a7d9a48b67ccf693
-        location: local
       regions: null
-      parent_id: rna_R1_SRR18677638.fastq.gz
-    - !Region
-      region_id: rna_umi
+    - region_id: rna_umi
       region_type: umi
       name: umi
       sequence_type: random
-      sequence: NNNNNNNNNNNN
+      sequence: XXXXXXXXXXXX
       min_len: 12
       max_len: 12
       onlist: null
       regions: null
-      parent_id: rna_R1_SRR18677638.fastq.gz
-  - !Region
-    region_id: rna_R2_SRR18677638.fastq.gz
+  - region_id: rna_R2_SRR18677638.fastq.gz
     region_type: fastq
     name: Read 2 FASTQ
     sequence_type: joined
-    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     min_len: 102
     max_len: 102
     onlist: null
     regions:
-    - !Region
-      region_id: cdna
+    - region_id: cdna
       region_type: cdna
       name: cdna
       sequence_type: random
-      sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+      sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       min_len: 102
       max_len: 102
       onlist: null
       regions: null
-      parent_id: rna_R2_SRR18677638.fastq.gz
-    parent_id: rna
-  parent_id: null
-- !Region
-  region_id: atac
+- region_id: atac
   region_type: atac
   name: atac
   sequence_type: joined
-  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNCAGACGCGNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+  sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXCAGACGCGNNNNNNNNNNNNNNNNXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   min_len: 128
   max_len: 128
   onlist: null
   regions:
-  - !Region
-    region_id: atac_R1_SRR18677642.fastq.gz
+  - region_id: atac_R1_SRR18677642.fastq.gz
     region_type: fastq
     name: Read 1 fastq
     sequence_type: joined
-    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     min_len: 52
     max_len: 52
     onlist: null
-    parent_id: atac
     regions:
-    - !Region
-      region_id: gDNA-1
+    - region_id: gDNA-1
       region_type: gdna
       name: gdna
       sequence_type: random
-      sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+      sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       min_len: 52
       max_len: 52
       onlist: null
       regions: null
-      parent_id: atac_R1_SRR18677642.fastq.gz
-  - !Region
-    region_id: atac_R2_SRR18677642.fastq.gz
+  - region_id: atac_R2_SRR18677642.fastq.gz
     region_type: fastq
     name: Read 2 fastq
     sequence_type: joined
@@ -335,10 +283,8 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    parent_id: atac
     regions:
-    - !Region
-      region_id: spacer
+    - region_id: spacer
       region_type: linker
       name: atac linker
       sequence_type: fixed
@@ -347,46 +293,37 @@ library_spec:
       max_len: 8
       onlist: null
       regions: null
-      parent_id: atac_R2_SRR18677642.fastq.gz
-    - !Region
-      region_id: atac_cell_bc
+    - region_id: atac_cell_bc
       region_type: barcode
       name: Cell Barcode
       sequence_type: onlist
       sequence: NNNNNNNNNNNNNNNN
       min_len: 16
       max_len: 16
-      onlist: !Onlist
+      onlist:
         file_id: ATA-737K-arc-v1_rc.txt
         filename: ATA-737K-arc-v1_rc.txt
         filetype: ''
         filesize: 0
         url: ''
-        urltype: ''
+        urltype: local
         md5: 3f9fc0f6ef9d72540ab010d0b5348aa1
-        location: local
       regions: null
-      parent_id: atac_R2_SRR18677642.fastq.gz
-  - !Region
-    region_id: atac_R3_SRR18677642.fastq.gz
+  - region_id: atac_R3_SRR18677642.fastq.gz
     region_type: fastq
     name: Read 3 FASTQ
     sequence_type: joined
-    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     min_len: 52
     max_len: 52
     onlist: null
     regions:
-    - !Region
-      region_id: gDNA-2
+    - region_id: gDNA-2
       region_type: gdna
       name: gdna
       sequence_type: random
-      sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+      sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       min_len: 52
       max_len: 52
       onlist: null
       regions: null
-      parent_id: atac_R3_SRR18677642.fastq.gz
-    parent_id: atac
-  parent_id: null

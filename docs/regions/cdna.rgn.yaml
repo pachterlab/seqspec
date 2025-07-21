@@ -1,5 +1,4 @@
-- !Region
-  region_id: cDNA
+- region_id: cDNA
   region_type: cDNA
   name: Complementary DNA
   sequence_type: random

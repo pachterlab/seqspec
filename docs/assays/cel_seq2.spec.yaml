@@ -1,4 +1,3 @@
-!Assay
 seqspec_version: 0.3.0
 assay_id: CEL-Seq2
 name: CEL-Seq2/Illumina
@@ -8,13 +7,12 @@ description: Improvement CEL-Seq, now with UMIs! Implemented on Fluidigm's C1
 modalities:
 - rna
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html
-library_protocol: null
-library_kit: null
 sequence_protocol: Illumina
-sequence_kit: null
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -22,16 +20,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -39,27 +35,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: rna
+- region_id: rna
   region_type: rna
   name: rna
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCNNNNNNNNNNNNXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACGTTCAGAGTTCTACAGTCCGACGATCXXXXXXXXXXXXXXTGGAATTCTCGGGTGCCAAGGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 132
   max_len: 326
   onlist: null
   regions:
-  - !Region
-    region_id: illumina_p5
+  - region_id: illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -68,9 +61,7 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: RA5
+  - region_id: RA5
     region_type: linker
     name: RA5
     sequence_type: fixed
@@ -79,31 +70,25 @@ library_spec:
     max_len: 26
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: umi
+  - region_id: umi
     region_type: umi
     name: umi
     sequence_type: random
-    sequence: NNNNNN
+    sequence: XXXXXX
     min_len: 6
     max_len: 6
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: cell_bc
+  - region_id: cell_bc
     region_type: barcode
     name: cell_bc
     sequence_type: random
-    sequence: NNNNNN
+    sequence: XXXXXX
     min_len: 6
     max_len: 6
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: poly_T
+  - region_id: poly_T
     region_type: poly_T
     name: poly_T
     sequence_type: random
@@ -112,9 +97,7 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: cDNA
+  - region_id: cDNA
     region_type: cdna
     name: cDNA
     sequence_type: random
@@ -123,9 +106,7 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: RA3
+  - region_id: RA3
     region_type: linker
     name: RA3
     sequence_type: fixed
@@ -134,9 +115,7 @@ library_spec:
     max_len: 21
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: link_1
+  - region_id: link_1
     region_type: linker
     name: link_1
     sequence_type: fixed
@@ -145,28 +124,23 @@ library_spec:
     max_len: 12
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: sample_bc
+  - region_id: sample_bc
     region_type: index7
     name: sample_bc
     sequence_type: onlist
     sequence: NNNNNN
     min_len: 6
     max_len: 6
-    onlist: !Onlist
+    onlist:
       file_id: sample_bc_onlist.txt
       filename: sample_bc_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: illumina_p7
+  - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -175,5 +149,3 @@ library_spec:
     max_len: 24
     onlist: null
     regions: null
-    parent_id: rna
-  parent_id: null

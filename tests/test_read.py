@@ -1,0 +1,348 @@
+import pytest
+from seqspec.Read import Read, ReadInput, ReadCoordinate
+from seqspec.File import File, FileInput
+from seqspec.Region import RegionCoordinate
+
+
+def test_read_creation_minimal():
+    """Test creating a minimal read"""
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos"
+    )
+    assert read.read_id == "test_read"
+    assert read.name == "Test Read"
+    assert read.modality == "RNA"
+    assert read.primer_id == "test_primer"
+    assert read.min_len == 100
+    assert read.max_len == 150
+    assert read.strand == "pos"
+    assert read.files == []
+
+def test_read_creation_with_files():
+    """Test creating a read with files"""
+    file1 = File(
+        file_id="file1",
+        filename="read1.fastq.gz",
+        filetype="fastq",
+        filesize=1000000,
+        url="file://read1.fastq.gz",
+        urltype="local",
+        md5="d41d8cd98f00b204e9800998ecf8427e"
+    )
+    file2 = File(
+        file_id="file2",
+        filename="read2.fastq.gz",
+        filetype="fastq",
+        filesize=1000000,
+        url="file://read2.fastq.gz",
+        urltype="local",
+        md5="d41d8cd98f00b204e9800998ecf8427e"
+    )
+    
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos",
+        files=[file1, file2]
+    )
+    
+    assert len(read.files) == 2
+    assert read.files[0].file_id == "file1"
+    assert read.files[1].file_id == "file2"
+
+def test_read_set_files():
+    """Test set_files method"""
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos"
+    )
+    
+    file1 = File(
+        file_id="file1",
+        filename="read1.fastq.gz",
+        filetype="fastq",
+        filesize=1000000,
+        url="file://read1.fastq.gz",
+        urltype="local",
+        md5="d41d8cd98f00b204e9800998ecf8427e"
+    )
+    
+    read.set_files([file1])
+    assert len(read.files) == 1
+    assert read.files[0].file_id == "file1"
+
+def test_read_to_dict():
+    """Test to_dict method"""
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos"
+    )
+    
+    read_dict = read.to_dict()
+    assert read_dict["read_id"] == "test_read"
+    assert read_dict["name"] == "Test Read"
+    assert read_dict["modality"] == "RNA"
+    assert read_dict["primer_id"] == "test_primer"
+    assert read_dict["min_len"] == 100
+    assert read_dict["max_len"] == 150
+    assert read_dict["strand"] == "pos"
+    assert read_dict["files"] == []
+
+def test_read_update_read_by_id():
+    """Test update_read_by_id method"""
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos"
+    )
+    
+    # Update some fields
+    read.update_read_by_id(
+        read_id="updated_read",
+        name="Updated Read",
+        modality="DNA",
+        primer_id="updated_primer",
+        min_len=200,
+        max_len=250,
+        strand="neg"
+    )
+    
+    assert read.read_id == "updated_read"
+    assert read.name == "Updated Read"
+    assert read.modality == "DNA"
+    assert read.primer_id == "updated_primer"
+    assert read.min_len == 200
+    assert read.max_len == 250
+    assert read.strand == "neg"
+
+def test_read_update_read_by_id_partial():
+    """Test update_read_by_id with partial updates"""
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos"
+    )
+    
+    # Update only some fields
+    read.update_read_by_id(
+        read_id="updated_read",
+        name="Updated Read"
+    )
+    
+    assert read.read_id == "updated_read"
+    assert read.name == "Updated Read"
+    assert read.modality == "RNA"  # Unchanged
+    assert read.primer_id == "test_primer"  # Unchanged
+    assert read.min_len == 100  # Unchanged
+    assert read.max_len == 150  # Unchanged
+    assert read.strand == "pos"  # Unchanged
+
+def test_read_get_read_by_file_id():
+    """Test getting read by file ID."""
+    file1 = File(
+        file_id="file1",
+        filename="read1.fastq.gz",
+        filetype="fastq",
+        filesize=1000000,
+        url="file://read1.fastq.gz",
+        urltype="local",
+        md5="d41d8cd98f00b204e9800998ecf8427e"
+    )
+    
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos",
+        files=[file1]
+    )
+    
+    # Test finding existing file
+    found_read = read.get_read_by_file_id("file1")
+    assert found_read == read
+    
+    # Test finding non-existent file
+    found_read = read.get_read_by_file_id("nonexistent")
+    assert found_read is None
+
+def test_read_repr():
+    """Test __repr__ method"""
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos"
+    )
+    
+    repr_str = repr(read)
+    assert "test_read" in repr_str
+    assert "Test Read" in repr_str
+
+
+def test_read_coordinate_creation():
+    """Test ReadCoordinate creation"""
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos"
+    )
+    
+    region_coord1 = RegionCoordinate(
+        region_id="region1",
+        region_type="barcode",
+        name="Region 1",
+        sequence_type="fixed",
+        sequence="AT",
+        start=0,
+        stop=2
+    )
+    region_coord2 = RegionCoordinate(
+        region_id="region2",
+        region_type="linker",
+        name="Region 2",
+        sequence_type="fixed",
+        sequence="CG",
+        start=2,
+        stop=4
+    )
+    
+    read_coord = ReadCoordinate(
+        read=read,
+        rcv=[region_coord1, region_coord2]
+    )
+    
+    assert read_coord.read == read
+    assert len(read_coord.rcv) == 2
+    assert read_coord.rcv[0] == region_coord1
+    assert read_coord.rcv[1] == region_coord2
+
+
+
+def test_file_creation():
+    """Test File creation"""
+    file_obj = File(
+        file_id="file1",
+        filename="read1.fastq.gz",
+        filetype="fastq",
+        filesize=1000000,
+        url="file://read1.fastq.gz",
+        urltype="local",
+        md5="d41d8cd98f00b204e9800998ecf8427e"
+    )
+    
+    assert file_obj.file_id == "file1"
+    assert file_obj.filename == "read1.fastq.gz"
+    assert file_obj.filetype == "fastq"
+    assert file_obj.filesize == 1000000
+    assert file_obj.url == "file://read1.fastq.gz"
+    assert file_obj.urltype == "local"
+    assert file_obj.md5 == "d41d8cd98f00b204e9800998ecf8427e"
+
+def test_file_to_dict():
+    """Test File to_dict method"""
+    file_obj = File(
+        file_id="file1",
+        filename="read1.fastq.gz",
+        filetype="fastq",
+        filesize=1000000,
+        url="file://read1.fastq.gz",
+        urltype="local",
+        md5="d41d8cd98f00b204e9800998ecf8427e"
+    )
+    
+    file_dict = file_obj.to_dict()
+    assert file_dict["file_id"] == "file1"
+    assert file_dict["filename"] == "read1.fastq.gz"
+    assert file_dict["filetype"] == "fastq"
+    assert file_dict["filesize"] == 1000000
+    assert file_dict["url"] == "file://read1.fastq.gz"
+    assert file_dict["urltype"] == "local"
+    assert file_dict["md5"] == "d41d8cd98f00b204e9800998ecf8427e"
+
+
+
+@pytest.fixture
+def atac_r1_read(dogmaseq_dig_spec):
+    """Fixture to get the atac_R1 read from the dogmaseq-dig spec"""
+    return dogmaseq_dig_spec.get_read("atac_R1")
+
+def test_read_properties_real(atac_r1_read):
+    """Test the properties of a Read object from a real spec"""
+    assert atac_r1_read.read_id == "atac_R1"
+    assert atac_r1_read.name == "atac Read 1"
+    assert atac_r1_read.modality == "atac"
+    assert atac_r1_read.primer_id == "atac_truseq_read1"
+    assert atac_r1_read.min_len == 53
+    assert atac_r1_read.max_len == 53
+    assert atac_r1_read.strand == "pos"
+
+def test_read_files_real(atac_r1_read):
+    """Test the files associated with a Read object from a real spec"""
+    assert isinstance(atac_r1_read.files, list)
+    assert len(atac_r1_read.files) > 0
+    for f in atac_r1_read.files:
+        assert isinstance(f, File)
+        assert f.filetype == "fastq"
+
+def test_get_read_by_file_id_real(atac_r1_read):
+    """Test get_read_by_file_id on a real Read object"""
+    # Assumes the file ID exists in the test data
+    file_id = atac_r1_read.files[0].file_id
+    found_read = atac_r1_read.get_read_by_file_id(file_id)
+    assert found_read is not None
+    assert found_read.read_id == atac_r1_read.read_id
+
+    # Test with a non-existent file ID
+    assert atac_r1_read.get_read_by_file_id("non_existent_file") is None
+
+def test_update_read_by_id_real(atac_r1_read):
+    """Test update_read_by_id on a real Read object"""
+    atac_r1_read.update_read_by_id(
+        name="Updated ATAC Read",
+        min_len=55,
+        max_len=55
+    )
+    assert atac_r1_read.name == "Updated ATAC Read"
+    assert atac_r1_read.min_len == 55
+    assert atac_r1_read.max_len == 55
+    # Ensure other properties are unchanged
+    assert atac_r1_read.read_id == "atac_R1"
+    assert atac_r1_read.modality == "atac" 

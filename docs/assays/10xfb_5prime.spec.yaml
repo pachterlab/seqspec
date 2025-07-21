@@ -1,21 +1,19 @@
-!Assay
 seqspec_version: 0.3.0
 assay_id: 10xFB protein and RNA assay 5'
 name: 10xFB protein and RNA assay 5'
 doi: https://doi.org/10.1038/ncomms14049
-date: null
+date: ''
 description: 10x single-cell RNA-seq and protein 5'
 modalities:
 - rna
 - protein
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium5vdjfb.html
-library_protocol: null
-library_kit: null
 sequence_protocol: Illumina
-sequence_kit: null
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -23,16 +21,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -40,27 +36,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: rna
+- region_id: rna
   region_type: rna
   name: rna
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNTTTCTTATATGGGXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNXXXXXXXXXXTTTCTTATATGGGXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 176
   max_len: 273
   onlist: null
   regions:
-  - !Region
-    region_id: rna_illumina_p5
+  - region_id: rna_illumina_p5
     region_type: illumina_p5
     name: Illumina P5
     sequence_type: fixed
@@ -69,28 +62,23 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: rna_i5_index
+  - region_id: rna_i5_index
     region_type: index5
     name: i5_index
     sequence_type: onlist
     sequence: NNNNNNNNNN
     min_len: 10
     max_len: 10
-    onlist: !Onlist
+    onlist:
       file_id: i5_index_onlist.txt
       filename: i5_index_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: rna_truseq_r1
+  - region_id: rna_truseq_r1
     region_type: truseq_read1
     name: Truseq Read 1
     sequence_type: fixed
@@ -99,39 +87,32 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: rna_cell_bc
+  - region_id: rna_cell_bc
     region_type: barcode
     name: Cell Barcode
     sequence_type: onlist
     sequence: NNNNNNNNNNNNNNNN
     min_len: 16
     max_len: 16
-    onlist: !Onlist
+    onlist:
       file_id: 737K-august-2016.txt.gz
       filename: 737K-august-2016.txt.gz
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: rna_umi
+  - region_id: rna_umi
     region_type: umi
     name: UMI
     sequence_type: random
-    sequence: NNNNNNNNNN
+    sequence: XXXXXXXXXX
     min_len: 10
     max_len: 10
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: rna_bead_TSO
+  - region_id: rna_bead_TSO
     region_type: linker
     name: bead_TSO
     sequence_type: fixed
@@ -140,9 +121,7 @@ library_spec:
     max_len: 13
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: cdna
+  - region_id: cdna
     region_type: cdna
     name: cdna
     sequence_type: random
@@ -151,9 +130,7 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: rna_truseq_r2
+  - region_id: rna_truseq_r2
     region_type: truseq_read2
     name: Truseq Read 2
     sequence_type: fixed
@@ -162,28 +139,23 @@ library_spec:
     max_len: 34
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: rna_sample_bc
+  - region_id: rna_sample_bc
     region_type: index7
     name: Sample index
     sequence_type: onlist
     sequence: NNNNNNNNNN
     min_len: 10
     max_len: 10
-    onlist: !Onlist
+    onlist:
       file_id: sample_bc_onlist.txt
       filename: sample_bc_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: rna_illumina_p7
+  - region_id: rna_illumina_p7
     region_type: illumina_p7
     name: Illumina P7
     sequence_type: fixed
@@ -192,20 +164,16 @@ library_spec:
     max_len: 24
     onlist: null
     regions: null
-    parent_id: rna
-  parent_id: null
-- !Region
-  region_id: protein
+- region_id: protein
   region_type: protein
   name: protein
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNNNNNNNNNNNTTTCTTATATGGGNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNXXXXXXXXXXTTTCTTATATGGGXXXXXXXXXNNNNNNNNNNNNNNNXXXXXXXXXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 213
   max_len: 213
   onlist: null
   regions:
-  - !Region
-    region_id: protein_illumina_p5
+  - region_id: protein_illumina_p5
     region_type: illumina_p5
     name: Illumina P5
     sequence_type: fixed
@@ -214,28 +182,23 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: protein_i5_index
+  - region_id: protein_i5_index
     region_type: index5
     name: i5_index
     sequence_type: onlist
     sequence: NNNNNNNNNN
     min_len: 10
     max_len: 10
-    onlist: !Onlist
+    onlist:
       file_id: i5_index_onlist.txt
       filename: i5_index_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: protein_truseq_read1
+  - region_id: protein_truseq_read1
     region_type: truseq_read1
     name: truseq_read1
     sequence_type: fixed
@@ -244,39 +207,32 @@ library_spec:
     max_len: 33
     onlist: null
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: protein_cell_bc
+  - region_id: protein_cell_bc
     region_type: barcode
     name: cell_bc
     sequence_type: onlist
     sequence: NNNNNNNNNNNNNNNN
     min_len: 16
     max_len: 16
-    onlist: !Onlist
+    onlist:
       file_id: 737K-august-2016.txt.gz
       filename: 737K-august-2016.txt.gz
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: protein_umi
+  - region_id: protein_umi
     region_type: umi
     name: umi
     sequence_type: random
-    sequence: NNNNNNNNNN
+    sequence: XXXXXXXXXX
     min_len: 10
     max_len: 10
     onlist: null
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: protein_bead_TSO
+  - region_id: protein_bead_TSO
     region_type: linker
     name: bead_TSO
     sequence_type: fixed
@@ -285,50 +241,41 @@ library_spec:
     max_len: 13
     onlist: null
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: spacer1
+  - region_id: spacer1
     region_type: linker
     name: spacer1
     sequence_type: random
-    sequence: NNNNNNNNN
+    sequence: XXXXXXXXX
     min_len: 9
     max_len: 9
     onlist: null
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: feature_bc
+  - region_id: feature_bc
     region_type: protein
     name: feature_bc
     sequence_type: onlist
     sequence: NNNNNNNNNNNNNNN
     min_len: 15
     max_len: 15
-    onlist: !Onlist
+    onlist:
       file_id: feature_bc_onlist.txt
       filename: feature_bc_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: spacer2
+  - region_id: spacer2
     region_type: linker
     name: spacer2
     sequence_type: random
-    sequence: NNNNNNNNNN
+    sequence: XXXXXXXXXX
     min_len: 10
     max_len: 10
     onlist: null
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: nextera_read2
+  - region_id: nextera_read2
     region_type: nextera_read2
     name: nextera_read2
     sequence_type: fixed
@@ -337,28 +284,23 @@ library_spec:
     max_len: 34
     onlist: null
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: protein_sample_index
+  - region_id: protein_sample_index
     region_type: index7
     name: sample_index
     sequence_type: onlist
     sequence: NNNNNNNNNN
     min_len: 10
     max_len: 10
-    onlist: !Onlist
+    onlist:
       file_id: sample_bc_onlist.txt
       filename: sample_bc_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: protein
-  - !Region
-    region_id: protein_illumina_p7
+  - region_id: protein_illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -367,5 +309,3 @@ library_spec:
     max_len: 24
     onlist: null
     regions: null
-    parent_id: protein
-  parent_id: null

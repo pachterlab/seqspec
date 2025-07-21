@@ -1,4 +1,3 @@
-!Assay
 seqspec_version: 0.3.0
 assay_id: Indropv2
 name: inDropv2/Illumina
@@ -8,13 +7,12 @@ description: Single-cell RNA-seq in Droplets
 modalities:
 - rna
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/inDrop.html
-library_protocol: null
-library_kit: null
 sequence_protocol: Illumina
-sequence_kit: null
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -22,16 +20,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -39,27 +35,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: rna
+- region_id: rna
   region_type: rna
   name: rna
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCTXXNNNNNNNNNNNNNNAAGGCGTCACAAGCAATCACTCNNNNNNNNAGATCGGAAGAGCGTCGTGTAGGGAAAGAGNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCTXXXXXXXXNNNNNNNNAAGGCGTCACAAGCAATCACTCNNNNNNNNAGATCGGAAGAGCGTCGTGTAGGGAAAGAGNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 171
   max_len: 368
   onlist: null
   regions:
-  - !Region
-    region_id: illumina_p5
+  - region_id: illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -68,9 +61,7 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: PE2
+  - region_id: PE2
     region_type: probe
     name: PE2
     sequence_type: fixed
@@ -79,9 +70,7 @@ library_spec:
     max_len: 36
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: cdna
+  - region_id: cdna
     region_type: cdna
     name: cdna
     sequence_type: random
@@ -90,9 +79,7 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: polyA
+  - region_id: polyA
     region_type: poly_A
     name: polyA
     sequence_type: random
@@ -101,39 +88,32 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: umi
+  - region_id: umi
     region_type: umi
     name: umi
     sequence_type: random
-    sequence: NNNNNN
+    sequence: XXXXXX
     min_len: 6
     max_len: 6
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: bc2
+  - region_id: bc2
     region_type: barcode
     name: bc2
     sequence_type: onlist
     sequence: NNNNNNNN
     min_len: 8
     max_len: 8
-    onlist: !Onlist
+    onlist:
       file_id: bc2_onlist.txt
       filename: bc2_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: W1
+  - region_id: W1
     region_type: probe
     name: W1
     sequence_type: fixed
@@ -142,28 +122,23 @@ library_spec:
     max_len: 22
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: bc1
+  - region_id: bc1
     region_type: barcode
     name: bc1
     sequence_type: onlist
     sequence: NNNNNNNN
     min_len: 8
     max_len: 11
-    onlist: !Onlist
+    onlist:
       file_id: bc1_onlist.txt
       filename: bc1_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: PE1
+  - region_id: PE1
     region_type: probe
     name: PE1
     sequence_type: fixed
@@ -172,28 +147,23 @@ library_spec:
     max_len: 30
     onlist: null
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: sample_index
+  - region_id: sample_index
     region_type: index7
     name: sample_index
     sequence_type: onlist
     sequence: NNNNNN
     min_len: 6
     max_len: 6
-    onlist: !Onlist
+    onlist:
       file_id: sample_index_onlist.txt
       filename: sample_index_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: rna
-  - !Region
-    region_id: illumina_p7
+  - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -202,5 +172,3 @@ library_spec:
     max_len: 24
     onlist: null
     regions: null
-    parent_id: rna
-  parent_id: null

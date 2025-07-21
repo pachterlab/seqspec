@@ -1,6 +1,5 @@
-!Assay
 seqspec_version: 0.3.0
-assay_id: null
+assay_id: ''
 name: Microwell-seq
 doi: https://doi.org/10.1016/j.cell.2018.02.001
 date: 22 February 2018
@@ -9,13 +8,12 @@ description: a high-throughput and low-cost scRNA-seq platform using simple, ine
 modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/
-library_protocol: null
-library_kit: null
-sequence_protocol: null
-sequence_kit: null
+sequence_protocol: []
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -23,16 +21,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -40,27 +36,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: RNA
+- region_id: RNA
   region_type: RNA
   name: RNA
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACGCCTGTCCGCGGAAGCAGTGGTATCAACGCAGAGTACGTNNNNNNCGACTCACTACAGGGNNNNNNTCGGTGACACGATCGNNNNNNNNNNNNXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACGCCTGTCCGCGGAAGCAGTGGTATCAACGCAGAGTACGTNNNNNNCGACTCACTACAGGGNNNNNNTCGGTGACACGATCGNNNNNNXXXXXXXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 190
   max_len: 384
   onlist: null
   regions:
-  - !Region
-    region_id: illumina_p5
+  - region_id: illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -69,9 +62,7 @@ library_spec:
     max_len: 29
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: read_1_primer
+  - region_id: read_1_primer
     region_type: read_1_primer
     name: read_1_primer
     sequence_type: fixed
@@ -80,28 +71,23 @@ library_spec:
     max_len: 39
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: bc1
+  - region_id: bc1
     region_type: bc1
     name: bc1
     sequence_type: onlist
     sequence: NNNNNN
     min_len: 6
     max_len: 6
-    onlist: !Onlist
+    onlist:
       file_id: bc1_onlist.txt
       filename: bc1_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: linker1
+  - region_id: linker1
     region_type: linker1
     name: linker1
     sequence_type: fixed
@@ -110,28 +96,23 @@ library_spec:
     max_len: 15
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: bc2
+  - region_id: bc2
     region_type: bc2
     name: bc2
     sequence_type: onlist
     sequence: NNNNNN
     min_len: 6
     max_len: 6
-    onlist: !Onlist
+    onlist:
       file_id: bc2_onlist.txt
       filename: bc2_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: linker2
+  - region_id: linker2
     region_type: linker2
     name: linker2
     sequence_type: fixed
@@ -140,39 +121,32 @@ library_spec:
     max_len: 15
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: bc3
+  - region_id: bc3
     region_type: bc3
     name: bc3
     sequence_type: onlist
     sequence: NNNNNN
     min_len: 6
     max_len: 6
-    onlist: !Onlist
+    onlist:
       file_id: bc3_onlist.txt
       filename: bc3_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: umi
+  - region_id: umi
     region_type: umi
     name: umi
     sequence_type: random
-    sequence: NNNNNN
+    sequence: XXXXXX
     min_len: 6
     max_len: 6
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: polyT
+  - region_id: polyT
     region_type: polyT
     name: polyT
     sequence_type: random
@@ -181,9 +155,7 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: cdna
+  - region_id: cdna
     region_type: cdna
     name: cdna
     sequence_type: random
@@ -192,9 +164,7 @@ library_spec:
     max_len: 98
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: ME
+  - region_id: ME
     region_type: ME
     name: ME
     sequence_type: fixed
@@ -203,9 +173,7 @@ library_spec:
     max_len: 19
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: s7
+  - region_id: s7
     region_type: s7
     name: s7
     sequence_type: fixed
@@ -214,28 +182,23 @@ library_spec:
     max_len: 15
     onlist: null
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: sample_index
+  - region_id: sample_index
     region_type: sample_index
     name: sample_index
     sequence_type: onlist
     sequence: NNNNNNNN
     min_len: 8
     max_len: 8
-    onlist: !Onlist
+    onlist:
       file_id: sample_index_onlist.txt
       filename: sample_index_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
+      urltype: local
+      md5: ''
     regions: null
-    parent_id: RNA
-  - !Region
-    region_id: illumina_p7
+  - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -244,5 +207,3 @@ library_spec:
     max_len: 24
     onlist: null
     regions: null
-    parent_id: RNA
-  parent_id: null

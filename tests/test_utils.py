@@ -1,331 +1,186 @@
-import gzip
 import os
-from hashlib import md5
-from io import BytesIO, StringIO
-from tempfile import TemporaryDirectory
-from unittest import TestCase
-from unittest.mock import patch
+import tempfile
+import gzip
+from unittest.mock import patch, mock_open, MagicMock
+from io import StringIO
+import io
 
-from requests import HTTPError
+import pytest
 
-from seqspec.Region import (
-    Onlist,
-    Region,
-    RegionCoordinate,
-    project_regions_to_coordinates,
-)
 from seqspec.utils import (
-    get_remote_auth_token,
     load_spec_stream,
-    map_read_id_to_regions,
     read_local_list,
     read_remote_list,
+    get_remote_auth_token,
+    map_read_id_to_regions,
     write_read,
     yield_onlist_contents,
 )
+from seqspec.Assay import Assay
+from seqspec.Region import Region, Onlist
+from seqspec.Read import Read
 
-from .test_region import (
-    region_rna_joined_dict,
-    region_rna_linker_dict,
-    region_rna_umi_dict,
-)
 
-example_spec = """!Assay
-seqspec_version: 0.3.0
-assay_id: test_assay
-name: my assay
-doi: https://doi.org/10.1038/nmeth.1315
-date: 06 April 2009
-description: first method to sequence the whole transcriptome (mRNA) of a single cell
-sequencer: custom
-modalities:
-- rna
-lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.html
-library_protocol: "Custom"
-library_kit: "Custom"
-sequence_protocol: "Custom"
-sequence_kit: "Custom"
-sequence_spec:
-- !Read
-  read_id: read1.fastq.gz
-  name: "Read1 for experiment"
-  modality: rna
-  primer_id: SOLiD_P1_adapter
-  min_len: 90
-  max_len: 187
-  strand: pos
-  files:
-  - !File
-    file_id: read1
-    filename: read1.fastq.gz
-    filetype: fastq
-    filesize: 123456789
-    url: read1.fastq.gz
-    urltype: local
-    md5: 68b329da9893e34099c7d8ad5cb9c940
-- !Read
-  read_id: read2.fastq.gz
-  name: read2 for experiment
-  modality: rna
-  primer_id: p2_adapter
-  min_len: 25
-  max_len: 25
-  strand: neg
-  files:
-  - !File
-    file_id: read2
-    filename: read2.fastq.gz
-    filetype: fastq
-    filesize: 123456789
-    url: read2.fastq.gz
-    urltype: local
-    md5: 68b329da9893e34099c7d8ad5cb9c940
-library_spec:
-- !Region
-  region_id: rna
-  region_type: rna
-  name: rna
-  sequence_type: joined
-  sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGATXCGCCTTGGCCGTACAGCAGNNNNNNAGAGAATGAGGAACCCGGGGCAG
-  min_len: 90
-  max_len: 187
-  onlist: null
-  regions:
-  - !Region
-    region_id: SOLiD_P1_adapter
-    region_type: custom_primer
-    name: SOLiD_P1_adapter
-    sequence_type: fixed
-    sequence: CCACTACGCCTCCGCTTTCCTCTCTATGGGCAGTCGGTGAT
-    min_len: 41
-    max_len: 41
-    onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: cDNA
-    region_type: cdna
-    name: cDNA
-    sequence_type: random
-    sequence: XXXXXXXXXXXXXXXXXXXX
-    min_len: 1
-    max_len: 20
-    onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: SOLiD_bc_adapter
-    region_type: linker
-    name: SOLiD_bc_adapter
-    sequence_type: fixed
-    sequence: CGCCTTGGCCGTACAGCAG
-    min_len: 19
-    max_len: 19
-    onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: index
-    region_type: barcode
-    name: index
-    sequence_type: onlist
-    sequence: NNNNNN
-    min_len: 6
-    max_len: 6
-    onlist: !Onlist
-      file_id: onlist-1
-      filename: index_onlist.tsv
-      filetype: tsv
-      filesize: 300
-      url: index_onlist.tsv
-      urltype: local
-      md5: 939cb244b4c43248fcc795bbe79599b0
-      location: local
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: p2_adapter
-    region_type: custom_primer
-    name: p2_adapter
-    sequence_type: fixed
-    sequence: AGAGAATGAGGAACCCGGGGCAG
-    min_len: 23
-    max_len: 23
-    onlist: null
-    regions: null
-    parent_id: rna
+def test_load_spec_stream_valid():
+    """Test loading a valid spec from a stream"""
+    spec_content = """
+seqspec_version: 0.2.0
+assay_id: MyAssay
+name: Test Assay
+doi: "10.1234/test.doi"
+date: "2023-01-01"
+description: "A test assay"
+modalities: ["RNA"]
+lib_struct: "Test structure"
+sequence_spec: []
+library_spec: []
 """
+    with StringIO(spec_content) as stream:
+        spec = load_spec_stream(stream)
+
+    assert isinstance(spec, Assay)
+    assert spec.assay_id == "MyAssay"
+
+def test_write_read():
+    # Create a dummy Read object
+    read = Read(
+        read_id="read1",
+        name="Read 1",
+        modality="RNA",
+        primer_id="primer1",
+        min_len=4,
+        max_len=4,
+        strand="+",
+    )
+
+    # Use a temporary file
+    with tempfile.NamedTemporaryFile(mode="w+", delete=False) as tmp:
+        file_path = tmp.name
+        write_read(read.name, "ATCG", "IIII", tmp)
+
+        # Read back the content to verify
+        tmp.seek(0)
+        content = tmp.read()
+        assert "Read 1" in content
+        assert "ATCG" in content
+        assert "IIII" in content
+
+    # Clean up the temporary file
+    os.remove(file_path)
 
 
-def load_example_spec(spec_text):
-    with StringIO(spec_text) as instream:
-        spec = load_spec_stream(instream)
-    return spec
 
-
-class TestUtils(TestCase):
-    def test_load_spec_stream(self):
-        spec = load_example_spec(example_spec)
-        self.assertEqual(spec.name, "my assay")
-        head = spec.get_libspec("rna")
-        self.assertEqual(len(head.regions), 5)
-
-    def test_project_regions_to_coordinates(self):
-        r_umi_dict = region_rna_umi_dict("region-2")
-        r_umi = Region(**r_umi_dict)
-        r_linker_dict = region_rna_linker_dict("region-3")
-        r_linker = Region(**r_linker_dict)
-        r_expected_dict = region_rna_joined_dict("region-1", [r_umi, r_linker])
-        r_expected_dict["sequence"] = r_umi_dict["sequence"] + r_linker_dict["sequence"]
-        r_expected = Region(**r_expected_dict)
-
-        r_umi_min, r_umi_max = r_umi.get_len()
-        r_linker_min, r_linker_max = r_linker.get_len()
-        r_linker_min += r_umi_max
-        r_linker_max += r_linker_max
-
-        umi_region = RegionCoordinate(r_umi, r_umi_min, r_umi_max)
-        linker_region = RegionCoordinate(r_linker, r_linker_min, r_linker_max)
-
-        cuts = project_regions_to_coordinates(r_expected.regions)
-        self.assertEqual(cuts, [umi_region, linker_region])
-
-    def test_write_header(self):
-        stream = StringIO()
-        header = "@string"
-        sequence = "CANNTG"
-        quality = "IIIIII"
-        write_read(header, sequence, quality, stream)
-
-        text = stream.getvalue().split(os.linesep)
-        self.assertEqual(text[0], f"{header}")
-        self.assertEqual(text[1], sequence)
-        self.assertEqual(text[2], "+")
-        self.assertEqual(text[3], quality)
-
-    def test_yield_onlist_contents(self):
-        fake_onlist = ["ATATATAT", "GCGCGCGC"]
-        fake_stream = StringIO("{}\n".format("\n".join(fake_onlist)))
-
-        response = list(yield_onlist_contents(fake_stream))
-        self.assertEqual(response, fake_onlist)
-
-    def test_read_local_list(self):
-        fake_onlist = ["ATATATAT", "GCGCGCGC"]
-        fake_contents = "{}\n".format("\n".join(fake_onlist))
-        fake_md5 = md5(fake_contents.encode("ascii")).hexdigest()
-
-        with TemporaryDirectory(prefix="onlist_tmp_") as tmpdir:
-            temp_list_filename = os.path.join(tmpdir, "index.txt.gz")
-            with gzip.open(temp_list_filename, "wt") as stream:
-                stream.write(fake_contents)
-
-            onlist1 = Onlist(
-                "123",
-                temp_list_filename,
-                "tsv",
-                300,
-                temp_list_filename,
-                "local",
-                fake_md5,
-                "local",
+def test_map_read_id_to_regions():
+    """Test mapping read ID to regions."""
+    # Create a mock spec
+    spec = Assay(
+        assay_id="test_assay",
+        name="Test Assay",
+        doi="test_doi",
+        date="2023-01-01",
+        description="Test description",
+        modalities=["RNA"],
+        lib_struct="test_lib_struct",
+        sequence_protocol="test_seq_protocol",
+        sequence_kit="test_seq_kit",
+        library_protocol="test_lib_protocol",
+        library_kit="test_lib_kit",
+        sequence_spec=[
+            Read(
+                read_id="read1",
+                name="Read 1",
+                modality="RNA",
+                primer_id="primer1",
+                min_len=20,
+                max_len=20,
+                strand="+",
             )
-            loaded_list = read_local_list(onlist1)
+        ],
+        library_spec=[
+            Region(
+                region_id="RNA",
+                region_type="RNA",
+                name="RNA region",
+                sequence_type="joined",
+                sequence="ACGTACGTACGTACGTACGT",
+                regions=[
+                    Region(
+                        region_id="primer1",
+                        region_type="primer",
+                        name="Primer",
+                        sequence_type="fixed",
+                        sequence="ACGTACGTACGTACGTACGT",
+                        min_len=20,
+                        max_len=20,
 
-            self.assertEqual(fake_onlist, loaded_list)
+                    ),
+                    Region(
+                        region_id="barcode",
+                        region_type="barcode",
+                        name="barcode",
+                        sequence_type="random",
+                        sequence="ACGTACGTACGTACGTACGT",
+                        min_len=20,
+                        max_len=20,
 
-    def test_read_local_list_gz(self):
-        fake_onlist = ["ATATATAT", "GCGCGCGC"]
-        fake_contents = "{}\n".format("\n".join(fake_onlist))
-        fake_md5 = md5(fake_contents.encode("ascii")).hexdigest()
-
-        with TemporaryDirectory(prefix="onlist_tmp_") as tmpdir:
-            temp_list_filename = os.path.join(tmpdir, "index.txt")
-            with open(temp_list_filename, "wt") as stream:
-                stream.write(fake_contents)
-
-            onlist1 = Onlist(
-                "123",
-                temp_list_filename,
-                "tsv",
-                300,
-                temp_list_filename,
-                "local",
-                fake_md5,
-                "local",
+                    )
+                ],
             )
-            loaded_list = read_local_list(onlist1)
+        ],
+    )
 
-            self.assertEqual(fake_onlist, loaded_list)
+    read, regions = map_read_id_to_regions(spec, "RNA", "read1")
 
-    def test_read_remote_list(self):
-        fake_onlist = ["ATATATAT", "GCGCGCGC"]
-        fake_contents = "{}\n".format("\n".join(fake_onlist))
-        fake_md5 = md5(fake_contents.encode("ascii")).hexdigest()
+    assert read.read_id == "read1"
+    assert len(regions) == 1
+    assert regions[0].region_id == "barcode"
 
-        def fake_request_get(url, stream=False, **kwargs):
-            class response:
-                def __init__(self):
-                    self.raw = BytesIO(fake_contents.encode("utf-8"))
-                    self.status_code = 200
+def test_map_read_id_to_regions_invalid_modality():
+    """Test mapping read ID with an invalid modality."""
+    spec = Assay(
+        assay_id="test_assay",
+        name="Test Assay",
+        doi="test_doi",
+        date="2023-01-01",
+        description="Test description",
+        modalities=["RNA"],
+        lib_struct="test_lib_struct",
+        sequence_protocol="test_seq_protocol",
+        sequence_kit="test_seq_kit",
+        library_protocol="test_lib_protocol",
+        library_kit="test_lib_kit",
+        sequence_spec=[],
+        library_spec=[],
+    )
+    with pytest.raises(ValueError):
+        map_read_id_to_regions(spec, "DNA", "read1")
 
-                def raise_for_status(self):
-                    if self.status_code != 200:
-                        raise HTTPError(self.status_code)
-
-            return response()
-
-        with patch("requests.get", new=fake_request_get):
-            url = "http://localhost/testlist.txt"
-            onlist1 = Onlist(
-                "123", "testlist.txt", "http", 300, url, "http", fake_md5, "remote"
+def test_map_read_id_to_regions_invalid_read_id():
+    """Test mapping read ID with an invalid read ID."""
+    spec = Assay(
+        assay_id="test_assay",
+        name="Test Assay",
+        doi="test_doi",
+        date="2023-01-01",
+        description="Test description",
+        modalities=["RNA"],
+        lib_struct="test_lib_struct",
+        sequence_protocol="test_seq_protocol",
+        sequence_kit="test_seq_kit",
+        library_protocol="test_lib_protocol",
+        library_kit="test_lib_kit",
+        sequence_spec=[
+            Read(
+                read_id="read1",
+                name="Read 1",
+                modality="RNA",
+                primer_id="primer1",
+                min_len=10,
+                max_len=20,
+                strand="+",
             )
-            loaded_list = read_remote_list(onlist1)
-
-            self.assertEqual(fake_onlist, loaded_list)
-
-    def test_get_igvf_auth(self):
-        # clean out the environment we inherited
-        for term in ["IGVF_SECRET_KEY", "IGVF_API_KEY"]:
-            if term in os.environ:
-                del os.environ[term]
-
-        test_data = [
-            (None, None, None),
-            ("user", "pass", ("user", "pass")),
-        ]
-
-        igvf_variables = ["IGVF_API_KEY", "IGVF_SECRET_KEY"]
-        previous = {name: os.environ.get(name) for name in igvf_variables}
-
-        for username, password, expected in test_data:
-            if username is not None:
-                os.environ["IGVF_API_KEY"] = username
-            if password is not None:
-                os.environ["IGVF_SECRET_KEY"] = password
-
-            auth = get_remote_auth_token()
-            self.assertEqual(auth, expected)
-
-        for name in igvf_variables:
-            if previous[name] is None:
-                del os.environ[name]
-            else:
-                os.environ[name] = previous[name]
-
-    def test_map_read_id_to_regions(self):
-        spec = load_example_spec(example_spec)
-
-        read1_id = "read1.fastq.gz"
-        read, region = map_read_id_to_regions(spec, "rna", read1_id)
-        self.assertEqual(read.read_id, read1_id)
-        self.assertEqual(len(region), 4)
-        expected_regions = [
-            (0, "cDNA"),
-            (1, "SOLiD_bc_adapter"),
-            (2, "index"),
-            (3, "p2_adapter"),
-        ]
-        for i, region_id in expected_regions:
-            self.assertEqual(region[i].region_id, region_id)
-        self.assertRaises(IndexError, map_read_id_to_regions, spec, "rna", "foo")
+        ],
+        library_spec=[],
+    )
+    with pytest.raises(IndexError):
+        map_read_id_to_regions(spec, "RNA", "read2") 

@@ -91,13 +91,6 @@ class Region(BaseModel):
     max_len: int = 1024
     onlist: Optional[Onlist] = None
     regions: Optional[List["Region"]] = None
-    # parent_id: Optional[str] = None
-
-    # def set_parent_id(self, parent_id: str):
-    #     self.parent_id = parent_id
-    #     if self.regions:
-    #         for r in self.regions:
-    #             r.set_parent_id(self.region_id)
 
     def get_sequence(self, s: str = "") -> str:
         if self.regions:
