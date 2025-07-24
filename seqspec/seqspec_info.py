@@ -186,7 +186,7 @@ def seqspec_info_sequence_spec(spec: Assay) -> Dict:
     Returns:
         Dictionary containing sequence specifications
     """
-    return {"sequence_spec": spec.sequence_spec}
+    return {"sequence_spec": [i.model_dump() for i in spec.sequence_spec]}
 
 
 def seqspec_info_modalities(spec: Assay) -> Dict:

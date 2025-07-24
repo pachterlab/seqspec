@@ -204,7 +204,7 @@ library_spec:
     min_len: 0
     max_len: 0
     onlist: null
-    regions: null
+    regions: []
   - region_id: protein_truseq_read1
     region_type: truseq_read1
     name: Truseq Read 1
@@ -213,7 +213,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: protein_cell_bc
     region_type: barcode
     name: Cell Barcode
@@ -221,6 +221,7 @@ library_spec:
     sequence: NNNNNNNNNNNNNNNN
     min_len: 16
     max_len: 16
+    regions: []
     onlist:
       file_id: RNA-737K-arc-v1.txt
       filename: RNA-737K-arc-v1.txt
@@ -229,7 +230,6 @@ library_spec:
       url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
       urltype: https
       md5: a88cd21e801ae6f9a7d9a48b67ccf693
-    regions: null
   - region_id: protein_umi
     region_type: umi
     name: umi
@@ -237,8 +237,8 @@ library_spec:
     sequence: XXXXXXXXXXXX
     min_len: 12
     max_len: 12
+    regions: []
     onlist: null
-    regions: null
   - region_id: protein_seq
     region_type: protein
     name: protein
@@ -246,6 +246,7 @@ library_spec:
     sequence: XXXXXXXXXXXXXXX
     min_len: 15
     max_len: 15
+    regions: []
     onlist:
       file_id: protein_feature_barcodes.txt
       filename: protein_feature_barcodes.txt
@@ -254,7 +255,6 @@ library_spec:
       url: https://raw.githubusercontent.com/pachterlab/seqspec/devel/examples/specs/dogmaseq-dig/protein_feature_barcodes.txt
       urltype: https
       md5: b5920c1fc1d22927607c31c96f5cf03e
-    regions: null
   - region_id: protein_truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
@@ -263,7 +263,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
 - region_id: tag
   region_type: tag
   name: tag
@@ -281,7 +281,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: tag_cell_bc
     region_type: barcode
     name: Cell Barcode
@@ -297,7 +297,7 @@ library_spec:
       url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
       urltype: https
       md5: a88cd21e801ae6f9a7d9a48b67ccf693
-    regions: null
+    regions: []
   - region_id: tag_umi
     region_type: umi
     name: umi
@@ -306,7 +306,7 @@ library_spec:
     min_len: 12
     max_len: 12
     onlist: null
-    regions: null
+    regions: []
   - region_id: tag_seq
     region_type: tag
     name: tag sequence
@@ -322,7 +322,7 @@ library_spec:
       url: https://raw.githubusercontent.com/pachterlab/seqspec/devel/examples/specs/dogmaseq-dig/tag_feature_barcodes.txt
       urltype: https
       md5: de44ad6d5c4b9f381a352283a6831112
-    regions: null
+    regions: []
   - region_id: tag_truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
@@ -331,7 +331,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
 - region_id: rna
   region_type: rna
   name: rna
@@ -349,7 +349,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_cell_bc
     region_type: barcode
     name: Cell Barcode
@@ -365,7 +365,7 @@ library_spec:
       url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
       urltype: https
       md5: a88cd21e801ae6f9a7d9a48b67ccf693
-    regions: null
+    regions: []
   - region_id: rna_umi
     region_type: umi
     name: umi
@@ -374,7 +374,7 @@ library_spec:
     min_len: 12
     max_len: 12
     onlist: null
-    regions: null
+    regions: []
   - region_id: cdna
     region_type: cdna
     name: cdna
@@ -383,7 +383,7 @@ library_spec:
     min_len: 102
     max_len: 102
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
@@ -392,7 +392,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
 - region_id: atac
   region_type: atac
   name: atac
@@ -410,7 +410,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: gDNA
     region_type: gdna
     name: gdna
@@ -419,7 +419,7 @@ library_spec:
     min_len: 100
     max_len: 100
     onlist: null
-    regions: null
+    regions: []
   - region_id: atac_truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
@@ -428,7 +428,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: spacer
     region_type: linker
     name: atac linker
@@ -437,7 +437,7 @@ library_spec:
     min_len: 8
     max_len: 8
     onlist: null
-    regions: null
+    regions: []
   - region_id: atac_cell_bc
     region_type: barcode
     name: Cell Barcode
@@ -453,4 +453,4 @@ library_spec:
       url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/ATA-737K-arc-v1.txt.gz
       urltype: https
       md5: 3f9fc0f6ef9d72540ab010d0b5348aa1
-    regions: null
+    regions: []

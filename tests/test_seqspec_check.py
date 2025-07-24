@@ -5,63 +5,34 @@ from pathlib import Path
 from unittest import TestCase
 
 import pytest
-
-from seqspec.seqspec_check import (
-    setup_check_args,
-    validate_check_args,
-)
+from seqspec.Assay import Assay
+from seqspec.seqspec_check import seqspec_check
+from seqspec.utils import load_spec
 
 
-def create_stub_check_parser():
-    parser = ArgumentParser()
-    subparser = parser.add_subparsers(
-        dest="command",
-        metavar="<CMD>",
+def test_seqspec_check(dogmaseq_dig_spec: Assay):
+    """Test seqspec_check function"""
+    # Test with valid spec
+    errors = seqspec_check(spec=dogmaseq_dig_spec, spec_fn="tests/fixtures/spec.yaml")
+    assert len(errors) == 0  # No errors for valid spec
+
+    # Test with invalid spec (missing required fields)
+    invalid_spec = Assay(
+        seqspec_version="0.3.0",
+        assay_id="test",
+        name="Test",
+        doi="",
+        date="20240101",
+        description="",
+        modalities=[],
+        lib_struct="",
+        sequence_protocol="",
+        sequence_kit="",
+        library_protocol="",
+        library_kit="",
+        sequence_spec=[],
+        library_spec=[]
     )
-    subparser = setup_check_args(subparser)
-    return parser
-
-
-
-def test_check_args():
-    """Test check command argument parsing."""
-    parser = ArgumentParser()
-    subparser = parser.add_subparsers()
-    check_parser = setup_check_args(subparser)
     
-    # Test with valid arguments
-    args = check_parser.parse_args(['test.yaml'])
-    assert args.yaml == Path('test.yaml')
-    assert args.output is None
-    assert args.skip is None
-    
-    # Test with output argument
-    args = check_parser.parse_args(['test.yaml', '-o', 'output.txt'])
-    assert args.yaml == Path('test.yaml')
-    assert args.output == Path('output.txt')
-    
-    # Test with skip argument
-    args = check_parser.parse_args(['test.yaml', '-s', 'igvf'])
-    assert args.yaml == Path('test.yaml')
-    assert args.skip == 'igvf'
-
-def test_validate_check_args():
-    """Test check command argument validation."""
-    parser = ArgumentParser()
-    subparser = parser.add_subparsers()
-    check_parser = setup_check_args(subparser)
-    
-    # Test with valid file
-    with tempfile.NamedTemporaryFile(suffix='.yaml', delete=False) as f:
-        f.write(b'assay_id: test')
-        f.flush()
-        
-        args = check_parser.parse_args([f.name])
-        validate_check_args(parser, args)  # Should not raise
-        
-        os.unlink(f.name)
-    
-    # Test with non-existent file
-    args = check_parser.parse_args(['nonexistent.yaml'])
-    with pytest.raises(SystemExit):
-        validate_check_args(parser, args)
+    errors = seqspec_check(spec=invalid_spec, spec_fn="tests/fixtures/spec.yaml")
+    assert len(errors) > 0  # Should have errors for invalid spec

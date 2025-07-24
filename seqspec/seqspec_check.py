@@ -79,6 +79,7 @@ def seqspec_check(
         List of error dictionaries
     """
     errors = check(spec, spec_fn)
+
     if filter_type:
         errors = filter_errors(errors, filter_type)
     return errors

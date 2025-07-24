@@ -60,7 +60,7 @@ def test_to_json(dogmaseq_dig_spec):
     assert data["assay_id"] == "DOGMAseq-DIG"
 
 
-def test_insert_regions(dogmaseq_dig_spec):
+def test_insert_regions(temp_spec):
     """
     Test inserting regions into a specific modality
     """
@@ -74,16 +74,16 @@ def test_insert_regions(dogmaseq_dig_spec):
         max_len=4,
     )
     modality = "rna"
-    original_lib_spec = dogmaseq_dig_spec.get_libspec(modality)
+    original_lib_spec = temp_spec.get_libspec(modality)
     original_region_count = len(original_lib_spec.regions)
 
-    dogmaseq_dig_spec.insert_regions([new_region], modality)
+    temp_spec.insert_regions([new_region], modality)
 
-    updated_lib_spec = dogmaseq_dig_spec.get_libspec(modality)
+    updated_lib_spec = temp_spec.get_libspec(modality)
     assert len(updated_lib_spec.regions) == original_region_count + 1
     assert updated_lib_spec.regions[0].region_id == "new_test_region"
 
-def test_insert_reads(dogmaseq_dig_spec):
+def test_insert_reads(temp_spec):
     """
     Test inserting reads into the sequence_spec
     """
@@ -97,24 +97,24 @@ def test_insert_reads(dogmaseq_dig_spec):
         strand="pos",
     )
     modality = "atac"
-    original_read_count = len(dogmaseq_dig_spec.sequence_spec)
-    original_modality_read_count = len(dogmaseq_dig_spec.get_seqspec(modality))
+    original_read_count = len(temp_spec.sequence_spec)
+    original_modality_read_count = len(temp_spec.get_seqspec(modality))
 
-    dogmaseq_dig_spec.insert_reads([new_read], modality)
+    temp_spec.insert_reads([new_read], modality)
 
-    assert len(dogmaseq_dig_spec.sequence_spec) == original_read_count + 1
+    assert len(temp_spec.sequence_spec) == original_read_count + 1
     assert (
-        len(dogmaseq_dig_spec.get_seqspec(modality))
+        len(temp_spec.get_seqspec(modality))
         == original_modality_read_count + 1
     )
-    assert dogmaseq_dig_spec.sequence_spec[0].read_id == "new_test_read"
+    assert temp_spec.sequence_spec[0].read_id == "new_test_read"
 
-def test_update_spec(dogmaseq_dig_spec):
+def test_update_spec(temp_spec):
     """
     Test update_spec method to ensure sequences and lengths are recalculated
     """
     modality = "rna"
-    lib_spec = dogmaseq_dig_spec.get_libspec(modality)
+    lib_spec = temp_spec.get_libspec(modality)
 
     # Get original sequence and lengths
     original_sequence = lib_spec.sequence
@@ -130,10 +130,10 @@ def test_update_spec(dogmaseq_dig_spec):
         sub_region.max_len = 4
 
         # Update the spec
-        dogmaseq_dig_spec.update_spec()
+        temp_spec.update_spec()
 
         # Check if the parent region's attributes are updated
-        updated_lib_spec = dogmaseq_dig_spec.get_libspec(modality)
+        updated_lib_spec = temp_spec.get_libspec(modality)
         assert updated_lib_spec.sequence != original_sequence
     else:
         pytest.skip(f"No regions to modify for modality {modality}")

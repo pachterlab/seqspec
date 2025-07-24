@@ -12,7 +12,7 @@ def test_region_creation_minimal():
         region_id="test_region",
         region_type="barcode",
         name="Test Barcode",
-        sequence_type="onlist"
+        sequence_type="onlist",
     )
     assert region.region_id == "test_region"
     assert region.region_type == "barcode"
@@ -22,7 +22,7 @@ def test_region_creation_minimal():
     assert region.min_len == 0
     assert region.max_len == 1024
     assert region.onlist is None
-    assert region.regions is None
+    assert region.regions == []
 
 def test_region_creation_with_all_fields():
     """Test creating a region with all fields"""
@@ -381,21 +381,24 @@ def test_region_get_leaf_region_types():
         region_type="barcode",
         name="Child 1",
         sequence_type="fixed",
-        sequence="AT"
+        sequence="AT",
+        regions=[]
     )
     child2 = Region(
         region_id="child2",
         region_type="linker",
         name="Child 2",
         sequence_type="fixed",
-        sequence="CG"
+        sequence="CG",
+        regions=[]
     )
     child3 = Region(
         region_id="child3",
         region_type="barcode",
         name="Child 3",
         sequence_type="fixed",
-        sequence="GC"
+        sequence="GC",
+        regions=[]
     )
     
     parent = Region(
@@ -418,7 +421,8 @@ def test_region_to_newick():
         sequence_type="fixed",
         sequence="AT",
         min_len=2,
-        max_len=2
+        max_len=2,
+        regions=[]
     )
     child2 = Region(
         region_id="child2",
@@ -427,7 +431,8 @@ def test_region_to_newick():
         sequence_type="fixed",
         sequence="CG",
         min_len=2,
-        max_len=2
+        max_len=2,
+        regions=[]
     )
     
     parent = Region(
@@ -451,7 +456,8 @@ def test_region_reverse():
         region_type="barcode",
         name="Test Barcode",
         sequence_type="fixed",
-        sequence="ATCG"
+        sequence="ATCG",
+        regions=[]
     )
     
     region.reverse()
@@ -464,7 +470,8 @@ def test_region_complement():
         region_type="barcode",
         name="Test Barcode",
         sequence_type="fixed",
-        sequence="ATCG"
+        sequence="ATCG",
+        regions=[]
     )
     
     region.complement()
@@ -503,6 +510,7 @@ def test_region_input():
     assert region.max_len == 6
     assert region.onlist is not None
     assert region.onlist.file_id == "test_file"
+    assert region.regions == []
 
 def test_onlist_creation():
     """Test Onlist creation"""
@@ -616,7 +624,8 @@ def test_project_regions_to_coordinates():
         sequence_type="fixed",
         sequence="AT",
         min_len=2,
-        max_len=2
+        max_len=2,
+        regions=[]
     )
     region2 = Region(
         region_id="region2",
@@ -625,7 +634,8 @@ def test_project_regions_to_coordinates():
         sequence_type="fixed",
         sequence="CG",
         min_len=2,
-        max_len=2
+        max_len=2,
+        regions=[]
     )
     
     coords = project_regions_to_coordinates([region1, region2])
@@ -644,7 +654,8 @@ def test_itx_read():
         sequence_type="fixed",
         sequence="AT",
         min_len=2,
-        max_len=2
+        max_len=2,
+        regions=[]
     )
     region2 = Region(
         region_id="region2",
@@ -653,7 +664,8 @@ def test_itx_read():
         sequence_type="fixed",
         sequence="CG",
         min_len=2,
-        max_len=2
+        max_len=2,
+        regions=[]
     )
     
     coords = [
@@ -756,9 +768,10 @@ def test_get_onlist_regions_real(rna_lib_spec):
 def test_get_leaves_real(rna_lib_spec):
     """Test get_leaves on a real spec"""
     leaves = rna_lib_spec.get_leaves()
+    # print(leaves)
     assert len(leaves) > 0
     for leaf in leaves:
-        assert leaf.regions is None
+        assert leaf.regions == []
 
 def test_get_leaf_region_types_real(rna_lib_spec):
     """Test get_leaf_region_types on a real spec"""

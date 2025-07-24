@@ -88,7 +88,7 @@ def seqspec_init(
 ) -> Assay:
     meta_regions: List[Region] = [
         Region(
-            region_id=mod, region_type="meta", name=mod, sequence_type="", regions=None
+            region_id=mod, region_type="meta", name=mod, sequence_type="", regions=[]
         )
         for mod in modalities
     ]

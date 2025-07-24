@@ -30,4 +30,4 @@ def test_seqspec_init():
         assert region.region_type == "meta"
         assert region.name == mod
         assert region.sequence_type == ""
-        assert region.regions is None
+        assert region.regions == []

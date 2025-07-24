@@ -90,7 +90,7 @@ class Region(BaseModel):
     min_len: int = 0
     max_len: int = 1024
     onlist: Optional[Onlist] = None
-    regions: Optional[List["Region"]] = None
+    regions: List["Region"] = []
 
     def get_sequence(self, s: str = "") -> str:
         if self.regions:
@@ -164,7 +164,7 @@ class Region(BaseModel):
         # print(leaves)
         if leaves is None:
             leaves = []
-        if not self.regions:
+        if len(self.regions) == 0:
             leaves.append(self)
             # print(leaves)
         else:
@@ -275,7 +275,7 @@ class RegionInput(LLMInput):
             min_len=min_len,
             max_len=max_len,
             onlist=self.onlist.to_onlist() if self.onlist else None,
-            regions=[r.to_region() for r in self.regions] if self.regions else None,
+            regions=[r.to_region() for r in self.regions] if self.regions else [],
         )
 
 

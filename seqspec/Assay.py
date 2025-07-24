@@ -156,8 +156,6 @@ class Assay(BaseModel):
         if modality not in self.modalities:
             raise ValueError(f"Modality '{modality}' not found.")
         target_region = self.get_libspec(modality)
-        if target_region.regions is None:
-            target_region.regions = []
         insert_idx = 0
         if after:
             for idx, r in enumerate(target_region.regions):
