@@ -153,6 +153,7 @@ Each `Region` has the following properties which are useful to annotate the elem
   - `rna`: The modality corresponding to assaying RNA.
   - `s5`: A sequencing primer or adaptor typically used in the Nextera kit in conjunction with ME1.
   - `s7`: A sequencing primer or adaptor typically used in the Nextera kit in conjunction with ME2.
+  - `sgrna_target`: A sequence corresponding to the guide RNA spacer region that determines the genomic target of CRISPR-based perturbations.
   - `tag`: A short sequence of DNA or RNA used to label or identify a sample, protein, or other grouping.
   - `truseq_read1`: The first read primer in a paired-end sequencing run using the Illumina TruSeq Library preparation kit.
   - `truseq_read2`: The second read primer in a paired-end sequencing run using the Illumina TruSeq Library preparation kit.

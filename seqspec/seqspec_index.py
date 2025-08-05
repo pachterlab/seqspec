@@ -364,12 +364,7 @@ def format_kallisto_bus(indices: List[Coordinate], subregion_type=None):
                 bcs.append(f"{idx},{cut.start},{cut.stop}")
             elif cut.region_type.upper() == "UMI":
                 umi.append(f"{idx},{cut.start},{cut.stop}")
-            elif (
-                cut.region_type.upper() == "CDNA"
-                or cut.region_type.upper() == "GDNA"
-                or cut.region_type.upper() == "PROTEIN"
-                or cut.region_type.upper() == "TAG"
-            ):
+            elif cut.region_type.upper() in {"CDNA", "GDNA", "PROTEIN", "TAG", "SGRNA_TARGET"}:
                 feature.append(f"{idx},{cut.start},{cut.stop}")
     if len(umi) == 0:
         umi.append("-1,-1,-1")

@@ -175,7 +175,7 @@ library_spec:
     onlist: null
     regions: []
   - region_id: sgrna_target
-    region_type: crispr
+    region_type: sgrna_target
     name: sgrna_target
     sequence_type: onlist
     sequence: NNNNNNNNNNNNNNNNN
