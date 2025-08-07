@@ -135,6 +135,91 @@ def test_map_read_id_to_regions():
     assert len(regions) == 1
     assert regions[0].region_id == "barcode"
 
+
+def test_map_read_id_to_multi_level_regions():
+    """Test mapping read ID to regions."""
+    # Create a mock spec
+    spec = Assay(
+        assay_id="test_assay",
+        name="Test Assay",
+        doi="test_doi",
+        date="2023-01-01",
+        description="Test description",
+        modalities=["RNA"],
+        lib_struct="test_lib_struct",
+        sequence_protocol="test_seq_protocol",
+        sequence_kit="test_seq_kit",
+        library_protocol="test_lib_protocol",
+        library_kit="test_lib_kit",
+        sequence_spec=[
+            Read(
+                read_id="read1",
+                name="Read 1",
+                modality="RNA",
+                primer_id="meta_primer",
+                min_len=20,
+                max_len=20,
+                strand="+",
+            )
+        ],
+        library_spec=[
+            Region(
+                region_id="RNA",
+                region_type="RNA",
+                name="RNA region",
+                sequence_type="joined",
+                sequence="ACGTACGTACGTACGTACGT",
+                regions=[
+                    Region(
+                        region_id="meta_primer",
+                        region_type="meta_primer",
+                        name="Primer",
+                        sequence_type="fixed",
+                        sequence="ACGTACGTACGTACGTACGT",
+                        min_len=20,
+                        max_len=20,
+                        regions=[
+                                    Region(
+                                        region_id="primer1",
+                                        region_type="primer",
+                                        name="Primer",
+                                        sequence_type="fixed",
+                                        sequence="ACGTACGTACGTACGTACGT",
+                                        min_len=20,
+                                        max_len=20,
+                                    ),
+                                    Region(
+                                        region_id="fixed_seq",
+                                        region_type="named",
+                                        name="fixed",
+                                        sequence_type="fixed",
+                                        sequence="ACGTACGTACGTACGTACGT",
+                                        min_len=20,
+                                        max_len=20,
+                            ),
+                        ]
+                    ),
+                    Region(
+                        region_id="barcode",
+                        region_type="barcode",
+                        name="barcode",
+                        sequence_type="random",
+                        sequence="ACGTACGTACGTACGTACGT",
+                        min_len=20,
+                        max_len=20,
+
+                    )
+                ],
+            )
+        ],
+    )
+
+    read, regions = map_read_id_to_regions(spec, "RNA", "read1")
+
+    assert read.read_id == "read1"
+    assert len(regions) == 1
+    assert regions[0].region_id == "barcode"
+
 def test_map_read_id_to_regions_invalid_modality():
     """Test mapping read ID with an invalid modality."""
     spec = Assay(
@@ -152,7 +237,7 @@ def test_map_read_id_to_regions_invalid_modality():
         sequence_spec=[],
         library_spec=[],
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(IndexError):
         map_read_id_to_regions(spec, "DNA", "read1")
 
 def test_map_read_id_to_regions_invalid_read_id():

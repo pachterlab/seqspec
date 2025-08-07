@@ -248,9 +248,9 @@ def format_sequence_spec(info: Dict, fmt: str = "tab") -> str:
     if fmt == "tab":
         lines = []
         for r in info["sequence_spec"]:
-            files = ",".join([i.file_id for i in r.files]) if r.files else ""
+            files = ",".join([i["file_id"] for i in r["files"]]) if r["files"] else ""
             lines.append(
-                f"{r.modality}\t{r.read_id}\t{r.strand}\t{r.min_len}\t{r.max_len}\t{r.primer_id}\t{r.name}\t{files}"
+                f"{r['modality']}\t{r['read_id']}\t{r['strand']}\t{r['min_len']}\t{r['max_len']}\t{r['primer_id']}\t{r['name']}\t{files}"
             )
         return "\n".join(lines)
     elif fmt == "json":
@@ -274,9 +274,9 @@ def format_library_spec(info: Dict, fmt: str = "tab") -> str:
         lines = []
         for modality, regions in info["library_spec"].items():
             for r in regions:
-                file = r.onlist.filename if r.onlist else None
+                file = r["onlist"]["filename"] if r["onlist"] else None
                 lines.append(
-                    f"{modality}\t{r.region_id}\t{r.region_type}\t{r.name}\t{r.sequence_type}\t{r.sequence}\t{r.min_len}\t{r.max_len}\t{file}"
+                    f"{modality}\t{r['region_id']}\t{r['region_type']}\t{r['name']}\t{r['sequence_type']}\t{r['sequence']}\t{r['min_len']}\t{r['max_len']}\t{file}"
                 )
         return "\n".join(lines)
     elif fmt == "json":

@@ -172,6 +172,23 @@ class Region(BaseModel):
                 r.get_leaves(leaves)
         return leaves
 
+    def get_leaves_with_region_id(
+        self, region_id: str, leaves: Optional[List["Region"]] = None
+    ) -> List["Region"]:
+        if leaves is None:
+            leaves = []
+        # if its the right level, add it (don't decend)
+        if self.region_id == region_id:
+            leaves.append(self)
+        # if its an atomic, add it (don't decend)
+        elif len(self.regions) == 0:
+            leaves.append(self)
+        else:
+            # decend
+            for r in self.regions:
+                r.get_leaves_with_region_id(region_id, leaves)
+        return leaves
+
     def get_leaf_region_types(self) -> Set[str]:
         return set(r.region_type for r in self.get_leaves())
 

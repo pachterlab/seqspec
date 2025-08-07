@@ -145,7 +145,15 @@ class Assay(BaseModel):
         return [r for r in self.sequence_spec if r.modality == modality]
 
     def get_read(self, read_id):
-        return [r for r in self.sequence_spec if r.read_id == read_id][0]
+        reads = [r for r in self.sequence_spec if r.read_id == read_id]
+
+        if len(reads) == 0:
+            raise IndexError(
+                "read_id {} not found in reads {}".format(
+                    read_id, [i.read_id for i in self.sequence_spec]
+                )
+            )
+        return reads[0]
 
     def list_modalities(self):
         return self.modalities

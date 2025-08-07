@@ -355,41 +355,34 @@ REGION_TYPE_COLORS = {
     "protein": "#ECF0F1",
 }
 
-
 # unused
 # '#FF8C00'
 # '#95A5A6'
 
 
-# NOTE: I think region_id should actually be read_id
 def map_read_id_to_regions(
-    spec: Assay, modality: str, region_id: str
+    spec: Assay, modality: str, read_id: str
 ) -> Tuple[Read, List[Region]]:
-    # get all atomic elements from library
-    leaves = spec.get_libspec(modality).get_leaves()
     # get the read object and primer id
-    for i in spec.sequence_spec:
-        if i.read_id == region_id:
-            read = i
-            break
-    else:
-        raise IndexError(
-            "region_id {} not found in reads {}".format(
-                region_id, [i.read_id for i in spec.sequence_spec]
-            )
-        )
+    read = spec.get_read(read_id)
     primer_id = read.primer_id
-    # get the index of the primer in the list of leaves (ASSUMPTION, 5'->3' and primer is an atomic element)
-    for i, leaf in enumerate(leaves):
-        if leaf.region_id == primer_id:
-            primer_idx = i
-            break
-    else:
+
+    # get all atomic elements from library
+    libspec = spec.get_libspec(modality)
+
+    # get the (ordered) leaves ensuring region with primer_id is included (but not its children)
+    leaves = libspec.get_leaves_with_region_id(primer_id)
+    # print(leaves)
+    # get the index of the primer in the list of leaves (ASSUMPTION, 5'->3' and primer can be any node)
+    pidxs = [idx for idx, leaf in enumerate(leaves) if leaf.region_id == primer_id]
+    if len(pidxs) == 0:
         raise IndexError(
             "primer_id {} not found in regions {}".format(
                 primer_id, [leaf.region_id for leaf in leaves]
             )
         )
+    primer_idx = pidxs[0]
+
     # If we are on the opposite strand, we go in the opposite way
     if read.strand == "neg":
         rgns = leaves[:primer_idx][::-1]
