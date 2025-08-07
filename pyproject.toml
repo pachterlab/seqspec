@@ -31,7 +31,6 @@ dependencies = [
     "requests",
     "biopython",
     "packaging",
-    # "mcp",
     "matplotlib",
     "pydantic",
 ]
