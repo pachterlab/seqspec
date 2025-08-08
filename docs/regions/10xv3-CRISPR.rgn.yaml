@@ -1,0 +1,79 @@
+- region_id: barcode
+  region_type: barcode
+  name: Barcode
+  sequence_type: onlist
+  sequence: NNNNNNNNNNNNNNNN
+  min_len: 16
+  max_len: 16
+  onlist:
+    file_id: 3M-february-2018.txt.gz
+    filename: 3M-february-2018.txt.gz
+    filetype: txt
+    filesize: 115512960
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNAv3/3M-february-2018.txt.gz
+    urltype: http
+    md5: 3d36d0a4021fd292b265e2b5e72aaaf3
+    location: remote
+  regions: null
+- region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: XXXXXXXXXXXX
+  min_len: 12
+  max_len: 12
+  onlist: null
+  regions: null
+- region_id: linker
+  region_type: linker
+  name: Capture sequence 1
+  sequence_type: fixed
+  sequence: TTGCTAGGACCGGCCTTAAAGC
+  min_len: 22
+  max_len: 22
+  onlist: null
+  regions: null
+- region_id: sgRNA-scaffold
+  region_type: linker
+  name: Guide rna scaffold
+  sequence_type: random
+  sequence: GCACCGACTCGGTGCCACTTTTTCAAGTTGATAACGGACTAGCCTTATTTAAACTTGCTATGCTGTTTCCAGCTTAGCTCTTAAAC
+  min_len: 86
+  max_len: 86
+  onlist: null
+  regions: null
+- region_id: antibody_barcode
+  region_type: barcode
+  name: Antibody Barcode
+  sequence_type: onlist
+  sequence: NNNNNNNNNNNNNNN
+  min_len: 17
+  max_len: 20
+  onlist:
+    file_id: null
+    filename: null
+    filetype: null
+    filesize: null
+    url: null
+    urltype: null
+    md5: null
+    location: null
+  regions: null
+- region_id: linker-2
+  region_type: linker
+  name: Random 9mer 2
+  sequence_type: fixed
+  sequence: CCC
+  min_len: 3
+  max_len: 3
+  onlist: null
+  regions: null
+- region_id: tso
+  region_type: tso
+  name: Template switch oligo
+  sequence_type: fixed
+  sequence: ATGTACTCTGCGTTGATACCACTGCTT
+  min_len: 27
+  max_len: 27
+  onlist: null
+  regions: null

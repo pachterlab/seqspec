@@ -1,0 +1,26 @@
+- region_id: barcode
+  region_type: barcode
+  name: Barcode
+  sequence_type: onlist
+  sequence: NNNNNNNN
+  min_len: 8
+  max_len: 8
+  onlist:
+    file_id: null
+    filename: null
+    filetype: null
+    filesize: null
+    url: null
+    urltype: null
+    md5: null
+    location: null
+  regions: null
+- region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null
