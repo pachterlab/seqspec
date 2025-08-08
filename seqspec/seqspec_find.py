@@ -63,14 +63,7 @@ seqspec find -m rna -s file -i r1.fastq.gz spec.yaml    # Find files with id r1.
         type=str,
         required=True,
     )
-    # depracate -r
-    subparser_required.add_argument(
-        "-r",
-        metavar="REGION",
-        help=SUPPRESS,
-        type=str,
-        default=None,
-    )
+
     subparser_required.add_argument(
         "-i",
         "--id",
@@ -91,16 +84,6 @@ def validate_find_args(parser: ArgumentParser, args: Namespace) -> None:
 
     if args.output and Path(args.output).exists() and not Path(args.output).is_file():
         parser.error(f"Output path exists but is not a file: {args.output}")
-
-    if args.r is not None:
-        warnings.warn(
-            "The '-r' argument is deprecated and will be removed in a future version. "
-            "Please use '-i' instead.",
-            DeprecationWarning,
-        )
-        # Optionally map the old option to the new one
-        if not args.id:
-            args.id = args.r
 
 
 def seqspec_find(

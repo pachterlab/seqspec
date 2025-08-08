@@ -10,8 +10,8 @@ def test_seqspec_index(dogmaseq_dig_spec: Assay):
         spec=dogmaseq_dig_spec, modality="rna", ids=["rna_R1"], idtype="read"
     )
     assert len(indices) == 1
-    assert "rna_R1" in indices[0]
-    assert indices[0]["strand"] == "pos"
+    assert "rna_R1" == indices[0].query_id
+    assert indices[0].strand == "pos"
 
     # Test get_index_by_file_ids
     indices = seqspec_index(
@@ -24,9 +24,9 @@ def test_seqspec_index(dogmaseq_dig_spec: Assay):
     # Check that indices match the expected structure and values
     assert len(indices) == 1
     index = indices[0]
-    assert "rna_R1" in index
-    assert index["strand"] == "pos"
-    regions = index["rna_R1"]
+    assert "rna_R1_SRR18677638.fastq.gz" == index.query_id
+    assert index.strand == "pos"
+    regions = index.rcv
     assert len(regions) == 2
 
     # Check that regions are RegionCoordinate objects
@@ -74,7 +74,7 @@ def test_seqspec_index(dogmaseq_dig_spec: Assay):
     )
     assert len(indices) == 1
 
-
+from seqspec.seqspec_index import Coordinate
 def test_seqspec_index_without_ids(dogmaseq_dig_spec: Assay):
     """Test seqspec_index without providing ids (uses get_index_by_files)"""
     # Test file indexing without specific IDs
@@ -86,18 +86,12 @@ def test_seqspec_index_without_ids(dogmaseq_dig_spec: Assay):
     assert len(indices) > 0
     
     # Check structure of returned indices
-    for index in indices:
-        assert isinstance(index, dict)
-        assert "strand" in index
-        # Should have at least one read ID as key
-        read_keys = [k for k in index.keys() if k != "strand"]
-        assert len(read_keys) > 0
-        
-        # Check that the regions are RegionCoordinate objects
-        for read_id in read_keys:
-            regions = index[read_id]
-            assert isinstance(regions, list)
-            assert all(isinstance(region, RegionCoordinate) for region in regions)
+    for coord in indices:
+        assert isinstance(coord, Coordinate)
+        assert coord.query_type == "File"
+        assert isinstance(coord.rcv, list)
+        assert len(coord.rcv) > 0
+        assert all(isinstance(region, RegionCoordinate) for region in coord.rcv)
 
 
 def test_seqspec_index_multiple_read_ids(dogmaseq_dig_spec: Assay):
@@ -114,16 +108,16 @@ def test_seqspec_index_multiple_read_ids(dogmaseq_dig_spec: Assay):
     
     # Check first read (rna_R1)
     rna_r1_index = indices[0]
-    assert "rna_R1" in rna_r1_index
-    assert rna_r1_index["strand"] == "pos"
-    rna_r1_regions = rna_r1_index["rna_R1"]
+    assert "rna_R1" in rna_r1_index.query_id
+    assert rna_r1_index.strand == "pos"
+    rna_r1_regions = rna_r1_index.rcv
     assert len(rna_r1_regions) == 2  # cell_bc + umi
     
     # Check second read (rna_R2) - this has negative strand
     rna_r2_index = indices[1]
-    assert "rna_R2" in rna_r2_index
-    assert rna_r2_index["strand"] == "neg"  # Fixed: rna_R2 has negative strand
-    rna_r2_regions = rna_r2_index["rna_R2"]
+    assert "rna_R2" in rna_r2_index.query_id
+    assert rna_r2_index.strand == "neg"  # Fixed: rna_R2 has negative strand
+    rna_r2_regions = rna_r2_index.rcv
     assert len(rna_r2_regions) == 1  # cdna only
 
 
@@ -139,17 +133,20 @@ def test_seqspec_index_multiple_file_ids(dogmaseq_dig_spec: Assay):
     
     assert len(indices) == 2
     
-    # Check that each index corresponds to a read
-    for index in indices:
-        assert isinstance(index, dict)
-        assert "strand" in index
-        read_keys = [k for k in index.keys() if k != "strand"]
-        assert len(read_keys) == 1
-        
-        # Check that regions are RegionCoordinate objects
-        for read_id in read_keys:
-            regions = index[read_id]
-            assert all(isinstance(region, RegionCoordinate) for region in regions)
+    # Validate returned file IDs and structure
+    file_ids = {"rna_R1_SRR18677638.fastq.gz", "rna_R2_SRR18677638.fastq.gz"}
+    returned_ids = {coord.query_id for coord in indices}
+    assert returned_ids == file_ids
+
+    for coord in indices:
+        assert isinstance(coord, Coordinate)
+        assert coord.strand in ["pos", "neg"]
+        assert isinstance(coord.rcv, list)
+        assert all(isinstance(region, RegionCoordinate) for region in coord.rcv)
+        if "rna_R1" in coord.query_id:
+            assert len(coord.rcv) == 2
+        if "rna_R2" in coord.query_id:
+            assert len(coord.rcv) == 1
 
 
 def test_seqspec_index_multiple_region_ids(dogmaseq_dig_spec: Assay):
@@ -165,16 +162,12 @@ def test_seqspec_index_multiple_region_ids(dogmaseq_dig_spec: Assay):
     assert len(indices) == 2
     
     # Check that each index has the expected structure
-    for index in indices:
-        assert isinstance(index, dict)
-        assert "strand" in index
-        region_keys = [k for k in index.keys() if k != "strand"]
-        assert len(region_keys) == 1
-        
-        # Check that regions are RegionCoordinate objects
-        for region_id in region_keys:
-            regions = index[region_id]
-            assert all(isinstance(region, RegionCoordinate) for region in regions)
+    for coord in indices:
+        assert isinstance(coord, Coordinate)
+        assert coord.strand in ["pos", "neg"]
+        assert isinstance(coord.rcv, list)
+        assert len(coord.rcv) > 0
+        assert all(isinstance(region, RegionCoordinate) for region in coord.rcv)
 
 
 def test_seqspec_index_different_modalities(dogmaseq_dig_spec: Assay):
@@ -184,28 +177,28 @@ def test_seqspec_index_different_modalities(dogmaseq_dig_spec: Assay):
         spec=dogmaseq_dig_spec, modality="rna", ids=["rna_R1"], idtype="read"
     )
     assert len(rna_indices) == 1
-    assert "rna_R1" in rna_indices[0]
+    assert "rna_R1" == rna_indices[0].query_id
     
     # Test ATAC modality
     atac_indices = seqspec_index(
         spec=dogmaseq_dig_spec, modality="atac", ids=["atac_R1"], idtype="read"
     )
     assert len(atac_indices) == 1
-    assert "atac_R1" in atac_indices[0]
+    assert "atac_R1" == atac_indices[0].query_id
     
     # Test protein modality
     protein_indices = seqspec_index(
         spec=dogmaseq_dig_spec, modality="protein", ids=["protein_R1"], idtype="read"
     )
     assert len(protein_indices) == 1
-    assert "protein_R1" in protein_indices[0]
+    assert "protein_R1" == protein_indices[0].query_id
     
     # Test tag modality
     tag_indices = seqspec_index(
         spec=dogmaseq_dig_spec, modality="tag", ids=["tag_R1"], idtype="read"
     )
     assert len(tag_indices) == 1
-    assert "tag_R1" in tag_indices[0]
+    assert "tag_R1" == tag_indices[0].query_id
 
 
 def test_seqspec_index_reverse_strand(dogmaseq_dig_spec: Assay):
@@ -220,11 +213,11 @@ def test_seqspec_index_reverse_strand(dogmaseq_dig_spec: Assay):
     )
     
     assert len(indices) == 1
-    assert "rna_R1" in indices[0]
-    assert indices[0]["strand"] == "pos"  # Strand should still be pos for this read
+    assert "rna_R1"  == indices[0].query_id
+    assert indices[0].strand == "pos"  # Strand should still be pos for this read
     
     # Check that regions are still RegionCoordinate objects
-    regions = indices[0]["rna_R1"]
+    regions = indices[0].rcv
     assert all(isinstance(region, RegionCoordinate) for region in regions)
 
 
@@ -282,20 +275,13 @@ def test_seqspec_index_structure_validation(dogmaseq_dig_spec: Assay):
         assert isinstance(indices, list)
         assert len(indices) > 0
         
-        for index in indices:
-            assert isinstance(index, dict)
-            assert "strand" in index
-            assert index["strand"] in ["pos", "neg"]
-            
-            # Should have at least one key that's not "strand"
-            data_keys = [k for k in index.keys() if k != "strand"]
-            assert len(data_keys) > 0
-            
-            # Check that the data contains RegionCoordinate objects
-            for key in data_keys:
-                regions = index[key]
-                assert isinstance(regions, list)
-                assert all(isinstance(region, RegionCoordinate) for region in regions)
+        for coord in indices:
+            assert isinstance(coord, Coordinate)
+            assert hasattr(coord, "strand")
+            assert coord.strand in ["pos", "neg"]
+            assert isinstance(coord.rcv, list)
+            assert len(coord.rcv) > 0
+            assert all(isinstance(region, RegionCoordinate) for region in coord.rcv)
 
 
 def test_format_index():
@@ -360,3 +346,31 @@ def test_format_index():
     formatted_index = format_index(indices, "zumis")
     expected_zumis = "- BCS(1-16)\n- UMI(17-28)\n\n- cDNA(1-102)"
     assert formatted_index == expected_zumis
+
+    # Additional pragmatic coverage: kb-single, seqkit, relative, splitcode formats
+    # kb-single chooses the longest feature among feature regions
+    indices = seqspec_index(
+        spec=dogmaseq_dig_spec, modality="rna", ids=["rna_R1", "rna_R2"], idtype="read"
+    )
+    formatted_kb_single = format_index(indices, "kb-single")
+    assert formatted_kb_single.endswith(":1,0,102")
+
+    # seqkit subseq for a specific subregion_type
+    indices = seqspec_index(
+        spec=dogmaseq_dig_spec, modality="rna", ids=["rna_R1"], idtype="read"
+    )
+    seqkit_subseq = format_index(indices, "seqkit", subregion_type="barcode")
+    assert seqkit_subseq.strip() == "1:16"
+
+    # relative output should be non-empty and tab-delimited when a linker exists
+    # Use the ATAC region which contains a linker
+    indices = seqspec_index(
+        spec=dogmaseq_dig_spec, modality="atac", ids=["atac"], idtype="region"
+    )
+    rel = format_index(indices, "relative")
+    assert isinstance(rel, str) and ("\t" in rel) and len(rel) > 0
+
+    # splitcode should contain @extract lines and groups header
+    split = format_index(indices, "splitcode")
+    assert "@extract" in split
+    assert "groups\tids\ttags\tdistances\tlocations" in split

@@ -16,7 +16,8 @@ class File(BaseModel):
     md5: str
 
     def __repr__(self) -> str:
-        return str(self.model_dump())
+        s = f"""{self.file_id}"""
+        return s
 
     def to_dict(self):
         return self.model_dump()

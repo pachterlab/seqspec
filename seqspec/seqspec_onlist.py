@@ -4,8 +4,7 @@ This module provides functionality to generate and manage onlist files for seqsp
 """
 
 import itertools
-import warnings
-from argparse import SUPPRESS, ArgumentParser, Namespace, RawTextHelpFormatter
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
 from typing import Dict, List
 
@@ -59,14 +58,6 @@ seqspec onlist -m rna -s read -i rna_R1 -f product -o joined.txt spec.yaml  # Jo
         choices=choices,
     )
 
-    subparser_required.add_argument(
-        "-r",
-        metavar="READ or REGION",
-        help=SUPPRESS,
-        type=str,
-        default=None,
-        required=False,
-    )
     format_choices = ["product", "multi"]
     subparser.add_argument(
         "-f",
@@ -106,15 +97,6 @@ def validate_onlist_args(parser: ArgumentParser, args: Namespace) -> None:
 
     if args.output and Path(args.output).exists() and not Path(args.output).is_file():
         parser.error(f"Output path exists but is not a file: {args.output}")
-
-    if args.r is not None:
-        warnings.warn(
-            "The '-r' argument is deprecated and will be removed in a future version. "
-            "Please use '-i' instead.",
-            DeprecationWarning,
-        )
-        if not args.id:
-            args.id = args.r
 
 
 def run_onlist(parser: ArgumentParser, args: Namespace) -> None:
