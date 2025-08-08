@@ -1,5 +1,4 @@
-- !Region
-  region_id: dropseq_seqA_read1
+- region_id: dropseq_seqA_read1
   region_type: dropseq_seqA_read1
   name: Drop-seq seqA Read 1
   sequence_type: fixed
@@ -7,4 +6,4 @@
   min_len: 39
   max_len: 39
   onlist: null
-  regions: null
+  regions: []

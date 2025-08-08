@@ -60,7 +60,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: truseq_read_1
     region_type: truseq_read_1
     name: truseq_read_1
@@ -69,7 +69,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: cDNA
     region_type: cDNA
     name: cDNA
@@ -78,7 +78,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: truseq_read_2
     region_type: truseq_read_2
     name: truseq_read_2
@@ -87,7 +87,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: cell_index
     region_type: cell_index
     name: cell_index
@@ -96,7 +96,7 @@ library_spec:
     min_len: 6
     max_len: 6
     onlist: null
-    regions: null
+    regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -105,4 +105,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

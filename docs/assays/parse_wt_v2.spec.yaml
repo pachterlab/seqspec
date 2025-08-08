@@ -60,7 +60,7 @@ library_spec:
     min_len: 1
     max_len: 150
     onlist: null
-    regions: null
+    regions: []
 - region_id: R2.fastq.gz
   region_type: fastq
   name: Read 2 umi and barcode FASTQ
@@ -78,7 +78,7 @@ library_spec:
     min_len: 10
     max_len: 10
     onlist: null
-    regions: null
+    regions: []
   - region_id: barcode-1
     region_type: barcode
     name: barcode-1
@@ -94,7 +94,7 @@ library_spec:
       url: ''
       urltype: local
       md5: 5c3b70034e9cef5de735dc9d4f3fdbde
-    regions: null
+    regions: []
   - region_id: linker-1
     region_type: linker
     name: linker-1
@@ -103,7 +103,7 @@ library_spec:
     min_len: 30
     max_len: 30
     onlist: null
-    regions: null
+    regions: []
   - region_id: barcode-2
     region_type: barcode
     name: barcode-2
@@ -119,7 +119,7 @@ library_spec:
       url: ''
       urltype: local
       md5: 1452e8ef104e6edf686fab8956172072
-    regions: null
+    regions: []
   - region_id: linker-3
     region_type: linker
     name: linker-3
@@ -128,7 +128,7 @@ library_spec:
     min_len: 22
     max_len: 22
     onlist: null
-    regions: null
+    regions: []
   - region_id: barcode-3
     region_type: barcode
     name: barcode-3
@@ -144,4 +144,4 @@ library_spec:
       url: ''
       urltype: local
       md5: 1452e8ef104e6edf686fab8956172072
-    regions: null
+    regions: []

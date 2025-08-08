@@ -84,7 +84,7 @@ library_spec:
         url: ''
         urltype: local
         md5: a88cd21e801ae6f9a7d9a48b67ccf693
-      regions: null
+      regions: []
     - region_id: protein_umi
       region_type: umi
       name: umi
@@ -93,7 +93,7 @@ library_spec:
       min_len: 12
       max_len: 12
       onlist: null
-      regions: null
+      regions: []
   - region_id: protein_R2_SRR18677644.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
@@ -118,7 +118,7 @@ library_spec:
         url: ''
         urltype: local
         md5: b5920c1fc1d22927607c31c96f5cf03e
-      regions: null
+      regions: []
 - region_id: tag
   region_type: tag
   name: tag
@@ -152,7 +152,7 @@ library_spec:
         url: ''
         urltype: local
         md5: a88cd21e801ae6f9a7d9a48b67ccf693
-      regions: null
+      regions: []
     - region_id: tag_umi
       region_type: umi
       name: umi
@@ -161,7 +161,7 @@ library_spec:
       min_len: 12
       max_len: 12
       onlist: null
-      regions: null
+      regions: []
   - region_id: tag_R2_SRR18677640.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
@@ -186,7 +186,7 @@ library_spec:
         url: ''
         urltype: local
         md5: de44ad6d5c4b9f381a352283a6831112
-      regions: null
+      regions: []
 - region_id: rna
   region_type: rna
   name: rna
@@ -220,7 +220,7 @@ library_spec:
         url: ''
         urltype: local
         md5: a88cd21e801ae6f9a7d9a48b67ccf693
-      regions: null
+      regions: []
     - region_id: rna_umi
       region_type: umi
       name: umi
@@ -229,7 +229,7 @@ library_spec:
       min_len: 12
       max_len: 12
       onlist: null
-      regions: null
+      regions: []
   - region_id: rna_R2_SRR18677638.fastq.gz
     region_type: fastq
     name: Read 2 FASTQ
@@ -247,7 +247,7 @@ library_spec:
       min_len: 102
       max_len: 102
       onlist: null
-      regions: null
+      regions: []
 - region_id: atac
   region_type: atac
   name: atac
@@ -274,7 +274,7 @@ library_spec:
       min_len: 52
       max_len: 52
       onlist: null
-      regions: null
+      regions: []
   - region_id: atac_R2_SRR18677642.fastq.gz
     region_type: fastq
     name: Read 2 fastq
@@ -292,7 +292,7 @@ library_spec:
       min_len: 8
       max_len: 8
       onlist: null
-      regions: null
+      regions: []
     - region_id: atac_cell_bc
       region_type: barcode
       name: Cell Barcode
@@ -308,7 +308,7 @@ library_spec:
         url: ''
         urltype: local
         md5: 3f9fc0f6ef9d72540ab010d0b5348aa1
-      regions: null
+      regions: []
   - region_id: atac_R3_SRR18677642.fastq.gz
     region_type: fastq
     name: Read 3 FASTQ
@@ -326,4 +326,4 @@ library_spec:
       min_len: 52
       max_len: 52
       onlist: null
-      regions: null
+      regions: []

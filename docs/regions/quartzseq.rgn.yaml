@@ -13,8 +13,7 @@
     url: null
     urltype: null
     md5: null
-    location: null
-  regions: null
+  regions: []
 - region_id: umi
   region_type: umi
   name: Unique Molecular Identifier
@@ -23,7 +22,7 @@
   min_len: 8
   max_len: 8
   onlist: null
-  regions: null
+  regions: []
 - region_id: cDNA
   region_type: cDNA
   name: Complementary DNA
@@ -32,4 +31,4 @@
   min_len: 1
   max_len: 98
   onlist: null
-  regions: null
+  regions: []

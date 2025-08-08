@@ -61,7 +61,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: RA5
     region_type: RA5
     name: RA5
@@ -70,7 +70,7 @@ library_spec:
     min_len: 26
     max_len: 26
     onlist: null
-    regions: null
+    regions: []
   - region_id: umi
     region_type: umi
     name: umi
@@ -79,7 +79,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: cell_barcode
     region_type: cell_barcode
     name: cell_barcode
@@ -88,7 +88,7 @@ library_spec:
     min_len: 6
     max_len: 6
     onlist: null
-    regions: null
+    regions: []
   - region_id: polyT
     region_type: polyT
     name: polyT
@@ -97,7 +97,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: cdna
     region_type: cdna
     name: cdna
@@ -106,7 +106,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: RA3
     region_type: RA3
     name: RA3
@@ -115,7 +115,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: sample_bc
     region_type: sample_bc
     name: sample_bc
@@ -131,7 +131,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -140,4 +140,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

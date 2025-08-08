@@ -61,7 +61,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: i5
     region_type: i5
     name: i5
@@ -77,7 +77,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: nextera_read1
     region_type: nextera_read1
     name: nextera_read1
@@ -95,7 +95,7 @@ library_spec:
       min_len: 33
       max_len: 33
       onlist: null
-      regions: null
+      regions: []
     - region_id: ME
       region_type: ME
       name: ME
@@ -104,7 +104,7 @@ library_spec:
       min_len: 19
       max_len: 19
       onlist: null
-      regions: null
+      regions: []
   - region_id: gdna
     region_type: gdna
     name: gdna
@@ -113,7 +113,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: nextera_read2
     region_type: nextera_read2
     name: nextera_read2
@@ -131,7 +131,7 @@ library_spec:
       min_len: 19
       max_len: 19
       onlist: null
-      regions: null
+      regions: []
     - region_id: s5
       region_type: s5
       name: s5
@@ -140,7 +140,7 @@ library_spec:
       min_len: 15
       max_len: 15
       onlist: null
-      regions: null
+      regions: []
   - region_id: i7
     region_type: i7
     name: i7
@@ -156,7 +156,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -165,4 +165,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

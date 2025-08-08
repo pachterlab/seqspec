@@ -61,7 +61,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: truseq_r1
     region_type: truseq_read1
     name: truseq_r1
@@ -70,7 +70,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: cls1
     region_type: barcode
     name: cls1
@@ -86,7 +86,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: linker1
     region_type: linker
     name: linker1
@@ -95,7 +95,7 @@ library_spec:
     min_len: 12
     max_len: 12
     onlist: null
-    regions: null
+    regions: []
   - region_id: cls2
     region_type: barcode
     name: cls2
@@ -111,7 +111,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: linker2
     region_type: linker
     name: linker2
@@ -120,7 +120,7 @@ library_spec:
     min_len: 13
     max_len: 13
     onlist: null
-    regions: null
+    regions: []
   - region_id: cls3
     region_type: barcode
     name: cls3
@@ -136,7 +136,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: umi
     region_type: umi
     name: umi
@@ -145,7 +145,7 @@ library_spec:
     min_len: 8
     max_len: 8
     onlist: null
-    regions: null
+    regions: []
   - region_id: polyT
     region_type: poly_T
     name: polyT
@@ -154,7 +154,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: cdna
     region_type: cdna
     name: cdna
@@ -163,7 +163,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: truseq_r2
     region_type: truseq_read2
     name: truseq_r2
@@ -172,7 +172,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: sample_index
     region_type: index7
     name: sample_index
@@ -188,7 +188,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -197,4 +197,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

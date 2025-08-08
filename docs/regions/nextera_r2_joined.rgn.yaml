@@ -5,7 +5,7 @@
   sequence: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC
   min_len: 34
   max_len: 34
-  onlist:
+  onlist: null
   regions:
     - region_id: ME2
       region_type: ME2
@@ -14,8 +14,8 @@
       sequence: CTGTCTCTTATACACATCT
       min_len: 19
       max_len: 19
-      onlist:
-      regions:
+      onlist: null
+      regions: []
     - region_id: s7
       region_type: s7
       name: s7
@@ -23,5 +23,5 @@
       sequence: CCGAGCCCACGAGAC
       min_len: 15
       max_len: 15
-      onlist:
-      regions:
+      onlist: null
+      regions: []

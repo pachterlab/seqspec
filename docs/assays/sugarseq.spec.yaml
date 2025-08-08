@@ -77,7 +77,7 @@ library_spec:
         url: ''
         urltype: local
         md5: 3d36d0a4021fd292b265e2b5e72aaaf3
-      regions: null
+      regions: []
     - region_id: umi
       region_type: umi
       name: umi
@@ -86,7 +86,7 @@ library_spec:
       min_len: 12
       max_len: 12
       onlist: null
-      regions: null
+      regions: []
   - region_id: rna_1-24_cDNA_Rep1_S1_R2_001.fastq.gz
     region_type: fastq
     name: rna_1-24_cDNA_Rep1_S1_R2_001.fastq.gz
@@ -104,7 +104,7 @@ library_spec:
       min_len: 90
       max_len: 90
       onlist: null
-      regions: null
+      regions: []
 - region_id: tag
   region_type: TAG
   name: tag
@@ -138,7 +138,7 @@ library_spec:
         url: ''
         urltype: local
         md5: 3d36d0a4021fd292b265e2b5e72aaaf3
-      regions: null
+      regions: []
     - region_id: umi
       region_type: umi
       name: umi
@@ -147,7 +147,7 @@ library_spec:
       min_len: 12
       max_len: 12
       onlist: null
-      regions: null
+      regions: []
   - region_id: tag_1-24_Barcodes_Rep1_S4_R2_001.fastq.gz
     region_type: fastq
     name: tag_1-24_Barcodes_Rep1_S4_R2_001.fastq.gz
@@ -165,7 +165,7 @@ library_spec:
       min_len: 3
       max_len: 3
       onlist: null
-      regions: null
+      regions: []
     - region_id: mtag
       region_type: tag
       name: mtag
@@ -181,7 +181,7 @@ library_spec:
         url: ''
         urltype: local
         md5: 097f8bb545c2d3471690bf3fd36db4b8
-      regions: null
+      regions: []
     - region_id: linker
       region_type: linker
       name: linker
@@ -190,7 +190,7 @@ library_spec:
       min_len: 3
       max_len: 3
       onlist: null
-      regions: null
+      regions: []
     - region_id: capture_sequence
       region_type: capture_sequence
       name: capture sequence
@@ -199,4 +199,4 @@ library_spec:
       min_len: 22
       max_len: 22
       onlist: null
-      regions: null
+      regions: []

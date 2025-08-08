@@ -71,7 +71,7 @@ library_spec:
       min_len: 50
       max_len: 50
       onlist: null
-      regions: null
+      regions: []
   - region_id: BMMC_single_donor_ATAC_L001_R2.fastq.gz
     region_type: fastq
     name: atac Read 2 FASTQ
@@ -89,7 +89,7 @@ library_spec:
       min_len: 50
       max_len: 50
       onlist: null
-      regions: null
+      regions: []
     - region_id: atac-raw-cell-barcode
       region_type: random
       name: atac Raw Cell Barcode
@@ -107,7 +107,7 @@ library_spec:
         min_len: 15
         max_len: 15
         onlist: null
-        regions: null
+        regions: []
       - region_id: atac-cell-barcode1
         region_type: barcode
         name: atac Cell Barcode 1
@@ -123,7 +123,7 @@ library_spec:
           url: ''
           urltype: local
           md5: ''
-        regions: null
+        regions: []
       - region_id: atac-linker2
         region_type: linker
         name: linker2
@@ -132,7 +132,7 @@ library_spec:
         min_len: 30
         max_len: 30
         onlist: null
-        regions: null
+        regions: []
       - region_id: atac-cell-barcode2
         region_type: barcode
         name: atac Cell Barcode 2
@@ -148,7 +148,7 @@ library_spec:
           url: ''
           urltype: local
           md5: ''
-        regions: null
+        regions: []
       - region_id: atac-linker3
         region_type: linker
         name: linker3
@@ -157,7 +157,7 @@ library_spec:
         min_len: 30
         max_len: 30
         onlist: null
-        regions: null
+        regions: []
       - region_id: atac-cell-barcode3
         region_type: barcode
         name: atac Cell Barcode 3
@@ -173,7 +173,7 @@ library_spec:
           url: ''
           urltype: local
           md5: ''
-        regions: null
+        regions: []
 - region_id: rna
   region_type: rna
   name: rna
@@ -200,7 +200,7 @@ library_spec:
       min_len: 50
       max_len: 50
       onlist: null
-      regions: null
+      regions: []
   - region_id: BMMC_single_donor_RNA_L001_R2.fastq.gz
     region_type: fastq
     name: rna Read 2 FASTQ
@@ -218,7 +218,7 @@ library_spec:
       min_len: 10
       max_len: 10
       onlist: null
-      regions: null
+      regions: []
     - region_id: poly_A
       region_type: poly_A
       name: poly_A
@@ -227,7 +227,7 @@ library_spec:
       min_len: 40
       max_len: 40
       onlist: null
-      regions: null
+      regions: []
     - region_id: rna-raw-cell-barcode
       region_type: random
       name: rna Raw Cell Barcode
@@ -245,7 +245,7 @@ library_spec:
         min_len: 15
         max_len: 15
         onlist: null
-        regions: null
+        regions: []
       - region_id: rna-cell-barcode1
         region_type: barcode
         name: rna Cell Barcode 1
@@ -261,7 +261,7 @@ library_spec:
           url: ''
           urltype: local
           md5: ''
-        regions: null
+        regions: []
       - region_id: rna-linker2
         region_type: linker
         name: linker2
@@ -270,7 +270,7 @@ library_spec:
         min_len: 30
         max_len: 30
         onlist: null
-        regions: null
+        regions: []
       - region_id: rna-cell-barcode2
         region_type: barcode
         name: rna Cell Barcode 2
@@ -286,7 +286,7 @@ library_spec:
           url: ''
           urltype: local
           md5: ''
-        regions: null
+        regions: []
       - region_id: rna-linker3
         region_type: linker
         name: linker3
@@ -295,7 +295,7 @@ library_spec:
         min_len: 30
         max_len: 30
         onlist: null
-        regions: null
+        regions: []
       - region_id: rna-cell-barcode3
         region_type: barcode
         name: rna Cell Barcode 3
@@ -311,4 +311,4 @@ library_spec:
           url: ''
           urltype: local
           md5: ''
-        regions: null
+        regions: []

@@ -1,5 +1,4 @@
-- !Region
-  region_id: umi
+- region_id: umi
   region_type: umi
   name: Unique Molecular Identifier
   sequence_type: random
@@ -7,16 +6,15 @@
   min_len: 7
   max_len: 7
   onlist: null
-  regions: null
-- !Region
-  region_id: petriseq_bc3
+  regions: []
+- region_id: petriseq_bc3
   region_type: barcode
   name: PETRI-seq_BC3
   sequence_type: onlist
   sequence: NNNNNNN
   min_len: 7
   max_len: 7
-  onlist: !Onlist
+  onlist:
     file_id: Round3_ligation_barcodes.tsv.gz
     filename: Round3_ligation_barcodes.tsv.gz
     filetype: txt
@@ -24,10 +22,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PETRI-seq/Round3_ligation_barcodes.tsv.gz
     urltype: http
     md5: 33d893504decdab2c30809c2e2e061fe
-    location: remote
-  regions: null
-- !Region
-  region_id: petriseq_linker3
+  regions: []
+- region_id: petriseq_linker3
   region_type: linker
   name: PETRI-seq_Linker3
   sequence_type: fixed
@@ -35,16 +31,15 @@
   min_len: 15
   max_len: 15
   onlist: null
-  regions: null
-- !Region
-  region_id: petriseq_bc2
+  regions: []
+- region_id: petriseq_bc2
   region_type: barcode
   name: PETRI-seq_BC2
   sequence_type: onlist
   sequence: NNNNNNN
   min_len: 7
   max_len: 7
-  onlist: !Onlist
+  onlist:
     file_id: Round2_ligation_barcodes.tsv.gz
     filename: Round2_ligation_barcodes.tsv.gz
     filetype: txt
@@ -52,10 +47,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PETRI-seq/Round2_ligation_barcodes.tsv.gz
     urltype: http
     md5: 80c64b9091860955b69d2c7eb4e7b2b7
-    location: remote
-  regions: null
-- !Region
-  region_id: petriseq_linker2
+  regions: []
+- region_id: petriseq_linker2
   region_type: linker
   name: PETRI-seq_Linker2
   sequence_type: fixed
@@ -63,16 +56,15 @@
   min_len: 14
   max_len: 14
   onlist: null
-  regions: null
-- !Region
-  region_id: petriseq_bc1
+  regions: []
+- region_id: petriseq_bc1
   region_type: barcode
   name: PETRI-seq_BC1
   sequence_type: onlist
   sequence: NNNNNNN
   min_len: 7
   max_len: 7
-  onlist: !Onlist
+  onlist:
     file_id: RT_barcodes.tsv.gz
     filename: RT_barcodes.tsv.gz
     filetype: txt
@@ -80,10 +72,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PETRI-seq/RT_barcodes.tsv.gz
     urltype: http
     md5: 34104c741c63a38db8d65112abf3a1e7
-    location: remote
-  regions: null
-- !Region
-  region_id: cDNA
+  regions: []
+- region_id: cDNA
   region_type: cDNA
   name: Complementary DNA
   sequence_type: random
@@ -91,4 +81,4 @@
   min_len: 1
   max_len: 98
   onlist: null
-  regions: null
+  regions: []

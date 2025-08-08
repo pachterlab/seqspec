@@ -60,7 +60,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: I2.fastq.gz
     region_type: gz
     name: Index 2 FASTQ
@@ -85,7 +85,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: truseq_read1
     region_type: truseq_read1
     name: truseq_read1
@@ -94,7 +94,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: R1.fastq.gz
     region_type: gz
     name: Read 1 FASTQ
@@ -112,7 +112,7 @@ library_spec:
       min_len: 8
       max_len: 8
       onlist: null
-      regions: null
+      regions: []
     - region_id: barcode
       region_type: barcode
       name: barcode
@@ -128,7 +128,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: R2.fastq.gz
     region_type: gz
     name: Read 2 FASTQ
@@ -146,7 +146,7 @@ library_spec:
       min_len: 1
       max_len: 98
       onlist: null
-      regions: null
+      regions: []
     - region_id: cDNA
       region_type: cDNA
       name: cDNA
@@ -155,7 +155,7 @@ library_spec:
       min_len: 1
       max_len: 98
       onlist: null
-      regions: null
+      regions: []
   - region_id: nextera_read2
     region_type: nextera_read2
     name: nextera_read2
@@ -173,7 +173,7 @@ library_spec:
       min_len: 19
       max_len: 19
       onlist: null
-      regions: null
+      regions: []
     - region_id: s7
       region_type: s7
       name: s7
@@ -182,7 +182,7 @@ library_spec:
       min_len: 15
       max_len: 15
       onlist: null
-      regions: null
+      regions: []
   - region_id: I1.fastq.gz
     region_type: gz
     name: Index 1 FASTQ
@@ -207,7 +207,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -216,4 +216,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

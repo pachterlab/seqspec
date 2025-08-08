@@ -61,7 +61,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_i5_index
     region_type: index5
     name: i5_index
@@ -77,7 +77,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: rna_truseq_read1
     region_type: truseq_read1
     name: Truseq Read 1
@@ -86,7 +86,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_cell_bc
     region_type: barcode
     name: Cell Barcode
@@ -102,7 +102,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: rna_umi
     region_type: umi
     name: UMI
@@ -111,7 +111,7 @@ library_spec:
     min_len: 10
     max_len: 10
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_bead_TSO
     region_type: linker
     name: bead_TSO
@@ -120,7 +120,7 @@ library_spec:
     min_len: 13
     max_len: 13
     onlist: null
-    regions: null
+    regions: []
   - region_id: cdna
     region_type: cdna
     name: cdna
@@ -129,7 +129,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
@@ -138,7 +138,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_sample_bc
     region_type: index7
     name: Sample index
@@ -154,7 +154,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: rna_illumina_p7
     region_type: illumina_p7
     name: Illumina P7
@@ -163,7 +163,7 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []
 - region_id: vdj
   region_type: vdj
   name: vdj
@@ -181,7 +181,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: vdj_i5_index
     region_type: index5
     name: i5_index
@@ -197,7 +197,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: vdj_truseq_read1
     region_type: truseq_read1
     name: truseq_read1
@@ -206,7 +206,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: vdj_cell_bc
     region_type: barcode
     name: cell_bc
@@ -222,7 +222,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: vdj_umi
     region_type: umi
     name: umi
@@ -231,7 +231,7 @@ library_spec:
     min_len: 10
     max_len: 10
     onlist: null
-    regions: null
+    regions: []
   - region_id: vdj_bead_TSO
     region_type: linker
     name: bead_TSO
@@ -240,7 +240,7 @@ library_spec:
     min_len: 13
     max_len: 13
     onlist: null
-    regions: null
+    regions: []
   - region_id: vdj
     region_type: vdj
     name: vdj
@@ -249,7 +249,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: vdj_truseq_read2
     region_type: truseq_read2
     name: truseq_read2
@@ -258,7 +258,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: vdj_sample_index
     region_type: index7
     name: sample_index
@@ -274,7 +274,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: vdj_illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -283,4 +283,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

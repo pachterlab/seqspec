@@ -60,7 +60,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: i5
     region_type: i5
     name: i5
@@ -76,7 +76,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: truseq_read_1_adapter
     region_type: truseq_read_1_adapter
     name: truseq_read_1_adapter
@@ -85,7 +85,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: read_1
     region_type: read_1
     name: read_1
@@ -110,7 +110,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
     - region_id: hairpin_adapter
       region_type: hairpin_adapter
       name: truseq_read_1_adapter
@@ -119,7 +119,7 @@ library_spec:
       min_len: 6
       max_len: 6
       onlist: null
-      regions: null
+      regions: []
     - region_id: umi
       region_type: umi
       name: umi
@@ -128,7 +128,7 @@ library_spec:
       min_len: 8
       max_len: 8
       onlist: null
-      regions: null
+      regions: []
     - region_id: cell_bc
       region_type: cell_bc
       name: cell_bc
@@ -144,7 +144,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: poly_T
     region_type: poly_T
     name: poly_T
@@ -153,7 +153,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: read_2
     region_type: read_2
     name: read_2
@@ -162,7 +162,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: i7_primer
     region_type: i7_primer
     name: i7_primer
@@ -180,7 +180,7 @@ library_spec:
       min_len: 19
       max_len: 19
       onlist: null
-      regions: null
+      regions: []
     - region_id: s7
       region_type: s7
       name: s7
@@ -189,7 +189,7 @@ library_spec:
       min_len: 15
       max_len: 15
       onlist: null
-      regions: null
+      regions: []
   - region_id: i7
     region_type: i7
     name: i7
@@ -205,7 +205,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -214,4 +214,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

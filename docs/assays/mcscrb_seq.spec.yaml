@@ -60,7 +60,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: truseq_r1
     region_type: truseq_r1
     name: truseq_r1
@@ -69,7 +69,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: cell_bc
     region_type: cell_bc
     name: cell_bc
@@ -85,7 +85,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: umi
     region_type: umi
     name: umi
@@ -94,7 +94,7 @@ library_spec:
     min_len: 10
     max_len: 10
     onlist: null
-    regions: null
+    regions: []
   - region_id: polyT
     region_type: polyT
     name: polyT
@@ -103,7 +103,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: cdna
     region_type: cdna
     name: cdna
@@ -112,7 +112,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: ME
     region_type: ME
     name: ME
@@ -121,7 +121,7 @@ library_spec:
     min_len: 19
     max_len: 19
     onlist: null
-    regions: null
+    regions: []
   - region_id: s7
     region_type: s7
     name: s7
@@ -130,7 +130,7 @@ library_spec:
     min_len: 15
     max_len: 15
     onlist: null
-    regions: null
+    regions: []
   - region_id: i7_index
     region_type: i7_index
     name: i7_index
@@ -146,7 +146,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -155,4 +155,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

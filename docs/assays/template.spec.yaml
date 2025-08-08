@@ -21,4 +21,4 @@ library_spec:
   min_len: 0
   max_len: 1024
   onlist: null
-  regions: null
+  regions: []

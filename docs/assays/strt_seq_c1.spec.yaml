@@ -60,7 +60,7 @@ library_spec:
     min_len: 20
     max_len: 20
     onlist: null
-    regions: null
+    regions: []
   - region_id: link_1
     region_type: link_1
     name: link_1
@@ -69,7 +69,7 @@ library_spec:
     min_len: 1
     max_len: 1
     onlist: null
-    regions: null
+    regions: []
   - region_id: umi
     region_type: umi
     name: umi
@@ -78,7 +78,7 @@ library_spec:
     min_len: 5
     max_len: 5
     onlist: null
-    regions: null
+    regions: []
   - region_id: triple_G
     region_type: triple_G
     name: triple_G
@@ -87,7 +87,7 @@ library_spec:
     min_len: 3
     max_len: 3
     onlist: null
-    regions: null
+    regions: []
   - region_id: cDNA
     region_type: cDNA
     name: cDNA
@@ -96,7 +96,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: ME
     region_type: ME
     name: ME
@@ -105,7 +105,7 @@ library_spec:
     min_len: 19
     max_len: 19
     onlist: null
-    regions: null
+    regions: []
   - region_id: link_2
     region_type: link_2
     name: link_2
@@ -114,7 +114,7 @@ library_spec:
     min_len: 5
     max_len: 5
     onlist: null
-    regions: null
+    regions: []
   - region_id: cell_bc
     region_type: cell_bc
     name: cell_bc
@@ -123,7 +123,7 @@ library_spec:
     min_len: 8
     max_len: 8
     onlist: null
-    regions: null
+    regions: []
   - region_id: solexa_p2
     region_type: solexa_p2
     name: solexa_p2
@@ -132,4 +132,4 @@ library_spec:
     min_len: 21
     max_len: 21
     onlist: null
-    regions: null
+    regions: []

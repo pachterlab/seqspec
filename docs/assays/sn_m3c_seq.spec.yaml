@@ -64,7 +64,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: I2.fastq.gz
     region_type: fastq
     name: I2.fastq.gz
@@ -89,7 +89,7 @@ library_spec:
         url: ''
         urltype: local
         md5: c36c18a6ee1603758767878b794335f1
-      regions: null
+      regions: []
   - region_id: truseq_read1
     region_type: truseq_read1
     name: truseq_read1
@@ -98,7 +98,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: R1.fastq.gz
     region_type: fastq
     name: R1.fastq.gz
@@ -123,7 +123,7 @@ library_spec:
         url: ''
         urltype: local
         md5: 0691bed03feb775d9aff8b37fb4dc94b
-      regions: null
+      regions: []
     - region_id: primer9H
       region_type: methyl
       name: linker
@@ -132,7 +132,7 @@ library_spec:
       min_len: 9
       max_len: 9
       onlist: null
-      regions: null
+      regions: []
     - region_id: bisulfite_gDNA-1
       region_type: methyl
       name: methyl
@@ -141,7 +141,7 @@ library_spec:
       min_len: 1
       max_len: 134
       onlist: null
-      regions: null
+      regions: []
   - region_id: R2.fastq.gz
     region_type: fastq
     name: R2.fastq.gz
@@ -159,7 +159,7 @@ library_spec:
       min_len: 1
       max_len: 150
       onlist: null
-      regions: null
+      regions: []
     - region_id: adaptase_CTs
       region_type: linker
       name: linker
@@ -168,7 +168,7 @@ library_spec:
       min_len: 1
       max_len: 15
       onlist: null
-      regions: null
+      regions: []
   - region_id: truseq_read2
     region_type: truseq_read2
     name: truseq_read2
@@ -177,7 +177,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: I1.fastq.gz
     region_type: fastq
     name: I1.fastq.gz
@@ -202,7 +202,7 @@ library_spec:
         url: ''
         urltype: local
         md5: 47874d94562f3b00125385a6c60daf9d
-      regions: null
+      regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -211,7 +211,7 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []
 - region_id: hic
   region_type: hic
   name: hic
@@ -229,7 +229,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: I2.fastq.gz
     region_type: fastq
     name: I2.fastq.gz
@@ -254,7 +254,7 @@ library_spec:
         url: ''
         urltype: local
         md5: c36c18a6ee1603758767878b794335f1
-      regions: null
+      regions: []
   - region_id: truseq_read1
     region_type: truseq_read1
     name: truseq_read1
@@ -263,7 +263,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: R1.fastq.gz
     region_type: fastq
     name: R1.fastq.gz
@@ -288,7 +288,7 @@ library_spec:
         url: ''
         urltype: local
         md5: 0691bed03feb775d9aff8b37fb4dc94b
-      regions: null
+      regions: []
     - region_id: primer9H
       region_type: hic
       name: linker
@@ -297,7 +297,7 @@ library_spec:
       min_len: 9
       max_len: 9
       onlist: null
-      regions: null
+      regions: []
     - region_id: chromcontact-1
       region_type: hic
       name: hic
@@ -306,7 +306,7 @@ library_spec:
       min_len: 1
       max_len: 134
       onlist: null
-      regions: null
+      regions: []
   - region_id: R2.fastq.gz
     region_type: fastq
     name: R2.fastq.gz
@@ -324,7 +324,7 @@ library_spec:
       min_len: 1
       max_len: 150
       onlist: null
-      regions: null
+      regions: []
     - region_id: adaptase_CTs
       region_type: linker
       name: linker
@@ -333,7 +333,7 @@ library_spec:
       min_len: 1
       max_len: 15
       onlist: null
-      regions: null
+      regions: []
   - region_id: truseq_read2
     region_type: truseq_read2
     name: truseq_read2
@@ -342,7 +342,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: I1.fastq.gz
     region_type: fastq
     name: I1.fastq.gz
@@ -367,7 +367,7 @@ library_spec:
         url: ''
         urltype: local
         md5: 47874d94562f3b00125385a6c60daf9d
-      regions: null
+      regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -376,4 +376,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

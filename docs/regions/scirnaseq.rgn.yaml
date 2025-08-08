@@ -13,7 +13,7 @@
     url: https://example.com/i5_barcodes.txt
     urltype: http
     md5: placeholder
-  regions: null
+  regions: []
 - region_id: truseq_adapter
   region_type: truseq_read1
   name: TruSeq adapter
@@ -22,7 +22,7 @@
   min_len: 33
   max_len: 33
   onlist: null
-  regions: null
+  regions: []
 - region_id: hairpin_barcode
   region_type: barcode
   name: hairpin barcode
@@ -31,7 +31,7 @@
   min_len: 9
   max_len: 10
   onlist: null
-  regions: null
+  regions: []
 - region_id: linker
   region_type: linker
   name: linker
@@ -40,7 +40,7 @@
   min_len: 6
   max_len: 6
   onlist: null
-  regions: null
+  regions: []
 - region_id: umi
   region_type: umi
   name: UMI
@@ -49,7 +49,7 @@
   min_len: 8
   max_len: 8
   onlist: null
-  regions: null
+  regions: []
 - region_id: rt_barcode
   region_type: barcode
   name: RT barcode
@@ -58,7 +58,7 @@
   min_len: 10
   max_len: 10
   onlist: null
-  regions: null
+  regions: []
 - region_id: cdna
   region_type: cdna
   name: cDNA
@@ -67,7 +67,7 @@
   min_len: 1
   max_len: 1000
   onlist: null
-  regions: null
+  regions: []
 - region_id: me
   region_type: ME1
   name: ME
@@ -76,7 +76,7 @@
   min_len: 19
   max_len: 19
   onlist: null
-  regions: null
+  regions: []
 - region_id: s7
   region_type: s7
   name: S7
@@ -85,7 +85,7 @@
   min_len: 15
   max_len: 15
   onlist: null
-  regions: null
+  regions: []
 - region_id: i7_barcode
   region_type: index7
   name: i7 barcode
@@ -94,4 +94,4 @@
   min_len: 10
   max_len: 10
   onlist: null
-  regions: null
+  regions: []

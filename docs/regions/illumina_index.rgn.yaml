@@ -13,5 +13,4 @@
     url: index_onlist.txt
     urltype: local
     md5: md5
-    location: local
-  regions: null
+  regions: []

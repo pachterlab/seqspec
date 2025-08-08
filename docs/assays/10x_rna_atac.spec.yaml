@@ -136,7 +136,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna-truseq_read1
     region_type: truseq_read1
     name: RNA Truseq Read 1
@@ -145,7 +145,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna-cell_barcode
     region_type: barcode
     name: Cell Barcode
@@ -161,7 +161,7 @@ library_spec:
       url: ''
       urltype: local
       md5: f62a276e262fdd85262a889d0f48556b
-    regions: null
+    regions: []
   - region_id: rna-umi
     region_type: umi
     name: GEX UMI
@@ -170,7 +170,7 @@ library_spec:
     min_len: 12
     max_len: 12
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna-cDNA
     region_type: cdna
     name: RNA-cDNA
@@ -179,7 +179,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna-truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
@@ -188,7 +188,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna-index7
     region_type: index7
     name: Truseq Read 2
@@ -204,7 +204,7 @@ library_spec:
       url: ''
       urltype: local
       md5: fcb5fe7d14ffc9984cd5450413c7a742
-    regions: null
+    regions: []
   - region_id: rna-illumina_p7
     region_type: illumina_p7
     name: Illumina P7
@@ -213,7 +213,7 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []
 - region_id: atac
   region_type: atac
   name: ATAC
@@ -231,7 +231,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: atac-cell_barcode
     region_type: barcode
     name: R2 Cell Barcode
@@ -247,7 +247,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ab645450cf30cc51077f6c030b665297
-    regions: null
+    regions: []
   - region_id: atac-linker
     region_type: linker
     name: atac linker
@@ -256,7 +256,7 @@ library_spec:
     min_len: 8
     max_len: 8
     onlist: null
-    regions: null
+    regions: []
   - region_id: atac-nextera_read1
     region_type: nextera_read1
     name: nextera_read1
@@ -265,7 +265,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: gDNA
     region_type: gdna
     name: gDNA
@@ -274,7 +274,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: atac-nextera_read2
     region_type: nextera_read2
     name: nextera_read2
@@ -283,7 +283,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: atac-index7
     region_type: index7
     name: ATAC index7
@@ -299,7 +299,7 @@ library_spec:
       url: ''
       urltype: local
       md5: fcb5fe7d14ffc9984cd5450413c7a742
-    regions: null
+    regions: []
   - region_id: atac-illumina_p7
     region_type: illumina_p7
     name: Illumina P7
@@ -308,4 +308,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

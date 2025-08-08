@@ -6,7 +6,7 @@
   min_len: 6
   max_len: 6
   onlist: null
-  regions: null
+  regions: []
 - region_id: barcode
   region_type: barcode
   name: Barcode
@@ -22,8 +22,7 @@
     url: null
     urltype: null
     md5: null
-    location: null
-  regions: null
+  regions: []
 - region_id: cDNA
   region_type: cDNA
   name: Complementary DNA
@@ -32,4 +31,4 @@
   min_len: 1
   max_len: 98
   onlist: null
-  regions: null
+  regions: []

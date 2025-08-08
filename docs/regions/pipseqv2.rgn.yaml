@@ -1,12 +1,11 @@
-- !Region
-  region_id: pipseq_v2_bc1
+- region_id: pipseq_v2_bc1
   region_type: barcode
   name: PIPseq_V2_BC1
   sequence_type: onlist
   sequence: NNNNNNNN
   min_len: 8
   max_len: 8
-  onlist: !Onlist
+  onlist:
     file_id: pip-seq_v2_bc1.tsv.gz
     filename: pip-seq_v2_bc1.tsv.gz
     filetype: txt
@@ -14,10 +13,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PIPseq/pip-seq_v2_bc1.tsv.gz
     urltype: http
     md5: c73b3d489e082d1bd1e2368151b9a63f
-    location: remote
-  regions: null
-- !Region
-  region_id: pipseq_v2_linker1
+  regions: []
+- region_id: pipseq_v2_linker1
   region_type: linker
   name: PIPseq_V2_Linker1
   sequence_type: fixed
@@ -25,16 +22,15 @@
   min_len: 7
   max_len: 7
   onlist: null
-  regions: null
-- !Region
-  region_id: pipseq_v2_bc2
+  regions: []
+- region_id: pipseq_v2_bc2
   region_type: barcode
   name: PIPseq_V2_BC2
   sequence_type: onlist
   sequence: NNNNNNNN
   min_len: 8
   max_len: 8
-  onlist: !Onlist
+  onlist:
     file_id: pip-seq_v2_bc2.tsv.gz
     filename: pip-seq_v2_bc2.tsv.gz
     filetype: txt
@@ -42,10 +38,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PIPseq/pip-seq_v2_bc2.tsv.gz
     urltype: http
     md5: 09babff2b602ad158c7b89f512206829
-    location: remote
-  regions: null
-- !Region
-  region_id: pipseq_v2_linker2
+  regions: []
+- region_id: pipseq_v2_linker2
   region_type: linker
   name: PIPseq_V2_Linker2
   sequence_type: fixed
@@ -53,16 +47,15 @@
   min_len: 7
   max_len: 7
   onlist: null
-  regions: null
-- !Region
-  region_id: pipseq_v2_bc3
+  regions: []
+- region_id: pipseq_v2_bc3
   region_type: barcode
   name: PIPseq_V2_BC3
   sequence_type: onlist
   sequence: NNNNNNNN
   min_len: 8
   max_len: 8
-  onlist: !Onlist
+  onlist:
     file_id: pip-seq_v2_bc3.tsv.gz
     filename: pip-seq_v2_bc3.tsv.gz
     filetype: txt
@@ -70,10 +63,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PIPseq/pip-seq_v2_bc3.tsv.gz
     urltype: http
     md5: 862227fd8440d96495420ef9c3297030
-    location: remote
-  regions: null
-- !Region
-  region_id: umi
+  regions: []
+- region_id: umi
   region_type: umi
   name: Unique Molecular Identifier
   sequence_type: random
@@ -81,9 +72,8 @@
   min_len: 12
   max_len: 12
   onlist: null
-  regions: null
-- !Region
-  region_id: cDNA
+  regions: []
+- region_id: cDNA
   region_type: cDNA
   name: Complementary DNA
   sequence_type: random
@@ -91,4 +81,4 @@
   min_len: 1
   max_len: 98
   onlist: null
-  regions: null
+  regions: []

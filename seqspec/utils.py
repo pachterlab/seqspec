@@ -15,46 +15,6 @@ from seqspec.File import File
 from seqspec.Read import Read
 from seqspec.Region import Onlist, Region
 
-# def strip_yaml_tags(yaml_str: str) -> str:
-#     """
-#     Removes leading YAML tags like !Assay or !Read from the input string.
-#     """
-#     return re.sub(r'^ *!(\w+)', '', yaml_str, flags=re.MULTILINE)
-
-
-# def safe_load_strip_tags(stream: Union[str, IO, Path]):
-#     """
-#     Reads a YAML string or file-like object, strips YAML tags,
-#     and safely loads it using yaml.safe_load().
-#     """
-#     if isinstance(stream, (str, Path)):
-#         with open(stream, "r") as f:
-#             raw = f.read()
-#     else:
-#         raw = stream.read()
-
-#     cleaned = strip_yaml_tags(raw)
-#     return yaml.safe_load(cleaned)
-
-# def load_spec(spec_fn: str):
-#     try:
-#         with gzip.open(spec_fn, "rt") as stream:
-#             return load_spec_stream(stream)
-#     except gzip.BadGzipFile:
-#         with open(spec_fn, "r") as stream:
-#             return load_spec_stream(stream)
-
-
-# def load_spec_stream(spec_stream: IO):
-#     data_dict = safe_load_strip_tags(spec_stream)
-#     assay = Assay(**data_dict)
-
-#     for r in assay.library_spec:
-#         r.set_parent_id(None)
-
-#     return assay
-
-
 # --- Known tags to strip from the YAML ---
 KNOWN_TAGS = [
     "!Assay",

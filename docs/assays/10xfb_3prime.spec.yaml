@@ -61,7 +61,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: truseq_read1
     region_type: truseq_read1
     name: Truseq Read 1
@@ -70,7 +70,7 @@ library_spec:
     min_len: 10
     max_len: 10
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_cell_bc
     region_type: barcode
     name: Cell Barcode
@@ -86,7 +86,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: rna_umi
     region_type: umi
     name: UMI
@@ -95,7 +95,7 @@ library_spec:
     min_len: 12
     max_len: 12
     onlist: null
-    regions: null
+    regions: []
   - region_id: poly_T
     region_type: poly_T
     name: Poly-T
@@ -104,7 +104,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: cdna
     region_type: cdna
     name: cdna
@@ -113,7 +113,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
@@ -122,7 +122,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: rna_sample_bc
     region_type: index7
     name: Truseq Read 2
@@ -138,7 +138,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: rna_illumina_p7
     region_type: illumina_p7
     name: Illumina P7
@@ -147,7 +147,7 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []
 - region_id: protein
   region_type: protein
   name: protein
@@ -165,7 +165,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: nextera_read1
     region_type: nextera_read1
     name: Nextera Read 1
@@ -174,7 +174,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: protein_cell_bc
     region_type: barcode
     name: Cell Barcode
@@ -190,7 +190,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: protein_umi
     region_type: umi
     name: UMI
@@ -199,7 +199,7 @@ library_spec:
     min_len: 12
     max_len: 12
     onlist: null
-    regions: null
+    regions: []
   - region_id: capture_seq
     region_type: linker
     name: Capture Sequence
@@ -208,7 +208,7 @@ library_spec:
     min_len: 22
     max_len: 22
     onlist: null
-    regions: null
+    regions: []
   - region_id: random_9mer1
     region_type: linker
     name: Random 9mer
@@ -217,7 +217,7 @@ library_spec:
     min_len: 9
     max_len: 9
     onlist: null
-    regions: null
+    regions: []
   - region_id: feature_barcode
     region_type: protein
     name: Feature barcode
@@ -233,7 +233,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: random_9mer2
     region_type: linker
     name: Random 9mer
@@ -242,7 +242,7 @@ library_spec:
     min_len: 9
     max_len: 9
     onlist: null
-    regions: null
+    regions: []
   - region_id: protein_truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
@@ -251,7 +251,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: protein_sample_bc
     region_type: index7
     name: Sample barcode index
@@ -267,7 +267,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: protein_illumina_p7
     region_type: illumina_p7
     name: Illumina P7
@@ -276,4 +276,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

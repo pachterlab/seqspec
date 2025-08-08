@@ -60,7 +60,7 @@ library_spec:
     min_len: 41
     max_len: 41
     onlist: null
-    regions: null
+    regions: []
   - region_id: cDNA
     region_type: cDNA
     name: cDNA
@@ -69,7 +69,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: SOLiD_bc_adapter
     region_type: SOLiD_bc_adapter
     name: SOLiD_bc_adapter
@@ -78,7 +78,7 @@ library_spec:
     min_len: 19
     max_len: 19
     onlist: null
-    regions: null
+    regions: []
   - region_id: index
     region_type: index
     name: index
@@ -94,7 +94,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: p2_adapter
     region_type: p2_adapter
     name: p2_adapter
@@ -103,4 +103,4 @@ library_spec:
     min_len: 23
     max_len: 23
     onlist: null
-    regions: null
+    regions: []

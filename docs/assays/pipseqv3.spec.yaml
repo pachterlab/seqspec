@@ -60,7 +60,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: I2.fastq.gz
     region_type: fastq
     name: i5 index
@@ -85,7 +85,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: truseq_read1
     region_type: truseq_read1
     name: TruSeq Read 1
@@ -94,7 +94,7 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
+    regions: []
   - region_id: R1.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
@@ -119,7 +119,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
     - region_id: linker1
       region_type: linker
       name: Linker1
@@ -128,7 +128,7 @@ library_spec:
       min_len: 3
       max_len: 3
       onlist: null
-      regions: null
+      regions: []
     - region_id: cb2
       region_type: barcode
       name: Cell Barcode 2
@@ -144,7 +144,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
     - region_id: linker2
       region_type: linker
       name: Linker2
@@ -153,7 +153,7 @@ library_spec:
       min_len: 3
       max_len: 3
       onlist: null
-      regions: null
+      regions: []
     - region_id: cb3
       region_type: barcode
       name: Cell Barcode 3
@@ -169,7 +169,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
     - region_id: linker3
       region_type: linker
       name: Linker3
@@ -178,7 +178,7 @@ library_spec:
       min_len: 5
       max_len: 5
       onlist: null
-      regions: null
+      regions: []
     - region_id: cb4
       region_type: barcode
       name: Cell Barcode 4
@@ -194,7 +194,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
     - region_id: umi
       region_type: umi
       name: UMI
@@ -203,7 +203,7 @@ library_spec:
       min_len: 12
       max_len: 12
       onlist: null
-      regions: null
+      regions: []
   - region_id: R2.fastq.gz
     region_type: fastq
     name: Read 2 FASTQ
@@ -221,7 +221,7 @@ library_spec:
       min_len: 1
       max_len: 98
       onlist: null
-      regions: null
+      regions: []
     - region_id: ligationT
       region_type: linker
       name: ligationT
@@ -230,7 +230,7 @@ library_spec:
       min_len: 1
       max_len: 1
       onlist: null
-      regions: null
+      regions: []
   - region_id: nextera_read2
     region_type: nextera_read2
     name: Nextera Read 2
@@ -248,7 +248,7 @@ library_spec:
       min_len: 19
       max_len: 19
       onlist: null
-      regions: null
+      regions: []
     - region_id: s7
       region_type: s7
       name: s7
@@ -257,7 +257,7 @@ library_spec:
       min_len: 15
       max_len: 15
       onlist: null
-      regions: null
+      regions: []
   - region_id: I1.fastq.gz
     region_type: fastq
     name: i7 index
@@ -282,7 +282,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: Illumina P7
@@ -291,4 +291,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

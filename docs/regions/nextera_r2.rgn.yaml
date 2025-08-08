@@ -6,4 +6,4 @@
   min_len: 34
   max_len: 34
   onlist: null
-  regions: null
+  regions: []

@@ -60,7 +60,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: PE2
     region_type: probe
     name: PE2
@@ -69,7 +69,7 @@ library_spec:
     min_len: 36
     max_len: 36
     onlist: null
-    regions: null
+    regions: []
   - region_id: cdna
     region_type: cdna
     name: cdna
@@ -78,7 +78,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: polyA
     region_type: poly_A
     name: polyA
@@ -87,7 +87,7 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
+    regions: []
   - region_id: umi
     region_type: umi
     name: umi
@@ -96,7 +96,7 @@ library_spec:
     min_len: 6
     max_len: 6
     onlist: null
-    regions: null
+    regions: []
   - region_id: bc2
     region_type: barcode
     name: bc2
@@ -112,7 +112,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: W1
     region_type: probe
     name: W1
@@ -121,7 +121,7 @@ library_spec:
     min_len: 22
     max_len: 22
     onlist: null
-    regions: null
+    regions: []
   - region_id: bc1
     region_type: barcode
     name: bc1
@@ -137,7 +137,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: PE1
     region_type: probe
     name: PE1
@@ -146,7 +146,7 @@ library_spec:
     min_len: 30
     max_len: 30
     onlist: null
-    regions: null
+    regions: []
   - region_id: sample_index
     region_type: index7
     name: sample_index
@@ -162,7 +162,7 @@ library_spec:
       url: ''
       urltype: local
       md5: ''
-    regions: null
+    regions: []
   - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
@@ -171,4 +171,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

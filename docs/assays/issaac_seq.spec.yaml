@@ -62,7 +62,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: RNA-I2.fastq.gz
     region_type: fastq
     name: Index 2
@@ -87,7 +87,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: RNA-nextera_read1
     region_type: nextera_read1
     name: Nextera Read 1
@@ -105,7 +105,7 @@ library_spec:
       min_len: 14
       max_len: 14
       onlist: null
-      regions: null
+      regions: []
     - region_id: RNA-ME1
       region_type: ME1
       name: ME1
@@ -114,7 +114,7 @@ library_spec:
       min_len: 19
       max_len: 19
       onlist: null
-      regions: null
+      regions: []
   - region_id: RNA-R1.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
@@ -132,7 +132,7 @@ library_spec:
       min_len: 1
       max_len: 150
       onlist: null
-      regions: null
+      regions: []
   - region_id: RNA-R2.fastq.gz
     region_type: fastq
     name: Read 2 FASTQ
@@ -150,7 +150,7 @@ library_spec:
       min_len: 1
       max_len: 140
       onlist: null
-      regions: null
+      regions: []
     - region_id: UMI
       region_type: umi
       name: umi
@@ -159,7 +159,7 @@ library_spec:
       min_len: 10
       max_len: 10
       onlist: null
-      regions: null
+      regions: []
   - region_id: RNA-truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
@@ -168,7 +168,7 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
+    regions: []
   - region_id: RNA-I1.fastq.gz
     region_type: fastq
     name: Index 1
@@ -193,7 +193,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: RNA-illumina_p7
     region_type: illumina_p7
     name: Illumina P7
@@ -202,7 +202,7 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []
 - region_id: ATAC
   region_type: ATAC
   name: ATAC
@@ -220,7 +220,7 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
+    regions: []
   - region_id: ATAC-I2.fastq.gz
     region_type: fastq
     name: Index 2
@@ -245,7 +245,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: ATAC-nextera_read1
     region_type: nextera_read1
     name: Nextera Read 1
@@ -263,7 +263,7 @@ library_spec:
       min_len: 14
       max_len: 14
       onlist: null
-      regions: null
+      regions: []
     - region_id: ME1
       region_type: ME1
       name: ME1
@@ -272,7 +272,7 @@ library_spec:
       min_len: 19
       max_len: 19
       onlist: null
-      regions: null
+      regions: []
   - region_id: ATAC-R1.fastq.gz
     region_type: fastq
     name: Read 1 FASTQ
@@ -290,7 +290,7 @@ library_spec:
       min_len: 1
       max_len: 150
       onlist: null
-      regions: null
+      regions: []
   - region_id: ATAC-R2.fastq.gz
     region_type: fastq
     name: Read 2 FASTQ
@@ -308,7 +308,7 @@ library_spec:
       min_len: 1
       max_len: 150
       onlist: null
-      regions: null
+      regions: []
   - region_id: ATAC-nextera_read2
     region_type: nextera_read2
     name: Nextera Read 2
@@ -326,7 +326,7 @@ library_spec:
       min_len: 19
       max_len: 19
       onlist: null
-      regions: null
+      regions: []
     - region_id: ATAC-s7
       region_type: s7
       name: s7
@@ -335,7 +335,7 @@ library_spec:
       min_len: 15
       max_len: 15
       onlist: null
-      regions: null
+      regions: []
   - region_id: ATAC-I1.fastq.gz
     region_type: fastq
     name: Index 1
@@ -360,7 +360,7 @@ library_spec:
         url: ''
         urltype: local
         md5: ''
-      regions: null
+      regions: []
   - region_id: ATAC-illumina_p7
     region_type: illumina_p7
     name: Illumina P7
@@ -369,4 +369,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

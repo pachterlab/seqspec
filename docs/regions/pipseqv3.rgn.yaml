@@ -1,12 +1,11 @@
-- !Region
-  region_id: pipseq_v3_bc1
+- region_id: pipseq_v3_bc1
   region_type: barcode
   name: PIPseq_V3_BC1
   sequence_type: onlist
   sequence: NNNNNNNN
   min_len: 8
   max_len: 8
-  onlist: !Onlist
+  onlist:
     file_id: fb_v3_bc1.tsv.gz
     filename: fb_v3_bc1.tsv.gz
     filetype: txt
@@ -14,10 +13,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PIPseq/fb_v3_bc1.tsv.gz
     urltype: http
     md5: dfd8270656f06d8f5cefa2f908cbbb1a
-    location: remote
-  regions: null
-- !Region
-  region_id: pipseq_v3_linker1
+  regions: []
+- region_id: pipseq_v3_linker1
   region_type: linker
   name: PIPseq_V3_Linker1
   sequence_type: fixed
@@ -25,16 +22,15 @@
   min_len: 3
   max_len: 3
   onlist: null
-  regions: null
-- !Region
-  region_id: pipseq_v3_bc2
+  regions: []
+- region_id: pipseq_v3_bc2
   region_type: barcode
   name: PIPseq_V3_BC2
   sequence_type: onlist
   sequence: NNNNNN
   min_len: 6
   max_len: 6
-  onlist: !Onlist
+  onlist:
     file_id: fb_v3_bc2.tsv.gz
     filename: fb_v3_bc2.tsv.gz
     filetype: txt
@@ -42,10 +38,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PIPseq/fb_v3_bc2.tsv.gz
     urltype: http
     md5: 74bef6695533cb94c044618ef337716b
-    location: remote
-  regions: null
-- !Region
-  region_id: pipseq_v3_linker2
+  regions: []
+- region_id: pipseq_v3_linker2
   region_type: linker
   name: PIPseq_V3_Linker2
   sequence_type: fixed
@@ -53,16 +47,15 @@
   min_len: 3
   max_len: 3
   onlist: null
-  regions: null
-- !Region
-  region_id: pipseq_v3_bc3
+  regions: []
+- region_id: pipseq_v3_bc3
   region_type: barcode
   name: PIPseq_V3_BC3
   sequence_type: onlist
   sequence: NNNNNN
   min_len: 6
   max_len: 6
-  onlist: !Onlist
+  onlist:
     file_id: fb_v3_bc3.tsv.gz
     filename: fb_v3_bc3.tsv.gz
     filetype: txt
@@ -70,10 +63,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PIPseq/fb_v3_bc3.tsv.gz
     urltype: http
     md5: fd3140c1b34150069b60aec00f17d343
-    location: remote
-  regions: null
-- !Region
-  region_id: pipseq_v3_linker3
+  regions: []
+- region_id: pipseq_v3_linker3
   region_type: linker
   name: PIPseq_V3_Linker3
   sequence_type: fixed
@@ -81,16 +72,15 @@
   min_len: 5
   max_len: 5
   onlist: null
-  regions: null
-- !Region
-  region_id: pipseq_v3_bc4
+  regions: []
+- region_id: pipseq_v3_bc4
   region_type: barcode
   name: PIPseq_V3_BC4
   sequence_type: onlist
   sequence: NNNNNNNN
   min_len: 8
   max_len: 8
-  onlist: !Onlist
+  onlist:
     file_id: fb_v3_bc4.tsv.gz
     filename: fb_v3_bc4.tsv.gz
     filetype: txt
@@ -98,10 +88,8 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/PIPseq/fb_v3_bc4.tsv.gz
     urltype: http
     md5: 9d30f1bfa8ce1a0431ffae1d7515eac3
-    location: remote
-  regions: null
-- !Region
-  region_id: umi
+  regions: []
+- region_id: umi
   region_type: umi
   name: Unique Molecular Identifier
   sequence_type: random
@@ -109,9 +97,8 @@
   min_len: 12
   max_len: 12
   onlist: null
-  regions: null
-- !Region
-  region_id: cDNA
+  regions: []
+- region_id: cDNA
   region_type: cDNA
   name: Complementary DNA
   sequence_type: random
@@ -119,4 +106,4 @@
   min_len: 1
   max_len: 98
   onlist: null
-  regions: null
+  regions: []
