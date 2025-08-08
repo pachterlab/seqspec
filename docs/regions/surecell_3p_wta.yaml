@@ -1,0 +1,114 @@
+- !Region
+  region_id: surecell_3p_wta_bc1
+  region_type: barcode
+  name: SureCell_3p_WTA_BC1
+  sequence_type: onlist
+  sequence: NNNNNN
+  min_len: 6
+  max_len: 6
+  onlist: !Onlist
+    file_id: barcodes.tsv.gz
+    filename: barcodes.tsv.gz
+    filetype: txt
+    filesize: 271
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/SureCell3pWTA/barcodes.tsv.gz
+    urltype: http
+    md5: 4328285ef757a2a1901d76a984627466
+    location: remote
+  regions: null
+- !Region
+  region_id: surecell_3p_wta_linker1
+  region_type: linker
+  name: SureCell_3p_WTA_Linker1
+  sequence_type: fixed
+  sequence: TAGCCATCGCATTGC
+  min_len: 15
+  max_len: 15
+  onlist: null
+  regions: null
+- !Region
+  region_id: surecell_3p_wta_bc2
+  region_type: barcode
+  name: SureCell_3p_WTA_BC2
+  sequence_type: onlist
+  sequence: NNNNNN
+  min_len: 6
+  max_len: 6
+  onlist: !Onlist
+    file_id: barcodes.tsv.gz
+    filename: barcodes.tsv.gz
+    filetype: txt
+    filesize: 271
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/SureCell3pWTA/barcodes.tsv.gz
+    urltype: http
+    md5: 4328285ef757a2a1901d76a984627466
+    location: remote
+  regions: null
+- !Region
+  region_id: surecell_3p_wta_linker2
+  region_type: linker
+  name: SureCell_3p_WTA_Linker2
+  sequence_type: fixed
+  sequence: TACCTCTGAGCTGAA
+  min_len: 15
+  max_len: 15
+  onlist: null
+  regions: null
+- !Region
+  region_id: surecell_3p_wta_bc3
+  region_type: barcode
+  name: SureCell_3p_WTA_BC3
+  sequence_type: onlist
+  sequence: NNNNNN
+  min_len: 6
+  max_len: 6
+  onlist: !Onlist
+    file_id: barcodes.tsv.gz
+    filename: barcodes.tsv.gz
+    filetype: txt
+    filesize: 271
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/SureCell3pWTA/barcodes.tsv.gz
+    urltype: http
+    md5: 4328285ef757a2a1901d76a984627466
+    location: remote
+  regions: null
+- !Region
+  region_id: surecell_3p_wta_linker3
+  region_type: linker
+  name: SureCell_3p_WTA_Linker3
+  sequence_type: fixed
+  sequence: ACG
+  min_len: 3
+  max_len: 3
+  onlist: null
+  regions: null
+- !Region
+  region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNN
+  min_len: 8
+  max_len: 8
+  onlist: null
+  regions: null
+- !Region
+  region_id: surecell_3p_wta_linker4
+  region_type: linker
+  name: SureCell_3p_WTA_Linker4
+  sequence_type: fixed
+  sequence: GAC
+  min_len: 3
+  max_len: 3
+  onlist: null
+  regions: null
+- !Region
+  region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null

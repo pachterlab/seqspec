@@ -1,0 +1,94 @@
+- !Region
+  region_id: microwellseq_bc1
+  region_type: barcode
+  name: Microwell-seq_BC1
+  sequence_type: onlist
+  sequence: NNNNNN
+  min_len: 6
+  max_len: 6
+  onlist: !Onlist
+    file_id: barcodes.tsv.gz
+    filename: barcodes.tsv.gz
+    filetype: txt
+    filesize: 298
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/Microwell-seq/barcodes.tsv.gz
+    urltype: http
+    md5: eda0253bced6ba9e1e47e3ee3d316a46
+    location: remote
+  regions: null
+- !Region
+  region_id: microwellseq_linker1
+  region_type: linker
+  name: Microwell-seq_Linker1
+  sequence_type: fixed
+  sequence: CGACTCACTACAGGG
+  min_len: 15
+  max_len: 15
+  onlist: null
+  regions: null
+- !Region
+  region_id: microwellseq_bc2
+  region_type: barcode
+  name: Microwell-seq_BC2
+  sequence_type: onlist
+  sequence: NNNNNN
+  min_len: 6
+  max_len: 6
+  onlist: !Onlist
+    file_id: barcodes.tsv.gz
+    filename: barcodes.tsv.gz
+    filetype: txt
+    filesize: 298
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/Microwell-seq/barcodes.tsv.gz
+    urltype: http
+    md5: eda0253bced6ba9e1e47e3ee3d316a46
+    location: remote
+  regions: null
+- !Region
+  region_id: microwellseq_linker2
+  region_type: linker
+  name: Microwell-seq_Linker2
+  sequence_type: fixed
+  sequence: TCGGTGACACGATCG
+  min_len: 15
+  max_len: 15
+  onlist: null
+  regions: null
+- !Region
+  region_id: microwellseq_bc3
+  region_type: barcode
+  name: Microwell-seq_BC3
+  sequence_type: onlist
+  sequence: NNNNNN
+  min_len: 6
+  max_len: 6
+  onlist: !Onlist
+    file_id: barcodes.tsv.gz
+    filename: barcodes.tsv.gz
+    filetype: txt
+    filesize: 298
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/Microwell-seq/barcodes.tsv.gz
+    urltype: http
+    md5: eda0253bced6ba9e1e47e3ee3d316a46
+    location: remote
+  regions: null
+- !Region
+  region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNN
+  min_len: 6
+  max_len: 6
+  onlist: null
+  regions: null
+- !Region
+  region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null

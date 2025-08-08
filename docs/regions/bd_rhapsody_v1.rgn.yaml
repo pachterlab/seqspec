@@ -1,0 +1,94 @@
+- !Region
+  region_id: bd_cls1
+  region_type: barcode
+  name: BD_CLS1
+  sequence_type: onlist
+  sequence: NNNNNNNNN
+  min_len: 9
+  max_len: 9
+  onlist: !Onlist
+    file_id: BD_CLS1.tsv.gz
+    filename: BD_CLS1.tsv.gz
+    filetype: txt
+    filesize: 402
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/BDRhapsody/BD_CLS1.tsv.gz
+    urltype: http
+    md5: ef4b8ed1f7ca7d4cc1110a8ab084808a
+    location: remote
+  regions: null
+- !Region
+  region_id: bd_cls_linker1
+  region_type: linker
+  name: BD_CLS_Linker1
+  sequence_type: fixed
+  sequence: ACTGGCCTGCGA
+  min_len: 12
+  max_len: 12
+  onlist: null
+  regions: null
+- !Region
+  region_id: bd_cls2
+  region_type: barcode
+  name: BD_CLS2
+  sequence_type: onlist
+  sequence: NNNNNNNNN
+  min_len: 9
+  max_len: 9
+  onlist: !Onlist
+    file_id: BD_CLS2.tsv.gz
+    filename: BD_CLS2.tsv.gz
+    filetype: txt
+    filesize: 407
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/BDRhapsody/BD_CLS2.tsv.gz
+    urltype: http
+    md5: 4f01189717e3809af9e3b31d2bc7e3af
+    location: remote
+  regions: null
+- !Region
+  region_id: bd_cls_linker2
+  region_type: linker
+  name: BD_CLS_Linker2
+  sequence_type: fixed
+  sequence: GGTAGCGGTGACA
+  min_len: 13
+  max_len: 13
+  onlist: null
+  regions: null
+- !Region
+  region_id: bd_cls3
+  region_type: barcode
+  name: BD_CLS3
+  sequence_type: onlist
+  sequence: NNNNNNNNN
+  min_len: 9
+  max_len: 9
+  onlist: !Onlist
+    file_id: BD_CLS3.tsv.gz
+    filename: BD_CLS3.tsv.gz
+    filetype: txt
+    filesize: 405
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/BDRhapsody/BD_CLS3.tsv.gz
+    urltype: http
+    md5: 2b640a77c2d61a42f946da2a3fe34b43
+    location: remote
+  regions: null
+- !Region
+  region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNN
+  min_len: 8
+  max_len: 8
+  onlist: null
+  regions: null
+- !Region
+  region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null

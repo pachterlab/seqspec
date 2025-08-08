@@ -1,0 +1,94 @@
+- !Region
+  region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: null
+- !Region
+  region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNN
+  min_len: 8
+  max_len: 8
+  onlist: null
+  regions: null
+- !Region
+  region_id: hydroprna_bc3
+  region_type: barcode
+  name: HyDrop-RNA_BC3
+  sequence_type: onlist
+  sequence: NNNNNNNNNN
+  min_len: 10
+  max_len: 10
+  onlist: !Onlist
+    file_id: HyDrop_RNA_BC3.tsv.gz
+    filename: HyDrop_RNA_BC3.tsv.gz
+    filetype: txt
+    filesize: 462
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/HyDrop-RNA/HyDrop_RNA_BC3.tsv.gz
+    urltype: http
+    md5: 3ac77e1d685092460701271df47a878b
+    location: remote
+  regions: null
+- !Region
+  region_id: hydroprna_linker2
+  region_type: linker
+  name: HyDrop-RNA_Linker2
+  sequence_type: fixed
+  sequence: AGGGTACTCG
+  min_len: 10
+  max_len: 10
+  onlist: null
+  regions: null
+- !Region
+  region_id: hydroprna_bc2
+  region_type: barcode
+  name: HyDrop-RNA_BC2
+  sequence_type: onlist
+  sequence: NNNNNNNNNN
+  min_len: 10
+  max_len: 10
+  onlist: !Onlist
+    file_id: HyDrop_RNA_BC2.tsv.gz
+    filename: HyDrop_RNA_BC2.tsv.gz
+    filetype: txt
+    filesize: 460
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/HyDrop-RNA/HyDrop_RNA_BC2.tsv.gz
+    urltype: http
+    md5: 5aa158e397e0375195f91d2d6f98abb9
+    location: remote
+  regions: null
+- !Region
+  region_id: hydroprna_linker1
+  region_type: linker
+  name: HyDrop-RNA_Linker1
+  sequence_type: fixed
+  sequence: GCAGTAGCTG
+  min_len: 10
+  max_len: 10
+  onlist: null
+  regions: null
+- !Region
+  region_id: hydroprna_bc1
+  region_type: barcode
+  name: HyDrop-RNA_BC1
+  sequence_type: onlist
+  sequence: NNNNNNNNNN
+  min_len: 10
+  max_len: 10
+  onlist: !Onlist
+    file_id: HyDrop_RNA_BC1.tsv.gz
+    filename: HyDrop_RNA_BC1.tsv.gz
+    filetype: txt
+    filesize: 460
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/HyDrop-RNA/HyDrop_RNA_BC1.tsv.gz
+    urltype: http
+    md5: bd0c0e9855dd2dab0233115496eb77c6
+    location: remote
+  regions: null
