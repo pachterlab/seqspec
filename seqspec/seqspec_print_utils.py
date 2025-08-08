@@ -24,22 +24,29 @@ def libseq(spec: Assay, modality: str) -> Tuple[List[str], List[str]]:
 
     p = []
     n = []
-    leaves = libspec.get_leaves()
-    cuts = project_regions_to_coordinates(leaves)
 
     for idx, read in enumerate(seqspec, 1):
         read_len = read.max_len
         read_id = read.read_id
         primer_id = read.primer_id
+
+        leaves = libspec.get_leaves_with_region_id(primer_id)
         primer_idx = [
-            i for i, leaf in enumerate(leaves) if leaf.region_id == primer_id
+            idx for idx, leaf in enumerate(leaves) if leaf.region_id == primer_id
         ][0]
+
+        cuts = project_regions_to_coordinates(leaves)
+        # TODO: contract the cuts so they are viewable
+
         primer_pos = cuts[primer_idx]
+        # print(cuts)
 
         if read.strand == "pos":
+            # start position of the arrow (where primer ends)
             wsl = primer_pos.stop - 1
             ws = wsl * " "
 
+            # length of the arrow
             arrowl = read_len - 1
             arrow = arrowl * "-"
 

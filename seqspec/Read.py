@@ -21,7 +21,10 @@ class Read(BaseModel):
         self.files = files
 
     def __repr__(self) -> str:
-        return str(self.model_dump())
+        strand = "+" if self.strand == "pos" else "-"
+        s = f"""{strand}({self.min_len}, {self.max_len}){self.read_id}:{self.primer_id}"""
+        # return str(self.model_dump())
+        return s
 
     def to_dict(self):
         return self.model_dump()

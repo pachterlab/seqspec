@@ -152,9 +152,6 @@ def validate_index_args(parser: ArgumentParser, args: Namespace) -> None:
     if args.output and Path(args.output).exists() and not Path(args.output).is_file():
         parser.error(f"Output path exists but is not a file: {args.output}")
 
-    if args.ids is None and (args.selector == "read" or args.selector == "region"):
-        parser.error("Must specify ids with -i for -s read or -s region")
-
 
 def seqspec_index(
     spec: Assay,
@@ -177,6 +174,8 @@ def seqspec_index(
     """
     GET_INDICES = {
         "file": get_index_by_files,
+        "read": get_index_by_reads,
+        "region": get_index_by_regions,
     }
 
     GET_INDICES_BY_IDS = {
@@ -252,12 +251,40 @@ def run_index(parser: ArgumentParser, args: Namespace) -> None:
 def get_index_by_files(spec, modality):
     # get the read associated for each file for each read get the regions by mapping primer
     files = list_read_files(spec, modality)
-
     # iterate through the keys (read ids) and get the index for each read
     indices = []
     for k, v in files.items():
         index = get_index_by_primer(spec, modality, k)
         indices.append(index)
+    # print(indices)
+
+    # NOTE: this is a hack for now, assumes each read has only one file
+    fixindices = []
+    for (fk, fv), v in zip(files.items(), indices):
+        fixindices.append(
+            {fv[0].file_id: list(v.values())[0], "strand": list(v.values())[1]}
+        )
+
+    return fixindices
+
+
+def get_index_by_reads(spec: Assay, modality):
+    read_ids = [i.read_id for i in spec.get_seqspec(modality)]
+    # get the read associated for each file for each read get the regions by mapping primer
+    indices = []
+    for id in read_ids:
+        index = get_index_by_primer(spec, modality, id)
+        indices.append(index)
+    return indices
+
+
+def get_index_by_regions(spec: Assay, modality):
+    rgn = spec.get_libspec(modality)
+    indices = []
+    leaves = rgn.get_leaves()
+    cuts = project_regions_to_coordinates(leaves)
+    indices.append({rgn.region_id: cuts, "strand": "pos"})
+
     return indices
 
 
@@ -270,13 +297,19 @@ def get_index_by_file_ids(spec, modality, file_ids):
     for k, v in files.items():
         index = get_index_by_primer(spec, modality, k)
         indices.append(index)
-    return indices
+
+    # NOTE hack for now, fix later. assume one file
+    fixindices = []
+    for (fk, fv), v in zip(files.items(), indices):
+        fixindices.append({fk: list(v.values())[0], "strand": list(v.values())[1]})
+
+    return fixindices
 
 
 def get_index_by_region_ids(spec, modality, region_ids):
     indices = []
     for id in region_ids:
-        index = get_index_by_primer(spec, modality, id)
+        index = get_index_by_region(spec, modality, id)
         indices.append(index)
     return indices
 
@@ -290,14 +323,12 @@ def get_index_by_read_ids(spec, modality, read_ids):
 
 
 # TODO fix return type
-def get_index(
-    spec, modality, region_id, rev=False
+def get_index_by_region(
+    spec, modality, region_id
 ):  # -> Dict[str, List[RegionCoordinate]]:
     rid = region_id
     regions = find_by_region_id(spec, modality, rid)
     leaves = regions[0].get_leaves()
-    if rev:
-        leaves.reverse()
     cuts = project_regions_to_coordinates(leaves)
 
     return {region_id: cuts, "strand": "pos"}

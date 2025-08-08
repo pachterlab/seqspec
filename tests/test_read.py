@@ -209,8 +209,7 @@ def test_read_repr():
     )
     
     repr_str = repr(read)
-    assert "test_read" in repr_str
-    assert "Test Read" in repr_str
+    assert "+(100, 150)test_read:test_primer" == repr_str
 
 
 def test_read_coordinate_creation():

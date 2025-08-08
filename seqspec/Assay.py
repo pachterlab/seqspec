@@ -113,7 +113,25 @@ class Assay(BaseModel):
     library_spec: List[Region]
 
     def __repr__(self) -> str:
-        return str(self.model_dump())
+        rds = []
+        rgns = []
+        for m in self.modalities:
+            rds.append(
+                f"- {m}: [{', '.join([i.__repr__() for i in self.get_seqspec(m)])}]"
+            )
+            leaves = self.get_libspec(m).get_leaves()
+            lstr = [i.__repr__() for i in leaves]
+            rgns.append(f"- {m}: 5'-{'-'.join(lstr)}-3'")
+        s = f"""
+Assay: {self.assay_id}
+Modalities: {self.modalities}
+Reads:
+{"\n".join(rds)}
+Regions:
+{"\n".join(rgns)}
+"""
+        # return str(self.model_dump())
+        return s
 
     def to_dict(self):
         return self.model_dump()

@@ -92,6 +92,10 @@ class Region(BaseModel):
     onlist: Optional[Onlist] = None
     regions: List["Region"] = []
 
+    def __repr__(self) -> str:
+        s = f"{self.region_type}({self.min_len}, {self.max_len})"
+        return s
+
     def get_sequence(self, s: str = "") -> str:
         if self.regions:
             for r in self.regions:
@@ -305,6 +309,10 @@ class RegionCoordinate(Region):
 
     def __str__(self):
         return f"RegionCoordinate {self.name} [{self.region_type}]: [{self.start}, {self.stop})"
+
+    def __repr__(self) -> str:
+        s = f"{self.region_type}({self.start}, {self.stop})"
+        return s
 
     def __sub__(self, other):
         if not isinstance(other, RegionCoordinate):

@@ -70,7 +70,7 @@ def test_seqspec_index(dogmaseq_dig_spec: Assay):
 
     # Test get_index_by_region_ids
     indices = seqspec_index(
-        spec=dogmaseq_dig_spec, modality="rna", ids=["rna_R1"], idtype="region"
+        spec=dogmaseq_dig_spec, modality="rna", ids=["rna_umi"], idtype="region"
     )
     assert len(indices) == 1
 
@@ -155,11 +155,10 @@ def test_seqspec_index_multiple_file_ids(dogmaseq_dig_spec: Assay):
 def test_seqspec_index_multiple_region_ids(dogmaseq_dig_spec: Assay):
     """Test seqspec_index with multiple region IDs"""
     # Test multiple region IDs for RNA modality
-    # Note: For region IDs, we need to use read IDs that contain these regions
     indices = seqspec_index(
         spec=dogmaseq_dig_spec,
         modality="rna",
-        ids=["rna_R1", "rna_R2"],  # Use read IDs instead of region IDs
+        ids=["rna_cell_bc", "cdna"],  # Use region IDs
         idtype="region"
     )
     
@@ -271,7 +270,7 @@ def test_seqspec_index_structure_validation(dogmaseq_dig_spec: Assay):
         if idtype == "read":
             ids = ["rna_R1"]
         elif idtype == "region":
-            ids = ["rna_R1"]  # Use read ID instead of region ID
+            ids = ["rna_cell_bc"]
         else:  # file
             ids = ["rna_R1_SRR18677638.fastq.gz"]
         

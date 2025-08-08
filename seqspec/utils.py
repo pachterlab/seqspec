@@ -353,10 +353,11 @@ REGION_TYPE_COLORS = {
     "umi": "#16A085",
     "tag": "#344E5C",
     "protein": "#ECF0F1",
+    "named": "#FF8C00",
 }
 
 # unused
-# '#FF8C00'
+
 # '#95A5A6'
 
 
