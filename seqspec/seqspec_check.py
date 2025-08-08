@@ -309,7 +309,7 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # TODO add option to check md5sum
-    def check_md5sum(spec, spec_fn, errors, idx):
+    def check_md5sum(spec: Assay, spec_fn, errors, idx):
         return (errors, idx)
 
     # Region_id is unique across all regions
@@ -371,19 +371,19 @@ def check(spec: Assay, spec_fn: str):
 
     # NOTE: this is a strong assumption that may be relaxed in the future
     # check that the primer id for each read is in the leaves of the spec for that modality
-    def check_primer_ids_in_libspec_leaves(spec, spec_fn, errors, idx):
-        for read in spec.sequence_spec:
-            mode = spec.get_libspec(read.modality)
-            leaves = mode.get_leaves()
-            if read.primer_id not in [i.region_id for i in leaves]:
-                errobj = {
-                    "error_type": "check_primer_ids_in_libspec_leaves",
-                    "error_message": f"'{read.read_id}' primer_id '{read.primer_id}' does not exist as an atomic region in the library_spec for modality '{read.modality}'",
-                    "error_object": "read",
-                }
-                errors.append(errobj)
-                idx += 1
-        return (errors, idx)
+    # def check_primer_ids_in_libspec_leaves(spec, spec_fn, errors, idx):
+    #     for read in spec.sequence_spec:
+    #         mode = spec.get_libspec(read.modality)
+    #         leaves = mode.get_leaves()
+    #         if read.primer_id not in [i.region_id for i in leaves]:
+    #             errobj = {
+    #                 "error_type": "check_primer_ids_in_libspec_leaves",
+    #                 "error_message": f"'{read.read_id}' primer_id '{read.primer_id}' does not exist as an atomic region in the library_spec for modality '{read.modality}'",
+    #                 "error_object": "read",
+    #             }
+    #             errors.append(errobj)
+    #             idx += 1
+    #     return (errors, idx)
 
     # check that the max read len is not longer than the max len of the lib spec after the primer
     # for read in spec.sequence_spec:
@@ -544,7 +544,7 @@ def check(spec: Assay, spec_fn: str):
         "check_unique_region_ids": check_unique_region_ids,
         "check_read_modalities": check_read_modalities,
         "check_primer_ids_in_region_ids": check_primer_ids_in_region_ids,
-        "check_primer_ids_in_libspec_leaves": check_primer_ids_in_libspec_leaves,
+        # "check_primer_ids_in_libspec_leaves": check_primer_ids_in_libspec_leaves,
         "check_sequence_types": check_sequence_types,
         "check_region_lengths": check_region_lengths,
         "check_sequence_lengths": check_sequence_lengths,
