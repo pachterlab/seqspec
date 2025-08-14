@@ -122,6 +122,14 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
         required=False,
     )
 
+    subparser.add_argument(
+        "--no-overlap",
+        help="Disable overlap (default: False)",
+        action="store_true",
+        dest="overlap",
+        default=False,
+    )
+
     return subparser
 
 
@@ -221,6 +229,10 @@ def run_index(parser: ArgumentParser, args: Namespace) -> None:
         args.rev,
     )
 
+    # filter index for no overlap if requested
+    if args.overlap:
+        indices = filter_index_no_overlap(indices)
+
     result = format_index(indices, args.tool, args.subregion_type)
 
     if args.output:
@@ -228,6 +240,22 @@ def run_index(parser: ArgumentParser, args: Namespace) -> None:
             print(result, file=f)
     else:
         print(result)
+
+
+def filter_index_no_overlap(indices: List[Coordinate]) -> List[Coordinate]:
+    # list of coordinates
+    # each coordinate has an rcv, a list of region coordiantes
+    # want to ensure that the intersection between all of them is empty
+    rids = set()
+    for idx in indices:
+        new_rcv = []
+        for rgn in idx.rcv:
+            if rgn.region_id not in rids:
+                new_rcv.append(rgn)
+                rids.add(rgn.region_id)
+        idx.rcv = new_rcv
+    # print(indices)
+    return indices
 
 
 def get_index_by_files(spec: Assay, modality: str) -> List[Coordinate]:
