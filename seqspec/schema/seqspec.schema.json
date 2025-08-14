@@ -351,6 +351,7 @@
             "rna",
             "s5",
             "s7",
+            "sgrna_target",
             "tag",
             "truseq_read1",
             "truseq_read2",

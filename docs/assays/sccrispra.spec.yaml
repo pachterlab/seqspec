@@ -186,7 +186,7 @@ library_spec:
       onlist: null
       regions: []
     - region_id: gRNA
-      region_type: gRNA
+      region_type: sgrna_target
       name: Guide RNAs
       sequence_type: onlist
       sequence: NNNNNNNNNNNNNNNNNNNN
