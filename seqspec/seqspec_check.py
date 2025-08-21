@@ -201,9 +201,6 @@ def check(spec: Assay):
                             "error_message": f"{ol.filename[:-3]} does not exist",
                             "error_object": "onlist",
                         }
-                        # errors.append(
-                        #     f"[error {idx}] {ol.filename[:-3]} does not exist"
-                        # )
                         errors.append(errobj)
                         idx += 1
                 else:
@@ -215,7 +212,6 @@ def check(spec: Assay):
                             "error_message": f"{ol.filename} does not exist",
                             "error_object": "onlist",
                         }
-                        # errors.append(f"[error {idx}] {ol.filename} does not exist")
                         errors.append(errobj)
                         idx += 1
             elif ol.urltype == "http" or ol.urltype == "https" or ol.urltype == "ftp":
@@ -228,7 +224,6 @@ def check(spec: Assay):
                             "error_object": "onlist",
                         }
 
-                        # errors.append(f"[error {idx}] {ol.filename} does not exist")
                         errors.append(errobj)
                         idx += 1
                 else:
@@ -238,7 +233,6 @@ def check(spec: Assay):
                             "error_message": f"{ol.filename} does not exist",
                             "error_object": "onlist",
                         }
-                        # errors.append(f"[error {idx}] {ol.filename} does not exist")
                         errors.append(errobj)
                         idx += 1
         return (errors, idx)
@@ -271,7 +265,6 @@ def check(spec: Assay):
                             "error_message": f"{f.filename} does not exist",
                             "error_object": "file",
                         }
-                        # errors.append(f"[error {idx}] {f.filename} does not exist")
                         errors.append(errobj)
                         idx += 1
                 elif f.urltype == "http" or f.urltype == "https" or f.urltype == "ftp":
@@ -282,7 +275,6 @@ def check(spec: Assay):
                             "error_message": f"{f.filename} does not exist",
                             "error_object": "file",
                         }
-                        # errors.append(f"[error {idx}] {f.filename} does not exist")
                         errors.append(errobj)
                         idx += 1
         return (errors, idx)
@@ -412,9 +404,6 @@ def check(spec: Assay):
                     "error_message": f"'{rgn.region_id}' sequence_type is 'joined' and does not contain subregions",
                     "error_object": "region",
                 }
-                # errors.append(
-                #     f"[error {idx}] '{rgn.region_id}' sequence_type is 'joined' and does not contain subregions"
-                # )
                 errors.append(errobj)
                 idx += 1
             if rgn.sequence_type == "random" and rgn.regions:
@@ -423,9 +412,6 @@ def check(spec: Assay):
                     "error_message": f"'{rgn.region_id}' sequence_type is 'random' and contains subregions",
                     "error_object": "region",
                 }
-                # errors.append(
-                #     f"[error {idx}] '{rgn.region_id}' sequence_type is 'random' and contains subregions"
-                # )
                 errors.append(errobj)
                 idx += 1
             if rgn.sequence_type == "random" and rgn.sequence != "X" * rgn.max_len:
@@ -478,8 +464,6 @@ def check(spec: Assay):
                 errors, idx = len_check(rgn, errors, idx)
         return (errors, idx)
 
-    # errors, idx = check_region_lengths(spec, errors, idx)
-
     # check that the length of the sequence is equal to the max_len using a recursive function
     # an assumption in the code and spec is that the displayed sequence is equal to the max_len
     def check_sequence_lengths(spec, errors, idx):
@@ -519,12 +503,64 @@ def check(spec: Assay):
                 "error_message": "Reads must have the same number of files",
                 "error_object": "read",
             }
-            # errors.append(f"[error {idx}] Reads must have the same number of files")
             errors.append(errobj)
             idx += 1
         return (errors, idx)
 
-    # errors, idx = check_read_file_count(spec, errors, idx)
+    # for every region, check that the min/max length of the region is equal to the sum of the min/sum of the max lengths.
+    def check_region_against_subregion_length(spec: Assay, errors, idx):
+        modes = spec.modalities
+
+        def check_sub_length(rgn, errors, idx):
+            if rgn.regions:
+                min_sum = sum(sub.min_len for sub in rgn.regions)
+                max_sum = sum(sub.max_len for sub in rgn.regions)
+                if rgn.min_len != min_sum or rgn.max_len != max_sum:
+                    errobj = {
+                        "error_type": "check_region_against_subregion_length",
+                        "error_message": (
+                            f"Region '{rgn.region_id}' min_len/max_len ({rgn.min_len}, {rgn.max_len}) "
+                            f"does not match sum of subregions ({min_sum}, {max_sum})"
+                        ),
+                        "error_object": "region",
+                    }
+                    errors.append(errobj)
+                    idx += 1
+                for sub in rgn.regions:
+                    errors, idx = check_sub_length(sub, errors, idx)
+            return (errors, idx)
+
+        for m in modes:
+            for rgn in [spec.get_libspec(m)]:
+                errors, idx = check_sub_length(rgn, errors, idx)
+        return (errors, idx)
+
+    # for every region, check that the sequence is equal to the left-right concatenation of the sub regions
+    def check_region_against_subregion_sequence(spec: Assay, errors, idx):
+        modes = spec.modalities
+
+        def check_sub_sequences(rgn, errors, idx):
+            if rgn.regions:
+                concat_seq = "".join(sub.sequence for sub in rgn.regions)
+                if rgn.sequence != concat_seq:
+                    errobj = {
+                        "error_type": "check_region_against_subregion_sequence",
+                        "error_message": (
+                            f"Region '{rgn.region_id}' sequence '{rgn.sequence}' does not match "
+                            f"concatenation of subregions '{concat_seq}'"
+                        ),
+                        "error_object": "region",
+                    }
+                    errors.append(errobj)
+                    idx += 1
+                for sub in rgn.regions:
+                    errors, idx = check_sub_sequences(sub, errors, idx)
+            return (errors, idx)
+
+        for m in modes:
+            for rgn in [spec.get_libspec(m)]:
+                errors, idx = check_sub_sequences(rgn, errors, idx)
+        return (errors, idx)
 
     errors = []
     idx = 0
@@ -544,6 +580,8 @@ def check(spec: Assay):
         "check_region_lengths": check_region_lengths,
         "check_sequence_lengths": check_sequence_lengths,
         "check_read_file_count": check_read_file_count,
+        "check_region_against_subregion_length": check_region_against_subregion_length,
+        "check_region_against_subregion_sequence": check_region_against_subregion_sequence,
     }
     for k, v in checks.items():
         # print(k)
