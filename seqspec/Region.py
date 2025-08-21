@@ -1,9 +1,7 @@
 from enum import Enum
 from typing import List, Optional, Set, Union
 
-from pydantic import BaseModel
-
-from seqspec.llmtools import LLMInput
+from pydantic import BaseModel, Field
 
 
 class SequenceType(str, Enum):
@@ -59,15 +57,61 @@ class Onlist(BaseModel):
     urltype: str
     md5: str
 
+    def update_from(self, patch: "OnlistInput") -> None:
+        for field in patch.model_fields_set:
+            value = getattr(patch, field)
+            if value is not None:
+                setattr(self, field, value)
 
-class OnlistInput(LLMInput):
-    file_id: Optional[str] = None
-    filename: Optional[str] = None
-    filetype: Optional[str] = None
-    filesize: Optional[int] = None
-    url: Optional[str] = None
-    urltype: Optional[str] = None
-    md5: Optional[str] = None
+
+class OnlistInput(BaseModel):
+    """
+    Input payload describing an on-list file (e.g., valid barcodes/UMIs).
+
+    Fields map directly to `Onlist`. If omitted, `to_onlist()` fills with empty
+    or neutral defaults, and `urltype` defaults to "local".
+    """
+
+    file_id: Optional[str] = Field(
+        default=None,
+        description=(
+            "Stable identifier for the on-list file. Not required if not used elsewhere."
+        ),
+    )
+    filename: Optional[str] = Field(
+        default=None,
+        description=(
+            "Name/path of the on-list file (e.g., 'onlist.txt' or 'RNA-737K.txt.gz')."
+        ),
+    )
+    filetype: Optional[str] = Field(
+        default=None,
+        description=(
+            "File format/extension without dot, e.g., 'txt', 'txt.gz', 'tsv'."
+        ),
+    )
+    filesize: Optional[int] = Field(
+        default=None,
+        description=(
+            "File size in bytes if known; 0 or omit if unknown at creation time."
+        ),
+    )
+    url: Optional[str] = Field(
+        default=None,
+        description=(
+            "Location of the file. Can be local path or remote URI (s3://, gs://, http://)."
+        ),
+    )
+    urltype: Optional[str] = Field(
+        default=None,
+        description=(
+            "How to interpret `url` (e.g., 'local', 's3', 'gs', 'http'). Defaults to 'local'."
+        ),
+    )
+    md5: Optional[str] = Field(
+        default=None,
+        description=("MD5 checksum of the on-list file if available; omit if unknown."),
+    )
 
     def to_onlist(self) -> Onlist:
         return Onlist(
@@ -163,6 +207,8 @@ class Region(BaseModel):
     def get_onlist(self) -> Optional[Onlist]:
         """Get the onlist associated with this region."""
         return self.onlist
+
+    # update_from removed per new approach
 
     def get_leaves(self, leaves: Optional[List["Region"]] = None) -> List["Region"]:
         # print(leaves)
@@ -262,16 +308,70 @@ class Region(BaseModel):
 Region.model_rebuild()
 
 
-class RegionInput(LLMInput):
-    region_id: Optional[str] = None
-    region_type: Optional[Union[str, RegionType]] = None
-    name: Optional[str] = None
-    sequence_type: Optional[Union[str, SequenceType]] = None
-    sequence: Optional[str] = None
-    min_len: Optional[int] = None
-    max_len: Optional[int] = None
-    onlist: Optional[OnlistInput] = None
-    regions: Optional[List["RegionInput"]] = None
+class RegionInput(BaseModel):
+    """
+    Input payload for constructing a `Region` (node in the library structure).
+
+    Defaults and behaviors applied in `to_region()`:
+    - `region_id`: defaults to empty string; also used to fill `name`/`region_type` if they are omitted.
+    - `sequence_type`: defaults to 'fixed'; when 'random', `sequence` is generated as 'X' * `min_len`; when 'onlist', 'N' * `min_len`.
+    - `min_len`: defaults to 0 when omitted.
+    - `max_len`: defaults to `min_len` if provided, otherwise 1024.
+    - `regions`: nested `RegionInput` entries to build a hierarchy.
+    - `onlist`: optional `OnlistInput` describing a whitelist for this region.
+    """
+
+    region_id: Optional[str] = Field(
+        default=None,
+        description=("Stable identifier for the region (unique within its parent)."),
+    )
+    region_type: Optional[Union[str, RegionType]] = Field(
+        default=None,
+        description=(
+            "Semantic type of the region (e.g., 'umi', 'barcode', 'cdna'). "
+            "Defaults to `region_id` when omitted."
+        ),
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description=(
+            "Human-readable label for the region. Defaults to `region_id` when omitted."
+        ),
+    )
+    sequence_type: Optional[Union[str, SequenceType]] = Field(
+        default=None,
+        description=(
+            "One of 'fixed' | 'random' | 'onlist' | 'joined'. Controls how `sequence` is interpreted/generated."
+        ),
+    )
+    sequence: Optional[str] = Field(
+        default=None,
+        description=(
+            "Literal nucleotide sequence for 'fixed' regions; series of 'X' when `sequence_type` is 'random', series of 'N' when type is 'onlist'. Number of characters should match the min_len property."
+        ),
+    )
+    min_len: Optional[int] = Field(
+        default=None,
+        description=(
+            "Minimum length of this region. Defaults to 0; also used to size generated sequences."
+        ),
+    )
+    max_len: Optional[int] = Field(
+        default=None,
+        description=(
+            "Maximum length of this region. Defaults to `min_len` if provided, else 1024."
+        ),
+    )
+    onlist: Optional[OnlistInput] = Field(
+        default=None,
+        description=("Optional on-list Object associated with this region."),
+    )
+    regions: Optional[List["RegionInput"]] = Field(
+        default=None,
+        description=(
+            "Child regions that compose this region (ordered, left-to-right)."
+        ),
+    )
 
     def to_region(self) -> Region:
         # Handle length defaults properly

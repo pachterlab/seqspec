@@ -1,31 +1,35 @@
-from seqspec.seqspec_insert import seqspec_insert_reads, seqspec_insert_regions
+from seqspec.seqspec_insert import (
+    seqspec_insert_reads,
+    seqspec_insert_regions,
+)
 from seqspec.Assay import Assay
-from seqspec.Read import Read
-from seqspec.Region import Region
+from seqspec.Read import ReadInput
+from seqspec.Region import RegionInput
+from typing import Any, List
 
 
 def test_seqspec_insert_reads(temp_spec):
     """Test inserting reads into a spec"""
     # Create test reads
     new_reads = [
-        Read(
+        ReadInput(
             read_id="test_R1",
             name="Test Read 1",
             modality="rna",
             primer_id="test_primer",
             min_len=50,
             max_len=50,
-            strand="pos"
+            strand="pos",
         ),
-        Read(
+        ReadInput(
             read_id="test_R2",
             name="Test Read 2",
             modality="rna",
             primer_id="test_primer",
             min_len=50,
             max_len=50,
-            strand="neg"
-        )
+            strand="neg",
+        ),
     ]
     
     # Get original read count
@@ -48,14 +52,14 @@ def test_seqspec_insert_reads(temp_spec):
 def test_seqspec_insert_reads_after_specific_read(temp_spec):
     """Test inserting reads after a specific read"""
     # Create a test read
-    new_read = Read(
+    new_read = ReadInput(
         read_id="inserted_read",
         name="Inserted Read",
         modality="rna",
         primer_id="test_primer",
         min_len=50,
         max_len=50,
-        strand="pos"
+        strand="pos",
     )
     
     # Get original RNA reads
@@ -82,24 +86,24 @@ def test_seqspec_insert_regions(temp_spec):
     """Test inserting regions into a spec"""
     # Create test regions
     new_regions = [
-        Region(
+        RegionInput(
             region_id="test_region_1",
             region_type="barcode",
             name="Test Region 1",
             sequence_type="fixed",
             sequence="ACGT",
             min_len=4,
-            max_len=4
+            max_len=4,
         ),
-        Region(
+        RegionInput(
             region_id="test_region_2",
             region_type="umi",
             name="Test Region 2",
             sequence_type="random",
             sequence="XXXX",
             min_len=4,
-            max_len=4
-        )
+            max_len=4,
+        ),
     ]
     
     # Get original region count for RNA modality
@@ -122,14 +126,14 @@ def test_seqspec_insert_regions(temp_spec):
 def test_seqspec_insert_regions_after_specific_region(temp_spec):
     """Test inserting regions after a specific region"""
     # Create a test region
-    new_region = Region(
+    new_region = RegionInput(
         region_id="inserted_region",
         region_type="linker",
         name="Inserted Region",
         sequence_type="fixed",
         sequence="TTTT",
         min_len=4,
-        max_len=4
+        max_len=4,
     )
     
     # Get original RNA library spec
@@ -156,14 +160,14 @@ def test_seqspec_insert_reads_different_modality(temp_spec):
     """Test inserting reads into a different modality"""
     # Create test reads for ATAC modality
     new_reads = [
-        Read(
+        ReadInput(
             read_id="atac_test_R1",
             name="ATAC Test Read 1",
             modality="atac",
             primer_id="atac_test_primer",
             min_len=50,
             max_len=50,
-            strand="pos"
+            strand="pos",
         )
     ]
     
@@ -184,14 +188,14 @@ def test_seqspec_insert_reads_different_modality(temp_spec):
 def test_seqspec_insert_regions_different_modality(temp_spec):
     """Test inserting regions into a different modality"""
     # Create test region for protein modality
-    new_region = Region(
+    new_region = RegionInput(
         region_id="protein_test_region",
         region_type="barcode",
         name="Protein Test Region",
         sequence_type="fixed",
         sequence="GCTA",
         min_len=4,
-        max_len=4
+        max_len=4,
     )
     
     # Get original protein region count
@@ -213,14 +217,14 @@ def test_seqspec_insert_regions_different_modality(temp_spec):
 def test_seqspec_insert_preserves_other_modalities(temp_spec):
     """Test that inserting into one modality doesn't affect others"""
     # Create test read for RNA modality
-    new_read = Read(
+    new_read = ReadInput(
         read_id="rna_test_read",
         name="RNA Test Read",
         modality="rna",
         primer_id="rna_test_primer",
         min_len=50,
         max_len=50,
-        strand="pos"
+        strand="pos",
     )
     
     # Get original read counts for different modalities
@@ -237,3 +241,26 @@ def test_seqspec_insert_preserves_other_modalities(temp_spec):
     assert len(updated_spec.get_seqspec("atac")) == original_atac_count
     assert len(updated_spec.get_seqspec("protein")) == original_protein_count
     assert len(updated_spec.get_seqspec("tag")) == original_tag_count 
+
+
+def test_seqspec_insert_general_read(temp_spec: Assay):
+    """Test inserting with ReadInput via direct reads insert API."""
+    original_rna_read_count = len(temp_spec.get_seqspec("rna"))
+
+    resources: List[Any] = [
+        ReadInput(
+            read_id="general_R1",
+            name="General Read",
+            modality="rna",
+            primer_id="rna_cell_bc",
+            min_len=10,
+            max_len=10,
+            strand="pos",
+        )
+    ]
+
+    updated_spec = seqspec_insert_reads(temp_spec, "rna", resources)
+
+    assert len(updated_spec.get_seqspec("rna")) == original_rna_read_count + 1
+    read_ids = [r.read_id for r in updated_spec.get_seqspec("rna")]
+    assert "general_R1" in read_ids

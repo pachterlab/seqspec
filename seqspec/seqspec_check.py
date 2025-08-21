@@ -65,20 +65,17 @@ def format_error(errobj, idx=0):
     return f"[error {idx}] {errobj['error_message']}"
 
 
-def seqspec_check(
-    spec: Assay, spec_fn: str, filter_type: Optional[str] = None
-) -> List[Dict]:
+def seqspec_check(spec: Assay, filter_type: Optional[str] = None) -> List[Dict]:
     """Core functionality to check a seqspec and return filtered errors.
 
     Args:
         spec: The Assay object to check
-        spec_fn: Path to the spec file, used for relative path resolution
         filter_type: Optional filter type to apply to errors (e.g. "igvf", "igvf_onlist_skip")
 
     Returns:
         List of error dictionaries
     """
-    errors = check(spec, spec_fn)
+    errors = check(spec)
 
     if filter_type:
         errors = filter_errors(errors, filter_type)
@@ -90,7 +87,7 @@ def run_check(parser: ArgumentParser, args: Namespace):
     validate_check_args(parser, args)
 
     spec = load_spec(args.yaml, strict=False)
-    errors = seqspec_check(spec, args.yaml, args.skip)
+    errors = seqspec_check(spec, args.skip)
 
     if args.output:
         with open(args.output, "w") as f:
@@ -140,9 +137,9 @@ def filter_errors(errors, filter_type):
         return errors
 
 
-def check(spec: Assay, spec_fn: str):
+def check(spec: Assay):
     # Variety of checks against schema
-    def check_schema(spec: Assay, spec_fn: str, errors=[], idx=0):
+    def check_schema(spec: Assay, errors=[], idx=0):
         schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
         with open(schema_fn, "r") as stream:
             schema = yaml.load(stream, Loader=yaml.Loader)
@@ -160,7 +157,7 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # Modalities are unique
-    def check_unique_modalities(spec, spec_fn, errors, idx):
+    def check_unique_modalities(spec, errors, idx):
         if len(spec.modalities) != len(set(spec.modalities)):
             errobj = {
                 "error_type": "check_unique_modalities",
@@ -172,7 +169,7 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # Region_ids of the first level  correspond to the modalities (one per modality)
-    def check_region_ids_modalities(spec, spec_fn, errors, idx):
+    def check_region_ids_modalities(spec, errors, idx):
         modes = spec.modalities
         rgns = spec.library_spec
         for r in rgns:
@@ -188,17 +185,16 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # Onlist files exist relative to the path of the spec or http
-    def check_onlist_files_exist(spec, spec_fn, errors, idx):
+    def check_onlist_files_exist(spec, errors, idx):
         modes = spec.modalities
         olrgns = []
         for m in modes:
             olrgns += [i.onlist for i in spec.get_libspec(m).get_onlist_regions()]
 
-        # check paths relative to spec_fn
         for ol in olrgns:
             if ol.urltype == "local":
                 if ol.filename[:-3] == ".gz":
-                    check = path.join(path.dirname(spec_fn), ol.filename[:-3])
+                    check = ol.url
                     if not path.exists(check):
                         errobj = {
                             "error_type": "check_onlist_files_exist",
@@ -211,8 +207,8 @@ def check(spec: Assay, spec_fn: str):
                         errors.append(errobj)
                         idx += 1
                 else:
-                    check = path.join(path.dirname(spec_fn), ol.filename)
-                    check_gz = path.join(path.dirname(spec_fn), ol.filename + ".gz")
+                    check = ol.url
+                    check_gz = ol.url + ".gz"
                     if not path.exists(check) and not path.exists(check_gz):
                         errobj = {
                             "error_type": "check_onlist_files_exist",
@@ -248,7 +244,7 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # Read ids are unique
-    def check_unique_read_ids(spec, spec_fn, errors, idx):
+    def check_unique_read_ids(spec, errors, idx):
         read_ids = set()
         for read in spec.sequence_spec:
             if read.read_id in read_ids:
@@ -264,12 +260,11 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # Read files exist
-    def check_read_files_exist(spec, spec_fn, errors, idx):
+    def check_read_files_exist(spec, errors, idx):
         for read in spec.sequence_spec:
-            spec_fn = path.dirname(spec_fn)
             for f in read.files:
                 if f.urltype == "local":
-                    check = path.join(spec_fn, f.filename)
+                    check = f.url
                     if not path.exists(check):
                         errobj = {
                             "error_type": "check_read_files_exist",
@@ -293,7 +288,7 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # Primer ids, strand tuple pairs are unique across all reads
-    def check_unique_read_primer_strand_pairs(spec, spec_fn, errors, idx):
+    def check_unique_read_primer_strand_pairs(spec, errors, idx):
         primer_strand_pairs = set()
         for read in spec.sequence_spec:
             if (read.primer_id, read.strand) in primer_strand_pairs:
@@ -309,11 +304,11 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # TODO add option to check md5sum
-    def check_md5sum(spec: Assay, spec_fn, errors, idx):
+    def check_md5sum(spec: Assay, errors, idx):
         return (errors, idx)
 
     # Region_id is unique across all regions
-    def check_unique_region_ids(spec, spec_fn, errors, idx):
+    def check_unique_region_ids(spec, errors, idx):
         modes = spec.modalities
         rgn_ids = set()
         for m in modes:
@@ -331,7 +326,7 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # Modality is in the reads
-    def check_read_modalities(spec, spec_fn, errors, idx):
+    def check_read_modalities(spec, errors, idx):
         modes = spec.modalities
         for read in spec.sequence_spec:
             if read.modality not in modes:
@@ -346,7 +341,7 @@ def check(spec: Assay, spec_fn: str):
 
     # check that the unique primer ids exist as a region id in the library_spec
     # TODO is there a better way to get the rgn_ids?
-    def check_primer_ids_in_region_ids(spec, spec_fn, errors, idx):
+    def check_primer_ids_in_region_ids(spec, errors, idx):
         # first get all unique region_ids
         modes = spec.modalities
         rgn_ids = set()
@@ -371,7 +366,7 @@ def check(spec: Assay, spec_fn: str):
 
     # NOTE: this is a strong assumption that may be relaxed in the future
     # check that the primer id for each read is in the leaves of the spec for that modality
-    # def check_primer_ids_in_libspec_leaves(spec, spec_fn, errors, idx):
+    # def check_primer_ids_in_libspec_leaves(spec, errors, idx):
     #     for read in spec.sequence_spec:
     #         mode = spec.get_libspec(read.modality)
     #         leaves = mode.get_leaves()
@@ -391,7 +386,7 @@ def check(spec: Assay, spec_fn: str):
     #     leaves = mode.get_leaves()
     #     idx = [i.region_id for i in leaves].index(read.primer_id)
 
-    def check_sequence_types(spec, spec_fn, errors, idx):
+    def check_sequence_types(spec, errors, idx):
         modes = spec.modalities
 
         # if a region has a sequence type "fixed" then it should not contain subregions
@@ -461,7 +456,7 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # check the lengths of every region against the max_len, using a recursive function
-    def check_region_lengths(spec, spec_fn, errors, idx):
+    def check_region_lengths(spec, errors, idx):
         modes = spec.modalities
 
         def len_check(rgn, errors, idx):
@@ -483,11 +478,11 @@ def check(spec: Assay, spec_fn: str):
                 errors, idx = len_check(rgn, errors, idx)
         return (errors, idx)
 
-    # errors, idx = check_region_lengths(spec, spec_fn, errors, idx)
+    # errors, idx = check_region_lengths(spec, errors, idx)
 
     # check that the length of the sequence is equal to the max_len using a recursive function
     # an assumption in the code and spec is that the displayed sequence is equal to the max_len
-    def check_sequence_lengths(spec, spec_fn, errors, idx):
+    def check_sequence_lengths(spec, errors, idx):
         modes = spec.modalities
 
         def seq_len_check(rgn, errors, idx):
@@ -513,7 +508,7 @@ def check(spec: Assay, spec_fn: str):
         return (errors, idx)
 
     # check that the number of files in each "File" object for all Read object are all the same length
-    def check_read_file_count(spec, spec_fn, errors, idx):
+    def check_read_file_count(spec, errors, idx):
         nfiles = []
         for read in spec.sequence_spec:
             nfiles.append(len(read.files))
@@ -529,7 +524,7 @@ def check(spec: Assay, spec_fn: str):
             idx += 1
         return (errors, idx)
 
-    # errors, idx = check_read_file_count(spec, spec_fn, errors, idx)
+    # errors, idx = check_read_file_count(spec, errors, idx)
 
     errors = []
     idx = 0
@@ -552,6 +547,6 @@ def check(spec: Assay, spec_fn: str):
     }
     for k, v in checks.items():
         # print(k)
-        errors, idx = v(spec, spec_fn, errors, idx)
+        errors, idx = v(spec, errors, idx)
 
     return errors

@@ -277,7 +277,18 @@ def test_methods_with_string_protocols():
         library_protocol="Test Library Protocol",
         library_kit="Test Library Kit",
         sequence_spec=[read],
-        library_spec=[region]
+        library_spec=[
+            Region(
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[region]
+            )
+        ]
     )
     
     methods_text = methods(spec, "rna")

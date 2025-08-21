@@ -13,7 +13,7 @@ from seqspec.utils import load_spec
 def test_seqspec_check(dogmaseq_dig_spec: Assay):
     """Test seqspec_check function"""
     # Test with valid spec
-    errors = seqspec_check(spec=dogmaseq_dig_spec, spec_fn="tests/fixtures/spec.yaml")
+    errors = seqspec_check(spec=dogmaseq_dig_spec)
     assert len(errors) == 0  # No errors for valid spec
 
     # Test with invalid spec (missing required fields)
@@ -34,5 +34,5 @@ def test_seqspec_check(dogmaseq_dig_spec: Assay):
         library_spec=[]
     )
     
-    errors = seqspec_check(spec=invalid_spec, spec_fn="tests/fixtures/spec.yaml")
+    errors = seqspec_check(spec=invalid_spec)
     assert len(errors) > 0  # Should have errors for invalid spec

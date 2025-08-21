@@ -1,19 +1,35 @@
 import gzip
 import io
+import json
+import logging
 import os
 import re
 from pathlib import Path
-from typing import IO, List, Optional, Tuple, Union
+from typing import IO, Any, Dict, List, Optional, Tuple, Union
 
 import requests
 import yaml
 from Bio import GenBank
+from opentelemetry.sdk.trace.export import (
+    SpanExporter,
+    SpanExportResult,
+)
+
+# at top of file with other imports
+from opentelemetry.trace import StatusCode
 from pydantic import ValidationError
 
-from seqspec.Assay import Assay
-from seqspec.File import File
-from seqspec.Read import Read
-from seqspec.Region import Onlist, Region
+from seqspec.Assay import (
+    Assay,
+    AssayInput,
+    LibKitInput,
+    LibProtocolInput,
+    SeqKitInput,
+    SeqProtocolInput,
+)
+from seqspec.File import File, FileInput
+from seqspec.Read import Read, ReadInput
+from seqspec.Region import Onlist, Region, RegionInput
 
 # --- Known tags to strip from the YAML ---
 KNOWN_TAGS = [
@@ -139,6 +155,274 @@ def load_spec(spec_fn: Union[str, Path], strict=True) -> Assay:
         return AssayInput(**data_dict).to_assay()
 
 
+def load_regions(
+    regions_source: Union[str, Path, IO, Dict[str, Any], List[Dict[str, Any]]],
+) -> List[RegionInput]:
+    """
+    Load regions from a YAML/JSON file (optionally gzipped) or a file-like stream.
+
+    The input is parsed into a list of RegionInput objects and converted to
+    Region objects via RegionInput.to_region(). Supports two top-level formats:
+    - A list of region dicts
+    - A dict with key 'regions' that maps to the list
+    """
+    # Read YAML/JSON data or accept in-memory python objects
+    if isinstance(regions_source, (dict, list)):
+        data = regions_source
+    elif isinstance(regions_source, (str, Path)):
+        # If it's a Path-like or an existing file path, read from disk (with gzip auto-detect)
+        if isinstance(regions_source, Path) or os.path.exists(str(regions_source)):
+            # Detect gzip by magic bytes
+            with open(regions_source, "rb") as f:  # type: ignore[arg-type]
+                magic = f.read(2)
+
+            if magic == b"\x1f\x8b":
+                with gzip.open(regions_source, "rt") as stream:  # type: ignore[arg-type]
+                    data = safe_load_strip_tags(stream)
+            else:
+                with open(regions_source, "r") as stream:  # type: ignore[arg-type]
+                    data = safe_load_strip_tags(stream)
+        else:
+            # Treat as raw YAML/JSON content
+            cleaned = strip_yaml_tags(str(regions_source))
+            data = yaml.safe_load(cleaned)
+    else:
+        data = safe_load_strip_tags(regions_source)
+
+    # Normalize to list of items
+    if isinstance(data, dict):
+        items = data.get("regions", [])
+        # Allow single-region dicts as a convenience
+        if items == [] and any(
+            k in data for k in ("region_id", "region_type", "sequence_type")
+        ):
+            items = [data]
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
+
+    # Build Region objects from inputs
+    region_inputs: List[RegionInput] = [
+        it if isinstance(it, RegionInput) else RegionInput(**it) for it in items
+    ]
+    # regions: List[Region] = [ri.to_region() for ri in region_inputs]
+    return region_inputs
+
+
+def load_reads(
+    reads_source: Union[str, Path, IO, Dict[str, Any], List[Dict[str, Any]]],
+) -> List[ReadInput]:
+    """
+    Load reads from a YAML/JSON file (optionally gzipped) or a file-like stream.
+
+    The input is parsed into a list of ReadInput objects and converted to
+    Read objects via ReadInput.to_read(). Supports two top-level formats:
+    - A list of read dicts
+    - A dict with key 'reads' that maps to the list
+    """
+    # Read YAML/JSON data or accept in-memory python objects
+    if isinstance(reads_source, (dict, list)):
+        data = reads_source
+    elif isinstance(reads_source, (str, Path)):
+        # If it's a Path-like or an existing file path, read from disk (with gzip auto-detect)
+        if isinstance(reads_source, Path) or os.path.exists(str(reads_source)):
+            # Detect gzip by magic bytes
+            with open(reads_source, "rb") as f:  # type: ignore[arg-type]
+                magic = f.read(2)
+
+            if magic == b"\x1f\x8b":
+                with gzip.open(reads_source, "rt") as stream:  # type: ignore[arg-type]
+                    data = safe_load_strip_tags(stream)
+            else:
+                with open(reads_source, "r") as stream:  # type: ignore[arg-type]
+                    data = safe_load_strip_tags(stream)
+        else:
+            # Treat as raw YAML/JSON content
+            cleaned = strip_yaml_tags(str(reads_source))
+            data = yaml.safe_load(cleaned)
+    else:
+        data = safe_load_strip_tags(reads_source)
+
+    # Normalize to list of items
+    if isinstance(data, dict):
+        items = data.get("reads", [])
+        # Allow single-read dicts as a convenience
+        if items == [] and any(k in data for k in ("read_id", "primer_id", "modality")):
+            items = [data]
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
+
+    # Build Read objects from inputs
+    read_inputs: List[ReadInput] = [
+        it if isinstance(it, ReadInput) else ReadInput(**it) for it in items
+    ]
+    # reads: List[Read] = [ri.to_read() for ri in read_inputs]
+    return read_inputs
+
+
+def _load_generic_items(
+    source: Union[str, Path, IO, Dict[str, Any], List[Dict[str, Any]]],
+):
+    """
+    Internal: read YAML/JSON from various inputs, returning a python object.
+    Mirrors behavior used by load_reads/load_regions.
+    """
+    if isinstance(source, (dict, list)):
+        return source
+    elif isinstance(source, (str, Path)):
+        if isinstance(source, Path) or os.path.exists(str(source)):
+            with open(source, "rb") as f:  # type: ignore[arg-type]
+                magic = f.read(2)
+            if magic == b"\x1f\x8b":
+                with gzip.open(source, "rt") as stream:  # type: ignore[arg-type]
+                    return safe_load_strip_tags(stream)
+            else:
+                with open(source, "r") as stream:  # type: ignore[arg-type]
+                    return safe_load_strip_tags(stream)
+        else:
+            cleaned = strip_yaml_tags(str(source))
+            return yaml.safe_load(cleaned)
+    else:
+        return safe_load_strip_tags(source)
+
+
+def load_files(
+    files_source: Union[str, Path, IO, Dict[str, Any], List[Dict[str, Any]]],
+) -> List[FileInput]:
+    """
+    Load files and return a list of FileInput objects.
+
+    Supports either a list of file dicts or a dict with key 'files'.
+    Also accepts a single file dict (detected by presence of 'file_id' or 'filename').
+    """
+    data = _load_generic_items(files_source)
+
+    if isinstance(data, dict):
+        items = data.get("files", [])
+        if items == [] and any(k in data for k in ("file_id", "filename")):
+            items = [data]
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
+
+    return [it if isinstance(it, FileInput) else FileInput(**it) for it in items]
+
+
+def load_seqkits(
+    kits_source: Union[str, Path, IO, Dict[str, Any], List[Dict[str, Any]]],
+) -> List[SeqKitInput]:
+    """
+    Load sequence kits and return a list of SeqKitInput objects.
+    Accepts list or dict with key 'seqkits', or a single-kit dict.
+    """
+    data = _load_generic_items(kits_source)
+
+    if isinstance(data, dict):
+        items = data.get("seqkits", [])
+        if items == [] and any(k in data for k in ("kit_id", "name")):
+            items = [data]
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
+
+    return [it if isinstance(it, SeqKitInput) else SeqKitInput(**it) for it in items]
+
+
+def load_seqprotocols(
+    protocols_source: Union[str, Path, IO, Dict[str, Any], List[Dict[str, Any]]],
+) -> List[SeqProtocolInput]:
+    """
+    Load sequence protocols and return a list of SeqProtocolInput objects.
+    Accepts list or dict with key 'seqprotocols', or a single-protocol dict.
+    """
+    data = _load_generic_items(protocols_source)
+
+    if isinstance(data, dict):
+        items = data.get("seqprotocols", [])
+        if items == [] and any(k in data for k in ("protocol_id", "name")):
+            items = [data]
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
+
+    return [
+        it if isinstance(it, SeqProtocolInput) else SeqProtocolInput(**it)
+        for it in items
+    ]
+
+
+def load_libkits(
+    kits_source: Union[str, Path, IO, Dict[str, Any], List[Dict[str, Any]]],
+) -> List[LibKitInput]:
+    """
+    Load library kits and return a list of LibKitInput objects.
+    Accepts list or dict with key 'libkits', or a single-kit dict.
+    """
+    data = _load_generic_items(kits_source)
+
+    if isinstance(data, dict):
+        items = data.get("libkits", [])
+        if items == [] and any(k in data for k in ("kit_id", "name")):
+            items = [data]
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
+
+    return [it if isinstance(it, LibKitInput) else LibKitInput(**it) for it in items]
+
+
+def load_libprotocols(
+    protocols_source: Union[str, Path, IO, Dict[str, Any], List[Dict[str, Any]]],
+) -> List[LibProtocolInput]:
+    """
+    Load library protocols and return a list of LibProtocolInput objects.
+    Accepts list or dict with key 'libprotocols', or a single-protocol dict.
+    """
+    data = _load_generic_items(protocols_source)
+
+    if isinstance(data, dict):
+        items = data.get("libprotocols", [])
+        if items == [] and any(k in data for k in ("protocol_id", "name")):
+            items = [data]
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
+
+    return [
+        it if isinstance(it, LibProtocolInput) else LibProtocolInput(**it)
+        for it in items
+    ]
+
+
+def load_assays(
+    assays_source: Union[str, Path, IO, Dict[str, Any], List[Dict[str, Any]]],
+) -> List[AssayInput]:
+    """
+    Load assay data and return a list of AssayInput objects.
+    Accepts list or dict with key 'assays', or a single-assay dict (detected by 'assay_id').
+    """
+    data = _load_generic_items(assays_source)
+
+    if isinstance(data, dict):
+        items = data.get("assays", [])
+        if items == [] and any(k in data for k in ("assay_id", "name")):
+            items = [data]
+    elif isinstance(data, list):
+        items = data
+    else:
+        items = []
+
+    return [it if isinstance(it, AssayInput) else AssayInput(**it) for it in items]
+
+
 def load_spec_stream(spec_stream: IO) -> Assay:
     """
     Parses a YAML stream, strips tags, and returns a validated Assay object.
@@ -224,14 +508,20 @@ def read_remote_list(onlist: Onlist, base_path: str = "") -> List[str]:
         auth = get_remote_auth_token()
         response = requests.get(filename, stream=True, auth=auth)
         response.raise_for_status()
-        stream = response.raw
+        # Read into an in-memory bytes buffer to satisfy type expectations
+        content_buffer = io.BytesIO(response.content)
 
         # do we need to decompress?
         if filename.endswith(".gz"):
-            stream = gzip.GzipFile(fileobj=stream)
+            # Read decompressed bytes into a new BytesIO to present IO[bytes]
+            with gzip.GzipFile(fileobj=content_buffer) as gz:
+                decompressed = gz.read()
+            binary_stream = io.BytesIO(decompressed)
+        else:
+            binary_stream = content_buffer
 
         # convert to text stream
-        stream = io.TextIOWrapper(stream)
+        stream = io.TextIOWrapper(binary_stream)
 
         results = []
         for i in yield_onlist_contents(stream):
@@ -351,3 +641,224 @@ def map_read_id_to_regions(
         rgns = leaves[primer_idx + 1 :]
 
     return (read, rgns)
+
+
+### LLM Utils
+
+
+class SummarySpanExporter(SpanExporter):
+    """
+    Simple: 1 line per span with key info. No args/outputs.
+    Extended: includes tool args + outputs (truncated).
+    """
+
+    def __init__(self, logger: logging.Logger, mode: str):
+        assert mode in {"simple", "extended"}
+        self.logger = logger
+        self.mode = mode
+
+    def export(self, spans):
+        for s in spans:
+            attrs = dict(getattr(s, "attributes", {}) or {})
+
+            # --- infer kind (LLM/TOOL/AGENT/...) ---
+            # Primary: OpenInference attribute when OTLP transport is used
+            kind = attrs.get("openinference.span.kind")
+            # Fallbacks for robustness
+            if not kind:
+                # Some exporters encode kind directly or via presence of attrs
+                if attrs.get("openinference.tool.name"):
+                    kind = "TOOL"
+                elif attrs.get("openinference.model") or attrs.get("llm.model_name"):
+                    kind = "LLM"
+                elif s.name.lower().startswith("agent"):
+                    kind = "AGENT"
+                else:
+                    kind = "CHAIN"
+
+            # --- outcome from span status ---
+            status = getattr(getattr(s, "status", None), "status_code", None)
+            if status == StatusCode.OK:
+                result = "ok"
+            elif status == StatusCode.ERROR:
+                result = "error"
+            else:
+                result = "unset"
+
+            # Optional extras
+            tool_name = attrs.get("openinference.tool.name")
+            model = attrs.get("openinference.model") or attrs.get("llm.model_name")
+
+            if self.mode == "simple":
+                # Compact, user-centric line
+                # e.g. "[span] seqspec_insert_regions type=TOOL result=ok tool=seqspec_insert_regions"
+                parts = [
+                    f"[span] {s.name}",
+                    f"type={kind}",
+                    f"result={result}",
+                ]
+                if tool_name:
+                    parts.append(f"tool={tool_name}")
+                elif model:
+                    parts.append(f"model={model}")
+                self.logger.info(" ".join(parts))
+                continue  # next span
+
+            # ----- extended mode (existing behavior) -----
+            # keep existing extended fields & truncation
+            ctx = s.get_span_context()
+            dur_ms = (
+                (s.end_time - s.start_time) / 1e6
+                if (s.end_time and s.start_time)
+                else 0.0
+            )
+
+            model = attrs.get("openinference.model", model)  # reuse model if set above
+            usage_in = attrs.get("openinference.usage.input_tokens")
+            usage_out = attrs.get("openinference.usage.output_tokens")
+            usage_reason = attrs.get("openinference.usage.reasoning_tokens")
+
+            base = (
+                f"[span] name={s.name} "
+                f"trace={ctx.trace_id:032x} span={ctx.span_id:016x} "
+                f"dur={dur_ms:.1f}ms"
+            )
+
+            extras = []
+            if model:
+                extras.append(f"model={model}")
+            if tool_name:
+                extras.append(f"tool={tool_name}")
+            if (
+                usage_in is not None
+                or usage_out is not None
+                or usage_reason is not None
+            ):
+                extras.append(
+                    f"tokens(in={usage_in},out={usage_out},reason={usage_reason})"
+                )
+            extras.append(f"type={kind}")
+            extras.append(f"result={result}")
+
+            line = base + (" " + " ".join(extras) if extras else "")
+
+            if self.mode == "extended":
+                targs = attrs.get("openinference.tool.args")
+                tout = attrs.get("openinference.tool.output")
+                if targs is not None:
+                    line += " args=" + _truncate_for_console(targs, 400)
+                if tout is not None:
+                    line += " output=" + _truncate_for_console(tout, 400)
+
+            self.logger.info(line)
+
+        return SpanExportResult.SUCCESS
+
+
+def _truncate_for_console(val, limit: int = 400) -> str:
+    try:
+        s = val if isinstance(val, str) else json.dumps(val, ensure_ascii=False)
+    except Exception:
+        s = str(val)
+    return s if len(s) <= limit else s[:limit] + "…"
+
+
+class JsonlSpanExporter(SpanExporter):
+    """Writes spans as JSON lines for later analysis."""
+
+    def __init__(self, path: Path):
+        self.path = Path(path)
+        self._fh = self.path.open("a", encoding="utf-8")
+
+    def shutdown(self):
+        try:
+            self._fh.close()
+        except Exception:
+            pass
+
+    def export(self, spans):
+        import json
+
+        for s in spans:
+            ctx = s.get_span_context()
+            # parent: may be None; when present it's a SpanContext
+            parent_span_id = None
+            try:
+                if s.parent:
+                    parent_span_id = f"{s.parent.span_id:016x}"
+            except Exception:
+                parent_span_id = None
+
+            # times can be 0 if the span didn't end cleanly
+            start = getattr(s, "start_time", 0) or 0
+            end = getattr(s, "end_time", 0) or 0
+            dur_ms = (end - start) / 1e6 if end and start else 0.0
+
+            # attributes/events/resource: coerce to JSON-safe
+            attrs = _json_safe_dict(getattr(s, "attributes", {}) or {})
+            events = []
+            try:
+                for e in getattr(s, "events", []) or []:
+                    events.append(
+                        {
+                            "name": getattr(e, "name", None),
+                            "attributes": _json_safe_dict(
+                                getattr(e, "attributes", {}) or {}
+                            ),
+                        }
+                    )
+            except Exception:
+                pass
+
+            resource_attrs = {}
+            try:
+                resource_attrs = _json_safe_dict(
+                    getattr(s, "resource", None).attributes
+                )  # <-- FIX
+            except Exception:
+                resource_attrs = {}
+
+            rec = {
+                "trace_id": f"{ctx.trace_id:032x}",
+                "span_id": f"{ctx.span_id:016x}",
+                "parent_span_id": parent_span_id,
+                "name": s.name,
+                "start_time_unix_nano": start,
+                "end_time_unix_nano": end,
+                "duration_ms": dur_ms,
+                "attributes": attrs,
+                "events": events,
+                "resource": resource_attrs,
+            }
+            self._fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            self._fh.flush()
+        return SpanExportResult.SUCCESS
+
+
+def _json_safe(obj):
+    # keep it compact + resilient
+    import json
+    from pathlib import Path as _Path
+
+    if obj is None:
+        return None
+    if isinstance(obj, (str, int, float, bool)):
+        return obj
+    if isinstance(obj, (list, tuple)):
+        return [_json_safe(x) for x in obj]
+    if isinstance(obj, dict):
+        return {str(k): _json_safe(v) for k, v in obj.items()}
+    if isinstance(obj, _Path):
+        return str(obj)
+    try:
+        return json.loads(json.dumps(obj))  # best-effort coercion
+    except Exception:
+        return str(obj)
+
+
+def _json_safe_dict(d):
+    try:
+        return {str(k): _json_safe(v) for k, v in dict(d).items()}
+    except Exception:
+        # last resort
+        return {}

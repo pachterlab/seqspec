@@ -3,7 +3,6 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from seqspec.File import File, FileInput
-from seqspec.llmtools import LLMInput
 from seqspec.Region import RegionCoordinate
 
 
@@ -63,21 +62,76 @@ class Read(BaseModel):
                 return self
         return None
 
+    # update_from removed per new approach
+
 
 class ReadCoordinate(BaseModel):
     read: Read
     rcv: List[RegionCoordinate]
 
 
-class ReadInput(LLMInput):
-    read_id: Optional[str] = None
-    name: Optional[str] = None
-    modality: Optional[str] = None
-    primer_id: Optional[str] = None
-    min_len: Optional[int] = None
-    max_len: Optional[int] = None
-    strand: Optional[str] = None
-    files: Optional[List[FileInput]] = None
+class ReadInput(BaseModel):
+    """
+    Input payload for constructing a `Read` (sequencing read definition).
+
+    Defaults and behaviors applied in `to_read()`:
+    - `read_id`: stable identifier for the read; defaults to empty string.
+    - `name`: user label; defaults to `read_id` when omitted.
+    - `modality`: modality name this read belongs to (e.g., 'rna', 'atac').
+    - `primer_id`: identifier of the primer initiating this read if applicable.
+    - `min_len`/`max_len`: expected observed bounds; default to 0.
+    - `strand`: 'pos' or 'neg'; defaults to 'pos'.
+    - `files`: optional list of `FileInput` defining associated FASTQs or other files.
+    """
+
+    read_id: Optional[str] = Field(
+        default=None,
+        description=(
+            "Stable identifier for this read within the assay (e.g., 'R1', 'R2')."
+        ),
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description=(
+            "Human-readable name for the read. Defaults to `read_id` when omitted."
+        ),
+    )
+    modality: Optional[str] = Field(
+        default=None,
+        description=(
+            "Modality this read belongs to (e.g., 'rna', 'atac', 'protein'). Modality must correspond to one of the Assay modalities."
+        ),
+    )
+    primer_id: Optional[str] = Field(
+        default=None,
+        description=(
+            "Identifier for the primer used to generate this read, if relevant."
+        ),
+    )
+    min_len: Optional[int] = Field(
+        default=None,
+        description=(
+            "Minimum expected read length in bases; defaults to 0 if omitted."
+        ),
+    )
+    max_len: Optional[int] = Field(
+        default=None,
+        description=(
+            "Maximum expected read length in bases; defaults to 0 if omitted."
+        ),
+    )
+    strand: Optional[str] = Field(
+        default=None,
+        description=(
+            "Read strand orientation relative to the library structure: 'pos' or 'neg'. Defaults to 'pos'."
+        ),
+    )
+    files: Optional[List[FileInput]] = Field(
+        default=None,
+        description=(
+            "Optional file descriptors (e.g., FASTQs) as File objects with this read."
+        ),
+    )
 
     def to_read(self) -> Read:
         return Read(

@@ -4,7 +4,7 @@
 from seqspec.Assay import Assay
 from seqspec.Region import Region
 
-from seqspec.seqspec_format import format_spec
+from seqspec.seqspec_format import seqspec_format
 
 
 def test_format_spec_basic():
@@ -54,7 +54,7 @@ def test_format_spec_basic():
     original_parent_lengths = (parent_region.min_len, parent_region.max_len)
     
     # Call format_spec
-    format_spec(spec)
+    seqspec_format(spec)
     
     # Verify that parent region was updated
     assert parent_region.sequence != original_parent_sequence
@@ -101,7 +101,7 @@ def test_format_spec_random_sequences():
     )
     
     # Call format_spec
-    format_spec(spec)
+    seqspec_format(spec)
     
     # Verify random sequence was set to "X" * min_len
     assert random_region.sequence == "X" * 10
@@ -139,7 +139,7 @@ def test_format_spec_onlist_sequences():
     )
     
     # Call format_spec
-    format_spec(spec)
+    seqspec_format(spec)
     
     # Verify onlist sequence was set to "N" * min_len
     assert onlist_region.sequence == "N" * 8
@@ -188,7 +188,7 @@ def test_format_spec_nested_regions():
     )
     
     # Call format_spec
-    format_spec(spec)
+    seqspec_format(spec)
     
     # Verify both parent and child were updated
     assert parent_region.sequence == "ATCG"  # Should be joined from child
@@ -230,7 +230,7 @@ def test_format_spec_preserves_fixed_sequences():
     original_sequence = fixed_region.sequence
     
     # Call format_spec
-    format_spec(spec)
+    seqspec_format(spec)
     
     # Verify fixed sequence was preserved
     assert fixed_region.sequence == original_sequence
@@ -242,7 +242,7 @@ def test_format_spec_with_dogmaseq_spec(dogmaseq_dig_spec: Assay):
     spec = dogmaseq_dig_spec.model_copy(deep=True)
     
     # Call format_spec
-    format_spec(spec)
+    seqspec_format(spec)
     
     # Verify that regions have been processed
     # Note: Some regions (like "named" regions) may remain empty
@@ -360,7 +360,7 @@ def test_format_spec_complex_structure():
     )
     
     # Call format_spec
-    format_spec(spec)
+    seqspec_format(spec)
     
     # Verify all levels were updated
     assert root.sequence == "ATCG" + "X" * 6  # fixed + random

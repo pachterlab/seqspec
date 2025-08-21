@@ -4,12 +4,14 @@ This module provides the main entry point for the seqspec command-line interface
 It handles argument parsing, command routing, and execution of subcommands.
 """
 
+import logging
 import sys
 import warnings
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from typing import Any, Callable, Dict
 
 from . import __version__
+from .seqspec_build import run_build, setup_build_args
 from .seqspec_check import run_check, setup_check_args
 from .seqspec_file import run_file, setup_file_args
 from .seqspec_find import run_find, setup_find_args
@@ -50,6 +52,7 @@ Documentation: https://pachterlab.github.io/seqspec/
 
     # Setup the arguments for all subcommands
     command_to_parser = {
+        "build": setup_build_args(subparsers),
         "check": setup_check_args(subparsers),
         "find": setup_find_args(subparsers),
         "file": setup_file_args(subparsers),
@@ -97,6 +100,11 @@ def main() -> None:
     """Main entry point for the seqspec CLI."""
     warnings.simplefilter("default", DeprecationWarning)
 
+    logging.basicConfig(
+        stream=sys.stderr,
+        format="[%(levelname)s] %(message)s",
+    )
+
     parser, command_to_parser = setup_parser()
     handle_no_args(parser, command_to_parser)
 
@@ -106,6 +114,7 @@ def main() -> None:
     command_to_function: Dict[str, Callable[[ArgumentParser, Namespace], Any]] = {
         "format": run_format,
         "print": run_print,
+        "build": run_build,
         "check": run_check,
         "find": run_find,
         "index": run_index,

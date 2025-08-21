@@ -73,7 +73,7 @@ def run_format(parser: ArgumentParser, args: Namespace) -> None:
     validate_format_args(parser, args)
 
     spec = load_spec(args.yaml, strict=False)
-    format_spec(spec)
+    spec = seqspec_format(spec)
 
     if args.output:
         spec.to_YAML(args.output)
@@ -81,10 +81,11 @@ def run_format(parser: ArgumentParser, args: Namespace) -> None:
         print(spec.to_YAML())
 
 
-def format_spec(spec: Assay) -> None:
+def seqspec_format(spec: Assay) -> Assay:
     """Format a seqspec specification by updating its fields.
 
     Args:
         spec: The seqspec specification to format.
     """
     spec.update_spec()
+    return spec

@@ -33,6 +33,9 @@ dependencies = [
     "packaging",
     "matplotlib",
     "pydantic",
+    "openai-agents>=0.2.8",
+    "opentelemetry-sdk>=1.36.0",
+    "openinference-instrumentation-openai-agents>=1.2.0",
 ]
 
 [project.optional-dependencies]

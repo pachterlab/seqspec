@@ -3,7 +3,6 @@ from typing import List, Optional, Union
 import yaml
 from pydantic import BaseModel, Field
 
-from seqspec.llmtools import LLMInput
 from seqspec.Read import Read, ReadInput
 from seqspec.Region import Region, RegionInput
 
@@ -18,11 +17,43 @@ class SeqProtocol(BaseModel):
     def to_dict(self):
         return self.model_dump()
 
+    def update_from(self, patch: Union["SeqProtocol", "SeqProtocolInput"]) -> None:
+        if isinstance(patch, SeqProtocolInput):
+            for field in patch.model_fields_set:
+                value = getattr(patch, field)
+                if value is not None:
+                    setattr(self, field, value)
+            return
+        if isinstance(patch, SeqProtocol):
+            for field in self.model_fields.keys():  # type: ignore[attr-defined]
+                setattr(self, field, getattr(patch, field))
 
-class SeqProtocolInput(LLMInput):
-    protocol_id: Optional[str] = None
-    name: Optional[str] = None
-    modality: Optional[str] = None
+
+class SeqProtocolInput(BaseModel):
+    """
+    Input for defining a sequencing protocol metadata entry.
+
+    - `protocol_id`: stable id; defaults to 'auto-id' in `to_seqprotocol()`.
+    - `name`: display name of the sequencing protocol.
+    - `modality`: modality covered by this protocol (e.g., 'rna').
+    """
+
+    protocol_id: Optional[str] = Field(
+        default=None,
+        description=(
+            "Stable identifier for the sequencing protocol; defaults to 'auto-id' if omitted."
+        ),
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description=("Human-readable name of the sequencing protocol."),
+    )
+    modality: Optional[str] = Field(
+        default=None,
+        description=(
+            "Modality name associated with the sequencing protocol. Modality must come from the `Assay` modality list."
+        ),
+    )
 
     def to_seqprotocol(self) -> SeqProtocol:
         return SeqProtocol(
@@ -40,11 +71,41 @@ class SeqKit(BaseModel):
     def to_dict(self):
         return self.model_dump()
 
+    def update_from(self, patch: Union["SeqKit", "SeqKitInput"]) -> None:
+        if isinstance(patch, SeqKitInput):
+            for field in patch.model_fields_set:
+                value = getattr(patch, field)
+                if value is not None:
+                    setattr(self, field, value)
+            return
+        if isinstance(patch, SeqKit):
+            for field in self.model_fields.keys():  # type: ignore[attr-defined]
+                setattr(self, field, getattr(patch, field))
 
-class SeqKitInput(LLMInput):
-    kit_id: Optional[str] = None
-    name: Optional[str] = None
-    modality: Optional[str] = None
+
+class SeqKitInput(BaseModel):
+    """
+    Input for defining a sequencing kit metadata entry.
+
+    - `kit_id`: stable id for the kit.
+    - `name`: display name of the kit.
+    - `modality`: modality covered by the kit (e.g., 'rna').
+    """
+
+    kit_id: Optional[str] = Field(
+        default=None,
+        description=("Stable identifier for the sequencing kit."),
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description=("Human-readable name of the sequencing kit."),
+    )
+    modality: Optional[str] = Field(
+        default=None,
+        description=(
+            "Modality name associated with the sequencing kit. Modality must come from the `Assay` modality list."
+        ),
+    )
 
     def to_seqkit(self) -> SeqKit:
         return SeqKit(
@@ -60,11 +121,41 @@ class LibProtocol(BaseModel):
     def to_dict(self):
         return self.model_dump()
 
+    def update_from(self, patch: Union["LibProtocol", "LibProtocolInput"]) -> None:
+        if isinstance(patch, LibProtocolInput):
+            for field in patch.model_fields_set:
+                value = getattr(patch, field)
+                if value is not None:
+                    setattr(self, field, value)
+            return
+        if isinstance(patch, LibProtocol):
+            for field in self.model_fields.keys():  # type: ignore[attr-defined]
+                setattr(self, field, getattr(patch, field))
 
-class LibProtocolInput(LLMInput):
-    protocol_id: Optional[str] = None
-    name: Optional[str] = None
-    modality: Optional[str] = None
+
+class LibProtocolInput(BaseModel):
+    """
+    Input for defining a library protocol metadata entry.
+
+    - `protocol_id`: stable id for the library protocol.
+    - `name`: display name of the library protocol.
+    - `modality`: modality covered by this protocol (e.g., 'rna').
+    """
+
+    protocol_id: Optional[str] = Field(
+        default=None,
+        description=("Stable identifier for the library protocol."),
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description=("Human-readable name of the library protocol."),
+    )
+    modality: Optional[str] = Field(
+        default=None,
+        description=(
+            "Modality name associated with the library protocol. Modality must come from the `Assay` modality list."
+        ),
+    )
 
     def to_libprotocol(self) -> LibProtocol:
         return LibProtocol(
@@ -82,11 +173,41 @@ class LibKit(BaseModel):
     def to_dict(self):
         return self.model_dump()
 
+    def update_from(self, patch: Union["LibKit", "LibKitInput"]) -> None:
+        if isinstance(patch, LibKitInput):
+            for field in patch.model_fields_set:
+                value = getattr(patch, field)
+                if value is not None:
+                    setattr(self, field, value)
+            return
+        if isinstance(patch, LibKit):
+            for field in self.model_fields.keys():  # type: ignore[attr-defined]
+                setattr(self, field, getattr(patch, field))
 
-class LibKitInput(LLMInput):
-    kit_id: Optional[str] = None
-    name: Optional[str] = None
-    modality: Optional[str] = None
+
+class LibKitInput(BaseModel):
+    """
+    Input for defining a library kit metadata entry.
+
+    - `kit_id`: stable id for the kit.
+    - `name`: display name of the kit.
+    - `modality`: modality covered by the kit (e.g., 'rna').
+    """
+
+    kit_id: Optional[str] = Field(
+        default=None,
+        description=("Stable identifier for the library kit."),
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description=("Human-readable name of the library kit."),
+    )
+    modality: Optional[str] = Field(
+        default=None,
+        description=(
+            "Modality name associated with the library kit. Modality must come from the `Assay` modality list."
+        ),
+    )
 
     def to_libkit(self) -> LibKit:
         return LibKit(
@@ -157,7 +278,21 @@ Regions:
             r.update_attr()
 
     def get_libspec(self, modality) -> Region:
-        return self.library_spec[self.modalities.index(modality)]
+        if modality not in self.modalities:
+            raise ValueError(f"Modality '{modality}' does not exist")
+
+        target_index = self.modalities.index(modality)
+
+        if target_index >= len(self.library_spec):
+            raise ValueError(f"Modality '{modality}' does not exist")
+
+        region = self.library_spec[target_index]
+        if getattr(region, "region_id", None) != modality:
+            raise ValueError(
+                f"Top-level region id '{getattr(region, 'region_id', None)}' does not correspond to modality '{modality}'"
+            )
+
+        return region
 
     def get_seqspec(self, modality):
         return [r for r in self.sequence_spec if r.modality == modality]
@@ -219,24 +354,102 @@ Regions:
             self.sequence_spec.insert(insert_idx, read)
             insert_idx += 1
 
+    # update_from removed per new approach
 
-class AssayInput(LLMInput):
-    seqspec_version: Optional[str] = __version__
-    assay_id: Optional[str] = None
-    name: Optional[str] = None
-    doi: Optional[str] = None
-    date: Optional[str] = None
-    description: Optional[str] = None
-    modalities: Optional[List[str]] = None
-    lib_struct: Optional[str] = None
 
-    sequence_protocol: Union[str, List[SeqProtocolInput], None] = None
-    sequence_kit: Union[str, List[SeqKitInput], None] = None
-    library_protocol: Union[str, List[LibProtocolInput], None] = None
-    library_kit: Union[str, List[LibKitInput], None] = None
+class AssayInput(BaseModel):
+    """
+    Input payload for constructing an `Assay` definition.
 
-    sequence_spec: Optional[List[ReadInput]] = None
-    library_spec: Optional[List[RegionInput]] = None
+    Guidance for key fields:
+    - `seqspec_version`: fixed by package; rarely overridden.
+    - `assay_id`/`name`: stable id and display name for the assay.
+    - `doi`/`date`/`description`: metadata describing provenance and context.
+    - `modalities`: ordered list of modality names used across specs (e.g., ['rna', 'atac']).
+    - `lib_struct`: textual representation of library structure (e.g., a schematic string).
+
+    Protocol/kit fields accept either a string (identifier to external registry) or
+    a list of strongly typed inputs defined above.
+
+    Specs:
+    - `sequence_spec`: list of `ReadInput` entries (reads) across modalities.
+    - `library_spec`: list of top-level `RegionInput` trees, one per modality and in the same order as `modalities`.
+    """
+
+    seqspec_version: Optional[str] = Field(
+        default=__version__,
+        description=("Version of the seqspec schema used to construct this assay."),
+    )
+    assay_id: Optional[str] = Field(
+        default=None,
+        description=("Stable identifier for the assay definition."),
+    )
+    name: Optional[str] = Field(
+        default=None,
+        description=("Human-readable assay name."),
+    )
+    doi: Optional[str] = Field(
+        default=None,
+        description=("DOI or accession describing the assay or reference publication."),
+    )
+    date: Optional[str] = Field(
+        default=None,
+        description=("Date string (e.g., YYYY-MM-DD) for the assay definition or run."),
+    )
+    description: Optional[str] = Field(
+        default=None,
+        description=("Free text description of the assay."),
+    )
+    modalities: Optional[List[str]] = Field(
+        default=None,
+        description=(
+            "Ordered list of modality names used in this assay (e.g., ['rna', 'atac'])."
+        ),
+    )
+    lib_struct: Optional[str] = Field(
+        default=None,
+        description=(
+            "String diagram of the library structure (for display or shorthand)."
+        ),
+    )
+
+    sequence_protocol: Union[str, List[SeqProtocolInput], None] = Field(
+        default=None,
+        description=(
+            "Either a registry identifier (string) or a list of `SeqProtocolInput`."
+        ),
+    )
+    sequence_kit: Union[str, List[SeqKitInput], None] = Field(
+        default=None,
+        description=(
+            "Either a registry identifier (string) or a list of `SeqKitInput`."
+        ),
+    )
+    library_protocol: Union[str, List[LibProtocolInput], None] = Field(
+        default=None,
+        description=(
+            "Either a registry identifier (string) or a list of `LibProtocolInput`."
+        ),
+    )
+    library_kit: Union[str, List[LibKitInput], None] = Field(
+        default=None,
+        description=(
+            "Either a registry identifier (string) or a list of `LibKitInput`."
+        ),
+    )
+
+    sequence_spec: Optional[List[ReadInput]] = Field(
+        default=None,
+        description=(
+            "List of read definitions across modalities. Must be a list of `Read` objects"
+        ),
+    )
+    library_spec: Optional[List[RegionInput]] = Field(
+        default=None,
+        description=(
+            "List of top-level region trees (one per modality, same order as `modalities`). Must be a list of `Region` objects."
+        ),
+    )
 
     def to_assay(self) -> Assay:
         return Assay(

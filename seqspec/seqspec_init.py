@@ -3,16 +3,11 @@
 This module provides functionality to generate new seqspec files from a newick tree format.
 """
 
-import warnings
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
 from typing import List
 
-import newick
-
 from seqspec.Assay import Assay
-from seqspec.File import File
-from seqspec.Read import Read
 from seqspec.Region import Region
 from seqspec.utils import write_pydantic_to_file_or_stdout
 
@@ -71,18 +66,6 @@ def run_init(parser: ArgumentParser, args: Namespace) -> None:
     write_pydantic_to_file_or_stdout(spec, args.output)
 
 
-# -----------------------------------------------------------------------------
-# Deprecated legacy (newick-based) helpers – kept for reference only
-# -----------------------------------------------------------------------------
-
-
-warnings.warn(
-    "The newick-based seqspec init format is deprecated and will be removed in a future release.",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
-
 def seqspec_init(
     name: str, doi: str, date: str, description: str, modalities: List[str]
 ) -> Assay:
@@ -110,142 +93,3 @@ def seqspec_init(
     )
     spec.update_spec()
     return spec
-
-
-# The following functions are **deprecated** and unused by the current CLI
-# but remain in the file for backward compatibility / reference.
-
-
-def old_seqspec_init(
-    name: str, modalities: List[str], regions: List[Region], reads: List[Read]
-) -> Assay:
-    """Initialize a new seqspec specification.
-
-    Args:
-        name: Name of the assay
-        modalities: List of modalities
-        regions: List of Region objects
-        reads: List of read specifications
-
-    Returns:
-        Initialized Assay object
-
-    Raises:
-        ValueError: If number of modalities doesn't match number of regions
-    """
-    if len(regions) != len(modalities):
-        raise ValueError("Number of modalities must match number of regions")
-
-    return Assay(
-        assay_id="",
-        name=name,
-        doi="",
-        date="",
-        description="",
-        modalities=modalities,
-        lib_struct="",
-        library_kit="",
-        library_protocol="",
-        sequence_kit="",
-        sequence_protocol="",
-        sequence_spec=reads,
-        library_spec=regions,
-    )
-
-
-def newick_to_regions(newick_str: str) -> List[Region]:
-    """Convert a newick string to a list of Region objects.
-
-    Args:
-        newick_str: Newick format string representing the library structure
-
-    Returns:
-        List of Region objects
-
-    Raises:
-        ValueError: If newick string is invalid
-    """
-    try:
-        tree = newick.loads(newick_str)
-    except Exception as e:
-        raise ValueError(f"Invalid newick string: {e}")
-
-    regions = []
-    for node in tree[0].descendants:
-        region = Region(region_id="", region_type="", name="", sequence_type="")
-        regions.append(newick_to_region(node, region))
-    return regions
-
-
-def newick_to_region(node: newick.Node, region: Region) -> Region:
-    """Convert a newick node to a Region object.
-
-    Args:
-        node: Newick tree node
-        region: Base region object to populate
-
-    Returns:
-        Populated Region object
-    """
-    region.region_id = node.name
-    region.name = node.name
-
-    if not node.descendants:
-        region.min_len = int(node.length)
-        region.max_len = int(node.length)
-        return region
-
-    region.regions = []
-    for descendant in node.descendants:
-        region.regions.append(
-            newick_to_region(
-                descendant,
-                Region(
-                    region_id=descendant.name,
-                    region_type="",
-                    name=descendant.name,
-                    sequence_type="",
-                ),
-            )
-        )
-    return region
-
-
-def parse_reads_string(input_string: str) -> List[Read]:
-    """Parse a string of read specifications into Read objects.
-
-    Args:
-        input_string: String containing read specifications in format
-            "modality,read_id,primer_id,min_len,strand:..."
-
-    Returns:
-        List of Read objects
-    """
-    reads = []
-    for obj in input_string.split(":"):
-        modality, read_id, primer_id, min_len, strand = obj.split(",")
-
-        reads.append(
-            Read(
-                read_id=read_id,
-                name=read_id,
-                modality=modality,
-                primer_id=primer_id,
-                min_len=int(min_len),
-                max_len=int(min_len),
-                strand=strand,
-                files=[
-                    File(
-                        file_id=read_id,
-                        filename=read_id,
-                        filetype="",
-                        filesize=0,
-                        url="",
-                        urltype="",
-                        md5="",
-                    )
-                ],
-            )
-        )
-
-    return reads

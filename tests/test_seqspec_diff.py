@@ -306,14 +306,25 @@ def test_compare_specs_identical():
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="region1",
-                region_type="barcode",
-                name="Region 1",
-                sequence_type="fixed",
-                sequence="ATCG",
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="region1",
+                        region_type="barcode",
+                        name="Region 1",
+                        sequence_type="fixed",
+                        sequence="ATCG",
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -334,14 +345,25 @@ def test_compare_specs_identical():
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="region1",
-                region_type="barcode",
-                name="Region 1",
-                sequence_type="fixed",
-                sequence="ATCG",
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="region1",
+                        region_type="barcode",
+                        name="Region 1",
+                        sequence_type="fixed",
+                        sequence="ATCG",
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -368,24 +390,46 @@ def test_compare_specs_different_modalities():
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="rna_region",
-                region_type="barcode",
-                name="RNA Region",
-                sequence_type="fixed",
-                sequence="ATCG",
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="rna_region",
+                        region_type="barcode",
+                        name="RNA Region",
+                        sequence_type="fixed",
+                        sequence="ATCG",
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             ),
             Region(
-                region_id="protein_region",
-                region_type="umi",
-                name="Protein Region",
-                sequence_type="random",
-                sequence="XXXX",
-                min_len=6,
-                max_len=6,
-                regions=[]
+                region_id="protein",
+                region_type="protein",
+                name="protein",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="protein_region",
+                        region_type="umi",
+                        name="Protein Region",
+                        sequence_type="random",
+                        sequence="XXXX",
+                        min_len=6,
+                        max_len=6,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -406,24 +450,46 @@ def test_compare_specs_different_modalities():
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="rna_region",
-                region_type="barcode",
-                name="RNA Region",
-                sequence_type="fixed",
-                sequence="ATCG",
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="rna_region",
+                        region_type="barcode",
+                        name="RNA Region",
+                        sequence_type="fixed",
+                        sequence="ATCG",
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             ),
             Region(
-                region_id="atac_region",
-                region_type="cdna",
-                name="ATAC Region",
+                region_id="atac",
+                region_type="atac",
+                name="atac",
                 sequence_type="joined",
-                sequence="NNNN",
-                min_len=8,
-                max_len=8,
-                regions=[]
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="atac_region",
+                        region_type="cdna",
+                        name="ATAC Region",
+                        sequence_type="joined",
+                        sequence="NNNN",
+                        min_len=8,
+                        max_len=8,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -453,14 +519,25 @@ def test_compare_specs_common_modality_differences():
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="region1",
-                region_type="barcode",
-                name="Region 1",
-                sequence_type="fixed",
-                sequence="ATCG",
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="region1",
+                        region_type="barcode",
+                        name="Region 1",
+                        sequence_type="fixed",
+                        sequence="ATCG",
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -481,14 +558,25 @@ def test_compare_specs_common_modality_differences():
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="region1",
-                region_type="barcode",
-                name="Region 1",
-                sequence_type="fixed",
-                sequence="GCTA",  # Different sequence
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="region1",
+                        region_type="barcode",
+                        name="Region 1",
+                        sequence_type="fixed",
+                        sequence="GCTA",  # Different sequence
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -518,24 +606,46 @@ def test_compare_specs_multiple_modalities():
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="rna_region",
-                region_type="barcode",
-                name="RNA Region",
-                sequence_type="fixed",
-                sequence="ATCG",
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="rna_region",
+                        region_type="barcode",
+                        name="RNA Region",
+                        sequence_type="fixed",
+                        sequence="ATCG",
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             ),
             Region(
-                region_id="protein_region",
-                region_type="umi",
-                name="Protein Region",
-                sequence_type="random",
-                sequence="XXXX",
-                min_len=6,
-                max_len=6,
-                regions=[]
+                region_id="protein",
+                region_type="protein",
+                name="protein",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="protein_region",
+                        region_type="umi",
+                        name="Protein Region",
+                        sequence_type="random",
+                        sequence="XXXX",
+                        min_len=6,
+                        max_len=6,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -556,24 +666,46 @@ def test_compare_specs_multiple_modalities():
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="rna_region",
-                region_type="barcode",
-                name="RNA Region",
-                sequence_type="fixed",
-                sequence="GCTA",  # Different sequence
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="rna_region",
+                        region_type="barcode",
+                        name="RNA Region",
+                        sequence_type="fixed",
+                        sequence="GCTA",  # Different sequence
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             ),
             Region(
-                region_id="protein_region",
-                region_type="umi",
-                name="Protein Region",
-                sequence_type="random",
-                sequence="XXXX",
-                min_len=6,
-                max_len=6,
-                regions=[]
+                region_id="protein",
+                region_type="protein",
+                name="protein",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="protein_region",
+                        region_type="umi",
+                        name="Protein Region",
+                        sequence_type="random",
+                        sequence="XXXX",
+                        min_len=6,
+                        max_len=6,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -629,14 +761,25 @@ def test_run_diff_stdout(tmp_path):
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="region1",
-                region_type="barcode",
-                name="Region 1",
-                sequence_type="fixed",
-                sequence="ATCG",
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="region1",
+                        region_type="barcode",
+                        name="Region 1",
+                        sequence_type="fixed",
+                        sequence="ATCG",
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -657,14 +800,25 @@ def test_run_diff_stdout(tmp_path):
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="region1",
-                region_type="barcode",
-                name="Region 1",
-                sequence_type="fixed",
-                sequence="GCTA",  # Different sequence
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="region1",
+                        region_type="barcode",
+                        name="Region 1",
+                        sequence_type="fixed",
+                        sequence="GCTA",  # Different sequence
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -714,14 +868,25 @@ def test_run_diff_file_output(tmp_path):
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="region1",
-                region_type="barcode",
-                name="Region 1",
-                sequence_type="fixed",
-                sequence="ATCG",
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="region1",
+                        region_type="barcode",
+                        name="Region 1",
+                        sequence_type="fixed",
+                        sequence="ATCG",
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
@@ -742,14 +907,25 @@ def test_run_diff_file_output(tmp_path):
         sequence_spec=[],
         library_spec=[
             Region(
-                region_id="region1",
-                region_type="barcode",
-                name="Region 1",
-                sequence_type="fixed",
-                sequence="GCTA",  # Different sequence
-                min_len=4,
-                max_len=4,
-                regions=[]
+                region_id="rna",
+                region_type="rna",
+                name="rna",
+                sequence_type="joined",
+                sequence="",
+                min_len=0,
+                max_len=0,
+                regions=[
+                    Region(
+                        region_id="region1",
+                        region_type="barcode",
+                        name="Region 1",
+                        sequence_type="fixed",
+                        sequence="GCTA",  # Different sequence
+                        min_len=4,
+                        max_len=4,
+                        regions=[]
+                    )
+                ]
             )
         ]
     )
