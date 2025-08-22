@@ -196,15 +196,6 @@ library_spec:
   max_len: 110
   onlist: null
   regions:
-  - region_id: ghost_protein_truseq_read1
-    region_type: named
-    name: Truseq Read 1
-    sequence_type: fixed
-    sequence: ''
-    min_len: 0
-    max_len: 0
-    onlist: null
-    regions: []
   - region_id: protein_truseq_read1
     region_type: truseq_read1
     name: Truseq Read 1
