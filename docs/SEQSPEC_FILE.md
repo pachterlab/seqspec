@@ -52,14 +52,14 @@ sequence_spec:
 
 The header of a `seqspec` file stores assay metadata including library preparation and sequencing kits and protocols.
 
-`modalities` contains a list of strings describing the types of molecules assayed. They come from a [controlled vocabulary](SPECIFICATION.md).
+`modalities` contains a list of strings describing the types of molecules assayed. They come from a [controlled vocabulary](SPECIFICATION.md). The first-level `library_spec` regions must have `region_id`s equal to these modalities.
 
 ## Library structure
 
 The `library_spec` describes the "regions", or set of standard "blocks" such as a barcode, contained in the sequencing library. Each region is annotated with the following metadata:
 
 - `region_id`: Unique identifier for the region
-- `region_type`: Type of region (e.g., barcode, UMI, cDNA)
+- `region_type`: Type of region (e.g., barcode, UMI, cDNA). See the complete list in the technical specification. `meta` is used as a modality placeholder by `seqspec init` for the top-level regions.
 - `sequence_type`: Nature of the sequence (fixed, random, onlist)
 - `sequence`: Actual or representative sequence
 - `min_len` and `max_len`: Minimum and maximum length of the region
@@ -79,13 +79,13 @@ region_5
 The first "level" of the `library_spec` must have `region_ids` that correspond to the list of `modalities`. In the example above, the first level corresponds to the region ids `region_1` and `region_5`.
 ```
 
-Regions are placed annotated within the library molecule in the 5' -> 3' order. The library specification does not encode the absolute position of the elements with respect to a linear coordinate system but rather encodes the relative position of these blocks along with their minimum and maximum length.
+Regions are annotated in the 5' -> 3' order. The spec encodes relative ordering and bounds (`min_len`, `max_len`), not absolute coordinates.
 
 This means that that the vertical ordering of the regions in the spec _must_ correspond to their 5' -> 3' ordering of the element in the library molecule that is being annotated.
 
 ## Sequence structure
 
-The `sequence_spec` contains a list of the sequencing "reads" generated from the `library_spec`. Each read is annotated with the following metadata:
+The `sequence_spec` contains a list of sequencing reads generated from the `library_spec`. Each read is annotated with the following metadata:
 
 - `read_id`: Identifier for the read
 - `modality`: Associated modality
@@ -107,11 +107,11 @@ The relationship between the `sequence_spec` and `library_spec` in `seqspec` is 
 4. The read encompasses all library elements that fall within its length, starting from the end of the `primer_id` region.
 5. If the read is on the positive strand, it extends to the right of the primer; if on the negative strand, it extends to the left.
 
-This mapping allows the precise identification the library elements captured in each sequencing read using the `seqspec index` command.
+This mapping enables precise identification of library elements captured in each sequencing read using the `seqspec index` command.
 
 # Mapping Files to Reads
 
-Each `Read` in the `sequence_spec` can contain a list of `File` objects. The files correspond real files that contain the sequence represented by the `Read`. Practically speaking, the can refer to multiple FASTQ files from different lanes but from the same read. For example suppose a sequencing run produced Read 1 and Read 2 FASTQ files with three lanes dedicated per read. The FASTQ files often have the following naming convention
+Each `Read` can contain a list of `File` objects. These correspond to real files that contain the sequences represented by the `Read`. Practically, multiple FASTQ files from different lanes but the same read are common. For example, a run with three lanes per read might look like:
 
 Read 1
 
@@ -131,7 +131,7 @@ And are sometimes represented as "pairs"
 2. R1_L002.fastq.gz, R2_L002.fastq.gz
 3. R1_L003.fastq.gz, R2_L003.fastq.gz
 
-The `files` entry for each `Read` functions to list the files for each read **in a consistent order**. Meaning "lane 3" for Read 1, must be in the same position as "lane 3" for Read 2.
+The `files` entry for each `Read` must list files in a consistent order across reads (e.g., lane 3 of Read 1 aligns with lane 3 of Read 2).
 
 ```yaml
 sequence_spec:
@@ -163,7 +163,7 @@ sequence_spec:
         ...
 ```
 
-Sometimes reads are grouped together in a single file like in the BAM file format where paired end reads are stored in one file. `seqspec` is flexible enough to handle this case. Simple repeat the File for each of the reads that are represented by that file.
+Sometimes reads are grouped together in a single file (e.g., paired-end reads in a BAM). `seqspec` supports this by repeating the same `File` under each corresponding `Read`.
 
 ```yaml
 sequence_spec:
@@ -187,7 +187,7 @@ sequence_spec:
 
 The following requirements are often sources of errors when writing a `seqspec` file.
 
-- Each `region_id` in top-most level of the `library_spec` should correspond to one modality in the `modalities`.
+- Each `region_id` in the top-most level of `library_spec` must correspond to one modality in `modalities`.
 - The `primer_id` of each read in the `sequence_spec` must exist as a `region_id` in the `library_spec`
 
 # Conclusion
