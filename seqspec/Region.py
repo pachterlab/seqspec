@@ -380,12 +380,14 @@ class RegionInput(BaseModel):
 
         # Handle sequence type and sequence generation
         seq_type = self.sequence_type or "fixed"
-        if seq_type == "random":
-            sequence = "X" * min_len
-        elif seq_type == "onlist":
-            sequence = "N" * min_len
-        else:
-            sequence = self.sequence or ""
+        sequence = self.sequence
+        if sequence is None:
+            if seq_type == "random":
+                sequence = "X" * min_len
+            elif seq_type == "onlist":
+                sequence = "N" * min_len
+            else:
+                sequence = self.sequence or ""
 
         return Region(
             region_id=self.region_id or "",

@@ -393,9 +393,6 @@ def check(spec: Assay):
                     "error_message": f"'{rgn.region_id}' sequence_type is 'fixed' and contains subregions",
                     "error_object": "region",
                 }
-                # errors.append(
-                #     f"[error {idx}] '{rgn.region_id}' sequence_type is 'fixed' and contains subregions"
-                # )
                 errors.append(errobj)
                 idx += 1
             if rgn.sequence_type == "joined" and not rgn.regions:
@@ -414,7 +411,10 @@ def check(spec: Assay):
                 }
                 errors.append(errobj)
                 idx += 1
-            if rgn.sequence_type == "random" and rgn.sequence != "X" * rgn.max_len:
+            if rgn.sequence_type == "random" and (
+                set(rgn.sequence) != {"X"}
+                or not (rgn.min_len <= len(rgn.sequence) <= rgn.max_len)
+            ):
                 errobj = {
                     "error_type": "check_sequence_types",
                     "error_message": f"'{rgn.region_id}' sequence_type is 'random' and sequence is not all X's",
