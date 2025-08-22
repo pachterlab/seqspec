@@ -372,11 +372,52 @@ def check(spec: Assay):
     #             idx += 1
     #     return (errors, idx)
 
-    # check that the max read len is not longer than the max len of the lib spec after the primer
-    # for read in spec.sequence_spec:
-    #     mode = spec.get_libspec(read.modality)
-    #     leaves = mode.get_leaves()
-    #     idx = [i.region_id for i in leaves].index(read.primer_id)
+    # check that the read lengths of the reads are between those allowed by the library elements after the primer
+    def check_read_length_against_library(spec: Assay, errors, idx):
+        for read in spec.sequence_spec:
+            mode = read.modality
+            libspec = spec.get_libspec(mode)
+            leaves = libspec.get_leaves_with_region_id(read.primer_id)
+            # Find the primer region index in the leaves
+            try:
+                pidx = next(
+                    i for i, obj in enumerate(leaves) if obj.region_id == read.primer_id
+                )
+            except StopIteration:
+                errobj = {
+                    "error_type": "check_read_length_against_library",
+                    "error_message": f"'{read.read_id}' primer_id '{read.primer_id}' not found in library leaves for modality '{mode}'",
+                    "error_object": "read",
+                }
+                errors.append(errobj)
+                idx += 1
+                continue
+
+            if read.strand == "pos":
+                # everything after the primer region
+                elements = leaves[pidx + 1 :]
+            else:
+                # everything before the primer region
+                elements = leaves[:pidx]
+
+            # sum_min = sum(obj.min_len for obj in elements)
+            sum_max = sum(obj.max_len for obj in elements)
+
+            # Check that the read's min_len and max_len are within the allowed range
+            if read.max_len > sum_max:
+                errobj = {
+                    "error_type": "check_read_length_against_library",
+                    "error_message": (
+                        f"'{read.read_id}' max read length (max_len={read.max_len}) "
+                        f"is greater than sequence-able range (max_sum={sum_max}) "
+                        f"for library elements {'after' if read.strand == 'pos' else 'before'} primer '{read.primer_id}'"
+                    ),
+                    "error_object": "read",
+                }
+                errors.append(errobj)
+                idx += 1
+
+        return (errors, idx)
 
     def check_sequence_types(spec, errors, idx):
         modes = spec.modalities
@@ -582,6 +623,7 @@ def check(spec: Assay):
         "check_read_file_count": check_read_file_count,
         "check_region_against_subregion_length": check_region_against_subregion_length,
         "check_region_against_subregion_sequence": check_region_against_subregion_sequence,
+        "check_read_length_against_library": check_read_length_against_library,
     }
     for k, v in checks.items():
         # print(k)
