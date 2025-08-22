@@ -76,16 +76,16 @@ run_check(schema_fn: str, spec_fn: str, o: str)
 
 A list of checks performed:
 
-1. Check that modalities are unique
-2. Check that `region_id`s of he first level of the `library_spec` correspond to modalities (and that there is one `region` per `modality`).
-3. Check that the onlist files exist (either locally or remotely)
-4. Check that the `read_id`s in the `sequence_spec` are unique.
-5. Check that Read files exist (either locally or remotely).
-6. Check that Read `primer_id`s, strand pairs are unique across all reads.
-7. Check that the `region_id`s are unique across all regions in the `library_spec`.
-8. Check that the read modalities are in assay list of modalities.
-9. Check that the `primer_id`s for the reads in the `sequence_spec` exist as a `region_id`s in the `library_spec`.
-10. Check that the `primer_id`s for the reads exist as `region_ids` for the "leaves" of the `library_spec`.
+1. Check that the spec validates against the JSON Schema.
+2. Check that modalities are unique.
+3. Check that `region_id`s of the first level of the `library_spec` correspond to modalities (one per modality).
+4. Check that onlist files exist (either as local paths or reachable URLs).
+5. Check that the `read_id`s in the `sequence_spec` are unique.
+6. Check that read files exist (either as local paths or reachable URLs).
+7. Check that read `(primer_id, strand)` pairs are unique across all reads.
+8. Check that the `region_id`s are unique across all regions.
+9. Check that each read `modality` exists in the assay list of modalities.
+10. Check that each read `primer_id` exists among the region IDs in the `library_spec`.
 11. Check `sequence_type` and region annotation consistencies:
 
 - if a region has a sequence type "fixed" then it should not contain subregions
@@ -93,9 +93,12 @@ A list of checks performed:
 - if a region has a sequence type "random" then it should not contain subregions and `sequence` should be all X's
 - if a region has a sequence type "onlist" then it should have an onlist object
 
-12. Check that the `min_len` is less than the `max_len`.
-13. Check that the lengths of the `sequence` in every region object is between the `min_len` and `max_len` length.
-14. Check that the number of files in each `File` object for all `Read` objects are the same length.
+12. Check that the `min_len` is less than or equal to the `max_len`.
+13. Check that the length of the `sequence` in every region is between the `min_len` and `max_len`.
+14. Check that the number of files in each `Read` is the same across all reads.
+15. Check that for every region with subregions, the region `min_len`/`max_len` equals the sum of the subregions' `min_len`/`max_len`.
+16. Check that for every region with subregions, the region `sequence` equals the left-to-right concatenation of the subregions' `sequence`s.
+17. Check that each read's `max_len` does not exceed the sequence-able range of library elements after (pos strand) or before (neg strand) the primer.
 
 Below are a list of example errors one may encounter when checking a spec:
 
