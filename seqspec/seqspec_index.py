@@ -319,6 +319,9 @@ def get_index_by_primer(
     return {read_id: new_rcs, "strand": rdc.read.strand}
 
 
+FEATURE_REGION_TYPES = {"CDNA", "GDNA", "PROTEIN", "TAG", "SGRNA_TARGET"}
+
+
 def format_kallisto_bus(indices, subregion_type=None):
     bcs = []
     umi = []
@@ -331,12 +334,7 @@ def format_kallisto_bus(indices, subregion_type=None):
                     bcs.append(f"{idx},{cut.start},{cut.stop}")
                 elif cut.region_type.upper() == "UMI":
                     umi.append(f"{idx},{cut.start},{cut.stop}")
-                elif (
-                    cut.region_type.upper() == "CDNA"
-                    or cut.region_type.upper() == "GDNA"
-                    or cut.region_type.upper() == "PROTEIN"
-                    or cut.region_type.upper() == "TAG"
-                ):
+                elif cut.region_type.upper() in FEATURE_REGION_TYPES:
                     feature.append(f"{idx},{cut.start},{cut.stop}")
     if len(umi) == 0:
         umi.append("-1,-1,-1")
@@ -362,12 +360,7 @@ def format_kallisto_bus_force_single(indices, subregion_type=None):
                     bcs.append(f"{idx},{cut.start},{cut.stop}")
                 elif cut.region_type.upper() == "UMI":
                     umi.append(f"{idx},{cut.start},{cut.stop}")
-                elif (
-                    cut.region_type.upper() == "CDNA"
-                    or cut.region_type.upper() == "GDNA"
-                    or cut.region_type.upper() == "PROTEIN"
-                    or cut.region_type.upper() == "TAG"
-                ):
+                elif cut.region_type.upper() in FEATURE_REGION_TYPES:
                     length = cut.stop - cut.start
                     if length > max_length:
                         max_length = length
