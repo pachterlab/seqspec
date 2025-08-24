@@ -30,16 +30,30 @@ authors:
    git checkout main
    git pull origin main
 
-   # 3. Create the release
+   # 3. Prepare environment (optional if already set up)
+   uv venv .venv
+   source .venv/bin/activate
+   uv pip install ".[dev]"
+
+   # 4. Sanity-check version resolution
+   make version
+
+   # 5. Create the release
    make release
    # This will:
+   # - Verify you are on main and working tree is clean
+   # - Pull with --ff-only
+   # - Run tests (uv run pytest)
    # - Prompt for version number
-   # - Create git tag
-   # - Push tag to GitHub
-   # - Build package
-   # - Upload to PyPI
+   # - Create and push git tag
+   # - Build sdist+wheel (uv run python -m build)
+   # - Upload to PyPI (uvx twine upload)
 
-   # 4. Return to development
+   # 6. Verify installation (optional)
+   uv pip install --no-cache-dir seqspec==<version>
+   seqspec --help
+
+   # 7. Return to development
    git checkout devel
    ```
 
@@ -60,9 +74,10 @@ Follow semantic versioning:
 
 2. **Always release from `main` branch**
 
-   - Ensures PyPI version matches main branch
+   - Makefile enforces releasing from `main` with a clean tree
+   - Ensures PyPI version matches `main`
    - Git tags point to correct code
-   - Release process is clean and reproducible
+   - Tests are run automatically during release
 
 3. **Development versions**
    - During development: `0.3.1.dev123+gabc123`
@@ -172,10 +187,11 @@ Follow semantic versioning:
 
 If `make release` fails:
 
-1. Ensure you're on `main` branch
-2. Ensure `main` is up to date (`git pull origin main`)
-3. Check PyPI credentials are correct
-4. Check git tags are being pushed correctly
+1. Ensure you're on `main` and the working tree is clean (`git status`)
+2. Ensure `main` is up to date (`git pull --ff-only`)
+3. Check that tests pass locally (`uv run pytest`)
+4. Check PyPI credentials are correct
+5. Confirm git tags are being pushed (`git push origin --tags`)
 
 ### uv Issues
 
@@ -220,6 +236,6 @@ make clean
 All dependencies are managed in `pyproject.toml`:
 
 - Runtime dependencies under `[project]`
-- Development dependencies under `[project.optional-dependencies]`
+- Development dependencies under `[project.optional-dependencies]` (includes `twine` for uploads)
 
 No separate `requirements.txt` or `dev-requirements.txt` files are needed.

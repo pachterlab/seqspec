@@ -47,6 +47,7 @@ dev = [
     "build",
     "setuptools_scm>=7.0",
     "ruff",
+    "twine",
 ]
 
 [project.urls]
