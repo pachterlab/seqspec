@@ -35,7 +35,7 @@ def setup_build_args(parser) -> ArgumentParser:
 Generate a complete seqspec with natural language.
 
 Example:
-    seqspec build -n myassay -m rna,atac -o spec.yaml
+seqspec build -o spec.yaml --description "An extensive description of the assay and sequencing reads" -n "seqspec generated with LLM" -m rna
 """,
         help="Generate a complete seqspec with natural language.",
         formatter_class=RawTextHelpFormatter,
