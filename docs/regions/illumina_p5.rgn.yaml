@@ -1,5 +1,4 @@
-- !Region
-  region_id: illumina_p5
+- region_id: illumina_p5
   region_type: illumina_p5
   name: Illumina P5
   sequence_type: fixed
@@ -7,4 +6,4 @@
   min_len: 29
   max_len: 29
   onlist: null
-  regions: null
+  regions: []

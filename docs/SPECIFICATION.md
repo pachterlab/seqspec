@@ -11,7 +11,7 @@ authors:
 
 # Schema Overview
 
-The `seqspec` schema is designed to annotate sequencing libraries through three main objects: `Assay`, `Region`, and `Read` objects. `Assay` objects contain `Region` objects, possibly nested, which can be orthogonally annotated with `Read` objects. The `Assay` object is the parent object contains a description of the structure of the molecules in a sequencing library (the library specification) as well as the structure of the reads obtained after sequencing the sequencing library (the sequence specification). Files, such as FASTQ/BAM/SRA, can be associated with individual reads as a way to map the content of the read to a file.
+The `seqspec` schema is designed to annotate sequencing libraries through three main Pydantic models: `Assay`, `Region`, and `Read`. An `Assay` contains the `library_spec` (a tree of `Region` objects, possibly nested) and the `sequence_spec` (a list of `Read` objects). Files (e.g., FASTQ/BAM/SRA) can be associated with individual reads via a list of `File` objects.
 
 Each seqspec file is associated with a sequencing run and documents the designed library structure and the designed read structure. A simple (but incomplete example) looks like the following:
 
@@ -43,7 +43,7 @@ library_spec:
   - region_id: Modality2
 ```
 
-In order to annotate relevant information for the library structure, sequence structure, and assay, multiple properties are specified for each `Region`, `Read`, and `Assay`. The specific schema can be found in `seqspec/schema/seqspec.schema.json`.
+Each object has clearly defined fields and helpful input variants (e.g., `ReadInput`, `RegionInput`) used by tools. The full JSON Schema is in `seqspec/schema/seqspec.schema.json`.
 
 ## `Assay` Object
 
@@ -55,10 +55,10 @@ Fields:
 - `assay_id`: Identifier for the assay.
 - `name`: The name of the assay.
 - `doi`: The doi of the paper that describes the assay.
-- `date`: The seqspec creation date, in "DD Month YYYY" format.
+- `date`: The seqspec creation date.
 - `description`: A short description of the assay.
 - `modalities`: The modalities the assay targets. E.g. "dna", "rna", "tag", "protein", "atac", "crispr".
-- `lib_struct`: The link to Teichmann's libstructs page derived for this sequence.
+- `lib_struct`: Optional link to Teichmann lab library structure page.
 - `library_protocol`: The protocol/machine/tool to generate the library insert. (can be a modality-specific list)
 - `library_kit`: The kit used to make the library sequence_protocol compatible. (can be a modality-specific list)
 - `sequence_protocol`: The protocol/machine/tool to generate sequences. (can be a modality-specific list)
@@ -67,7 +67,7 @@ Fields:
 - `library_spec`: The spec for the library structure, an array of Region objects.
 
 :::{note}
-For the library_protocol, library_kit, sequence_protocol, sequence_kit, their values can be specified as a list, one element per modality. If all modalities defined in the spec use the same protocol/kit, then only one string is needed.
+For `library_protocol`, `library_kit`, `sequence_protocol`, and `sequence_kit`, values can be a single string or a list of typed objects (`LibProtocol`, `LibKit`, `SeqProtocol`, `SeqKit`) where each entry can be scoped by `modality`.
 :::
 
 Example:
@@ -97,7 +97,7 @@ library_spec: ...
 
 ## `Region` Object
 
-The `library_spec` contains a list of, possibly nested, `Region` objects which detail individual segments within the sequencing library molecule, specifying types, sequences, and relationships between segments. The order of the `Region`s in the `library_spec` from top to bottom correspond to their linear ordering in the library molecule from the 5' -> 3' end.
+The `library_spec` contains a list of, possibly nested, `Region` objects which detail individual segments within the sequencing library molecule, specifying types, sequences, and relationships between segments. The order of the `Region`s in the `library_spec` (top to bottom) corresponds to their linear ordering in the library molecule from the 5' -> 3' end.
 
 ```yaml
 modalities:
@@ -143,6 +143,7 @@ Each `Region` has the following properties which are useful to annotate the elem
   - `ME2`: Mosaic end 2, used in the Nextera Library kit for library preparation.
   - `methyl`: The modality for methylation sequencing which assays the presence of a methyl group.
   - `named`: A custom named region for grouping other regions.
+  - `meta`: A top-level modality placeholder used by `seqspec init`.
   - `nextera_read1`: A read sequence obtained from the first end in paired-end Nextera library sequencing.
   - `nextera_read2`: A read sequence obtained from the second end in paired-end Nextera library sequencing.
   - `poly_A`: A sequence of multiple adenine nucleotides.
@@ -153,6 +154,7 @@ Each `Region` has the following properties which are useful to annotate the elem
   - `rna`: The modality corresponding to assaying RNA.
   - `s5`: A sequencing primer or adaptor typically used in the Nextera kit in conjunction with ME1.
   - `s7`: A sequencing primer or adaptor typically used in the Nextera kit in conjunction with ME2.
+  - `sgrna_target`: A sequence corresponding to the guide RNA spacer region that determines the genomic target of CRISPR-based perturbations.
   - `tag`: A short sequence of DNA or RNA used to label or identify a sample, protein, or other grouping.
   - `truseq_read1`: The first read primer in a paired-end sequencing run using the Illumina TruSeq Library preparation kit.
   - `truseq_read2`: The second read primer in a paired-end sequencing run using the Illumina TruSeq Library preparation kit.
@@ -202,7 +204,7 @@ regions: null
 
 For more information about the various fields, please see the JSON schema specification (`seqspec/schema/seqspec.schema.json`). For consistency across assays I suggest following a standard naming conventions for common regions. I've made a collection of "named" regions available; please see `seqspec/docs/regions` for a list of example regions.
 
-## Read Object
+## `Read` Object
 
 The `sequence_spec` contains a list of `Read` objects which describe the sequencing "reads" that are generated from sequencing the molecule described in the `library_spec`. A crucial concept is that `Read` objects contain a `primer_id` which maps to a single `region_id` in the `library_spec`. Importantly, `Read`s can contain `File`s which I describe in the subsequent section.
 
@@ -222,11 +224,11 @@ sequence_spec:
 A `Read` object is annotated with the following attributes:
 
 - `read_id`: A freeform string that functions as a unique identifier for the read.
-- `name`: A freeform string that functinos as the name of the read.
+- `name`: A freeform string that functions as the name of the read.
 - `modality`: A string that matches the modality of the assay generating the read.
 - `primer_id`: A string that matches the region id of the primer used to generate the read (in the `library_spec`).
-- `min_len`: An integr greater than or equal to zero that specifies the minimum length of the read.
-- `max_len`: An integr greater than or equal to zero that specifies the maximum length of the read.
+- `min_len`: An integer greater than or equal to zero specifying the minimum length of the read.
+- `max_len`: An integer greater than or equal to zero specifying the maximum length of the read.
 - `strand`: One of ["pos", "neg"], denotes the strandedness of the read.
 - `files`: A list of `File` objects that contain sequences that match the structure of the parent `Read`.
 
@@ -249,7 +251,7 @@ Example:
 
 ## `File` Object
 
-File's are annotated with the `File` object. Files can be any real file on a local computer or remotely stored. Some common examples include FASTQ, BAM, POD5, TXT, SRA files. `File` objects contain are annotated with the following attributes:
+Files are annotated with the `File` object. Files can be local or remote (e.g., FASTQ, BAM, POD5, TXT, SRA). `File` objects contain the following attributes:
 
 - `file_id`: a freeform string that uniquely identifies the file.
 - `filename`: a freeform string that matches the name of the file being annotated
@@ -316,9 +318,9 @@ And an "incorrect" ordering.
 
 :::
 
-## YAML Tags
+## Python library
 
-seqspec files contains YAML tags (strings prepended with an exclamation point `!`) to describe the various objects (`Assay`, `Region`, `Onlist`, `Read`). These tags make it easy to load `seqspec` files into python as a python object. Python manipulation of seqspec files becomes straightforward with "dot notation":
+seqspec files can be loaded into python as a python object. Manipulation becomes straightforward with dot notation:
 
 ```python
 from seqspec.utils import load_spec

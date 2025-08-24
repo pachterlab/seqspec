@@ -1,30 +1,27 @@
-- !Region
-  region_id: nextera_read1
+- region_id: nextera_read1
   region_type: nextera_read1
   name: nextera_read1
   sequence_type: fixed
   sequence: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG
   min_len: 33
   max_len: 33
-  onlist:
+  onlist: null
   regions:
-    - !Region
-      region_id: s5
+    - region_id: s5
       region_type: s5
       name: s5
       sequence_type: fixed
       sequence: TCGTCGGCAGCGTC
       min_len: 14
       max_len: 14
-      onlist:
-      regions:
-    - !Region
-      region_id: ME1
+      onlist: null
+      regions: []
+    - region_id: ME1
       region_type: ME1
       name: ME1
       sequence_type: fixed
       sequence: AGATGTGTATAAGAGACAG
       min_len: 19
       max_len: 19
-      onlist:
-      regions:
+      onlist: null
+      regions: []

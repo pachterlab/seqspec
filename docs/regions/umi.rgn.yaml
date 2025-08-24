@@ -1,5 +1,4 @@
-- !Region
-  region_id: umi
+- region_id: umi
   region_type: umi
   name: Unique Molecular Identifier
   sequence_type: random
@@ -7,4 +6,4 @@
   min_len: 10
   max_len: 10
   onlist: null
-  regions: null
+  regions: []

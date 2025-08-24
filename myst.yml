@@ -25,6 +25,7 @@ project:
       - file: docs/TUTORIAL_COMPLEX.md
       - file: docs/SEQ_PRIMER.md
     - file: docs/CONTRIBUTING.md
+    - file: docs/DEV_GUIDE.md
     - file: docs/CHANGELOG.md
     
 site:

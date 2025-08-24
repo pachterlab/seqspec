@@ -1,46 +1,48 @@
-from . import __version__
-import argparse
+"""Main module for seqspec CLI.
+
+This module provides the main entry point for the seqspec command-line interface.
+It handles argument parsing, command routing, and execution of subcommands.
+"""
+
+import logging
 import sys
-from .seqspec_format import setup_format_args, validate_format_args
-from .seqspec_print import setup_print_args, validate_print_args
-from .seqspec_check import setup_check_args, validate_check_args
-from .seqspec_find import setup_find_args, validate_find_args
-
-# from .seqspec_genbank import setup_genbank_args, validate_genbank_args
-from .seqspec_modify import setup_modify_args, validate_modify_args
-from .seqspec_index import setup_index_args, validate_index_args
-from .seqspec_info import setup_info_args, validate_info_args
-
-from .seqspec_split import setup_split_args, validate_split_args
-from .seqspec_init import setup_init_args, validate_init_args
-from .seqspec_onlist import setup_onlist_args, validate_onlist_args
-from .seqspec_version import setup_version_args, validate_version_args
-from .seqspec_methods import setup_methods_args, validate_methods_args
-from .seqspec_file import setup_file_args, validate_file_args
-from .seqspec_upgrade import setup_upgrade_args, validate_upgrade_args
-
 import warnings
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from typing import Any, Callable, Dict
 
-# Steps to add new subcommands
-# Create seqspec_subcommand.py (create setup_subcmd_args, validate_subcmd_args, run_subcmd in that file)
-# (in this file) from seqspec_subcmd import setup_subcmd_args, validate_subcmd_args
-# Add setup_subcmd_args to command_to_parser along with its key==str(subcmd)
-# Add validate_subcmd_args to COMMAND_TO_FUNCTION along with its key==str(subcmd)
+from . import __version__
+from .seqspec_build import run_build, setup_build_args
+from .seqspec_check import run_check, setup_check_args
+from .seqspec_file import run_file, setup_file_args
+from .seqspec_find import run_find, setup_find_args
+from .seqspec_format import run_format, setup_format_args
+from .seqspec_index import run_index, setup_index_args
+from .seqspec_info import run_info, setup_info_args
+from .seqspec_init import run_init, setup_init_args
+from .seqspec_insert import run_insert, setup_insert_args
+from .seqspec_methods import run_methods, setup_methods_args
+from .seqspec_modify import run_modify, setup_modify_args
+from .seqspec_onlist import run_onlist, setup_onlist_args
+from .seqspec_print import run_print, setup_print_args
+from .seqspec_split import run_split, setup_split_args
+from .seqspec_upgrade import run_upgrade, setup_upgrade_args
+from .seqspec_version import run_version, setup_version_args
 
 
-def main():
-    warnings.simplefilter("default", DeprecationWarning)
+def setup_parser():
+    """Create and configure the main argument parser.
 
-    # setup parsers
-    parser = argparse.ArgumentParser(
+    Returns:
+        Configured ArgumentParser instance.
+    """
+    parser = ArgumentParser(
         description=f"""
 seqspec {__version__}: A machine-readable file format for genomic library sequence and structure.
 
 GitHub: https://github.com/pachterlab/seqspec
 Documentation: https://pachterlab.github.io/seqspec/
-
 """,
-        formatter_class=argparse.RawTextHelpFormatter,
+        formatter_class=RawTextHelpFormatter,
     )
 
     subparsers = parser.add_subparsers(
@@ -50,14 +52,16 @@ Documentation: https://pachterlab.github.io/seqspec/
 
     # Setup the arguments for all subcommands
     command_to_parser = {
+        "build": setup_build_args(subparsers),
         "check": setup_check_args(subparsers),
         "find": setup_find_args(subparsers),
         "file": setup_file_args(subparsers),
         "format": setup_format_args(subparsers),
-        # "genbank": setup_genbank_args(subparsers),
+        # "convert": setup_convert_args(subparsers),
         "index": setup_index_args(subparsers),
         "info": setup_info_args(subparsers),
         "init": setup_init_args(subparsers),
+        "insert": setup_insert_args(subparsers),
         "methods": setup_methods_args(subparsers),
         "modify": setup_modify_args(subparsers),
         "onlist": setup_onlist_args(subparsers),
@@ -67,7 +71,18 @@ Documentation: https://pachterlab.github.io/seqspec/
         "version": setup_version_args(subparsers),
     }
 
-    # Show help when no arguments are given
+    return parser, command_to_parser
+
+
+def handle_no_args(
+    parser: ArgumentParser, command_to_parser: Dict[str, ArgumentParser]
+) -> None:
+    """Handle case when no arguments are provided.
+
+    Args:
+        parser: Main argument parser.
+        command_to_parser: Dictionary mapping commands to their parsers.
+    """
     if len(sys.argv) == 1:
         parser.print_help(sys.stderr)
         sys.exit(1)
@@ -80,27 +95,50 @@ Documentation: https://pachterlab.github.io/seqspec/
             parser.print_help(sys.stderr)
         sys.exit(1)
 
+
+def main() -> None:
+    """Main entry point for the seqspec CLI."""
+    warnings.simplefilter("default", DeprecationWarning)
+
+    logging.basicConfig(
+        stream=sys.stderr,
+        format="[%(levelname)s] %(message)s",
+    )
+
+    parser, command_to_parser = setup_parser()
+    handle_no_args(parser, command_to_parser)
+
     args = parser.parse_args()
 
-    # Setup validator and runner for all subcommands (validate and run if valid)
-    COMMAND_TO_FUNCTION = {
-        "format": validate_format_args,
-        "print": validate_print_args,
-        "check": validate_check_args,
-        "find": validate_find_args,
-        "index": validate_index_args,
-        "info": validate_info_args,
-        "init": validate_init_args,
-        "methods": validate_methods_args,
-        "modify": validate_modify_args,
-        "onlist": validate_onlist_args,
-        "split": validate_split_args,
-        "version": validate_version_args,
-        "file": validate_file_args,
-        "upgrade": validate_upgrade_args,
-        # "genbank": validate_genbank_args,
+    # Setup validator and runner for all subcommands
+    command_to_function: Dict[str, Callable[[ArgumentParser, Namespace], Any]] = {
+        "format": run_format,
+        "print": run_print,
+        "build": run_build,
+        "check": run_check,
+        "find": run_find,
+        "index": run_index,
+        "info": run_info,
+        "init": run_init,
+        "methods": run_methods,
+        "modify": run_modify,
+        "onlist": run_onlist,
+        "split": run_split,
+        "version": run_version,
+        "file": run_file,
+        "upgrade": run_upgrade,
+        # "convert": run_convert,
+        "insert": run_insert,
     }
-    COMMAND_TO_FUNCTION[sys.argv[1]](parser, args)
+
+    try:
+        command_to_function[sys.argv[1]](parser, args)
+    except KeyError:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

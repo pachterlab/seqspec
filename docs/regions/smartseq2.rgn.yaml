@@ -1,0 +1,9 @@
+- region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: []

@@ -1,6 +1,5 @@
-!Assay
 seqspec_version: 0.3.0
-assay_id: null
+assay_id: ''
 name: Smart-seq2
 doi: https://doi.org/10.1038/nprot.2014.006
 date: 02 January 2014
@@ -8,13 +7,12 @@ description: full-length rna-seq from individual cells
 modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SMART-seq_family.html
-library_protocol: null
-library_kit: null
-sequence_protocol: null
-sequence_kit: null
+sequence_protocol: []
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -22,16 +20,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -39,27 +35,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: RNA
+- region_id: RNA
   region_type: RNA
   name: RNA
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACNNNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 139
   max_len: 236
   onlist: null
   regions:
-  - !Region
-    region_id: illumina_p5
+  - region_id: illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -67,29 +60,24 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: i5
+    regions: []
+  - region_id: i5
     region_type: i5
     name: i5
     sequence_type: onlist
-    sequence: NNNNNNNN
+    sequence: NNNNNNNNNN
     min_len: 10
     max_len: 10
-    onlist: !Onlist
+    onlist:
       file_id: i5_onlist.txt
       filename: i5_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: s5
+      urltype: local
+      md5: ''
+    regions: []
+  - region_id: s5
     region_type: s5
     name: s5
     sequence_type: fixed
@@ -97,10 +85,8 @@ library_spec:
     min_len: 14
     max_len: 14
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: ME1
+    regions: []
+  - region_id: ME1
     region_type: ME1
     name: ME1
     sequence_type: fixed
@@ -108,10 +94,8 @@ library_spec:
     min_len: 19
     max_len: 19
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: cDNA
+    regions: []
+  - region_id: cDNA
     region_type: cDNA
     name: cDNA
     sequence_type: random
@@ -119,10 +103,8 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: ME2
+    regions: []
+  - region_id: ME2
     region_type: ME2
     name: ME2
     sequence_type: fixed
@@ -130,10 +112,8 @@ library_spec:
     min_len: 19
     max_len: 19
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: s7
+    regions: []
+  - region_id: s7
     region_type: s7
     name: s7
     sequence_type: fixed
@@ -141,36 +121,29 @@ library_spec:
     min_len: 15
     max_len: 15
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: i7
+    regions: []
+  - region_id: i7
     region_type: i7
     name: i7
     sequence_type: onlist
     sequence: NNNNNNNN
     min_len: 8
     max_len: 8
-    onlist: !Onlist
+    onlist:
       file_id: i7_onlist.txt
       filename: i7_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: illumina_p7
+      urltype: local
+      md5: ''
+    regions: []
+  - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
-    sequence_type: null
+    sequence_type: fixed
     sequence: ATCTCGTATGCCGTCTTCTGCTTG
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
-    parent_id: RNA
-  parent_id: null
+    regions: []

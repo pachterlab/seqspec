@@ -1,4 +1,3 @@
-!Assay
 seqspec_version: 0.3.0
 assay_id: BD-Rhapsody-EB
 name: BD-Rhapsody-EB
@@ -9,13 +8,12 @@ description: BD Rhapsody WTA is a nanowell-based commercial system that uses a s
 modalities:
 - rna
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/BD_Rhapsody.html
-library_protocol: null
-library_kit: null
 sequence_protocol: Illumina
-sequence_kit: null
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -23,16 +21,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -40,27 +36,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: rna
+- region_id: rna
   region_type: rna
   name: rna
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTXNNNNNNNNNGTGANNNNNNNNNGACANNNNNNNNNNNNNNNNNXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNGTGANNNNNNNNNGACANNNNNNNNNXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 169
   max_len: 366
   onlist: null
   regions:
-  - !Region
-    region_id: illumina_p5
+  - region_id: illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -68,10 +61,8 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: truseq_r1
+    regions: []
+  - region_id: truseq_r1
     region_type: truseq_read1
     name: truseq_r1
     sequence_type: fixed
@@ -79,48 +70,40 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: vb
+    regions: []
+  - region_id: vb
     region_type: linker
     name: vb
     sequence_type: onlist
-    sequence: X
+    sequence: ''
     min_len: 0
     max_len: 3
-    onlist: !Onlist
+    onlist:
       file_id: vb_onlist.txt
       filename: vb_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: cls1
+      urltype: local
+      md5: ''
+    regions: []
+  - region_id: cls1
     region_type: barcode
     name: cls1
     sequence_type: onlist
     sequence: NNNNNNNNN
     min_len: 9
     max_len: 9
-    onlist: !Onlist
+    onlist:
       file_id: cls1_onlist.txt
       filename: cls1_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: linker1
+      urltype: local
+      md5: ''
+    regions: []
+  - region_id: linker1
     region_type: linker
     name: linker1
     sequence_type: fixed
@@ -128,29 +111,24 @@ library_spec:
     min_len: 4
     max_len: 4
     onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: cls2
+    regions: []
+  - region_id: cls2
     region_type: barcode
     name: cls2
     sequence_type: onlist
     sequence: NNNNNNNNN
     min_len: 9
     max_len: 9
-    onlist: !Onlist
+    onlist:
       file_id: cls2_onlist.txt
       filename: cls2_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: linker2
+      urltype: local
+      md5: ''
+    regions: []
+  - region_id: linker2
     region_type: linker
     name: linker2
     sequence_type: fixed
@@ -158,40 +136,33 @@ library_spec:
     min_len: 4
     max_len: 4
     onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: cls3
+    regions: []
+  - region_id: cls3
     region_type: barcode
     name: cls3
     sequence_type: onlist
     sequence: NNNNNNNNN
     min_len: 9
     max_len: 9
-    onlist: !Onlist
+    onlist:
       file_id: cls3_onlist.txt
       filename: cls3_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: umi
+      urltype: local
+      md5: ''
+    regions: []
+  - region_id: umi
     region_type: umi
     name: umi
     sequence_type: random
-    sequence: NNNNNNNN
+    sequence: XXXXXXXX
     min_len: 8
     max_len: 8
     onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: polyT
+    regions: []
+  - region_id: polyT
     region_type: poly_T
     name: polyT
     sequence_type: random
@@ -199,10 +170,8 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: cdna
+    regions: []
+  - region_id: cdna
     region_type: cdna
     name: cdna
     sequence_type: random
@@ -210,10 +179,8 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: truseq_r2
+    regions: []
+  - region_id: truseq_r2
     region_type: truseq_read2
     name: truseq_r2
     sequence_type: fixed
@@ -221,29 +188,24 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: sample_index
+    regions: []
+  - region_id: sample_index
     region_type: index7
     name: sample_index
     sequence_type: onlist
     sequence: NNNNNNNN
     min_len: 8
     max_len: 8
-    onlist: !Onlist
+    onlist:
       file_id: sample_index_onlist.txt
       filename: sample_index_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
-    regions: null
-    parent_id: rna
-  - !Region
-    region_id: illumina_p7
+      urltype: local
+      md5: ''
+    regions: []
+  - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -251,6 +213,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
-    parent_id: rna
-  parent_id: null
+    regions: []

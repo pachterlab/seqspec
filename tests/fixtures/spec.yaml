@@ -1,0 +1,447 @@
+seqspec_version: 0.3.0
+assay_id: DOGMAseq-DIG
+name: DOGMAseq-DIG/Illumina
+doi: https://doi.org/10.1186/s13059-022-02698-8
+date: 23 June 2022
+description: DOGMAseq with digitonin (DIG) is a single-cell multi-omics assay that
+  simultaneously measures protein, RNA, and chromatin accessibility in single cells.
+  The assay is based on the DOGMAseq technology, which uses a DNA-barcoded antibody
+  library to capture proteins of interest, followed by a single-cell RNA-seq protocol
+  and a single-cell ATAC-seq protocol. The DOGMAseq-LLL assay is designed to be compatible
+  with the 10x Genomics Chromium platform.
+modalities:
+- protein
+- tag
+- rna
+- atac
+lib_struct: ''
+sequence_protocol: Illumina NovaSeq 6000 (EFO:0008637)
+sequence_kit:
+- kit_id: "NovaSeq 6000 S2 Reagent Kit v1.5 (100\u2009cycles)"
+  name: illumina
+  modality: rna
+- kit_id: "NovaSeq 6000 S1 Reagent Kit v1.5 (100\u2009cycles)"
+  name: illumina
+  modality: tag
+- kit_id: "NovaSeq 6000 S1 Reagent Kit v1.5 (100\u2009cycles)"
+  name: illumina
+  modality: protein
+- kit_id: "NovaSeq 6000 S1 Reagent Kit v1.5 (100\u2009cycles)"
+  name: illumina
+  modality: atac
+library_protocol:
+- protocol_id: CG000338 Chromium Next GEM Multiome ATAC + Gene Expression Rev. D protocol
+    (10x Genomics)
+  name: DogmaSeq-DIG
+  modality: rna
+- protocol_id: CG000338 Chromium Next GEM Multiome ATAC + Gene Expression Rev. D protocol
+    (10x Genomics)
+  name: DogmaSeq-DIG
+  modality: atac
+- protocol_id: "TotalSeq\u2122-A Antibodies and Cell Hashing with 10x Single Cell\
+    \ 3' Reagent Kit v3 or v3.1 single index protocol (BioLegend)"
+  name: DogmaSeq-DIG
+  modality: protein
+- protocol_id: "TotalSeq\u2122-A Antibodies and Cell Hashing with 10x Single Cell\
+    \ 3' Reagent Kit v3 or v3.1 single index protocol (BioLegend)"
+  name: DogmaSeq-DIG
+  modality: tag
+library_kit:
+- kit_id: Illumina Truseq Single Index
+  name: null
+  modality: rna
+sequence_spec:
+- read_id: protein_R1
+  name: protein Read 1
+  modality: protein
+  primer_id: protein_truseq_read1
+  min_len: 28
+  max_len: 28
+  strand: pos
+  files:
+  - file_id: protein_R1_SRR18677644.fastq.gz
+    filename: protein_R1_SRR18677644.fastq.gz
+    filetype: fastq
+    filesize: 18174591
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/protein_R1_SRR18677644.fastq.gz
+    urltype: https
+    md5: 2525f8bececba54232e8857f9885f870
+- read_id: protein_R2
+  name: protein Read 2
+  modality: protein
+  primer_id: protein_truseq_read2
+  min_len: 15
+  max_len: 15
+  strand: neg
+  files:
+  - file_id: protein_R2_SRR18677644.fastq.gz
+    filename: protein_R2_SRR18677644.fastq.gz
+    filetype: fastq
+    filesize: 9411964
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/protein_R2_SRR18677644.fastq.gz
+    urltype: https
+    md5: 0100a6e62ebbc2db9e9346b796662922
+- read_id: tag_R1
+  name: tag Read 1
+  modality: tag
+  primer_id: tag_truseq_read1
+  min_len: 28
+  max_len: 28
+  strand: pos
+  files:
+  - file_id: tag_R1_SRR18677640.fastq.gz
+    filename: tag_R1_SRR18677640.fastq.gz
+    filetype: fastq
+    filesize: 18034172
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/tag_R1_SRR18677640.fastq.gz
+    urltype: https
+    md5: 05cc5c1a87f0d646cb6d8b9cfca47f0f
+- read_id: tag_R2
+  name: tag Read 2
+  modality: tag
+  primer_id: tag_truseq_read2
+  min_len: 15
+  max_len: 15
+  strand: neg
+  files:
+  - file_id: tag_R2_SRR18677640.fastq.gz
+    filename: tag_R2_SRR18677640.fastq.gz
+    filetype: fastq
+    filesize: 7475374
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/tag_R2_SRR18677640.fastq.gz
+    urltype: https
+    md5: 8a364a8c74a77fae255f1650a5ff7cbb
+- read_id: rna_R1
+  name: rna Read 1
+  modality: rna
+  primer_id: rna_truseq_read1
+  min_len: 28
+  max_len: 28
+  strand: pos
+  files:
+  - file_id: rna_R1_SRR18677638.fastq.gz
+    filename: rna_R1_SRR18677638.fastq.gz
+    filetype: fastq
+    filesize: 18499436
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/rna_R1_SRR18677638.fastq.gz
+    urltype: https
+    md5: 7eb15a70da9b729b5a87e30b6596b641
+- read_id: rna_R2
+  name: rna Read 2
+  modality: rna
+  primer_id: rna_truseq_read2
+  min_len: 102
+  max_len: 102
+  strand: neg
+  files:
+  - file_id: rna_R2_SRR18677638.fastq.gz
+    filename: rna_R2_SRR18677638.fastq.gz
+    filetype: fastq
+    filesize: 45812569
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/rna_R2_SRR18677638.fastq.gz
+    urltype: https
+    md5: 5e6915770e50f72e462e5b2575089c66
+- read_id: atac_R1
+  name: atac Read 1
+  modality: atac
+  primer_id: atac_truseq_read1
+  min_len: 53
+  max_len: 53
+  strand: pos
+  files:
+  - file_id: atac_R1_SRR18677642.fastq.gz
+    filename: atac_R1_SRR18677642.fastq.gz
+    filetype: fastq
+    filesize: 40165947
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/atac_R1_SRR18677642.fastq.gz
+    urltype: https
+    md5: e1134f01b51e73ee71d391af152ef3ec
+- read_id: atac_R2
+  name: atac Read 2
+  modality: atac
+  primer_id: atac_truseq_read2
+  min_len: 24
+  max_len: 24
+  strand: pos
+  files:
+  - file_id: atac_R2_SRR18677642.fastq.gz
+    filename: atac_R2_SRR18677642.fastq.gz
+    filetype: fastq
+    filesize: 20987219
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/atac_R2_SRR18677642.fastq.gz
+    urltype: https
+    md5: 49eac34723c5d5dbaac161af5ba6bd44
+- read_id: atac_R3
+  name: atac Read 3
+  modality: atac
+  primer_id: atac_truseq_read2
+  min_len: 53
+  max_len: 53
+  strand: neg
+  files:
+  - file_id: atac_R3_SRR18677642.fastq.gz
+    filename: atac_R3_SRR18677642.fastq.gz
+    filetype: fastq
+    filesize: 36580319
+    url: https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/atac_R3_SRR18677642.fastq.gz
+    urltype: https
+    md5: 603f9e06910e166ed6df6d4134147db5
+library_spec:
+- region_id: protein
+  region_type: protein
+  name: protein
+  sequence_type: joined
+  sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNXXXXXXXXXXXXXXXXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+  min_len: 110
+  max_len: 110
+  onlist: null
+  regions:
+  - region_id: protein_truseq_read1
+    region_type: truseq_read1
+    name: Truseq Read 1
+    sequence_type: fixed
+    sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: []
+  - region_id: protein_cell_bc
+    region_type: barcode
+    name: Cell Barcode
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNNNNNN
+    min_len: 16
+    max_len: 16
+    onlist:
+      file_id: RNA-737K-arc-v1.txt
+      filename: RNA-737K-arc-v1.txt
+      filetype: txt
+      filesize: 2142553
+      url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
+      urltype: https
+      md5: a88cd21e801ae6f9a7d9a48b67ccf693
+    regions: []
+  - region_id: protein_umi
+    region_type: umi
+    name: umi
+    sequence_type: random
+    sequence: XXXXXXXXXXXX
+    min_len: 12
+    max_len: 12
+    onlist: null
+    regions: []
+  - region_id: protein_seq
+    region_type: protein
+    name: protein
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXX
+    min_len: 15
+    max_len: 15
+    onlist:
+      file_id: protein_feature_barcodes.txt
+      filename: protein_feature_barcodes.txt
+      filetype: txt
+      filesize: 4662
+      url: https://raw.githubusercontent.com/pachterlab/seqspec/devel/examples/specs/dogmaseq-dig/protein_feature_barcodes.txt
+      urltype: https
+      md5: b5920c1fc1d22927607c31c96f5cf03e
+    regions: []
+  - region_id: protein_truseq_read2
+    region_type: truseq_read2
+    name: Truseq Read 2
+    sequence_type: fixed
+    sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: []
+- region_id: tag
+  region_type: tag
+  name: tag
+  sequence_type: joined
+  sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNXXXXXXXXXXXXXXXXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+  min_len: 110
+  max_len: 110
+  onlist: null
+  regions:
+  - region_id: tag_truseq_read1
+    region_type: truseq_read1
+    name: Truseq Read 1
+    sequence_type: fixed
+    sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: []
+  - region_id: tag_cell_bc
+    region_type: barcode
+    name: Cell Barcode
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNNNNNN
+    min_len: 16
+    max_len: 16
+    onlist:
+      file_id: RNA-737K-arc-v1.txt
+      filename: RNA-737K-arc-v1.txt
+      filetype: txt
+      filesize: 2142553
+      url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
+      urltype: https
+      md5: a88cd21e801ae6f9a7d9a48b67ccf693
+    regions: []
+  - region_id: tag_umi
+    region_type: umi
+    name: umi
+    sequence_type: random
+    sequence: XXXXXXXXXXXX
+    min_len: 12
+    max_len: 12
+    onlist: null
+    regions: []
+  - region_id: tag_seq
+    region_type: tag
+    name: tag sequence
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXX
+    min_len: 15
+    max_len: 15
+    onlist:
+      file_id: tag_feature_barcodes.txt
+      filename: tag_feature_barcodes.txt
+      filetype: txt
+      filesize: 208
+      url: https://raw.githubusercontent.com/pachterlab/seqspec/devel/examples/specs/dogmaseq-dig/tag_feature_barcodes.txt
+      urltype: https
+      md5: de44ad6d5c4b9f381a352283a6831112
+    regions: []
+  - region_id: tag_truseq_read2
+    region_type: truseq_read2
+    name: Truseq Read 2
+    sequence_type: fixed
+    sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: []
+- region_id: rna
+  region_type: rna
+  name: rna
+  sequence_type: joined
+  sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+  min_len: 197
+  max_len: 197
+  onlist: null
+  regions:
+  - region_id: rna_truseq_read1
+    region_type: truseq_read1
+    name: Truseq Read 1
+    sequence_type: fixed
+    sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: []
+  - region_id: rna_cell_bc
+    region_type: barcode
+    name: Cell Barcode
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNNNNNN
+    min_len: 16
+    max_len: 16
+    onlist:
+      file_id: RNA-737K-arc-v1.txt
+      filename: RNA-737K-arc-v1.txt
+      filetype: txt
+      filesize: 2142553
+      url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
+      urltype: https
+      md5: a88cd21e801ae6f9a7d9a48b67ccf693
+    regions: []
+  - region_id: rna_umi
+    region_type: umi
+    name: umi
+    sequence_type: random
+    sequence: XXXXXXXXXXXX
+    min_len: 12
+    max_len: 12
+    onlist: null
+    regions: []
+  - region_id: cdna
+    region_type: cdna
+    name: cdna
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    min_len: 102
+    max_len: 102
+    onlist: null
+    regions: []
+  - region_id: rna_truseq_read2
+    region_type: truseq_read2
+    name: Truseq Read 2
+    sequence_type: fixed
+    sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: []
+- region_id: atac
+  region_type: atac
+  name: atac
+  sequence_type: joined
+  sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCTXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACCAGACGCGNNNNNNNNNNNNNNNN
+  min_len: 191
+  max_len: 191
+  onlist: null
+  regions:
+  - region_id: atac_truseq_read1
+    region_type: truseq_read1
+    name: Truseq Read 1
+    sequence_type: fixed
+    sequence: ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+    min_len: 33
+    max_len: 33
+    onlist: null
+    regions: []
+  - region_id: gDNA
+    region_type: gdna
+    name: gdna
+    sequence_type: random
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    min_len: 100
+    max_len: 100
+    onlist: null
+    regions: []
+  - region_id: atac_truseq_read2
+    region_type: truseq_read2
+    name: Truseq Read 2
+    sequence_type: fixed
+    sequence: AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC
+    min_len: 34
+    max_len: 34
+    onlist: null
+    regions: []
+  - region_id: spacer
+    region_type: linker
+    name: atac linker
+    sequence_type: fixed
+    sequence: CAGACGCG
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions: []
+  - region_id: atac_cell_bc
+    region_type: barcode
+    name: Cell Barcode
+    sequence_type: onlist
+    sequence: NNNNNNNNNNNNNNNN
+    min_len: 16
+    max_len: 16
+    onlist:
+      file_id: ATA-737K-arc-v1_rc.txt
+      filename: ATA-737K-arc-v1_rc.txt
+      filetype: txt
+      filesize: 2465078
+      url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/ATA-737K-arc-v1.txt.gz
+      urltype: https
+      md5: 3f9fc0f6ef9d72540ab010d0b5348aa1
+    regions: []

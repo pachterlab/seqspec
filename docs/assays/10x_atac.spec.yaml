@@ -1,4 +1,3 @@
-!Assay
 seqspec_version: 0.3.0
 assay_id: 10xATAC
 name: 10x-ATAC
@@ -8,13 +7,12 @@ description: Single Cell ATAC
 modalities:
 - atac
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium_scATAC.html
-library_protocol: null
-library_kit: null
 sequence_protocol: Illumina
-sequence_kit: null
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: atac
   primer_id: nextera_read1
@@ -22,16 +20,14 @@ sequence_spec:
   max_len: 98
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: I1.fastq.gz
+- read_id: I1.fastq.gz
   name: Index 1 (i7 index)
   modality: atac
   primer_id: nextera_read2
@@ -39,16 +35,14 @@ sequence_spec:
   max_len: 8
   strand: pos
   files:
-  - !File
-    file_id: I1.fastq.gz
+  - file_id: I1.fastq.gz
     filename: I1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: I2.fastq.gz
+- read_id: I2.fastq.gz
   name: Index 2 (i5 index)
   modality: atac
   primer_id: nextera_read1
@@ -56,16 +50,14 @@ sequence_spec:
   max_len: 16
   strand: neg
   files:
-  - !File
-    file_id: I2.fastq.gz
+  - file_id: I2.fastq.gz
     filename: I2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: atac
   primer_id: nextera_read2
@@ -73,27 +65,24 @@ sequence_spec:
   max_len: 98
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: atac
+- region_id: atac
   region_type: atac
   name: atac
   sequence_type: joined
-  sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXNNNNNNNNNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXNNNNNNNNNNNNNNNNTCGTCGGCAGCGTCAGATGTGTATAAGAGACAGXCTGTCTCTTATACACATCTCCGAGCCCACGAGACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 145
   max_len: 242
   onlist: null
   regions:
-  - !Region
-    region_id: illumina_p5
+  - region_id: illumina_p5
     region_type: illumina_p5
     name: Illumina P5
     sequence_type: random
@@ -101,29 +90,24 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
-    parent_id: atac
-  - !Region
-    region_id: cell_bc
+    regions: []
+  - region_id: cell_bc
     region_type: barcode
     name: Cell Barcode
     sequence_type: onlist
     sequence: NNNNNNNNNNNNNNNN
     min_len: 16
     max_len: 16
-    onlist: !Onlist
+    onlist:
       file_id: 737K-cratac-v1.txt.gz
       filename: 737K-cratac-v1.txt.gz
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
-    regions: null
-    parent_id: atac
-  - !Region
-    region_id: nextera_read1
+      urltype: local
+      md5: ''
+    regions: []
+  - region_id: nextera_read1
     region_type: nextera_read1
     name: nextera_read1
     sequence_type: fixed
@@ -131,21 +115,17 @@ library_spec:
     min_len: 33
     max_len: 33
     onlist: null
-    regions: null
-    parent_id: atac
-  - !Region
-    region_id: gdna
+    regions: []
+  - region_id: gdna
     region_type: gdna
     name: gdna
     sequence_type: random
-    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    sequence: X
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
-    parent_id: atac
-  - !Region
-    region_id: nextera_read2
+    regions: []
+  - region_id: nextera_read2
     region_type: nextera_read2
     name: nextera_read2
     sequence_type: fixed
@@ -153,29 +133,24 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
-    parent_id: atac
-  - !Region
-    region_id: index7
+    regions: []
+  - region_id: index7
     region_type: index7
     name: index7
     sequence_type: onlist
     sequence: NNNNNNNN
     min_len: 8
     max_len: 8
-    onlist: !Onlist
+    onlist:
       file_id: index7_onlist.txt
       filename: index7_onlist.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
-      md5: null
-      location: local
-    regions: null
-    parent_id: atac
-  - !Region
-    region_id: illumina_p7
+      urltype: local
+      md5: ''
+    regions: []
+  - region_id: illumina_p7
     region_type: illumina_p7
     name: Illumina P7
     sequence_type: fixed
@@ -183,6 +158,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
-    parent_id: atac
-  parent_id: null
+    regions: []

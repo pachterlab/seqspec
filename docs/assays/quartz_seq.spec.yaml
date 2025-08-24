@@ -1,6 +1,5 @@
-!Assay
 seqspec_version: 0.3.0
-assay_id: null
+assay_id: ''
 name: Quartz-seq
 doi: https://doi.org/10.1186/gb-2013-14-4-r31
 date: 17 April 2013
@@ -8,13 +7,12 @@ description: Riken technology for single-cell RNA-seq
 modalities:
 - RNA
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/Quartz-seq_family.html
-library_protocol: null
-library_kit: null
-sequence_protocol: null
-sequence_kit: null
+sequence_protocol: []
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -22,16 +20,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -39,27 +35,24 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: RNA
+- region_id: RNA
   region_type: RNA
   name: RNA
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACXXXXXXATCTCGTATGCCGTCTTCTGCTTG
   min_len: 123
   max_len: 220
   onlist: null
   regions:
-  - !Region
-    region_id: illumina_p5
+  - region_id: illumina_p5
     region_type: illumina_p5
     name: illumina_p5
     sequence_type: fixed
@@ -67,10 +60,8 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: truseq_read_1
+    regions: []
+  - region_id: truseq_read_1
     region_type: truseq_read_1
     name: truseq_read_1
     sequence_type: fixed
@@ -78,10 +69,8 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: cDNA
+    regions: []
+  - region_id: cDNA
     region_type: cDNA
     name: cDNA
     sequence_type: random
@@ -89,10 +78,8 @@ library_spec:
     min_len: 1
     max_len: 98
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: truseq_read_2
+    regions: []
+  - region_id: truseq_read_2
     region_type: truseq_read_2
     name: truseq_read_2
     sequence_type: fixed
@@ -100,21 +87,17 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: cell_index
+    regions: []
+  - region_id: cell_index
     region_type: cell_index
     name: cell_index
     sequence_type: random
-    sequence: NNNNNN
+    sequence: XXXXXX
     min_len: 6
     max_len: 6
     onlist: null
-    regions: null
-    parent_id: RNA
-  - !Region
-    region_id: illumina_p7
+    regions: []
+  - region_id: illumina_p7
     region_type: illumina_p7
     name: illumina_p7
     sequence_type: fixed
@@ -122,6 +105,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
-    parent_id: RNA
-  parent_id: null
+    regions: []

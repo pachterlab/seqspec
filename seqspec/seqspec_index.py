@@ -1,19 +1,39 @@
-from seqspec.utils import load_spec, map_read_id_to_regions
-from seqspec.seqspec_find import find_by_region_id
+"""Index module for seqspec CLI.
+
+This module provides functionality to identify the position of elements in a spec for use in downstream tools.
+"""
+
 import warnings
-from seqspec.seqspec_file import list_files_by_file_id, list_read_files
-from argparse import SUPPRESS, RawTextHelpFormatter
-from seqspec.Region import complement_sequence
-from seqspec.Region import RegionCoordinateDifference
+from argparse import SUPPRESS, ArgumentParser, Namespace, RawTextHelpFormatter
+from pathlib import Path
+from typing import List, Optional
 
+from pydantic import BaseModel
+
+from seqspec.Assay import Assay
 from seqspec.Region import (
-    project_regions_to_coordinates,
+    RegionCoordinate,
+    RegionCoordinateDifference,
+    complement_sequence,
     itx_read,
+    project_regions_to_coordinates,
 )
-from seqspec.Read import ReadCoordinate
+from seqspec.seqspec_file import list_files_by_file_id
+from seqspec.seqspec_find import find_by_region_id
+from seqspec.utils import load_spec, map_read_id_to_regions
 
 
-def setup_index_args(parser):
+class Coordinate(BaseModel):
+    # query_obj: Union[File, Read, Region]
+    query_id: str
+    query_name: str
+    query_type: str
+    rcv: List[RegionCoordinate]
+    strand: str = "pos"
+
+
+def setup_index_args(parser) -> ArgumentParser:
+    """Create and configure the index command subparser."""
     subparser = parser.add_parser(
         "index",
         description="""
@@ -30,17 +50,18 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
-    subparser.add_argument("yaml", help="Sequencing specification yaml file")
+    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
     subparser.add_argument(
         "-o",
+        "--output",
         metavar="OUT",
-        help=("Path to output file"),
-        type=str,
+        help="Path to output file",
+        type=Path,
         default=None,
     )
 
     subparser.add_argument(
-        "--subregion_type",
+        "--subregion-type",
         metavar="SUBREGIONTYPE",
         help=SUPPRESS,
         type=str,
@@ -50,6 +71,7 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
     choices = [
         "chromap",
         "kb",
+        "kb-single",
         "relative",
         "seqkit",
         "simpleaf",
@@ -60,8 +82,9 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
     ]
     subparser.add_argument(
         "-t",
+        "--tool",
         metavar="TOOL",
-        help=(f"Tool, [{', '.join(choices)}] (default: tab)"),
+        help=f"Tool, [{', '.join(choices)}] (default: tab)",
         default="tab",
         type=str,
         choices=choices,
@@ -70,8 +93,9 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
     choices = ["read", "region", "file"]
     subparser.add_argument(
         "-s",
+        "--selector",
         metavar="SELECTOR",
-        help=(f"Selector for ID, [{', '.join(choices)}] (default: read)"),
+        help=f"Selector for ID, [{', '.join(choices)}] (default: read)",
         type=str,
         default="read",
         choices=choices,
@@ -80,112 +104,98 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
         "--rev", help="Returns 3'->5' region order", action="store_true"
     )
 
-    # boolean to indicate specifying a region or a read
-    # depracate
-    subparser.add_argument(
-        "--region",
-        action="store_true",
-        help=SUPPRESS,
-    )
-
     subparser_required.add_argument(
         "-m",
+        "--modality",
         metavar="MODALITY",
-        help=("Modality"),
+        help="Modality",
         type=str,
-        default=None,
         required=True,
     )
     subparser_required.add_argument(
         "-i",
+        "--ids",
         metavar="IDs",
-        help=("IDs"),
+        help="IDs",
         type=str,
         default=None,
         required=False,
     )
-    subparser_required.add_argument(
-        "-r",
-        metavar="READ or REGION or FILE",
-        help=SUPPRESS,
-        type=str,
+
+    subparser.add_argument(
+        "--no-overlap",
+        help="Disable overlap (default: False)",
+        action="store_true",
+        dest="overlap",
+        default=False,
     )
 
     return subparser
 
 
-def validate_index_args(parser, args):
-    if args.r is not None:
-        warnings.warn(
-            "The '-r' argument is deprecated and will be removed in a future version. "
-            "Please use '-i' instead.",
-            DeprecationWarning,
-        )
-        # Optionally map the old option to the new one
-        if not args.i:
-            args.i = args.r
-    if args.region:
-        warnings.warn(
-            "The '--region' argument is deprecated and will be removed in a future version. "
-            "Please use '-s region' instead.",
-            DeprecationWarning,
-        )
+def validate_index_args(parser: ArgumentParser, args: Namespace) -> None:
+    """Validate the index command arguments."""
 
-    fn = args.yaml
-    m = args.m
-    ids = args.i  # this can be a list of ids (reads, regions, or files)
-    t = args.t
-    o = args.o
-    subregion_type = args.subregion_type
-    rev = args.rev
-    idtype = args.s
+    if not Path(args.yaml).exists():
+        parser.error(f"Input file does not exist: {args.yaml}")
 
-    if ids is None and (idtype == "read" or idtype == "region"):
-        parser.error("Must specify ids with -i for -s read or -s region")
-
-    return run_index(fn, m, ids, idtype, t, rev, subregion_type, o=o)
+    if args.output and Path(args.output).exists() and not Path(args.output).is_file():
+        parser.error(f"Output path exists but is not a file: {args.output}")
 
 
-def run_index(
-    spec_fn,
-    modality,
-    ids,
-    idtype,
-    fmt,
-    rev,
-    subregion_type,
-    o,
-):
-    spec = load_spec(spec_fn)
-    if ids is None:
-        ids = []
-    else:
-        ids = ids.split(",")
+def seqspec_index(
+    spec: Assay,
+    modality: str,
+    ids: List[str],
+    idtype: str,
+    rev: bool = False,
+) -> List[Coordinate]:
+    """Core functionality to get index information from the spec.
 
-    x = index(spec, modality, ids, idtype, fmt, rev, subregion_type)
+    Args:
+        spec: The Assay object to index
+        modality: The modality to index
+        ids: List of IDs to index
+        idtype: Type of ID (read, region, file)
+        rev: Whether to return 3'->5' region order
 
-    # post processing
-    if o:
-        with open(o, "w") as f:
-            print(x, file=f)
-    else:
-        print(x)
+    Returns:
+        List of index dictionaries containing region coordinates and strand information
+    """
+    GET_INDICES = {
+        "file": get_index_by_files,
+        "read": get_index_by_reads,
+        "region": get_index_by_regions,
+    }
 
-    return
+    GET_INDICES_BY_IDS = {
+        "file": get_index_by_file_ids,
+        "region": get_index_by_region_ids,
+        "read": get_index_by_read_ids,
+    }
+
+    if not ids:
+        return GET_INDICES[idtype](spec, modality)
+    return GET_INDICES_BY_IDS[idtype](spec, modality, ids)
 
 
-def index(
-    spec,
-    modality,
-    ids,
-    idtype,
-    fmt,
-    rev=False,
-    subregion_type=None,
-):
+def format_index(
+    indices: List[Coordinate], fmt: str, subregion_type: Optional[str] = None
+) -> str:
+    """Format index information into a specific output format.
+
+    Args:
+        indices: List of index dictionaries from seqspec_index
+        fmt: Output format to use
+        subregion_type: Optional subregion type for filtering
+
+    Returns:
+        Formatted index information as a string
+    """
     FORMAT = {
         "chromap": format_chromap,
         "kb": format_kallisto_bus,
+        "kb-single": format_kallisto_bus_force_single,
         "relative": format_relative,
         "seqkit": format_seqkit_subseq,
         "simpleaf": format_simpleaf,
@@ -195,113 +205,168 @@ def index(
         "zumis": format_zumis,
     }
 
-    GET_INDICES = {
-        "file": get_index_by_files,
-    }
-
-    GET_INDICES_BY_IDS = {
-        "file": get_index_by_file_ids,
-        "region": get_index_by_region_ids,
-        "read": get_index_by_read_ids,
-    }
-
-    if len(ids) == 0:
-        indices = GET_INDICES[idtype](spec, modality)
-    else:
-        indices = GET_INDICES_BY_IDS[idtype](spec, modality, ids)
+    if fmt not in FORMAT:
+        warnings.warn(
+            f"Unknown format '{fmt}'. Valid formats are: {', '.join(FORMAT.keys())}"
+        )
+        return ""
 
     return FORMAT[fmt](indices, subregion_type)
 
 
-def get_index_by_files(spec, modality):
-    # get the read associated for each file for each read get the regions by mapping primer
-    files = list_read_files(spec, modality)
+def run_index(parser: ArgumentParser, args: Namespace) -> None:
+    """Run the index command."""
+    validate_index_args(parser, args)
 
-    # iterate through the keys (read ids) and get the index for each read
-    indices = []
-    for k, v in files.items():
-        index = get_index_by_primer(spec, modality, k)
-        indices.append(index)
+    spec = load_spec(args.yaml)
+    ids = args.ids.split(",") if args.ids else []
+
+    indices = seqspec_index(
+        spec,
+        args.modality,
+        ids,
+        args.selector,
+        args.rev,
+    )
+
+    # filter index for no overlap if requested
+    if args.overlap:
+        indices = filter_index_no_overlap(indices)
+
+    result = format_index(indices, args.tool, args.subregion_type)
+
+    if args.output:
+        with open(args.output, "w") as f:
+            print(result, file=f)
+    else:
+        print(result)
+
+
+def filter_index_no_overlap(indices: List[Coordinate]) -> List[Coordinate]:
+    # list of coordinates
+    # each coordinate has an rcv, a list of region coordiantes
+    # want to ensure that the intersection between all of them is empty
+    rids = set()
+    for idx in indices:
+        new_rcv = []
+        for rgn in idx.rcv:
+            if rgn.region_id not in rids:
+                new_rcv.append(rgn)
+                rids.add(rgn.region_id)
+        idx.rcv = new_rcv
+    # print(indices)
     return indices
 
 
-def get_index_by_file_ids(spec, modality, file_ids):
+def get_index_by_files(spec: Assay, modality: str) -> List[Coordinate]:
+    files = []
+    for r in spec.get_seqspec(modality):
+        files += r.files
+    indices = get_index_by_file_ids(spec, modality, [i.file_id for i in files])
+    return indices
+
+
+def get_index_by_reads(spec: Assay, modality: str) -> List[Coordinate]:
+    read_ids = [i.read_id for i in spec.get_seqspec(modality)]
+    indices = get_index_by_read_ids(spec, modality, read_ids)
+    return indices
+
+
+def get_index_by_regions(spec: Assay, modality: str) -> List[Coordinate]:
+    rgn = spec.get_libspec(modality)
+    indices = get_index_by_region_ids(spec, modality, [rgn.region_id])
+    return indices
+
+
+def get_index_by_file_ids(
+    spec: Assay, modality: str, file_ids: List[str]
+) -> List[Coordinate]:
     # get the read associated for each file for each read get the regions by mapping primer
     files = list_files_by_file_id(spec, modality, file_ids)
 
     # iterate through the keys (read ids) and get the index for each read
     indices = []
     for k, v in files.items():
-        index = get_index_by_primer(spec, modality, k)
+        index = get_coordinate_by_read_id(spec, modality, k)
+        # replace query_obj with file obj. assume only one file per read
+        index.query_id = v[0].file_id
+        index.query_name = v[0].filename
+        index.query_type = "File"
         indices.append(index)
+
     return indices
 
 
-def get_index_by_region_ids(spec, modality, region_ids):
+def get_index_by_region_ids(
+    spec: Assay, modality: str, region_ids: List[str]
+) -> List[Coordinate]:
     indices = []
     for id in region_ids:
-        index = get_index_by_primer(spec, modality, id)
+        index = get_coordinate_by_region_id(spec, modality, id)
         indices.append(index)
     return indices
 
 
-def get_index_by_read_ids(spec, modality, read_ids):
+def get_index_by_read_ids(
+    spec: Assay, modality: str, read_ids: List[str]
+) -> List[Coordinate]:
     indices = []
     for id in read_ids:
-        index = get_index_by_primer(spec, modality, id)
+        index = get_coordinate_by_read_id(spec, modality, id)
         indices.append(index)
     return indices
 
 
-# TODO fix return type
-def get_index(
-    spec, modality, region_id, rev=False
-):  # -> Dict[str, List[RegionCoordinate]]:
-    rid = region_id
-    regions = find_by_region_id(spec, modality, rid)
-    leaves = regions[0].get_leaves()
-    if rev:
-        leaves.reverse()
+def get_coordinate_by_region_id(
+    spec: Assay, modality: str, region_id: str
+) -> Coordinate:
+    regions = find_by_region_id(spec, modality, region_id)
+    rgn = regions[0]
+
+    leaves = rgn.get_leaves()
     cuts = project_regions_to_coordinates(leaves)
+    coord = Coordinate(
+        query_id=rgn.region_id,
+        query_name=rgn.name,
+        query_type="Region",
+        rcv=cuts,
+        strand="pos",
+    )
 
-    return {region_id: cuts, "strand": "pos"}
+    return coord
 
 
-# TODO fix return type
-def get_index_by_primer(
-    spec, modality: str, read_id: str
-):  # -> Dict[str, List[RegionCoordinate]]:  # noqa
-    # this manages the strandedness internally
+def get_coordinate_by_read_id(spec: Assay, modality: str, read_id: str) -> Coordinate:
     (read, rgns) = map_read_id_to_regions(spec, modality, read_id)
 
     # get the cuts for all of the atomic elements (tuples of 0-indexed start stop)
     rcs = project_regions_to_coordinates(rgns)
 
     new_rcs = itx_read(rcs, 0, read.max_len)
-    rdc = ReadCoordinate(read, new_rcs)
+    coord = Coordinate(
+        query_id=read.read_id,
+        query_name=read.name,
+        query_type="Read",
+        rcv=new_rcs,
+        strand=read.strand,
+    )
 
-    return {read_id: new_rcs, "strand": rdc.read.strand}
+    return coord
 
+FEATURE_REGION_TYPES = {"CDNA", "GDNA", "PROTEIN", "TAG", "SGRNA_TARGET"}
 
-def format_kallisto_bus(indices, subregion_type=None):
+def format_kallisto_bus(indices: List[Coordinate], subregion_type=None):
     bcs = []
     umi = []
     feature = []
-    for idx, region in enumerate(indices):
-        rg_strand = region.pop("strand")  # noqa
-        for rgn, cuts in region.items():
-            for cut in cuts:
-                if cut.region_type.upper() == "BARCODE":
-                    bcs.append(f"{idx},{cut.start},{cut.stop}")
-                elif cut.region_type.upper() == "UMI":
-                    umi.append(f"{idx},{cut.start},{cut.stop}")
-                elif (
-                    cut.region_type.upper() == "CDNA"
-                    or cut.region_type.upper() == "GDNA"
-                    or cut.region_type.upper() == "PROTEIN"
-                    or cut.region_type.upper() == "TAG"
-                ):
-                    feature.append(f"{idx},{cut.start},{cut.stop}")
+    for idx, obj in enumerate(indices):
+        for cut in obj.rcv:
+            if cut.region_type.upper() == "BARCODE":
+                bcs.append(f"{idx},{cut.start},{cut.stop}")
+            elif cut.region_type.upper() == "UMI":
+                umi.append(f"{idx},{cut.start},{cut.stop}")
+            elif cut.region_type.upper() in FEATURE_REGION_TYPES:
+                feature.append(f"{idx},{cut.start},{cut.stop}")
     if len(umi) == 0:
         umi.append("-1,-1,-1")
     if len(bcs) == 0:
@@ -311,87 +376,110 @@ def format_kallisto_bus(indices, subregion_type=None):
     return x
 
 
+def format_kallisto_bus_force_single(indices: List[Coordinate], subregion_type=None):
+    bcs = []
+    umi = []
+    feature = []
+    longest_feature = None
+    max_length = 0
+
+    for idx, coord in enumerate(indices):
+        for cut in coord.rcv:
+            if cut.region_type.upper() == "BARCODE":
+                bcs.append(f"{idx},{cut.start},{cut.stop}")
+            elif cut.region_type.upper() == "UMI":
+                umi.append(f"{idx},{cut.start},{cut.stop}")
+            elif cut.region_type.upper() in FEATURE_REGION_TYPES:
+                length = cut.stop - cut.start
+                if length > max_length:
+                    max_length = length
+                    longest_feature = f"{idx},{cut.start},{cut.stop}"
+
+    if len(umi) == 0:
+        umi.append("-1,-1,-1")
+    if len(bcs) == 0:
+        bcs.append("-1,-1,-1")
+    if longest_feature:
+        feature.append(longest_feature)
+
+    x = ",".join(bcs) + ":" + ",".join(umi) + ":" + ",".join(feature)
+    return x
+
+
 # this one should only return one string
 # TODO: return to this
-def format_seqkit_subseq(indices, subregion_type=None):
+def format_seqkit_subseq(indices: List[Coordinate], subregion_type=None):
     # The x string format is start:stop (1-indexed)
     # x = ""
     # region = indices[0]
     # # need to get the right start position
     x = ""
-    region = indices[0]
-    for rgn, cuts in region.items():
-        for cut in cuts:
-            if cut.region_type == subregion_type:
-                x = f"{cut.start+1}:{cut.stop}\n"
+    coord = indices[0]
+    for cut in coord.rcv:
+        if cut.region_type == subregion_type:
+            x = f"{cut.start + 1}:{cut.stop}\n"
 
     return x
 
 
-def format_tab(indices, subregion_type=None):
+def format_tab(indices: List[Coordinate], subregion_type=None):
     x = ""
-    for idx, region in enumerate(indices):
-        rg_strand = region.pop("strand")  # noqa
-        for rgn, cuts in region.items():
-            for cut in cuts:
-                x += f"{rgn}\t{cut.name}\t{cut.region_type}\t{cut.start}\t{cut.stop}\n"
+    for idx, coord in enumerate(indices):
+        rcv = coord.rcv
+        # for rgn, cuts in rcv.items():
+        for cut in rcv:
+            x += f"{coord.query_id}\t{cut.name}\t{cut.region_type}\t{cut.start}\t{cut.stop}\n"
 
     return x[:-1]
 
 
-def format_starsolo(indices, subregion_type=None):
+def format_starsolo(indices: List[Coordinate], subregion_type=None):
     bcs = []
     umi = []
     cdna = []
-    for idx, region in enumerate(indices):
-        rg_strand = region.pop("strand")  # noqa
-        for rgn, cuts in region.items():
-            for cut in cuts:
-                if cut.region_type.upper() == "BARCODE":
-                    bcs.append(f"--soloCBstart {cut.start + 1} --soloCBlen {cut.stop}")
-                elif cut.region_type.upper() == "UMI":
-                    umi.append(
-                        f"--soloUMIstart {cut.start + 1} --soloUMIlen {cut.stop - cut.start}"
-                    )
-                elif cut.region_type.upper() == "CDNA":
-                    cdna.append(f"{cut.start},{cut.stop}")
+    for idx, coord in enumerate(indices):
+        for cut in coord.rcv:
+            if cut.region_type.upper() == "BARCODE":
+                bcs.append(f"--soloCBstart {cut.start + 1} --soloCBlen {cut.stop}")
+            elif cut.region_type.upper() == "UMI":
+                umi.append(
+                    f"--soloUMIstart {cut.start + 1} --soloUMIlen {cut.stop - cut.start}"
+                )
+            elif cut.region_type.upper() == "CDNA":
+                cdna.append(f"{cut.start},{cut.stop}")
     x = f"--soloType CB_UMI_Simple {bcs[0]} {umi[0]}"
     return x
 
 
-def format_simpleaf(indices, subregion_type=None):
+def format_simpleaf(indices: List[Coordinate], subregion_type=None):
     x = ""
     xl = []
-    for idx, region in enumerate(indices):
-        rg_strand = region.pop("strand")  # noqa
+    for idx, coord in enumerate(indices):
         fn = idx
-        x = f"{fn+1}{{"
-        for rgn, cuts in region.items():
-            for cut in cuts:
-                if cut.region_type.upper() == "BARCODE":
-                    x += f"b[{cut.stop-cut.start}]"
-                elif cut.region_type.upper() == "UMI":
-                    x += f"u[{cut.stop-cut.start}]"
-                elif cut.region_type.upper() == "CDNA":
-                    x += f"r[{cut.stop - cut.start}]"
-            x += "x:}"
+        x = f"{fn + 1}{{"
+        for cut in coord.rcv:
+            if cut.region_type.upper() == "BARCODE":
+                x += f"b[{cut.stop - cut.start}]"
+            elif cut.region_type.upper() == "UMI":
+                x += f"u[{cut.stop - cut.start}]"
+            elif cut.region_type.upper() == "CDNA":
+                x += f"r[{cut.stop - cut.start}]"
+        x += "x:}"
         xl.append(x)
     return "".join(xl)
 
 
-def format_zumis(indices, subregion_type=None):
+def format_zumis(indices: List[Coordinate], subregion_type=None):
     xl = []
-    for idx, region in enumerate(indices):
-        rg_strand = region.pop("strand")  # noqa
+    for idx, coord in enumerate(indices):
         x = ""
-        for rgn, cuts in region.items():
-            for cut in cuts:
-                if cut.region_type.upper() == "BARCODE":
-                    x += f"- BCS({cut.start + 1}-{cut.stop})\n"
-                elif cut.region_type.upper() == "UMI":
-                    x += f"- UMI({cut.start + 1}-{cut.stop})\n"
-                elif cut.region_type.upper() == "CDNA":
-                    x += f"- cDNA({cut.start + 1}-{cut.stop})\n"
+        for cut in coord.rcv:
+            if cut.region_type.upper() == "BARCODE":
+                x += f"- BCS({cut.start + 1}-{cut.stop})\n"
+            elif cut.region_type.upper() == "UMI":
+                x += f"- UMI({cut.start + 1}-{cut.stop})\n"
+            elif cut.region_type.upper() == "CDNA":
+                x += f"- cDNA({cut.start + 1}-{cut.stop})\n"
         xl.append(x)
 
     return "\n".join(xl)[:-1]
@@ -408,23 +496,21 @@ def stable_deduplicate_fqs(fqs):
     return deduplicated_fqs
 
 
-def format_chromap(indices, subregion_type=None):
+def format_chromap(indices: List[Coordinate], subregion_type=None):
     bc_fqs = []
     bc_str = []
     gdna_fqs = []
     gdna_str = []
-    for idx, region in enumerate(indices):
-        rg_strand = region.pop("strand")
-        strand = "" if rg_strand == "pos" else ":-"
-        for rgn, cuts in region.items():
-            for cut in cuts:
-                if cut.region_type.upper() == "BARCODE":
-                    bc_fqs.append(rgn)
-                    bc_str.append(f"bc:{cut.start}:{cut.stop-1}{strand}")
-                    pass
-                elif cut.region_type.upper() == "GDNA":
-                    gdna_fqs.append(rgn)
-                    gdna_str.append(f"{cut.start}:{cut.stop-1}")
+    for idx, coord in enumerate(indices):
+        strand = "" if coord.strand == "pos" else ":-"
+        for cut in coord.rcv:
+            if cut.region_type.upper() == "BARCODE":
+                bc_fqs.append(coord.query_id)
+                bc_str.append(f"bc:{cut.start}:{cut.stop - 1}{strand}")
+                pass
+            elif cut.region_type.upper() == "GDNA":
+                gdna_fqs.append(coord.query_id)
+                gdna_str.append(f"{cut.start}:{cut.stop - 1}")
     if len(set(bc_fqs)) > 1:
         raise Exception("chromap only supports barcodes from one fastq")
     if len(set(gdna_fqs)) > 2:
@@ -453,7 +539,7 @@ def compute_relative(rcs):
         for rgnc2 in rcs:
             diff = rgnc1 - rgnc2
             # obj - fixed
-            d.append(RegionCoordinateDifference(rgnc1, rgnc2, diff))
+            d.append(RegionCoordinateDifference(obj=rgnc1, fixed=rgnc2, rgncdiff=diff))
 
     return d
 
@@ -477,18 +563,20 @@ def filter_groupby_region_type(g, keep=["umi", "barcode", "cdna"]):
     return g
 
 
-def format_relative(indices, subregion_type=None):
+def format_relative(indices: List[Coordinate], subregion_type=None):
     x = ""
-    d = []
-    for idx, region in enumerate(indices):
-        rg_strand = region.pop("strand")  # noqa
-        for rgn, cuts in region.items():
-            d = compute_relative(cuts)
-            f = filter_differences(d)
-            f.sort(key=lambda x: x.rgnc1.region_type)
+    for idx, coord in enumerate(indices):
+        rg_strand = coord.strand  # noqa
+        # compute differences across all region coordinates for this coordinate
+        diffs = compute_relative(coord.rcv)
+        filtered = filter_differences(diffs)
+        filtered.sort(key=lambda diff: diff.obj.region_type)
 
-            for i in f:
-                x += f"{i.rgnc1.region_id}\t{i.rgnc2.region_id}\t{i.rgncdiff.start}\t{i.rgncdiff.stop}\t{i.loc}\n"
+        for diff in filtered:
+            x += (
+                f"{diff.obj.region_id}\t{diff.fixed.region_id}\t"
+                f"{diff.rgncdiff.start}\t{diff.rgncdiff.stop}\t{diff.loc}\n"
+            )
     return x
 
 
@@ -601,7 +689,7 @@ def format_splitcode_row(obj, rgncdiffs, idx=0, rev=False, complement=False):
     return {"region_type": obj.region_type, "fmt": e}
 
 
-def format_splitcode(indices, subregion_type=None):
+def format_splitcode(indices: List[Coordinate], subregion_type=None):
     # extraction based on fixed sequences
     # extraction based on onlist sequences
     # umi - bc3 - link2 - bc2 - link1 - bc1 - read
@@ -614,83 +702,78 @@ def format_splitcode(indices, subregion_type=None):
     x = ""
     e = ""
     d = []
-    coords = indices
-    for idx, coord in enumerate(coords):
-        rg_strand = coord.pop("strand")  # noqa
+    for idx, coord in enumerate(indices):
+        # compute differences across all region coordinates for this coordinate
+        d = compute_relative(coord.rcv)
 
-        # iterate through the read id
-        for coord_id, cuts in coord.items():
-            # object, fixed sequence, diff
-            d = compute_relative(cuts)
+        # retain only the "objects" that are not linkers
+        f = filter_differences(d)
 
-            # retain only the "objects" that are not linkers
-            f = filter_differences(d)
+        # groupby region_id of the first object (order is retained wrt library)
+        g = groupby_region_id(f)
 
-            # groupby region_id of the first object (order is retained wrt library)
-            g = groupby_region_id(f)
+        # remove everything from g except obj.region_type umi/cdna/barcode
+        g = filter_groupby_region_type(g)
 
-            # remove everything from g except obj.region_type umi/cdna/barcode
-            g = filter_groupby_region_type(g)
+        g = list(g.values())
 
-            g = list(g.values())
-
-            # format forward rows
-            frows = []
-            rrows = []
-            crows = []
-            rcrows = []
-            for idx, (gb, rgb) in enumerate(zip(g, g[::-1])):
-                if idx + 1 == len(g):
-                    idx = -1
-                    # format each region_id object
-                frows.append(
-                    format_splitcode_row(
-                        gb["obj"],
-                        gb["rgncdiffs"],
-                        idx,
-                        rev=False,
-                        complement=False,
-                    )
+        # format forward rows
+        frows = []
+        rrows = []
+        crows = []
+        rcrows = []
+        for idx, (gb, rgb) in enumerate(zip(g, g[::-1])):
+            if idx + 1 == len(g):
+                idx = -1
+            # format each region_id object
+            frows.append(
+                format_splitcode_row(
+                    gb["obj"],
+                    gb["rgncdiffs"],
+                    idx,
+                    rev=False,
+                    complement=False,
                 )
-                rrows.append(
-                    format_splitcode_row(
-                        rgb["obj"], rgb["rgncdiffs"], idx, rev=True, complement=False
-                    )
+            )
+            rrows.append(
+                format_splitcode_row(
+                    rgb["obj"], rgb["rgncdiffs"], idx, rev=True, complement=False
                 )
-                crows.append(
-                    format_splitcode_row(
-                        gb["obj"], gb["rgncdiffs"], idx, rev=False, complement=True
-                    )
+            )
+            crows.append(
+                format_splitcode_row(
+                    gb["obj"], gb["rgncdiffs"], idx, rev=False, complement=True
                 )
-                rcrows.append(
-                    format_splitcode_row(
-                        rgb["obj"], rgb["rgncdiffs"], idx, rev=True, complement=True
-                    )
+            )
+            rcrows.append(
+                format_splitcode_row(
+                    rgb["obj"], rgb["rgncdiffs"], idx, rev=True, complement=True
                 )
+            )
 
-            from collections import defaultdict
+        from collections import defaultdict
 
-            g_frows = defaultdict(list)
-            g_crows = defaultdict(list)
-            g_rrows = defaultdict(list)
-            g_rcrows = defaultdict(list)
-            for r in frows:
-                g_frows[r["region_type"]].append(r["fmt"])
-            for r in crows:
-                g_crows[r["region_type"]].append(r["fmt"])
-            for r in rrows:
-                g_rrows[r["region_type"]].append(r["fmt"])
-            for r in rcrows:
-                g_rcrows[r["region_type"]].append(r["fmt"])
+        g_frows = defaultdict(list)
+        g_crows = defaultdict(list)
+        g_rrows = defaultdict(list)
+        g_rcrows = defaultdict(list)
+        for r in frows:
+            g_frows[r["region_type"]].append(r["fmt"])
+        for r in crows:
+            g_crows[r["region_type"]].append(r["fmt"])
+        for r in rrows:
+            g_rrows[r["region_type"]].append(r["fmt"])
+        for r in rcrows:
+            g_rcrows[r["region_type"]].append(r["fmt"])
 
-            for gr in g_frows:
-                e += f"@extract {','.join(g_frows[gr])}\n"
-            for gr in g_crows:
-                e += f"@extract {','.join(g_crows[gr])}\n"
-            for gr in g_rrows:
-                e += f"@extract {','.join(g_rrows[gr])}\n"
-            for gr in g_rcrows:
-                e += f"@extract {','.join(g_rcrows[gr])}\n"
+        for gr in g_frows:
+            e += f"@extract {','.join(g_frows[gr])}\n"
+        for gr in g_crows:
+            e += f"@extract {','.join(g_crows[gr])}\n"
+        for gr in g_rrows:
+            e += f"@extract {','.join(g_rrows[gr])}\n"
+        for gr in g_rcrows:
+            e += f"@extract {','.join(g_rcrows[gr])}\n"
 
     x += e
 
@@ -706,23 +789,20 @@ def format_splitcode(indices, subregion_type=None):
     # group2	linker2c	CACCGGCTACAAAGCGTAGCCGCATGCTGA	3:3:3	0:0:0
     # group2	linker2rc	AGTCGTACGCCGATGCGAAACATCGGCCAC	3:3:3	0:0:0
 
-    for idx, region in enumerate(indices):
+    for idx, coord in enumerate(indices):
         # rg_strand = region.pop("strand")  # noqa
         lc = ""
         x += "groups\tids\ttags\tdistances\tlocations\n"
         idx = 1
-        for rgn, cuts in region.items():
-            for cut in cuts:
-                lc += f"{cut.name}[{cut.min_len}]\t{cut.sequence}\n"
-                if cut.region_type == "linker":
-                    # forward, regular and complement
-                    x += f"group{idx}\t{cut.name}f\t{cut.sequence}\t3:3:3\t0:0:0\n"
-                    x += f"group{idx}\t{cut.name}c\t{complement_sequence(cut.sequence)}\t3:3:3\t0:0:0\n"
+        for cut in coord.rcv:
+            lc += f"{cut.name}[{cut.min_len}]\t{cut.sequence}\n"
+            if cut.region_type == "linker":
+                # forward, regular and complement
+                x += f"group{idx}\t{cut.name}f\t{cut.sequence}\t3:3:3\t0:0:0\n"
+                x += f"group{idx}\t{cut.name}c\t{complement_sequence(cut.sequence)}\t3:3:3\t0:0:0\n"
 
-                    # reverse, regular and complement
-                    x += (
-                        f"group{idx}\t{cut.name}r\t{cut.sequence[::-1]}\t3:3:3\t0:0:0\n"
-                    )
-                    x += f"group{idx}\t{cut.name}rc\t{complement_sequence(cut.sequence)[::-1]}\t3:3:3\t0:0:0\n"
-                    idx += 1
+                # reverse, regular and complement
+                x += f"group{idx}\t{cut.name}r\t{cut.sequence[::-1]}\t3:3:3\t0:0:0\n"
+                x += f"group{idx}\t{cut.name}rc\t{complement_sequence(cut.sequence)[::-1]}\t3:3:3\t0:0:0\n"
+                idx += 1
     return x

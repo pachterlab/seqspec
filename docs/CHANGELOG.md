@@ -1,11 +1,75 @@
 ---
 title: Changelog
-date: 2024-10-08
+date: 2025-08-24
 authors:
   - name: A. Sina Booeshaghi
 ---
 
 # Changelog
+
+## [0.4.0] - 2025-08-24
+
+### Added
+
+- `seqspec build` subcommand. Generates a draft spec from a natural-language description using the existing `init/insert/modify/check` tools. Marked experimental.
+- New validation checks for `seqspec check`
+  - `check_region_against_subregion_length`
+  - `check_region_against_subregion_sequence`
+  - `check_read_length_against_library`
+- `seqspec index`:
+  - `--no-overlap` to de-duplicate regions covered by overlapping reads.
+  - Target `-t kb-single` for single-end kallisto-bus indexing.
+  - Primer ID may be any region (not only a leaf).
+- `seqspec print -f png` now layers sequencing reads on top of the library diagram.
+- `load_spec` supports gzipped YAML (`.yaml.gz`).
+- `seqspec check` can skip specific checks; can ignore onlist when needed.
+- “Loose loading” mode for `seqspec check` and `seqspec format` with captured validation errors.
+- New region type: `sgrna_target`.
+
+### Fixed
+
+- `Read.get_file_by_id` returned the wrong file in some cases.
+
+- `seqspec file -f paired` lists all files.
+- `seqspec index`:
+  - Correct file-name indexing with `-s file`.
+  - Correct behavior when targeting region indices.
+  - Deterministic deduplication of FASTQ filenames.
+  - Lists file URLs and accepts HTTPS onlists.
+- `seqspec onlist`:
+  - Local caching and remote download (handles gzip and HTTP 302).
+  - Support for kallisto “multi” file format.
+  - Fix for bug tracked in #68.
+- Plotting fixes for single-modality figures and read overlays.
+- Test suite rewritten and passing on modern Python; mocks added for remote I/O.
+
+### Changed
+
+- `seqspec init` now initializes an empty seqspec file.
+- seqspec creation simplified:
+  - Create with `init`, then add `regions`/`reads` via `insert`, then `modify`.
+  - `insert`/`modify` take lists of `*Input` objects. Consistent `-s` selector.
+  - `-r` is deprecated in favor of `-i` across `index`, `onlist`, and `find`.
+- Internal models now derive from Pydantic `BaseModel`. YAML tags (`!Assay`, `!Read`, `!Region`, `!Onlist`, `!File`) are no longer required and are stripped on load.
+- `Region.regions` defaults to `[]` (not optional). Several `repr` and printing paths were cleaned up.
+- Packaging and dev:
+  - Moved to `pyproject.toml`; works well with `uv`. Versioning via `setuptools_scm`.
+  - Formatter switched to `ruff`. Test runner switched to `pytest`.
+- `seqspec index` internals made consistent; primer mapping works at any level of the library.
+
+### Removed
+
+- `spec_fn` parameter from `seqspec check`.
+- `seqspec convert` CLI (unimplemented).
+- Legacy implicit `parent_id` in specs (was unused).
+- `tox` (replaced by `pytest`).
+
+### Breaking changes
+
+- `seqspec onlist` now uses `urltype` (not `location`) to decide local vs remote. Older specs must update onlist metadata.
+- `init` no longer accepts library/read structures. You must `insert` regions and reads after `init`.
+- Input flag change: prefer `-i` (ID) over `-r` across `index`/`onlist`/`find`. `-r` is deprecated and will be removed in a future release.
+- Onlist/schema updates since 0.3.x (Files in Reads, `file_id` fields, URL checks) may require running `seqspec upgrade` or manual edits.
 
 ## [0.3.1] - 2024-10-14
 

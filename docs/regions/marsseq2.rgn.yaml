@@ -1,0 +1,59 @@
+- region_id: marsseq2_platebarcode_linker
+  region_type: linker
+  name: MARS-seq2 Plate Barcode Linker
+  sequence_type: random
+  sequence: NNNNN
+  min_len: 5
+  max_len: 5
+  onlist: null
+  regions: []
+- region_id: marsseq2_platebarcode
+  region_type: barcode
+  name: MARS-seq2 Plate Barcode
+  sequence_type: onlist
+  sequence: NNNN
+  min_len: 4
+  max_len: 4
+  onlist:
+    file_id: lig_N5X4_ix_rc.tsv.gz
+    filename: lig_N5X4_ix_rc.tsv.gz
+    filetype: txt
+    filesize: 122
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/MARS-seq2/lig_N5X4_ix_rc.tsv.gz
+    urltype: http
+    md5: 1074de66476c0c591a3eb0d520077cce
+  regions: []
+- region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: []
+- region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNN
+  min_len: 8
+  max_len: 8
+  onlist: null
+  regions: []
+- region_id: marsseq2_rt1_barcode
+  region_type: barcode
+  name: MARS-seq2 RT1 Barcode
+  sequence_type: onlist
+  sequence: NNNNNNN
+  min_len: 7
+  max_len: 7
+  onlist:
+    file_id: RT1_rc.tsv.gz
+    filename: RT1_rc.tsv.gz
+    filetype: txt
+    filesize: 1166
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/MARS-seq2/RT1_rc.tsv.gz
+    urltype: http
+    md5: 1fe7e76f2574cbc33a54ab217e7baa4a
+  regions: []

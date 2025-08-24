@@ -1,0 +1,34 @@
+- region_id: mcscrb_barcode
+  region_type: barcode
+  name: mcSCRB-seq Barcode
+  sequence_type: onlist
+  sequence: NNNNNN
+  min_len: 6
+  max_len: 6
+  onlist:
+    file_id: well_barcodes.tsv.gz
+    filename: well_barcodes.tsv.gz
+    filetype: txt
+    filesize: 852
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/mcSCRB-seq/well_barcodes.tsv.gz
+    urltype: http
+    md5: 717107816d92fbb81bd70c2b12fbe853
+  regions: []
+- region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNNNN
+  min_len: 10
+  max_len: 10
+  onlist: null
+  regions: []
+- region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: []

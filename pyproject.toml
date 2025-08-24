@@ -1,0 +1,111 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm>=7.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seqspec"
+dynamic = ["version"]
+description = "A tool for working with sequencing specifications"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Sina Booeshaghi", email = "abooesha@caltech.edu" }]
+maintainers = [{ name = "Sina Booeshaghi", email = "abooesha@caltech.edu" }]
+keywords = ["bioinformatics", "sequencing", "specifications"]
+classifiers = [
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "jsonschema",
+    "newick",
+    "requests",
+    "biopython",
+    "packaging",
+    "matplotlib",
+    "pydantic",
+    "openai-agents>=0.2.8",
+    "opentelemetry-sdk>=1.36.0",
+    "openinference-instrumentation-openai-agents>=1.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pre-commit",
+    "build",
+    "setuptools_scm>=7.0",
+    "ruff",
+    "twine",
+]
+
+[project.urls]
+Homepage = "https://github.com/sbooeshaghi/seqspec"
+Repository = "https://github.com/sbooeshaghi/seqspec.git"
+
+[project.scripts]
+seqspec = "seqspec.main:main"
+
+[tool.setuptools]
+packages = ["seqspec"]
+package-dir = { "" = "." }
+
+[tool.setuptools.package-data]
+"seqspec" = ["schema/*"]
+
+[tool.setuptools_scm]
+write_to = "seqspec/__init__.py"
+version_scheme = "python-simplified-semver"
+local_scheme = "node-and-date"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "--cov=seqspec"
+
+[tool.coverage.run]
+source = ["seqspec"]
+omit = ["tests/*"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+exclude = [
+  ".git",
+  "__pycache__",
+  "build",
+  "dist",
+  ".venv",
+  ".mypy_cache",
+  ".github",
+  "examples",
+  "tests"
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501", "E203"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "pytest-cov>=6.0.0",
+    "pytest-mock>=3.14.0",
+    "pre-commit>=4.2.0",
+    "build>=1.0.0",
+    "setuptools_scm>=7.0",
+    "ruff>=0.9.0",
+]
+
+

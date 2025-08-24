@@ -1,0 +1,43 @@
+- region_id: barcode
+  region_type: barcode
+  name: Barcode
+  sequence_type: onlist
+  sequence: NNNNNNNNNNNNNNNN
+  min_len: 16
+  max_len: 16
+  onlist:
+    file_id: 3M-5pgex-jan-2023.txt.gz
+    filename: 3M-5pgex-jan-2023.txt.gz
+    filetype: txt
+    filesize: 6945252
+    url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNA5PRIMEv3/3M-5pgex-jan-2023.txt.gz
+    urltype: http
+    md5: 5033d08c9b8d5080d2e5f65a3896b53b
+  regions: []
+- region_id: umi
+  region_type: umi
+  name: Unique Molecular Identifier
+  sequence_type: random
+  sequence: NNNNNNNNNNNN
+  min_len: 12
+  max_len: 12
+  onlist: null
+  regions: []
+- region_id: 10x5pTSO
+  region_type: 10x5pTSO
+  name: 10x 5 Prime Template Switching Oligo
+  sequence_type: fixed
+  sequence: TTTCTTATATGGG
+  min_len: 13
+  max_len: 13
+  onlist: null
+  regions: []
+- region_id: cDNA
+  region_type: cDNA
+  name: Complementary DNA
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  onlist: null
+  regions: []

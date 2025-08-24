@@ -3,8 +3,7 @@ library_kit: Illumina TruSeq Dual Index
 sequence_protocol: Element Aviti
 sequence_kit: Adept Workflow
 sequence_spec:
-- !Read
-  read_id: Index 1
+- read_id: Index 1
   name: Index 1
   modality: element_adept
   primer_id: element_read2
@@ -12,16 +11,14 @@ sequence_spec:
   max_len: 9
   strand: pos
   files:
-  - !File
-    file_id: I1.fastq.gz
+  - file_id: I1.fastq.gz
     filename: I1.fastq.gz
     filetype: fastq
     filesize: 0
     url: I1.fastq.gz
     urltype: local
     md5: md5
-- !Read
-  read_id: Index 2
+- read_id: Index 2
   name: Index 2 
   modality: element_adept
   primer_id: illumina_p5
@@ -29,16 +26,14 @@ sequence_spec:
   max_len: 9
   strand: pos
   files:
-  - !File
-    file_id: I2.fastq.gz
+  - file_id: I2.fastq.gz
     filename: I2.fastq.gz
     filetype: fastq
     filesize: 0
     url: I2.fastq.gz
     urltype: local
     md5: md5
-- !Read
-  read_id: Read 1
+- read_id: Read 1
   name: Read 1
   modality: element_adept
   primer_id: element_read1
@@ -46,16 +41,14 @@ sequence_spec:
   max_len: 150
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
     filetype: fastq
     filesize: 0
     url: R1.fastq.gz
     urltype: local
     md5: md5
-- !Read
-  read_id: Read 2
+- read_id: Read 2
   name: Read 2
   modality: element_adept
   primer_id: element_read2
@@ -63,8 +56,7 @@ sequence_spec:
   max_len: 150
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
     filetype: fastq
     filesize: 0

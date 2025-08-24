@@ -17,7 +17,7 @@ The `seqspec` tool operates on `seqspec` files and
 The `seqspec` specification is detailed in [here](SEQSPEC_FILE.md). Please review it before using and developing `seqspec` files; knowing the structure will help in understanding how to effectively use `seqspec`.
 :::
 
-`seqspec` consists of 13 subcommands:
+`seqspec` consists of the following subcommands:
 
 ```
 usage: seqspec [-h] <CMD> ...
@@ -29,18 +29,21 @@ Documentation: https://pachterlab.github.io/seqspec/
 
 positional arguments:
   <CMD>
+    build     Generate a complete seqspec with natural language (LLM-assisted)
     check     Validate seqspec file against specification
     find      Find objects in seqspec file
     file      List files present in seqspec file
     format    Autoformat seqspec file
     index     Identify position of elements in seqspec file
     info      Get information from seqspec file
-    init      Generate a new seqspec file
+    init      Generate a new empty seqspec file
+    insert    Insert regions or reads into an existing spec
     methods   Convert seqspec file into methods section
     modify    Modify attributes of various elements in seqspec file
     onlist    Get onlist file for elements in seqspec file
     print     Display the sequence and/or library structure from seqspec file
     split     Split seqspec file by modality
+    upgrade   Upgrade seqspec file to current version (hidden)
     version   Get seqspec tool version and seqspec file version
 
 optional arguments:
@@ -58,34 +61,44 @@ optional arguments:
 Check that the `seqspec` file is correctly formatted and consistent with the [specification](https://github.com/IGVF/seqspec/blob/main/docs/SPECIFICATION.md).
 
 ```bash
-seqspec check [-h] [-o OUT] yaml
+seqspec check [-h] [-o OUT] [--skip {igvf,igvf_onlist_skip}] yaml
+```
+
+```python
+from seqspec.seqspec_check import run_check
+
+run_check(schema_fn: str, spec_fn: str, o: str)
 ```
 
 - optionally, `-o OUT` can be used to write the output to a file.
+- optionally, `--skip {igvf,igvf_onlist_skip}` can filter out known IGVF-specific warnings (see source for list).
 - `yaml` corresponds to the `seqspec` file.
 
 A list of checks performed:
 
-1. Check that modalities are unique
-2. Check that `region_id`s of he first level of the `library_spec` correspond to modalities (and that there is one `region` per `modality`).
-3. Check that the onlist files exist (either locally or remotely)
-4. Check that the `read_id`s in the `sequence_spec` are unique.
-5. Check that Read files exist (either locally or remotely).
-6. Check that Read `primer_id`s, strand pairs are unique across all reads.
-7. Check that the `region_id`s are unique across all regions in the `library_spec`.
-8. Check that the read modalities are in assay list of modalities.
-9. Check that the `primer_id`s for the reads in the `sequence_spec` exist as a `region_id`s in the `library_spec`.
-10. Check that the `primer_id`s for the reads exist as `region_ids` for the "leaves" of the `library_spec`.
+1. Check that the spec validates against the JSON Schema.
+2. Check that modalities are unique.
+3. Check that `region_id`s of the first level of the `library_spec` correspond to modalities (one per modality).
+4. Check that onlist files exist (either as local paths or reachable URLs).
+5. Check that the `read_id`s in the `sequence_spec` are unique.
+6. Check that read files exist (either as local paths or reachable URLs).
+7. Check that read `(primer_id, strand)` pairs are unique across all reads.
+8. Check that the `region_id`s are unique across all regions.
+9. Check that each read `modality` exists in the assay list of modalities.
+10. Check that each read `primer_id` exists among the region IDs in the `library_spec`.
 11. Check `sequence_type` and region annotation consistencies:
 
 - if a region has a sequence type "fixed" then it should not contain subregions
-- if a region has a sequence type "joiend" then it should contain subregions
+- if a region has a sequence type "joined" then it should contain subregions
 - if a region has a sequence type "random" then it should not contain subregions and `sequence` should be all X's
 - if a region has a sequence type "onlist" then it should have an onlist object
 
-12. Check that the `min_len` is less than the `max_len`.
-13. Check that the lengths of the `sequence` in every region object is between the `min_len` and `max_len` length.
-14. Check that the number of files in each `File` object for all `Read` objects are the same length.
+12. Check that the `min_len` is less than or equal to the `max_len`.
+13. Check that the length of the `sequence` in every region is between the `min_len` and `max_len`.
+14. Check that the number of files in each `Read` is the same across all reads.
+15. Check that for every region with subregions, the region `min_len`/`max_len` equals the sum of the subregions' `min_len`/`max_len`.
+16. Check that for every region with subregions, the region `sequence` equals the left-to-right concatenation of the subregions' `sequence`s.
+17. Check that each read's `max_len` does not exceed the sequence-able range of library elements after (pos strand) or before (neg strand) the primer.
 
 Below are a list of example errors one may encounter when checking a spec:
 
@@ -130,7 +143,13 @@ $ seqspec check spec.yaml
 ## `seqspec find`: Find objects in seqspec file
 
 ```bash
-seqspec find [-h] [-o OUT] [-s Selector] -m MODALITY [-i IDs] yaml
+seqspec find [-h] [-o OUT] [-s SELECTOR] -m MODALITY [-i ID] yaml
+```
+
+```python
+from seqspec.seqspec_find import run_find
+
+run_find(spec_fn: str, modality: str, id: str, idtype: str, o: str)
 ```
 
 - optionally, `-o OUT` can be used to write the output to a file.
@@ -140,7 +159,7 @@ seqspec find [-h] [-o OUT] [-s Selector] -m MODALITY [-i IDs] yaml
   - file
   - region-type
 - `-m MODALITY` is the modality in which you are searching within.
-- `-i IDs` the ID you are searching for.
+- `-i ID` the ID you are searching for.
 - `yaml` corresponds to the `seqspec` file.
 
 ### Examples
@@ -192,7 +211,13 @@ $ seqspec find -m rna -s region-type -i barcode spec.yaml
 ## `seqspec file`: List files present in seqspec file
 
 ```bash
-seqspec file [-h] [-o OUT] [-i IDs] -m MODALITY [-s SELECTOR] [-f FORMAT] [-k KEY] yaml
+seqspec file [-h] [-o OUT] [-i IDs] -m MODALITY [-s SELECTOR] [-f FORMAT] [-k KEY] [--fullpath] yaml
+```
+
+```python
+from seqspec.seqspec_file import run_file
+
+run_file(spec_fn: str, m: str, ids: List[str], idtype: str, fmt: str, k: str, o: str, fp=False)
 ```
 
 - optionally, `-o OUT` can be used to write the output to a file.
@@ -219,6 +244,7 @@ seqspec file [-h] [-o OUT] [-i IDs] -m MODALITY [-s SELECTOR] [-f FORMAT] [-k KE
 - `-m MODALITY` is the modality in which you are searching within.
 - `-i IDs` the ID you are searching for.
 - `yaml` corresponds to the `seqspec` file.
+- `--fullpath` expands local `url` values to absolute paths relative to the spec file.
 
 ### Examples
 
@@ -266,6 +292,11 @@ Automatically fill in missing fields in the spec.
 seqspec format [-h] [-o OUT] yaml
 ```
 
+```python
+from seqspec.seqspec_format import run_format
+run_format(spec_fn: str, o: str)
+```
+
 - `-o OUT` the path to create the formatted `seqspec` file.
 - `yaml` corresponds to the `seqspec` file.
 
@@ -283,18 +314,24 @@ $ seqspec format -o spec.yaml spec.yaml
 
 Identify the position of elements in a spec for use in downstream tools. Returns the 0-indexed position of elements contained in a given region in the 5'->3' direction.
 
+```bash
+seqspec index [-h] [-o OUT] [-t TOOL] [-s SELECTOR] [--rev] [--subregion-type SUBREGIONTYPE] [--no-overlap] -m MODALITY [-i IDs] yaml
 ```
-seqspec index [-o OUT] [-t TOOL] [--rev] -m MODALITY -r REGION yaml
-seqspec index [-h] [-o OUT] [-t TOOL] [-s SELECTOR] [--rev] -m MODALITY [-i IDs] yaml
+
+```python
+from seqspec.seqspec_index import run_index
+run_index(spec_fn: str, modality: str, ids: List[str], idtype: str, fmt: str, rev: str, subregion_type: str, o)
 ```
 
 - optionally, `-o OUT` can be used to write the output to a file.
 - optionally, `--rev` can be set to return the 3'->5' index.
 - optionally, `-t TOOL` returns the indices in the format specified by the tool. One of:
+  - `chromap`: emit barcode and genomic ranges in chromap `--read-format` syntax
   - `kb`: `kallisto`/`kb count` `-x TECHNOLOGY` ([format](https://pachterlab.github.io/kallisto/manual#:~:text=will%20accept%20a-,string,-specifying%20a%20new)) requires a barcode, UMI, and sequence. The following `region_type` are used during indexing:
     - `barcode` for the barcode
     - `umi` for the umi
     - `cdna`, `gdna`, `protein`, or `tag` for the sequence
+  - `kb-single`: same as `kb` but forces a single feature segment
   - `seqkit`: `seqkit subseq` `-r, --region string` ([format](https://bioinf.shenwei.me/seqkit/usage/#subseq))
   - `simpleaf`: `simpleaf quant` `-c, --chemistry` ([format](https://simpleaf.readthedocs.io/en/latest/quant-command.html#a-note-on-the-chemistry-flag)) requires a barcode, UMI, and sequence. The following `region_type` are used during indexing:
     - `barcode` for the barcode
@@ -304,6 +341,7 @@ seqspec index [-h] [-o OUT] [-t TOOL] [-s SELECTOR] [--rev] -m MODALITY [-i IDs]
     - `barcode` for the barcode
     - `umi` for the umi
     - `cdna` for the sequence
+  - `splitcode`: splitcode `@extract` lines and tag groups
   - `tab`: tab delimited file (`region<\t>element<\t>start<t>end`)
   - `zumis`: yaml ([format](https://github.com/sdparekh/zUMIs/blob/main/zUMIs.yaml)) requires a barcode, UMI, and sequence. The following `region_type` are used during indexing:
     - `barcode` for the barcode
@@ -316,6 +354,8 @@ seqspec index [-h] [-o OUT] [-t TOOL] [-s SELECTOR] [--rev] -m MODALITY [-i IDs]
 - `-m MODALITY` is the modality that the `-r REGION`region resides in.
 - `-i IDs` is the ID of the object you are indexing.
 - `yaml` corresponds to the `seqspec` file.
+- `--subregion-type` filters to a specific region_type in some formats (e.g., seqkit)
+- `--no-overlap` removes overlapping regions across coordinates (stable, by first occurrence)
 
 ### Examples
 
@@ -342,11 +382,16 @@ $ seqspec index -m atac -t kb -s file spec.yaml
 seqspec info [-h] [-k KEY] [-f FORMAT] [-o OUT] yaml
 ```
 
+```python
+from seqspec.seqspec_info import run_info
+run_info(spec_fn: str, f: str, k=None, o=None)
+```
+
 - optionally, `-o OUT` path to write the info.
 - optionally, `-k KEY` the object to display (default: meta). Can be one of
   - modalities
   - meta
-  - seqeunce_spec
+  - sequence_spec
   - library_spec
 - optionally, `-f FORMAT` the output format (default: tab). Can be one of
   - tab
@@ -407,37 +452,36 @@ $ seqspec info -f json -k sequence_spec spec.yaml
         # long output omitted
 ```
 
-## `seqspec init`: Generate a new seqspec file
+## `seqspec init`: Generate a new empty seqspec draft
+
+Create a minimal, valid draft containing only meta Regions (one per modality). This is intended as a starting point to then insert regions and reads.
 
 ```bash
-seqspec init [-h] -n NAME -m MODALITIES -r READS [-o OUT] newick
+seqspec init [-h] -n NAME -m MODALITIES [--doi DOI] [--description DESC] [--date YYYY-MM-DD] [-o OUT]
 ```
 
-- optionally, `-o OUT` path to create `seqspec` file.
-- `-m MODALITIES` is a comma-separated list of modalities (e.g. rna,atac)
-- `-n NAME` is the name associated with the `seqspec` file.
-- `r READS ` is a list of modalities, reads, primer_ids, lengths, and strand (e.g. modality,fastq_name,primer_id,len,strand:...) one for each "Read"
-- `newick` is the [`newick`](http://bioinformatics.intec.ugent.be/MotifSuite/treeformat.php#:~:text=Newick%20Tree%20file%20format,html.) string corresponding to the structure of library molecule.
+- `-m MODALITIES` comma-separated list of modalities (e.g., `rna,atac`).
+- `-n NAME` assay name.
+- `--doi`, `--description`, `--date` optional metadata.
+- `-o OUT` optional output path (default: stdout).
 
-### Examples
+Example:
 
 ```bash
-# single-cell RNA
-# 16bp barcode + 12bp UMI (in r1.fastq.gz) and 150bp cdna (in r2.fastq.gz)
-$ seqspec init -n myassay -m rna -o spec.yaml -r rna,R1.fastq.gz,r1_primer,26,pos:rna,R2.fastq.gz,r2_primer,100,neg "((r1_primer:0,barcode:16,umi:12,cdna:150,r2_primer:0)rna)"
-
-# single-cell multiome ATAC + RNA
-# RNA Modality: 16bp barcode + 12bp UMI (in rna_r1.fastq.gz) and 150bp cdna (in rna_r2.fastq.gz)
-# ATAC Modality: 16bp barcode (in atac_r1.fastq.gz) + 150bp gdna (in atac_r2.fastq.gz) + 150bp gdna (in atac_r3.fastq.gz)
-$ seqspec init -n myassay -m rna,atac -o spec.yaml -r rna,rna_R1.fastq.gz,rna_r1_primer,26,pos:rna,rna_R2.fastq.gz,rna_r2_primer,100,neg:atac,atac_R1.fastq.gz,atac_r1_primer,100,pos:atac,atac_R2.fastq.gz,atac_r1_primer,16,neg:atac,atac_R3.fastq.gz,atac_r2_primer,100,neg "(((rna_r1_primer:0,barcode:16,umi:12,cdna:150,rna_r2_primer:0)rna),(barcode:16,atac_r1_primer:1,gdna:150,atac_r2_primer)atac)"
+seqspec init -n myassay -m rna,atac -o spec.yaml
 ```
 
-## `seqsoec methods`: Convert seqspec file into methods section
+## `seqspec methods`: Convert seqspec file into methods section
 
 Generate a methods section from a seqspec file.
 
 ```bash
 seqspec methods [-h] -m MODALITY [-o OUT] yaml
+```
+
+```python
+from seqspec.seqspec_methods import run_methods
+run_methods(spec_fn: str, m: str, o: str)
 ```
 
 - optionally, `-o OUT` path to write the methods section.
@@ -473,42 +517,28 @@ The library was sequenced on a Illumina NovaSeq 6000 (EFO:0008637) using the Nov
   - File 1: rna_R2_SRR18677638.fastq.gz
 ```
 
-## `seqspec modify`: Modify attributes of various elements in seqspec file
+## `seqspec modify`: Modify attributes of various elements (JSON-based)
+
+Modify objects by passing a JSON array of partial objects via `--keys`. Only provided fields are applied.
 
 ```bash
-seqspec modify [-h] [--read-id READID] [--read-name READNAME] [--primer-id PRIMERID] [--strand STRAND] [--files FILES] [--region-id REGIONID] [--region-type REGIONTYPE] [--region-name REGIONNAME] [--sequence-type SEQUENCETYPE] [--sequence SEQUENCE] [--min-len MINLEN] [--max-len MAXLEN] [-o OUT] [-i IDs] [-s SELECTOR] -m MODALITY yaml
+seqspec modify [-h] -m MODALITY -s SELECTOR -k JSON [-o OUT] yaml
 ```
 
-Read modifications
+Selectors: `read`, `region`, `file`, `seqkit`, `seqprotocol`, `libkit`, `libprotocol`, `assay`.
 
-- optionally, `--read-id READID` specifies the new `read_id`.
-- optionally, `--read-name READNAME` specifies the new `name`.
-- optionally, `--primer-id PRIMERID` specifies the new `primer_id`.
-- optionally, `--strand STRAND` specifies the new `strand`.
-- optionally, `--files FILES` files to insert into a read (format filename,filetype,filesize,url,urltype,md5:...)
+Examples:
 
-Region modifications
+```bash
+# Update a read name
+seqspec modify -m rna -s read -k '[{"read_id":"rna_R1","name":"renamed_rna_R1"}]' spec.yaml
 
-- optionally, `--region-id REGIONID` specifies the new `region_id`.
-- optionally, `--region-type REGIONTYPE` specifies the new `region_type`, must come from controlled vocabulary.
-- optionally, `--region-name REGIONNAME` specifies the new name for the region.
-- optionally, `--sequence-type SEQUENCETYPE` specifies the new sequence type, must come from the controlled vocabulary.
-- optionally, `--sequence SEQUENCE` specifies the new sequence for the region.
+# Update a region name
+seqspec modify -m rna -s region -k '[{"region_id":"rna_cell_bc","name":"Cell Barcode"}]' spec.yaml
 
-Read or region modifications
-
-- optionally, `--min-len MINLEN` sets the new minimum length that the sequence should have.
-- optionally, `--max-len MAXLEN` sets the new maximum length that the sequence can have.
-
-- `-o OUT` path to create or overwrite the `seqspec` file.
-- `-i ID` is the `id` of the object to modify.
-- `-s SELECTOR` is the type of the `id` of the object to modify (default: read). Can be one of:
-  - read
-  - region
-- `-m MODALITY` is the `modality` containing the `region_id` you are modifying.
-- `yaml` corresponds to the `seqspec` file.
-
-_Note_: modifying multiple attributes at one time is currently not supported.
+# Update a file url
+seqspec modify -m rna -s file -k '[{"file_id":"R1.fastq.gz","url":"./fastq/R1.fastq.gz"}]' spec.yaml
+```
 
 ### Examples
 
@@ -523,22 +553,28 @@ $ seqspec modify -m atac -o mod_spec.yaml -s region -i atac_cell_bc --region-id 
 $ seqspec modify -m atac -o mod_spec.yaml -i atac_R1 --files "R1_1.fastq.gz,fastq,0,./fastq/R1_1.fastq.gz,local,null:R1_2.fastq.gz,fastq,0,./fastq/R1_2.fastq.gz,local,null" spec.yaml
 ```
 
-## `seqspec onlist`: Get onlist file for elements in seqspec file
+## `seqspec onlist`: Get onlist file(s) for elements in seqspec file
 
 ```bash
-seqspec onlist [-h] [-o OUT] [-s SELECTOR] [-f FORMAT] [-i IDs] -m MODALITY yaml
+seqspec onlist [-h] [-o OUT] [-s SELECTOR] [-f {product,multi}] -m MODALITY [-i ID] yaml
 ```
 
-- optionally, `-o OUT` to set the path of the onlist file.
+```python
+from seqspec.seqspec_onlist import run_onlist
+
+run_onlist(spec_fn, modality, ids, idtype, fmt, o)
+```
+
+- optionally, `-o OUT` when set with `-f`, writes the joined onlist to this file; when set without `-f`, downloads remote onlists locally and prints paths.
 - `-m MODALITY` is the modality in which you are searching for the region.
 - `-i ID` is the `id` of the object to search for the onlist.
 - `-s SELECTOR` is the type of the `id` of the object (default: read). Can be one of:
   - read
   - region
   - region-type
-- `-f FORMAT` is the format for combining multiple onlists (default: product). Can be one of:
-  - product (cartesian product)
-  - multi
+- `-f` selects how to combine multiple onlists:
+  - `product` (cartesian product)
+  - `multi` (row-aligned, zip with padding)
 - `yaml` corresponds to the `seqspec` file.
 
 _Note_: If, for example, there are multiple regions with the specified `region_type` in the modality (e.g. multiple barcodes), then `seqspec onlist` will return a path to an onlist that it generates where the entries in that onlist are the cartesian product of the onlists for all of the regions found.
@@ -563,11 +599,16 @@ Print sequence and/or library structure as ascii, png, or html.
 seqspec print [-h] [-o OUT] [-f FORMAT] yaml
 ```
 
+```python
+from seqspec.seqspec_print import run_seqspec_print
+run_seqspec_print(spec_fn, fmt, o)
+```
+
 - optionally, `-o OUT` to set the path of printed file.
 - optionally, `-f FORMAT` is the format of the printed file. Can be one of:
   - `library-ascii`: prints an ascii tree of the library_spec
   - `seqspec-html`: prints an html of both the library_spec and sequence_spec (TODO this is incomplete)
-  - `seqspec-png`: prints an png of both the library_spec and sequence_spec (TODO this is incomplete)
+  - `seqspec-png`: prints a png summary of modality structures
   - `seqspec-ascii`: prints an ascii representation of both the library_spec and sequence_spec
 - `yaml` corresponds to the `seqspec` file.
 
@@ -651,6 +692,11 @@ $ seqspec print -o spec.png -f seqspec-png spec.yaml
 seqspec split [-h] -o OUT yaml
 ```
 
+```python
+from seqspec.seqspec_split import run_split
+run_split(spec_fn, o)
+```
+
 - optionally, `-o OUT` name prepended to split specs.
 - `yaml` corresponds to the `seqspec` file.
 
@@ -673,6 +719,11 @@ split.tag.yaml
 seqspec version [-h] [-o OUT] yaml
 ```
 
+```python
+from seqspec.seqspec_version import run_version
+run_version(spec_fn, o)
+```
+
 - optionally, `-o OUT` path to file to write output.
 - `yaml` corresponds to the `seqspec` file.
 
@@ -691,6 +742,11 @@ This is a hidden subcommand that upgrades an old version of the spec to the curr
 
 ```bash
 seqspec upgrade [-h] [-o OUT] yaml
+```
+
+```python
+from seqspec.seqspec_upgrade import run_upgrade
+run_upgrade(spec_fn, o)
 ```
 
 ### Examples

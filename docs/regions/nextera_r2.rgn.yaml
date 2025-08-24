@@ -1,5 +1,4 @@
-- !Region
-  region_id: nextera_read2
+- region_id: nextera_read2
   region_type: nextera_read2
   name: Nextera Read 2
   sequence_type: joined
@@ -7,4 +6,4 @@
   min_len: 34
   max_len: 34
   onlist: null
-  regions: null
+  regions: []

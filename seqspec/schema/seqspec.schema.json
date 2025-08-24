@@ -36,7 +36,14 @@
       "type": "array",
       "items": {
         "type": "string",
-        "enum": ["dna", "rna", "tag", "protein", "atac", "crispr"]
+        "enum": [
+          "dna",
+          "rna",
+          "tag",
+          "protein",
+          "atac",
+          "crispr"
+        ]
       }
     },
     "lib_struct": {
@@ -71,6 +78,8 @@
             "massively parallel reporter assay (OBI:0002675)",
             "chromosome conformation capture-on-chip assay (OBI:0002458)",
             "single nucleus methylation chromatin conformation capture seq (NTR:0000745)",
+            "in vitro CRISPR screen using flow cytometry (OBI:0003661)",
+            "in vitro CRISPR screen using single-cell RNA-seq (OBI:0003660)",
             "Custom"
           ]
         },
@@ -79,11 +88,23 @@
           "items": {
             "type": "object",
             "properties": {
-              "protocol_id": { "type": "string" },
-              "name": { "type": ["string", "null"] },
-              "modality": { "type": "string" }
+              "protocol_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "modality": {
+                "type": "string"
+              }
             },
-            "required": ["protocol_id", "modality"],
+            "required": [
+              "protocol_id",
+              "modality"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -101,11 +122,23 @@
           "items": {
             "type": "object",
             "properties": {
-              "kit_id": { "type": "string" },
-              "name": { "type": ["string", "null"] },
-              "modality": { "type": "string" }
+              "kit_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "modality": {
+                "type": "string"
+              }
             },
-            "required": ["kit_id", "modality"],
+            "required": [
+              "kit_id",
+              "modality"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -141,6 +174,7 @@
             "Illumina NextSeq 2000 (EFO:0010963)",
             "Illumina NovaSeq X (NTR:0000765)",
             "PacBio RS II (EFO:0008631)",
+            "Illumina NovaSeq X (EFO:0022840)",
             "Custom"
           ]
         },
@@ -149,11 +183,23 @@
           "items": {
             "type": "object",
             "properties": {
-              "protocol_id": { "type": "string" },
-              "name": { "type": ["string", "null"] },
-              "modality": { "type": "string" }
+              "protocol_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "modality": {
+                "type": "string"
+              }
             },
-            "required": ["protocol_id", "modality"],
+            "required": [
+              "protocol_id",
+              "modality"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -209,11 +255,23 @@
           "items": {
             "type": "object",
             "properties": {
-              "kit_id": { "type": "string" },
-              "name": { "type": ["string", "null"] },
-              "modality": { "type": "string" }
+              "kit_id": {
+                "type": "string"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "modality": {
+                "type": "string"
+              }
             },
-            "required": ["kit_id", "modality"],
+            "required": [
+              "kit_id",
+              "modality"
+            ],
             "additionalProperties": false
           },
           "minItems": 1
@@ -265,6 +323,7 @@
           "enum": [
             "atac",
             "barcode",
+            "bead_TSO",
             "cdna",
             "crispr",
             "custom_primer",
@@ -292,6 +351,7 @@
             "rna",
             "s5",
             "s7",
+            "sgrna_target",
             "tag",
             "truseq_read1",
             "truseq_read2",
@@ -301,7 +361,12 @@
         "sequence_type": {
           "description": "The type of the sequence",
           "type": "string",
-          "enum": ["fixed", "random", "onlist", "joined"]
+          "enum": [
+            "fixed",
+            "random",
+            "onlist",
+            "joined"
+          ]
         },
         "sequence": {
           "description": "The sequence",
@@ -321,7 +386,10 @@
         },
         "onlist": {
           "description": "The file containing the sequence if seq_type = onlist",
-          "type": ["object", "null"],
+          "type": [
+            "object",
+            "null"
+          ],
           "properties": {
             "file_id": {
               "description": "filename",
@@ -346,12 +414,20 @@
             "urltype": {
               "description": "type of file path",
               "type": "string",
-              "enum": ["local", "ftp", "http", "https"]
+              "enum": [
+                "local",
+                "ftp",
+                "http",
+                "https"
+              ]
             },
             "location": {
               "description": "location of onlist",
               "type": "string",
-              "enum": ["local", "remote"]
+              "enum": [
+                "local",
+                "remote"
+              ]
             },
             "md5": {
               "description": "md5sum for the file pointed to by filename",
@@ -442,7 +518,10 @@
         },
         "strand": {
           "type": "string",
-          "enum": ["pos", "neg"],
+          "enum": [
+            "pos",
+            "neg"
+          ],
           "description": "The strand orientation of the read, either positive ('pos') or negative ('neg')."
         },
         "files": {
@@ -474,7 +553,12 @@
               "urltype": {
                 "description": "type of file path",
                 "type": "string",
-                "enum": ["local", "ftp", "http", "https"]
+                "enum": [
+                  "local",
+                  "ftp",
+                  "http",
+                  "https"
+                ]
               },
               "md5": {
                 "description": "md5sum for the file pointed to by filename",

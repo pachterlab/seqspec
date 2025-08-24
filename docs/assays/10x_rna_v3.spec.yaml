@@ -1,20 +1,18 @@
-!Assay
 seqspec_version: 0.3.0
 assay_id: 10xRNAv3
 name: 10x-RNA-v3
 doi: https://doi.org/10.1038/ncomms14049
-date: null
+date: ''
 description: 10xv3 single-cell RNA-seq
 modalities:
 - rna
 lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3.html
-library_protocol: Any
-library_kit: Illumina Truseq Dual Index
 sequence_protocol: Illumina NovaSeq 6000
 sequence_kit: NovaSeq 6000 v1.5
+library_protocol: Any
+library_kit: Illumina Truseq Dual Index
 sequence_spec:
-- !Read
-  read_id: rna-R1.fastq.gz
+- read_id: rna-R1.fastq.gz
   name: Read 1
   modality: rna
   primer_id: rna-truseq_read1
@@ -22,16 +20,14 @@ sequence_spec:
   max_len: 28
   strand: pos
   files:
-  - !File
-    file_id: rna-R1.fastq.gz
+  - file_id: rna-R1.fastq.gz
     filename: rna-R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: rna-I1.fastq.gz
+- read_id: rna-I1.fastq.gz
   name: Index 1 (i7 index)
   modality: rna
   primer_id: rna-truseq_read2
@@ -39,16 +35,14 @@ sequence_spec:
   max_len: 8
   strand: pos
   files:
-  - !File
-    file_id: rna-I1.fastq.gz
+  - file_id: rna-I1.fastq.gz
     filename: rna-I1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: rna-R2.fastq.gz
+- read_id: rna-R2.fastq.gz
   name: Read 2
   modality: rna
   primer_id: rna-truseq_read2
@@ -56,29 +50,24 @@ sequence_spec:
   max_len: 50
   strand: neg
   files:
-  - !File
-    file_id: rna-R2.fastq.gz
+  - file_id: rna-R2.fastq.gz
     filename: rna-R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  parent_id: null
-  region_id: rna
+- region_id: rna
   region_type: rna
   name: 10x-ATAC-RNA-MULTI-seq RNA
   sequence_type: joined
-  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
+  sequence: AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNXXXXXXXXXXXXXAGATCGGAAGAGCACACGTCTGAACTCCAGTCACNNNNNNNNATCTCGTATGCCGTCTTCTGCTTG
   min_len: 153
   max_len: 202
   onlist: null
   regions:
-  - !Region
-    parent_id: rna
-    region_id: rna-illumina_p5
+  - region_id: rna-illumina_p5
     region_type: illumina_p5
     name: Illumina P5
     sequence_type: fixed
@@ -86,10 +75,8 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
-  - !Region
-    parent_id: rna
-    region_id: rna-truseq_read1
+    regions: []
+  - region_id: rna-truseq_read1
     region_type: truseq_read1
     name: RNA Truseq Read 1
     sequence_type: fixed
@@ -97,28 +84,24 @@ library_spec:
     min_len: 29
     max_len: 29
     onlist: null
-    regions: null
-  - !Region
-    parent_id: rna
-    region_id: rna-cell_barcode
+    regions: []
+  - region_id: rna-cell_barcode
     region_type: barcode
     name: Cell Barcode
     sequence_type: onlist
     sequence: NNNNNNNNNNNNNNNN
     min_len: 16
     max_len: 16
-    onlist: !Onlist
+    onlist:
       file_id: 737K-august-2016.txt
       filename: 737K-august-2016.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
+      urltype: local
       md5: f62a276e262fdd85262a889d0f48556b
-      location: local
-    regions: null
-  - !Region
-    region_id: rna-umi
+    regions: []
+  - region_id: rna-umi
     region_type: umi
     name: GEX UMI
     sequence_type: random
@@ -126,22 +109,17 @@ library_spec:
     min_len: 12
     max_len: 12
     onlist: null
-    regions: null
-    parent_id: rna
-  - !Region
-    parent_id: rna
-    region_id: rna-cDNA
+    regions: []
+  - region_id: rna-cDNA
     region_type: cdna
     name: RNA-cDNA
     sequence_type: random
-    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    sequence: X
     min_len: 1
     max_len: 50
     onlist: null
-    regions: null
-  - !Region
-    parent_id: rna
-    region_id: rna-truseq_read2
+    regions: []
+  - region_id: rna-truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2
     sequence_type: fixed
@@ -149,29 +127,24 @@ library_spec:
     min_len: 34
     max_len: 34
     onlist: null
-    regions: null
-  - !Region
-    parent_id: rna
-    region_id: rna-index7
+    regions: []
+  - region_id: rna-index7
     region_type: index7
     name: Truseq Read 2
     sequence_type: onlist
     sequence: NNNNNNNN
     min_len: 8
     max_len: 8
-    onlist: !Onlist
+    onlist:
       file_id: index7_onlist_RNA-ATAC.txt
       filename: index7_onlist_RNA-ATAC.txt
       filetype: ''
       filesize: 0
       url: ''
-      urltype: ''
+      urltype: local
       md5: fcb5fe7d14ffc9984cd5450413c7a742
-      location: local
-    regions: null
-  - !Region
-    parent_id: rna
-    region_id: rna-illumina_p7
+    regions: []
+  - region_id: rna-illumina_p7
     region_type: illumina_p7
     name: Illumina P7
     sequence_type: fixed
@@ -179,4 +152,4 @@ library_spec:
     min_len: 24
     max_len: 24
     onlist: null
-    regions: null
+    regions: []

@@ -1,13 +1,12 @@
 # note for multiple of the same region the region id gets a number, i.e. barcode-1 barcode-2
-- !Region
-  region_id: barcode
+- region_id: barcode
   region_type: barcode
   name: Barcode
   sequence_type: onlist
   sequence: NNNNNNNNNNNNNNNN
   min_len: 16
   max_len: 16
-  onlist: !Onlist
+  onlist:
     file_id: 3M-february-2018.txt.gz
     filename: 3M-february-2018.txt.gz
     filetype: txt
@@ -15,5 +14,4 @@
     url: https://github.com/pachterlab/qcbc/raw/main/tests/10xRNAv3/3M-february-2018.txt.gz
     urltype: http
     md5: 3d36d0a4021fd292b265e2b5e72aaaf3
-    location: remote
-  regions: null
+  regions: []

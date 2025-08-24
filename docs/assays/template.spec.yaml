@@ -1,26 +1,24 @@
-!Assay
 seqspec_version: 0.2.0
-assay_id: 
-name: 
-doi: 
-date: 
-description: 
+assay_id: ''
+name: ''
+doi: ''
+date: ''
+description: ''
 modalities:
 - mode
-lib_struct: 
-library_protocol: 
-library_kit: 
-sequence_protocol: 
-sequence_kit: 
-sequence_spec:
+lib_struct: ''
+sequence_protocol: []
+sequence_kit: []
+library_protocol: []
+library_kit: []
+sequence_spec: []
 library_spec:
-- !Region
-  region_id: mode
+- region_id: mode
   region_type: named
   name: mode
   sequence_type: joined
-  sequence: 
-  min_len: 
-  max_len: 
+  sequence: ''
+  min_len: 0
+  max_len: 1024
   onlist: null
-  regions: null
+  regions: []

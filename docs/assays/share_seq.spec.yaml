@@ -1,4 +1,3 @@
-!Assay
 seqspec_version: 0.3.0
 assay_id: SHARE-Seq
 name: SHARE-Seq
@@ -6,17 +5,16 @@ doi: https://doi.org/10.1016/j.cell.2020.09.056
 date: 23 October 2020
 description: Simultaneous high-throughput atac and rna expression in the same single
   cell
-lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SHARE-seq.html
 modalities:
 - atac
 - rna
-library_protocol: null
-library_kit: null
+lib_struct: https://teichlab.github.io/scg_lib_structs/methods_html/SHARE-seq.html
 sequence_protocol: Illumina
-sequence_kit: null
+sequence_kit: []
+library_protocol: []
+library_kit: []
 sequence_spec:
-- !Read
-  read_id: R1.fastq.gz
+- read_id: R1.fastq.gz
   name: Read 1
   modality: illumina_truseq_prep
   primer_id: generic_primer1
@@ -24,16 +22,14 @@ sequence_spec:
   max_len: 250
   strand: pos
   files:
-  - !File
-    file_id: R1.fastq.gz
+  - file_id: R1.fastq.gz
     filename: R1.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
-- !Read
-  read_id: R2.fastq.gz
+- read_id: R2.fastq.gz
   name: Read 2
   modality: illumina_truseq_prep
   primer_id: generic_primer2
@@ -41,71 +37,60 @@ sequence_spec:
   max_len: 250
   strand: neg
   files:
-  - !File
-    file_id: R2.fastq.gz
+  - file_id: R2.fastq.gz
     filename: R2.fastq.gz
-    filetype: ''
+    filetype: gz
     filesize: 0
     url: ''
-    urltype: ''
+    urltype: local
     md5: ''
 library_spec:
-- !Region
-  region_id: atac
+- region_id: atac
   region_type: atac
   name: atac
   sequence_type: joined
-  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNTCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
+  sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
   min_len: 199
   max_len: 199
   onlist: null
   regions:
-  - !Region
-    region_id: BMMC_single_donor_ATAC_L001_R1.fastq.gz
+  - region_id: BMMC_single_donor_ATAC_L001_R1.fastq.gz
     region_type: gdna
     name: atac Read 1 FASTQ
     sequence_type: random
-    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     min_len: 50
     max_len: 50
     onlist: null
     regions:
-    - !Region
-      region_id: gdna-1
+    - region_id: gdna-1
       region_type: gdna
       name: Genomic DNA
       sequence_type: random
-      sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+      sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       min_len: 50
       max_len: 50
       onlist: null
-      regions: null
-      parent_id: BMMC_single_donor_ATAC_L001_R1.fastq.gz
-    parent_id: atac
-  - !Region
-    region_id: BMMC_single_donor_ATAC_L001_R2.fastq.gz
+      regions: []
+  - region_id: BMMC_single_donor_ATAC_L001_R2.fastq.gz
     region_type: fastq
     name: atac Read 2 FASTQ
     sequence_type: joined
-    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNTCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
     min_len: 149
     max_len: 149
     onlist: null
-    parent_id: atac
     regions:
-    - !Region
-      region_id: gdna-2
+    - region_id: gdna-2
       region_type: gdna
       name: Genomic DNA read 2
       sequence_type: random
-      sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
+      sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       min_len: 50
       max_len: 50
       onlist: null
-      parent_id: BMMC_single_donor_ATAC_L001_R2.fastq.gz
-      regions: null
-    - !Region
-      region_id: atac-raw-cell-barcode
+      regions: []
+    - region_id: atac-raw-cell-barcode
       region_type: random
       name: atac Raw Cell Barcode
       sequence_type: joined
@@ -113,10 +98,8 @@ library_spec:
       min_len: 99
       max_len: 99
       onlist: null
-      parent_id: BMMC_single_donor_ATAC_L001_R2.fastq.gz
       regions:
-      - !Region
-        region_id: atac-linker1
+      - region_id: atac-linker1
         region_type: linker
         name: atac linker1
         sequence_type: fixed
@@ -124,29 +107,24 @@ library_spec:
         min_len: 15
         max_len: 15
         onlist: null
-        regions: null
-        parent_id: atac-raw-cell-barcode
-      - !Region
-        region_id: atac-cell-barcode1
+        regions: []
+      - region_id: atac-cell-barcode1
         region_type: barcode
         name: atac Cell Barcode 1
         sequence_type: onlist
         sequence: NNNNNNNN
         min_len: 8
         max_len: 8
-        onlist: !Onlist
+        onlist:
           file_id: R1_human_barcodes.txt
           filename: R1_human_barcodes.txt
           filetype: ''
           filesize: 0
           url: ''
-          urltype: ''
-          md5: null
-          location: local
-        regions: null
-        parent_id: atac-raw-cell-barcode
-      - !Region
-        region_id: atac-linker2
+          urltype: local
+          md5: ''
+        regions: []
+      - region_id: atac-linker2
         region_type: linker
         name: linker2
         sequence_type: fixed
@@ -154,29 +132,24 @@ library_spec:
         min_len: 30
         max_len: 30
         onlist: null
-        regions: null
-        parent_id: atac-raw-cell-barcode
-      - !Region
-        region_id: atac-cell-barcode2
+        regions: []
+      - region_id: atac-cell-barcode2
         region_type: barcode
         name: atac Cell Barcode 2
         sequence_type: onlist
         sequence: NNNNNNNN
         min_len: 8
         max_len: 8
-        onlist: !Onlist
+        onlist:
           file_id: R2_human_barcodes.txt
           filename: R2_human_barcodes.txt
           filetype: ''
           filesize: 0
           url: ''
-          urltype: ''
-          md5: null
-          location: local
-        regions: null
-        parent_id: atac-raw-cell-barcode
-      - !Region
-        region_id: atac-linker3
+          urltype: local
+          md5: ''
+        regions: []
+      - region_id: atac-linker3
         region_type: linker
         name: linker3
         sequence_type: fixed
@@ -184,95 +157,78 @@ library_spec:
         min_len: 30
         max_len: 30
         onlist: null
-        regions: null
-        parent_id: atac-raw-cell-barcode
-      - !Region
-        region_id: atac-cell-barcode3
+        regions: []
+      - region_id: atac-cell-barcode3
         region_type: barcode
         name: atac Cell Barcode 3
         sequence_type: onlist
         sequence: NNNNNNNN
         min_len: 8
         max_len: 8
-        onlist: !Onlist
+        onlist:
           file_id: R3_human_barcodes.txt
           filename: R3_human_barcodes.txt
           filetype: ''
           filesize: 0
           url: ''
-          urltype: ''
-          md5: null
-          location: local
-        regions: null
-        parent_id: atac-raw-cell-barcode
-  parent_id: null
-- !Region
-  region_id: rna
+          urltype: local
+          md5: ''
+        regions: []
+- region_id: rna
   region_type: rna
   name: rna
   sequence_type: joined
-  sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
-  onlist: null
+  sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
   min_len: 199
   max_len: 199
+  onlist: null
   regions:
-  - !Region
-    region_id: BMMC_single_donor_RNA_L001_R1.fastq.gz
+  - region_id: BMMC_single_donor_RNA_L001_R1.fastq.gz
     region_type: fastq
     name: rna Read 1 FASTQ
     sequence_type: random
-    sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-    onlist: null
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     min_len: 50
     max_len: 50
-    parent_id: rna
+    onlist: null
     regions:
-    - !Region
-      region_id: cdna
+    - region_id: cdna
       region_type: cdna
       name: cdna
       sequence_type: random
-      sequence: NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN
-      onlist: null
+      sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       min_len: 50
       max_len: 50
-      parent_id: BMMC_single_donor_RNA_L001_R1.fastq.gz
-      regions: null
-  - !Region
-    region_id: BMMC_single_donor_RNA_L001_R2.fastq.gz
+      onlist: null
+      regions: []
+  - region_id: BMMC_single_donor_RNA_L001_R2.fastq.gz
     region_type: fastq
     name: rna Read 2 FASTQ
     sequence_type: joined
-    sequence: NNNNNNNNNNAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
+    sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXTCGGACGATCATGGGNNNNNNNNCAAGTATGCAGCGCGCTCAAGCACGTGGATNNNNNNNNAGTCGTACGCCGATGCGAAACATCGGCCACNNNNNNNN
     min_len: 149
     max_len: 149
     onlist: null
-    parent_id: rna
     regions:
-    - !Region
-      region_id: umi
+    - region_id: umi
       region_type: umi
       name: umi
       sequence_type: random
-      sequence: NNNNNNNNNN
+      sequence: XXXXXXXXXX
       min_len: 10
       max_len: 10
       onlist: null
-      regions: null
-      parent_id: BMMC_single_donor_RNA_L001_R2.fastq.gz
-    - !Region
-      region_id: poly_A
+      regions: []
+    - region_id: poly_A
       region_type: poly_A
       name: poly_A
       sequence_type: random
-      sequence: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+      sequence: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
       min_len: 40
       max_len: 40
       onlist: null
-      regions: null
-      parent_id: BMMC_single_donor_RNA_L001_R2.fastq.gz
-    - !Region
-      region_id: rna-raw-cell-barcode
+      regions: []
+    - region_id: rna-raw-cell-barcode
       region_type: random
       name: rna Raw Cell Barcode
       sequence_type: joined
@@ -280,10 +236,8 @@ library_spec:
       min_len: 99
       max_len: 99
       onlist: null
-      parent_id: BMMC_single_donor_RNA_L001_R2.fastq.gz
       regions:
-      - !Region
-        region_id: rna-linker1
+      - region_id: rna-linker1
         region_type: linker
         name: linker1
         sequence_type: fixed
@@ -291,29 +245,24 @@ library_spec:
         min_len: 15
         max_len: 15
         onlist: null
-        regions: null
-        parent_id: rna-raw-cell-barcode
-      - !Region
-        region_id: rna-cell-barcode1
+        regions: []
+      - region_id: rna-cell-barcode1
         region_type: barcode
         name: rna Cell Barcode 1
         sequence_type: onlist
         sequence: NNNNNNNN
         min_len: 8
         max_len: 8
-        onlist: !Onlist
+        onlist:
           file_id: R1_human_barcodes.txt
           filename: R1_human_barcodes.txt
           filetype: ''
           filesize: 0
           url: ''
-          urltype: ''
-          md5: null
-          location: local
-        regions: null
-        parent_id: rna-raw-cell-barcode
-      - !Region
-        region_id: rna-linker2
+          urltype: local
+          md5: ''
+        regions: []
+      - region_id: rna-linker2
         region_type: linker
         name: linker2
         sequence_type: fixed
@@ -321,29 +270,24 @@ library_spec:
         min_len: 30
         max_len: 30
         onlist: null
-        regions: null
-        parent_id: rna-raw-cell-barcode
-      - !Region
-        region_id: rna-cell-barcode2
+        regions: []
+      - region_id: rna-cell-barcode2
         region_type: barcode
         name: rna Cell Barcode 2
         sequence_type: onlist
         sequence: NNNNNNNN
         min_len: 8
         max_len: 8
-        onlist: !Onlist
+        onlist:
           file_id: R2_human_barcodes.txt
           filename: R2_human_barcodes.txt
           filetype: ''
           filesize: 0
           url: ''
-          urltype: ''
-          md5: null
-          location: local
-        regions: null
-        parent_id: rna-raw-cell-barcode
-      - !Region
-        region_id: rna-linker3
+          urltype: local
+          md5: ''
+        regions: []
+      - region_id: rna-linker3
         region_type: linker
         name: linker3
         sequence_type: fixed
@@ -351,25 +295,20 @@ library_spec:
         min_len: 30
         max_len: 30
         onlist: null
-        regions: null
-        parent_id: rna-raw-cell-barcode
-      - !Region
-        region_id: rna-cell-barcode3
+        regions: []
+      - region_id: rna-cell-barcode3
         region_type: barcode
         name: rna Cell Barcode 3
         sequence_type: onlist
         sequence: NNNNNNNN
         min_len: 8
         max_len: 8
-        onlist: !Onlist
+        onlist:
           file_id: R3_human_barcodes.txt
           filename: R3_human_barcodes.txt
           filetype: ''
           filesize: 0
           url: ''
-          urltype: ''
-          md5: null
-          location: local
-        regions: null
-        parent_id: rna-raw-cell-barcode
-  parent_id: null
+          urltype: local
+          md5: ''
+        regions: []
