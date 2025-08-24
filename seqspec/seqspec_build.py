@@ -37,7 +37,7 @@ Generate a complete seqspec with natural language.
 Example:
     seqspec build -n myassay -m rna,atac -o spec.yaml
 """,
-        help="Generate a new empty seqspec file",
+        help="Generate a complete seqspec with natural language.",
         formatter_class=RawTextHelpFormatter,
     )
     req = subparser.add_argument_group("required arguments")
