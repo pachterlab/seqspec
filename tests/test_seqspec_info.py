@@ -79,7 +79,7 @@ def test_seqspec_info_library_spec(dogmaseq_dig_spec: Assay):
     protein_regions = library_spec["protein"]
     region_ids = [region.region_id for region in protein_regions]
     expected_protein_regions = [
-        "ghost_protein_truseq_read1", "protein_truseq_read1", "protein_cell_bc", 
+        "protein_truseq_read1", "protein_cell_bc",
         "protein_umi", "protein_seq", "protein_truseq_read2"
     ]
     assert set(region_ids) == set(expected_protein_regions)

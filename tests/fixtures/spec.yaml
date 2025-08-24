@@ -212,7 +212,6 @@ library_spec:
     sequence: NNNNNNNNNNNNNNNN
     min_len: 16
     max_len: 16
-    regions: []
     onlist:
       file_id: RNA-737K-arc-v1.txt
       filename: RNA-737K-arc-v1.txt
@@ -221,6 +220,7 @@ library_spec:
       url: https://github.com/pachterlab/qcbc/raw/main/tests/10xMOME/RNA-737K-arc-v1.txt.gz
       urltype: https
       md5: a88cd21e801ae6f9a7d9a48b67ccf693
+    regions: []
   - region_id: protein_umi
     region_type: umi
     name: umi
@@ -228,8 +228,8 @@ library_spec:
     sequence: XXXXXXXXXXXX
     min_len: 12
     max_len: 12
-    regions: []
     onlist: null
+    regions: []
   - region_id: protein_seq
     region_type: protein
     name: protein
@@ -237,7 +237,6 @@ library_spec:
     sequence: XXXXXXXXXXXXXXX
     min_len: 15
     max_len: 15
-    regions: []
     onlist:
       file_id: protein_feature_barcodes.txt
       filename: protein_feature_barcodes.txt
@@ -246,6 +245,7 @@ library_spec:
       url: https://raw.githubusercontent.com/pachterlab/seqspec/devel/examples/specs/dogmaseq-dig/protein_feature_barcodes.txt
       urltype: https
       md5: b5920c1fc1d22927607c31c96f5cf03e
+    regions: []
   - region_id: protein_truseq_read2
     region_type: truseq_read2
     name: Truseq Read 2

@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Dict, List
 
 from seqspec.Assay import Assay
+from seqspec.Read import Read
 from seqspec.Region import Onlist, itx_read, project_regions_to_coordinates
 from seqspec.seqspec_find import find_by_region_id, find_by_region_type
 from seqspec.utils import (
@@ -134,9 +135,26 @@ def run_onlist(parser: ArgumentParser, args: Namespace) -> None:
 def get_onlists(spec: Assay, modality: str, selector: str, id: str) -> List[Onlist]:
     """Get onlists based on selector type."""
     if selector == "region-type":
-        # Use the existing find_by_region_type function
+        # Prefer ordering by read orientation when possible to ensure
+        # consistency with the `read` selector behavior.
+        reads: List[Read] = spec.get_seqspec(modality)
+        for rd in reads:
+            try:
+                _, rgns = map_read_id_to_regions(spec, modality, rd.read_id)
+            except Exception:
+                continue
+            ordered_onlists: List[Onlist] = []
+            for r in rgns:
+                if str(r.region_type) == str(id):
+                    ol = r.get_onlist()
+                    if ol:
+                        ordered_onlists.append(ol)
+            if ordered_onlists:
+                return ordered_onlists
+
+        # Fallback: original region-type traversal order
         regions = find_by_region_type(spec, modality, id)
-        onlists = []
+        onlists: List[Onlist] = []
         for r in regions:
             ol = r.get_onlist()
             if ol:

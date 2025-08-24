@@ -76,7 +76,7 @@ def temp_dir():
         yield temp_dir 
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def dogmaseq_dig_spec():
     """
     Load the dogmaseq-dig spec from file
