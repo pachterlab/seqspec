@@ -243,7 +243,7 @@ def check(spec: Assay):
                         errors.append(errobj)
                         idx += 1
                 else:
-                    if not file_exists(ol.filename):
+                    if not file_exists(ol.url):
                         errobj = {
                             "error_type": "check_onlist_files_exist",
                             "error_message": f"{ol.filename} does not exist",
