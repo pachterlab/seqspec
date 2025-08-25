@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0", "setuptools_scm>=7.0"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "seqspec"
-dynamic = ["version"]
+version = "0.4.0"
 description = "A tool for working with sequencing specifications"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -45,7 +45,6 @@ dev = [
     "pytest-mock",
     "pre-commit",
     "build",
-    "setuptools_scm>=7.0",
     "ruff",
     "twine",
 ]
@@ -64,10 +63,7 @@ package-dir = { "" = "." }
 [tool.setuptools.package-data]
 "seqspec" = ["schema/*"]
 
-[tool.setuptools_scm]
-write_to = "seqspec/__init__.py"
-version_scheme = "python-simplified-semver"
-local_scheme = "node-and-date"
+ 
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -104,7 +100,6 @@ dev = [
     "pytest-mock>=3.14.0",
     "pre-commit>=4.2.0",
     "build>=1.0.0",
-    "setuptools_scm>=7.0",
     "ruff>=0.9.0",
 ]
 

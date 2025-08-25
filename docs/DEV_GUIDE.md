@@ -35,17 +35,18 @@ authors:
    source .venv/bin/activate
    uv pip install ".[dev]"
 
-   # 4. Sanity-check version resolution
-   make version
+   # 4. Set the release version in pyproject.toml
+   # - Edit [project] version = "X.Y.Z"
+   # - Commit the change on main
+   uv run python -c "import tomllib, pathlib; print(tomllib.loads(pathlib.Path('pyproject.toml').read_bytes().decode())['project']['version'])"  # verify
 
    # 5. Create the release
    make release
    # This will:
    # - Verify you are on main and working tree is clean
    # - Pull with --ff-only
+   # - Read version from pyproject.toml and tag vX.Y.Z
    # - Run tests (uv run pytest)
-   # - Prompt for version number
-   # - Create and push git tag
    # - Build sdist+wheel (uv run python -m build)
    # - Upload to PyPI (uvx twine upload)
 
@@ -75,14 +76,13 @@ Follow semantic versioning:
 2. **Always release from `main` branch**
 
    - Makefile enforces releasing from `main` with a clean tree
-   - Ensures PyPI version matches `main`
+   - Version is stored in `pyproject.toml` and tags are derived from it
    - Git tags point to correct code
    - Tests are run automatically during release
 
-3. **Development versions**
-   - During development: `0.3.1.dev123+gabc123`
-   - After release: `0.3.2`
-   - Handled automatically by setuptools_scm
+3. **Version management**
+   - Bump `[project].version` in `pyproject.toml` before releases
+   - Example: 0.3.1 → 0.4.0 for new features
 
 ## Using uv for Development
 
@@ -237,5 +237,10 @@ All dependencies are managed in `pyproject.toml`:
 
 - Runtime dependencies under `[project]`
 - Development dependencies under `[project.optional-dependencies]` (includes `twine` for uploads)
+
+Versioning is manual (single source of truth):
+
+- Set `[project].version` in `pyproject.toml` (e.g., `0.4.0`)
+- `seqspec/__init__.py` reads the installed distribution version via `importlib.metadata`
 
 No separate `requirements.txt` or `dev-requirements.txt` files are needed.
