@@ -1,0 +1,397 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "Assay.schema.json",
+    "title": "Assay",
+    "description": "A Assay of DNA",
+    "type": "object",
+    "properties": {
+      "seqspec_version": {
+        "description": "Version of the seqspec specification used",
+        "type": "string",
+        "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+      },
+      "assay_id": {
+        "description": "Identifier for the assay",
+        "type": "string"
+      },
+      "name": {
+        "description": "The name of the assay",
+        "type": "string"
+      },
+      "doi": {
+        "description": "the doi of the paper that describes the assay",
+        "type": "string"
+      },
+      "date": {
+        "description": "The seqspec creation date",
+        "type": "string",
+        "pattern": "^(0?[1-9]|[12][0-9]|3[01])\\s(January|February|March|April|May|June|July|August|September|October|November|December)\\s(19|20)\\d\\d$"
+      },
+      "description": {
+        "description": "A short description of the assay",
+        "type": "string"
+      },
+      "modalities": {
+        "description": "The modalities the assay targets",
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["dna", "rna", "tag", "protein", "atac", "crispr"]
+        }
+      },
+      "lib_struct": {
+        "description": "The link to Teichmann's libstructs page derived for this sequence",
+        "type": "string"
+      },
+      "library_protocol": {
+        "description": "The protocol/machine/tool to generate the library insert",
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "protocol_id": { "type": "string" },
+                "name": { "type": ["string", "null"] },
+                "modality": { "type": "string" }
+              }
+            },
+            "minItems": 1
+          }
+        ]
+      },
+      "library_kit": {
+        "description": "The kit used to make the library sequence_protocol compatible",
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kit_id": { "type": "string" },
+                "name": { "type": ["string", "null"] },
+                "modality": { "type": "string" }
+              }
+            },
+            "minItems": 1
+          }
+        ]
+      },
+      "sequence_protocol": {
+        "description": "The protocol/machine/tool to generate sequences",
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "protocol_id": { "type": "string" },
+                "name": { "type": ["string", "null"] },
+                "modality": { "type": "string" }
+              }
+            },
+            "minItems": 1
+          }
+        ]
+      },
+      "sequence_kit": {
+        "description": "The kit used with the protocol to sequence the library",
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "kit_id": { "type": "string" },
+                "name": { "type": ["string", "null"] },
+                "modality": { "type": "string" }
+              }
+            },
+            "minItems": 1
+          }
+        ]
+      },
+      "sequence_spec": {
+        "description": "The spec for the sequencer",
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/read"
+        }
+      },
+      "library_spec": {
+        "description": "The spec for the assay",
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/region"
+        }
+      }
+    },
+    "required": [
+      "seqspec_version",
+      "assay_id",
+      "name",
+      "doi",
+      "date",
+      "description",
+      "modalities"
+    ],
+    "$defs": {
+      "region": {
+        "title": "Region",
+        "description": "A region of DNA",
+        "type": "object",
+        "properties": {
+          "region_id": {
+            "description": "identifier for the region",
+            "type": "string"
+          },
+          "region_type": {
+            "description": "the type of region",
+            "type": "string",
+            "enum": [
+              "atac",
+              "barcode",
+              "bead_TSO",
+              "cdna",
+              "crispr",
+              "custom_primer",
+              "dna",
+              "fastq",
+              "fastq_link",
+              "gdna",
+              "hic",
+              "illumina_p5",
+              "illumina_p7",
+              "index5",
+              "index7",
+              "linker",
+              "ME1",
+              "ME2",
+              "methyl",
+              "named",
+              "nextera_read1",
+              "nextera_read2",
+              "poly_A",
+              "poly_G",
+              "poly_T",
+              "poly_C",
+              "protein",
+              "rna",
+              "s5",
+              "s7",
+              "sgrna_target",
+              "tag",
+              "truseq_read1",
+              "truseq_read2",
+              "umi"
+            ]
+          },
+          "sequence_type": {
+            "description": "The type of the sequence",
+            "type": "string",
+            "enum": ["fixed", "random", "onlist", "joined"]
+          },
+          "sequence": {
+            "description": "The sequence",
+            "type": "string"
+          },
+          "min_len": {
+            "description": "The minimum length of the sequence",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2048
+          },
+          "max_len": {
+            "description": "The maximum length of the sequence",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2048
+          },
+          "onlist": {
+            "description": "The file containing the sequence if seq_type = onlist",
+            "type": ["object", "null"],
+            "properties": {
+              "file_id": {
+                "description": "filename",
+                "type": "string"
+              },
+              "filename": {
+                "description": "filename for the onlist",
+                "type": "string"
+              },
+              "filetype": {
+                "description": "the type of file",
+                "type": "string"
+              },
+              "filesize": {
+                "description": "the size of the file in bytes",
+                "type": "integer"
+              },
+              "url": {
+                "description": "The path or url to the file",
+                "type": "string"
+              },
+              "urltype": {
+                "description": "type of file path",
+                "type": "string",
+                "enum": ["local", "ftp", "http", "https"]
+              },
+              "location": {
+                "description": "location of onlist",
+                "type": "string",
+                "enum": ["local", "remote"]
+              },
+              "md5": {
+                "description": "md5sum for the file pointed to by filename",
+                "type": "string"              }
+            },
+            "required": [
+              "file_id",
+              "filename",
+              "filetype",
+              "filesize",
+              "url",
+              "urltype"
+            ]
+          },
+          "regions": {
+            "description": "The regions being joined",
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/region"
+            }
+          }
+        },
+        "required": [
+          "region_id",
+          "region_type",
+          "sequence_type",
+          "sequence",
+          "min_len",
+          "max_len"
+        ],
+        "if": {
+          "properties": {
+            "min_len": {
+              "const": 0
+            }
+          }
+        },
+        "then": {
+          "properties": {
+            "sequence": {
+              "type": "string",
+              "pattern": "^[ACGTRYMKSWHBVDNX]*$"
+            }
+          }
+        },
+        "else": {
+          "properties": {
+            "sequence": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^[ACGTRYMKSWHBVDNX]+$"
+            }
+          }
+        }
+      },
+      "read": {
+        "title": "Read",
+        "type": "object",
+        "properties": {
+          "read_id": {
+            "type": "string",
+            "description": "The unique identifier for the read."
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the read."
+          },
+          "modality": {
+            "type": "string",
+            "description": "The modality of the assay generating the read."
+          },
+          "primer_id": {
+            "type": "string",
+            "description": "The region id of the primer used."
+          },
+          "min_len": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "The minimum length of the read, must be greater than or equal to 0."
+          },
+          "max_len": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "description": "The maximum length of the read, must be greater than 0."
+          },
+          "strand": {
+            "type": "string",
+            "enum": ["pos", "neg"],
+            "description": "The strand orientation of the read, either positive ('pos') or negative ('neg')."
+          },
+          "files": {
+            "description": "An array of files containing the reads",
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "file_id": {
+                  "description": "filename",
+                  "type": "string"
+                },
+                "filename": {
+                  "description": "filename",
+                  "type": "string"
+                },
+                "filetype": {
+                  "description": "the type of file",
+                  "type": "string"
+                },
+                "filesize": {
+                  "description": "the size of the file in bytes",
+                  "type": "integer"
+                },
+                "url": {
+                  "description": "The path or url to the file",
+                  "type": "string"
+                },
+                "urltype": {
+                  "description": "type of file path",
+                  "type": "string",
+                  "enum": ["local", "ftp", "http", "https"]
+                },
+                "md5": {
+                  "description": "md5sum for the file pointed to by filename",
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{32}$"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "read_id",
+          "modality",
+          "primer_id",
+          "min_len",
+          "max_len",
+          "strand"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+  
