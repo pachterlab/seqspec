@@ -1,5 +1,5 @@
 !Assay
-seqspec_version: 0.3.0
+seqspec_version: 0.3.2
 assay_id: 10x-ATAC-RNA-MULTI
 name: 10x-ATAC-RNA-MULTI/Illumina
 doi: https://doi.org/10.1038/s41592-019-0433-8
