@@ -25,6 +25,7 @@ authors:
 - `seqspec check` can skip specific checks; can ignore onlist when needed.
 - “Loose loading” mode for `seqspec check` and `seqspec format` with captured validation errors.
 - New region type: `sgrna_target`.
+- Added private attribute to `Assay`, `_spec_path` (str). Stores the fully resolved path to the loaded spec. Used in `seqspec check`.
 
 ### Fixed
 
