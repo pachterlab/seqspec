@@ -1,7 +1,7 @@
 from typing import List, Optional, Union
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 from seqspec.Read import Read, ReadInput
 from seqspec.Region import Region, RegionInput
@@ -232,6 +232,9 @@ class Assay(BaseModel):
 
     sequence_spec: List[Read]
     library_spec: List[Region]
+
+    # Not part of the public schema; populated when loading from disk.
+    _spec_path: Optional[str] = PrivateAttr(default=None)
 
     def __repr__(self) -> str:
         rds = []

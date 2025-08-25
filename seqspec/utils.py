@@ -123,6 +123,11 @@ def load_spec(spec_fn: Union[str, Path], strict=True) -> Assay:
     if strict:
         try:
             assay = Assay(**data_dict)
+            # record the absolute path of the spec on the created object
+            try:
+                assay._spec_path = str(Path(spec_fn).resolve())
+            except Exception:
+                assay._spec_path = None
             return assay
         except ValidationError as e:
             verrors = e.errors()
@@ -152,7 +157,12 @@ def load_spec(spec_fn: Union[str, Path], strict=True) -> Assay:
     else:
         from seqspec.Assay import AssayInput
 
-        return AssayInput(**data_dict).to_assay()
+        assay = AssayInput(**data_dict).to_assay()
+        try:
+            assay._spec_path = str(Path(spec_fn).resolve())
+        except Exception:
+            assay._spec_path = None
+        return assay
 
 
 def load_regions(

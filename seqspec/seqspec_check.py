@@ -191,10 +191,21 @@ def check(spec: Assay):
         for m in modes:
             olrgns += [i.onlist for i in spec.get_libspec(m).get_onlist_regions()]
 
+        # Base directory of the spec file if known
+        spec_base = None
+        try:
+            spec_path = getattr(spec, "_spec_path", None)
+            if spec_path:
+                spec_base = Path(spec_path).parent
+        except Exception:
+            spec_base = None
+
         for ol in olrgns:
             if ol.urltype == "local":
                 if ol.filename[:-3] == ".gz":
                     check = ol.url
+                    if spec_base and not Path(check).is_absolute():
+                        check = str((spec_base / check).resolve())
                     if not path.exists(check):
                         errobj = {
                             "error_type": "check_onlist_files_exist",
@@ -206,6 +217,11 @@ def check(spec: Assay):
                 else:
                     check = ol.url
                     check_gz = ol.url + ".gz"
+                    if spec_base:
+                        if not Path(check).is_absolute():
+                            check = str((spec_base / check).resolve())
+                        if not Path(check_gz).is_absolute():
+                            check_gz = str((spec_base / check_gz).resolve())
                     if not path.exists(check) and not path.exists(check_gz):
                         errobj = {
                             "error_type": "check_onlist_files_exist",
@@ -255,10 +271,21 @@ def check(spec: Assay):
 
     # Read files exist
     def check_read_files_exist(spec, errors, idx):
+        # Base directory of the spec file if known
+        spec_base = None
+        try:
+            spec_path = getattr(spec, "_spec_path", None)
+            if spec_path:
+                spec_base = Path(spec_path).parent
+        except Exception:
+            spec_base = None
+
         for read in spec.sequence_spec:
             for f in read.files:
                 if f.urltype == "local":
                     check = f.url
+                    if spec_base and not Path(check).is_absolute():
+                        check = str((spec_base / check).resolve())
                     if not path.exists(check):
                         errobj = {
                             "error_type": "check_read_files_exist",

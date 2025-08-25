@@ -18,9 +18,9 @@ def test_seqspec_file(dogmaseq_dig_spec: Assay):
     assert rna_r1_file.filesize == 18499436
     assert (
         rna_r1_file.url
-        == "https://github.com/pachterlab/seqspec/raw/devel/examples/specs/dogmaseq-dig/fastqs/rna_R1_SRR18677638.fastq.gz"
+        == "fastqs/rna_R1_SRR18677638.fastq.gz"
     )
-    assert rna_r1_file.urltype == "https"
+    assert rna_r1_file.urltype == "local"
     assert rna_r1_file.md5 == "7eb15a70da9b729b5a87e30b6596b641"
 
     # Test with ids
