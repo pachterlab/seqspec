@@ -14,9 +14,6 @@ class SeqProtocol(BaseModel):
     name: str
     modality: str
 
-    def to_dict(self):
-        return self.model_dump()
-
     def update_from(self, patch: Union["SeqProtocol", "SeqProtocolInput"]) -> None:
         if isinstance(patch, SeqProtocolInput):
             for field in patch.model_fields_set:
@@ -68,9 +65,6 @@ class SeqKit(BaseModel):
     name: Optional[str]
     modality: str
 
-    def to_dict(self):
-        return self.model_dump()
-
     def update_from(self, patch: Union["SeqKit", "SeqKitInput"]) -> None:
         if isinstance(patch, SeqKitInput):
             for field in patch.model_fields_set:
@@ -117,9 +111,6 @@ class LibProtocol(BaseModel):
     protocol_id: str
     name: str
     modality: str
-
-    def to_dict(self):
-        return self.model_dump()
 
     def update_from(self, patch: Union["LibProtocol", "LibProtocolInput"]) -> None:
         if isinstance(patch, LibProtocolInput):
@@ -169,9 +160,6 @@ class LibKit(BaseModel):
     kit_id: str
     name: Optional[str]
     modality: str
-
-    def to_dict(self):
-        return self.model_dump()
 
     def update_from(self, patch: Union["LibKit", "LibKitInput"]) -> None:
         if isinstance(patch, LibKitInput):
@@ -254,14 +242,7 @@ Reads:
 Regions:
 {"\n".join(rgns)}
 """
-        # return str(self.model_dump())
         return s
-
-    def to_dict(self):
-        return self.model_dump()
-
-    def to_JSON(self):
-        return self.model_dump_json(indent=4)
 
     def to_YAML(self, fname: Optional[str] = None):
         yaml_str = yaml.dump(self.model_dump(), sort_keys=False)

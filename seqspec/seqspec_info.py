@@ -152,7 +152,7 @@ def seqspec_info_meta(spec: Assay) -> Dict:
     Returns:
         Dictionary containing meta information
     """
-    sd = spec.to_dict()
+    sd = spec.model_dump()
     del sd["library_spec"]
     del sd["sequence_spec"]
     del sd["modalities"]
@@ -173,7 +173,8 @@ def seqspec_info_library_spec(spec: Assay) -> Dict:
     for m in modalities:
         libspec = spec.get_libspec(m)
         leaves = libspec.get_leaves()
-        result[m] = leaves if leaves else []
+        r = leaves if leaves else []
+        result[m] = [i.model_dump() for i in r]
     return {"library_spec": result}
 
 

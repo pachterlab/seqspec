@@ -50,15 +50,6 @@ def test_get_read(dogmaseq_dig_spec):
     with pytest.raises(IndexError):
         dogmaseq_dig_spec.get_read("non_existent_read")
 
-def test_to_json(dogmaseq_dig_spec):
-    """
-    Test to_JSON method
-    """
-    json_output = dogmaseq_dig_spec.to_JSON()
-    assert isinstance(json_output, str)
-    data = json.loads(json_output)
-    assert data["assay_id"] == "DOGMAseq-DIG"
-
 
 def test_insert_regions(temp_spec):
     """

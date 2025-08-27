@@ -17,9 +17,6 @@ class File(BaseModel):
         s = f"""{self.file_id}"""
         return s
 
-    def to_dict(self):
-        return self.model_dump()
-
     def update_file_id(self, file_id: str):
         self.file_id = file_id
 

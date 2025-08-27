@@ -208,8 +208,6 @@ class Region(BaseModel):
         """Get the onlist associated with this region."""
         return self.onlist
 
-    # update_from removed per new approach
-
     def get_leaves(self, leaves: Optional[List["Region"]] = None) -> List["Region"]:
         # print(leaves)
         if leaves is None:

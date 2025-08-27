@@ -86,28 +86,6 @@ def test_read_set_files():
     assert len(read.files) == 1
     assert read.files[0].file_id == "file1"
 
-def test_read_to_dict():
-    """Test to_dict method"""
-    read = Read(
-        read_id="test_read",
-        name="Test Read",
-        modality="RNA",
-        primer_id="test_primer",
-        min_len=100,
-        max_len=150,
-        strand="pos"
-    )
-    
-    read_dict = read.to_dict()
-    assert read_dict["read_id"] == "test_read"
-    assert read_dict["name"] == "Test Read"
-    assert read_dict["modality"] == "RNA"
-    assert read_dict["primer_id"] == "test_primer"
-    assert read_dict["min_len"] == 100
-    assert read_dict["max_len"] == 150
-    assert read_dict["strand"] == "pos"
-    assert read_dict["files"] == []
-
 def test_read_update_read_by_id():
     """Test update_read_by_id method"""
     read = Read(
@@ -275,26 +253,6 @@ def test_file_creation():
     assert file_obj.urltype == "local"
     assert file_obj.md5 == "d41d8cd98f00b204e9800998ecf8427e"
 
-def test_file_to_dict():
-    """Test File to_dict method"""
-    file_obj = File(
-        file_id="file1",
-        filename="read1.fastq.gz",
-        filetype="fastq",
-        filesize=1000000,
-        url="file://read1.fastq.gz",
-        urltype="local",
-        md5="d41d8cd98f00b204e9800998ecf8427e"
-    )
-    
-    file_dict = file_obj.to_dict()
-    assert file_dict["file_id"] == "file1"
-    assert file_dict["filename"] == "read1.fastq.gz"
-    assert file_dict["filetype"] == "fastq"
-    assert file_dict["filesize"] == 1000000
-    assert file_dict["url"] == "file://read1.fastq.gz"
-    assert file_dict["urltype"] == "local"
-    assert file_dict["md5"] == "d41d8cd98f00b204e9800998ecf8427e"
 
 
 

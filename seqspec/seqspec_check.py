@@ -144,7 +144,7 @@ def check(spec: Assay):
         with open(schema_fn, "r") as stream:
             schema = yaml.load(stream, Loader=yaml.Loader)
         validator = Draft4Validator(schema)
-        for idx, error in enumerate(validator.iter_errors(spec.to_dict()), 1):
+        for idx, error in enumerate(validator.iter_errors(spec.model_dump()), 1):
             err_elements = [repr(index) for index in error.path]
             err_path = f"spec[{']['.join(err_elements)}]"
             errobj = {

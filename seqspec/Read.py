@@ -25,9 +25,6 @@ class Read(BaseModel):
         # return str(self.model_dump())
         return s
 
-    def to_dict(self):
-        return self.model_dump()
-
     def update_read_by_id(
         self,
         read_id=None,

@@ -77,7 +77,7 @@ def test_seqspec_info_library_spec(dogmaseq_dig_spec: Assay):
     
     # Check protein modality regions
     protein_regions = library_spec["protein"]
-    region_ids = [region.region_id for region in protein_regions]
+    region_ids = [region["region_id"] for region in protein_regions]
     expected_protein_regions = [
         "protein_truseq_read1", "protein_cell_bc",
         "protein_umi", "protein_seq", "protein_truseq_read2"
@@ -85,11 +85,11 @@ def test_seqspec_info_library_spec(dogmaseq_dig_spec: Assay):
     assert set(region_ids) == set(expected_protein_regions)
     
     # Check specific region properties
-    protein_cell_bc = next(region for region in protein_regions if region.region_id == "protein_cell_bc")
-    assert protein_cell_bc.region_type == "barcode"
-    assert protein_cell_bc.name == "Cell Barcode"
-    assert protein_cell_bc.min_len == 16
-    assert protein_cell_bc.max_len == 16
+    protein_cell_bc = next(region for region in protein_regions if region["region_id"] == "protein_cell_bc")
+    assert protein_cell_bc["region_type"] == "barcode"
+    assert protein_cell_bc["name"] == "Cell Barcode"
+    assert protein_cell_bc["min_len"] == 16
+    assert protein_cell_bc["max_len"] == 16
 
 
 def test_seqspec_info_meta(dogmaseq_dig_spec: Assay):
