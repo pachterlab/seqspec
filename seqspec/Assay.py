@@ -14,17 +14,6 @@ class SeqProtocol(BaseModel):
     name: str
     modality: str
 
-    def update_from(self, patch: Union["SeqProtocol", "SeqProtocolInput"]) -> None:
-        if isinstance(patch, SeqProtocolInput):
-            for field in patch.model_fields_set:
-                value = getattr(patch, field)
-                if value is not None:
-                    setattr(self, field, value)
-            return
-        if isinstance(patch, SeqProtocol):
-            for field in self.model_fields.keys():  # type: ignore[attr-defined]
-                setattr(self, field, getattr(patch, field))
-
 
 class SeqProtocolInput(BaseModel):
     """
@@ -65,17 +54,6 @@ class SeqKit(BaseModel):
     name: Optional[str]
     modality: str
 
-    def update_from(self, patch: Union["SeqKit", "SeqKitInput"]) -> None:
-        if isinstance(patch, SeqKitInput):
-            for field in patch.model_fields_set:
-                value = getattr(patch, field)
-                if value is not None:
-                    setattr(self, field, value)
-            return
-        if isinstance(patch, SeqKit):
-            for field in self.model_fields.keys():  # type: ignore[attr-defined]
-                setattr(self, field, getattr(patch, field))
-
 
 class SeqKitInput(BaseModel):
     """
@@ -111,17 +89,6 @@ class LibProtocol(BaseModel):
     protocol_id: str
     name: str
     modality: str
-
-    def update_from(self, patch: Union["LibProtocol", "LibProtocolInput"]) -> None:
-        if isinstance(patch, LibProtocolInput):
-            for field in patch.model_fields_set:
-                value = getattr(patch, field)
-                if value is not None:
-                    setattr(self, field, value)
-            return
-        if isinstance(patch, LibProtocol):
-            for field in self.model_fields.keys():  # type: ignore[attr-defined]
-                setattr(self, field, getattr(patch, field))
 
 
 class LibProtocolInput(BaseModel):
@@ -160,17 +127,6 @@ class LibKit(BaseModel):
     kit_id: str
     name: Optional[str]
     modality: str
-
-    def update_from(self, patch: Union["LibKit", "LibKitInput"]) -> None:
-        if isinstance(patch, LibKitInput):
-            for field in patch.model_fields_set:
-                value = getattr(patch, field)
-                if value is not None:
-                    setattr(self, field, value)
-            return
-        if isinstance(patch, LibKit):
-            for field in self.model_fields.keys():  # type: ignore[attr-defined]
-                setattr(self, field, getattr(patch, field))
 
 
 class LibKitInput(BaseModel):
@@ -337,8 +293,6 @@ Regions:
             read.modality = modality
             self.sequence_spec.insert(insert_idx, read)
             insert_idx += 1
-
-    # update_from removed per new approach
 
 
 class AssayInput(BaseModel):

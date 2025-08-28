@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+__all__ = ["File"]
+
 
 class File(BaseModel):
     file_id: str
@@ -14,8 +16,7 @@ class File(BaseModel):
     md5: str
 
     def __repr__(self) -> str:
-        s = f"""{self.file_id}"""
-        return s
+        return self.file_id
 
     def update_file_id(self, file_id: str):
         self.file_id = file_id
@@ -79,11 +80,12 @@ class FileInput(BaseModel):
     )
 
     def to_file(self) -> File:
+        # derive defaults from filename when needed
+        fname = self.filename or ""
         return File(
-            file_id=self.file_id or (Path(self.filename).name if self.filename else ""),
-            filename=self.filename or "",
-            filetype=self.filetype
-            or (Path(self.filename).suffix.lstrip(".") if self.filename else ""),
+            file_id=self.file_id or (Path(fname).name if fname else ""),
+            filename=fname,
+            filetype=self.filetype or (Path(fname).suffix.lstrip(".") if fname else ""),
             filesize=self.filesize or 0,
             url=self.url or "",
             urltype=self.urltype or "local",

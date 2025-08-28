@@ -57,12 +57,6 @@ class Onlist(BaseModel):
     urltype: str
     md5: str
 
-    def update_from(self, patch: "OnlistInput") -> None:
-        for field in patch.model_fields_set:
-            value = getattr(patch, field)
-            if value is not None:
-                setattr(self, field, value)
-
 
 class OnlistInput(BaseModel):
     """

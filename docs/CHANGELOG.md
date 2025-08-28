@@ -7,6 +7,21 @@ authors:
 
 # Changelog
 
+## [0.X.X] - XXXX-XX-XX
+
+### Added
+
+### Fixed
+
+### Changed
+
+### Removed
+
+- Removed `to_dict` attribute for all objects. Updated tests.
+- Removed `update_from` attribute, cleaned class objects
+
+#### Breaking changes
+
 ## [0.4.0] - 2025-08-24
 
 ### Added

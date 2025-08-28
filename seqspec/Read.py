@@ -22,7 +22,6 @@ class Read(BaseModel):
     def __repr__(self) -> str:
         strand = "+" if self.strand == "pos" else "-"
         s = f"""{strand}({self.min_len}, {self.max_len}){self.read_id}:{self.primer_id}"""
-        # return str(self.model_dump())
         return s
 
     def update_read_by_id(
@@ -58,8 +57,6 @@ class Read(BaseModel):
             if f.file_id == file_id:
                 return self
         return None
-
-    # update_from removed per new approach
 
 
 class ReadCoordinate(BaseModel):
