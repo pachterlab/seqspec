@@ -75,7 +75,7 @@ def seqspec_check(spec: Assay, filter_type: Optional[str] = None) -> List[Dict]:
     Returns:
         List of error dictionaries
     """
-    errors = check(spec)
+    errors = check(spec, filter_type)
 
     if filter_type:
         errors = filter_errors(errors, filter_type)
@@ -99,24 +99,14 @@ def run_check(parser: ArgumentParser, args: Namespace):
     return errors
 
 
-IGVF_FILTERS = [
-    {"error_type": "check_schema", "error_object": "'lib_struct'"},
-    {"error_type": "check_schema", "error_object": "'library_protocol'"},
-    {"error_type": "check_schema", "error_object": "'library_kit'"},
-    {"error_type": "check_schema", "error_object": "'sequence_protocol'"},
-    {"error_type": "check_schema", "error_object": "'sequence_kit'"},
-    {"error_type": "check_schema", "error_object": "'md5'"},
-]
-IGVF_ONLIST_SKIP_FILTERS = IGVF_FILTERS + [
+IGVF_ONLIST_SKIP_FILTERS = [
     {"error_type": "check_onlist_files_exist", "error_object": "onlist"}
 ]
 
 
 def filter_errors(errors, filter_type):
     filters = None
-    if filter_type == "igvf":
-        filters = IGVF_FILTERS
-    elif filter_type == "igvf_onlist_skip":
+    if filter_type == "igvf_onlist_skip":
         filters = IGVF_ONLIST_SKIP_FILTERS
 
     if filters:
@@ -137,10 +127,19 @@ def filter_errors(errors, filter_type):
         return errors
 
 
-def check(spec: Assay):
+def check(spec: Assay, filter_type: Optional[str] = None):
     # Variety of checks against schema
     def check_schema(spec: Assay, errors=[], idx=0):
-        schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
+        if filter_type == "igvf":
+            schema_fn = path.join(
+                path.dirname(__file__), "schema/seqspec_igvf.schema.json"
+            )
+        elif filter_type == "igvf_onlist_skip":
+            schema_fn = path.join(
+                path.dirname(__file__), "schema/seqspec_igvf_onlist_skip.schema.json"
+            )
+        else:
+            schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
         with open(schema_fn, "r") as stream:
             schema = yaml.load(stream, Loader=yaml.Loader)
         validator = Draft4Validator(schema)
@@ -232,7 +231,7 @@ def check(spec: Assay):
                         idx += 1
             elif ol.urltype == "http" or ol.urltype == "https" or ol.urltype == "ftp":
                 # ping the link with a simple http request to check if the file exists at that URI
-                if spec.seqspec_version == "0.3.0":
+                if spec.seqspec_version in ["0.3.0", "0.3.1", "0.3.2", "0.4.0"]:
                     if not file_exists(ol.url):
                         errobj = {
                             "error_type": "check_onlist_files_exist",

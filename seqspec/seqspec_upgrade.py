@@ -69,7 +69,10 @@ def seqspec_upgrade(spec: Assay, version: str) -> Assay:
         "0.1.0": upgrade_0_1_0_to_0_3_0,
         "0.1.1": upgrade_0_1_1_to_0_3_0,
         "0.2.0": upgrade_0_2_0_to_0_3_0,
-        "0.3.0": upgrade_0_3_0_to_0_3_0,
+        "0.3.0": no_upgrade,
+        "0.3.1": no_upgrade,
+        "0.3.2": no_upgrade,
+        "0.4.0": no_upgrade,
     }
 
     if version not in UPGRADE:
@@ -80,7 +83,7 @@ def seqspec_upgrade(spec: Assay, version: str) -> Assay:
     return UPGRADE[version](spec)
 
 
-def upgrade_0_3_0_to_0_3_0(spec: Assay) -> Assay:
+def no_upgrade(spec: Assay) -> Assay:
     """No upgrade needed for current version."""
     return spec
 

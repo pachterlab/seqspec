@@ -103,3 +103,11 @@ def temp_spec(dogmaseq_dig_spec: Assay):
     Create a deepcopy of the dogmaseq-dig spec for modification
     """
     return dogmaseq_dig_spec.model_copy(deep=True) 
+
+@pytest.fixture(scope="function")
+def seqspec_valid_ignore_onlist():
+    """
+    Load the seqspec_valid_ignore_onlist spec from file
+    """
+    spec_path = "tests/fixtures/seqspec_valid_ignore_onlist.yaml"
+    return load_spec(spec_path, strict=False)
