@@ -2,8 +2,10 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-from seqspec.File import File, FileInput
+from seqspec.File import File, FileInput, RustFile
 from seqspec.Region import RegionCoordinate
+
+from ._core import Read as _RustRead
 
 
 class Read(BaseModel):
@@ -57,6 +59,64 @@ class Read(BaseModel):
             if f.file_id == file_id:
                 return self
         return None
+
+
+class RustRead:
+    __slots__ = ("_inner",)
+
+    def __init__(self, inner: _RustRead) -> None:
+        object.__setattr__(self, "_inner", inner)
+
+    # Generic forwarding
+
+    def __getattr__(self, name):
+        # called only if attribute not found on Rust object itself
+        return getattr(self._inner, name)
+
+    def __setattr__(self, name, value):
+        if name == "_inner":
+            object.__setattr__(self, name, value)
+        else:
+            setattr(self._inner, name, value)
+
+    @classmethod
+    def new(
+        cls,
+        *,
+        read_id: str,
+        name: str,
+        modality: str,
+        primer_id: str,
+        min_len: int,
+        max_len: int,
+        strand: str,
+        files: List[RustFile] | None = None,
+    ) -> "RustRead":
+        rust_files = [f._inner for f in (files or [])]  # pass raw RustFile inners
+        inner = _RustRead(
+            read_id,
+            name,
+            modality,
+            primer_id,
+            int(min_len),
+            int(max_len),
+            strand,
+            rust_files,
+        )
+        return cls(inner)
+
+    # convenience constructor: accept a Pydantic Read DTO
+    @classmethod
+    def from_model(cls, m: Read) -> "RustRead":
+        # serde in Rust will build Vec<File> from the nested DTOs
+        return cls(_RustRead.from_json(m.model_dump_json()))
+
+    def snapshot(self) -> "Read":
+        # Convert back into your Pydantic DTO
+        return Read.model_validate_json(self._inner.to_json())
+
+    def __repr__(self) -> str:
+        return self._inner.__repr__()  # uses Rust __repr__
 
 
 class ReadCoordinate(BaseModel):

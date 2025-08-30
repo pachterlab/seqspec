@@ -1,7 +1,9 @@
 import pytest
 import json
 from seqspec.Assay import Assay, Region, Read
-
+from seqspec.Assay import Assay, RustAssay, SeqProtocol, SeqKit, LibProtocol, LibKit
+from seqspec.Read import ReadInput
+from seqspec.Region import RegionInput
 
 
 def test_load_spec(dogmaseq_dig_spec):
@@ -144,3 +146,121 @@ def test_print_sequence(dogmaseq_dig_spec, capsys):
     expected_sequence += "\n"
 
     assert captured.out == expected_sequence
+
+def test_assay_kits_protocols_list_only(dogmaseq_dig_spec: Assay):
+    pytest.importorskip("seqspec._core")
+
+    # Start from an existing spec and add lists of objects
+    spec = dogmaseq_dig_spec.model_copy(deep=True)
+    spec.sequence_protocol = [SeqProtocol(protocol_id="NovaSeq", name="Illumina NovaSeq", modality=spec.modalities[0])]
+    spec.sequence_kit = [SeqKit(kit_id="NovaKit", name="NovaSeq v1.5", modality=spec.modalities[0])]
+    spec.library_protocol = [LibProtocol(protocol_id="10x_rna", name="10x RNA", modality=spec.modalities[0])]
+    spec.library_kit = [LibKit(kit_id="TruSeq", name="TruSeq Dual", modality=spec.modalities[0])]
+
+    ra = RustAssay.from_model(spec)
+    snap = ra.snapshot()
+
+    assert isinstance(snap.sequence_protocol, list)
+    assert getattr(snap.sequence_protocol[0], "protocol_id", None) == "NovaSeq"
+    assert isinstance(snap.sequence_kit, list)
+    assert getattr(snap.sequence_kit[0], "kit_id", None) == "NovaKit"
+    assert isinstance(snap.library_protocol, list)
+    assert getattr(snap.library_protocol[0], "name", None) == "10x RNA"
+    assert isinstance(snap.library_kit, list)
+    assert getattr(snap.library_kit[0], "name", None) == "TruSeq Dual"
+
+
+def test_rustassay_snapshot_and_modalities_parity(dogmaseq_dig_spec: Assay):
+    pytest.importorskip("seqspec._core")
+
+    py = dogmaseq_dig_spec
+    ra = RustAssay.from_model(py)
+    snap = ra.snapshot()
+
+    # Whole-object parity (JSON) and modalities
+    assert snap.model_dump_json() == py.model_dump_json()
+    assert ra.list_modalities() == py.list_modalities()
+
+    # __repr__ parity (structural depiction)
+    assert repr(snap) == repr(py)
+
+
+def test_rustassay_getters_parity(dogmaseq_dig_spec: Assay):
+    pytest.importorskip("seqspec._core")
+    py = dogmaseq_dig_spec
+    ra = RustAssay.from_model(py)
+
+    # get_libspec parity (compare DTO json per modality)
+    for m in py.list_modalities():
+        py_lib = py.get_libspec(m)
+        ru_lib = ra.get_libspec(m)
+        assert ru_lib.model_dump_json() == py_lib.model_dump_json()
+
+    # get_seqspec parity
+    for m in py.list_modalities():
+        py_reads = py.get_seqspec(m)
+        ru_reads = ra.get_seqspec(m)
+        assert len(py_reads) == len(ru_reads)
+        for pr, rr in zip(py_reads, ru_reads):
+            assert rr.model_dump_json() == pr.model_dump_json()
+
+    # get_read parity
+    # choose a known read id from the spec
+    known = py.sequence_spec[0].read_id
+    assert ra.get_read(known).model_dump_json() == py.get_read(known).model_dump_json()
+
+
+def test_rustassay_insert_reads_regions_parity(temp_spec: Assay):
+    pytest.importorskip("seqspec._core")
+
+    # Work on a copy to avoid mutating fixtures
+    py = temp_spec.model_copy(deep=True)
+    ra = RustAssay.from_model(py)
+
+    # Prepare a new read and region
+    new_read = Read(
+        read_id="new_RX",
+        name="New Read X",
+        modality="rna",
+        primer_id="primerX",
+        min_len=42,
+        max_len=42,
+        strand="pos",
+    )
+    new_region = Region(
+        region_id="new_regX",
+        region_type="named",
+        name="new_regX",
+        sequence_type="fixed",
+        sequence="ACGT",
+        min_len=4,
+        max_len=4,
+        regions=[],
+    )
+
+    # Insert in Python
+    py.insert_reads([new_read], modality="rna")
+    py.insert_regions([new_region], modality="rna")
+
+    # Insert in Rust and snapshot
+    ra.insert_reads([new_read], modality="rna")
+    ra.insert_regions([new_region], modality="rna")
+    snap = ra.snapshot()
+
+    # Full object parity after inserts
+    assert snap.model_dump_json() == py.model_dump_json()
+
+
+def test_rustassay_update_spec_parity(temp_spec: Assay):
+    pytest.importorskip("seqspec._core")
+
+    py = temp_spec.model_copy(deep=True)
+    ra = RustAssay.from_model(py)
+
+    # Trigger updates on both sides
+    py.update_spec()
+    ra.update_spec()
+    snap = ra.snapshot()
+
+    # Parity after update (derived attributes on regions recomputed)
+    assert snap.model_dump_json() == py.model_dump_json()

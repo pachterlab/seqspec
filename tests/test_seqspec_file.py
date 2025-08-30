@@ -103,3 +103,52 @@ def test_list_files_by_id(dogmaseq_dig_spec: Assay):
     rna_cell_bc_file = files["rna_cell_bc"][0]
     assert rna_cell_bc_file.file_id == "RNA-737K-arc-v1.txt"
 
+import pytest
+from seqspec.File import File, FileInput, RustFile
+
+def test_rustfile_roundtrip_and_mutation():
+    # Skip if the Rust extension isn't built
+    pytest.importorskip("seqspec._core")
+
+    # Build a Pydantic File, wrap it in Rust, mutate in Rust, snapshot back
+    fin = FileInput(filename="r1.fastq.gz")
+    py = fin.to_file()
+    rf = RustFile.from_model(py)
+
+    # Properties reflect Rust state
+    assert rf.file_id == py.file_id
+    assert rf.filename == py.filename
+
+    # Mutate in Rust
+    rf.file_id = "new_id"
+    snap = rf.snapshot()
+
+    # Snapshot reflects Rust mutation; original Pydantic object is unchanged
+    assert snap.file_id == "new_id"
+    assert py.file_id != "new_id"
+
+
+def test_rustfile_on_real_spec_file(dogmaseq_dig_spec):
+    # Skip if the Rust extension isn't built
+    pytest.importorskip("seqspec._core")
+
+    # Take an existing File from the spec and round-trip through Rust
+    rna_r1 = dogmaseq_dig_spec.sequence_spec[0].files[0]
+    rf = RustFile.from_model(rna_r1)
+
+    # Assert parity on all attributes
+    assert rf.file_id == rna_r1.file_id
+    assert rf.filename == rna_r1.filename
+    assert rf.filetype == rna_r1.filetype
+    assert rf.filesize == rna_r1.filesize
+    assert rf.url == rna_r1.url
+    assert rf.urltype == rna_r1.urltype
+    assert rf.md5 == rna_r1.md5
+
+    # Mutate in Rust and snapshot back
+    new_id = rna_r1.file_id + ".tmp"
+    rf.file_id = new_id
+    snap = rf.snapshot()
+    assert snap.file_id == new_id
+    # Original spec object remains unchanged
+    assert rna_r1.file_id != new_id

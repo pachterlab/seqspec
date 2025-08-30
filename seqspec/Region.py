@@ -3,6 +3,9 @@ from typing import List, Optional, Set, Union
 
 from pydantic import BaseModel, Field
 
+from ._core import Onlist as _RustOnlist
+from ._core import Region as _RustRegion
+
 
 class SequenceType(str, Enum):
     FIXED = "fixed"
@@ -56,6 +59,8 @@ class Onlist(BaseModel):
     url: str
     urltype: str
     md5: str
+
+    # add a update_spec attribute that computes the md5 for the object
 
 
 class OnlistInput(BaseModel):
@@ -117,6 +122,39 @@ class OnlistInput(BaseModel):
             urltype=self.urltype or "local",
             md5=self.md5 or "",
         )
+
+
+class RustOnlist:
+    __slots__ = ("_inner",)
+
+    def __init__(self, inner: _RustOnlist) -> None:
+        object.__setattr__(self, "_inner", inner)
+
+    # Generic forwarding
+    def __getattr__(self, name):  # only called if not found on self
+        return getattr(self._inner, name)
+
+    def __setattr__(self, name, value):
+        # write straight into PyO3 fields since you use #[pyo3(get, set)]
+        setattr(self._inner, name, value)
+
+    @classmethod
+    def new(cls, **kwargs) -> "RustOnlist":
+        return cls(_RustOnlist(**kwargs))
+
+    @classmethod
+    def from_model(cls, m: Onlist) -> "RustOnlist":
+        return cls(_RustOnlist.from_json(m.model_dump_json()))
+
+    @classmethod
+    def from_input(cls, i: OnlistInput) -> "RustOnlist":
+        return cls.from_model(i.to_onlist())
+
+    def snapshot(self) -> Onlist:
+        return Onlist.model_validate_json(self._inner.to_json())
+
+    def __repr__(self) -> str:
+        return f"RustOnlist(file_id={self._inner.file_id!r}, filename={self._inner.filename!r})"
 
 
 class Region(BaseModel):
@@ -298,6 +336,175 @@ class Region(BaseModel):
 
 
 Region.model_rebuild()
+
+
+class RustRegion:
+    __slots__ = ("_inner",)
+
+    def __init__(self, inner: _RustRegion) -> None:
+        object.__setattr__(self, "_inner", inner)
+
+    # generic forwarding
+    def __getattr__(self, name):
+        return getattr(self._inner, name)
+
+    def __setattr__(self, name, value):
+        if name == "_inner":
+            return object.__setattr__(self, name, value)
+        # strict: if setting 'regions' or 'onlist', expect Rust proxies
+        if name == "regions":
+            coerced = [r._inner for r in value] if value else []
+            return setattr(self._inner, "regions", coerced)
+        if name == "onlist":
+            coerced = value._inner if value is not None else None
+            return setattr(self._inner, "onlist", coerced)
+        return setattr(self._inner, name, value)
+
+    # constructors
+    @classmethod
+    def new(
+        cls,
+        *,
+        region_id: str,
+        region_type: str,
+        name: str,
+        sequence_type: str,
+        sequence: str = "",
+        min_len: int = 0,
+        max_len: int = 1024,
+        onlist: Optional["RustOnlist"] = None,
+        regions: Optional[List["RustRegion"]] = None,
+    ) -> "RustRegion":
+        raw_onlist: Optional[_RustOnlist] = (
+            onlist._inner if onlist is not None else None
+        )
+        raw_regions: List[_RustRegion] = [r._inner for r in (regions or [])]
+        inner = _RustRegion(
+            region_id,
+            region_type,
+            name,
+            sequence_type,
+            sequence,
+            int(min_len),
+            int(max_len),
+            raw_onlist,
+            raw_regions,
+        )
+        return cls(inner)
+
+    @classmethod
+    def from_model(cls, m: "Region") -> "RustRegion":
+        # leverage serde to build nested regions/onlist
+        return cls(_RustRegion.from_json(m.model_dump_json()))
+
+    def snapshot(self) -> "Region":
+        return Region.model_validate_json(self._inner.to_json())
+
+    # conversions for list-returning methods
+    @staticmethod
+    def _to_dto_list(items: List[_RustRegion]) -> List["Region"]:
+        return [Region.model_validate_json(it.to_json()) for it in items]
+
+    # wrappers with DTO output
+    def get_sequence(self) -> str:
+        return self._inner.get_sequence()
+
+    def get_len(self) -> tuple[int, int]:
+        mn, mx = self._inner.get_len()
+        return int(mn), int(mx)
+
+    def update_attr(self) -> None:
+        self._inner.update_attr()
+
+    def get_region_by_id(self, region_id: str) -> List["Region"]:
+        items = self._inner.get_region_by_id(region_id)
+        rgns = [Region.model_validate_json(it.to_json()) for it in items]
+        return rgns
+
+    def get_region_by_region_type(self, region_type: str) -> List["Region"]:
+        items = self._inner.get_region_by_region_type(region_type)
+        rgns = [Region.model_validate_json(it.to_json()) for it in items]
+        return rgns
+
+    def get_onlist_regions(self) -> List["Region"]:
+        items = self._inner.get_onlist_regions()
+        rgns = [Region.model_validate_json(it.to_json()) for it in items]
+        return rgns
+
+    def get_onlist(self) -> Optional[Onlist]:
+        ol = self._inner.get_onlist()
+        return Onlist.model_validate_json(ol.to_json()) if ol is not None else None
+
+    def get_leaves(self) -> List["Region"]:
+        items = self._inner.get_leaves()
+        rgns = [Region.model_validate_json(it.to_json()) for it in items]
+        return rgns
+
+    def get_leaves_with_region_id(self, region_id: str) -> List["Region"]:
+        items = self._inner.get_leaves_with_region_id(region_id)
+        rgns = [Region.model_validate_json(it.to_json()) for it in items]
+        return rgns
+
+    def get_leaf_region_types(self) -> Set[str]:
+        return set(self._inner.get_leaf_region_types())
+
+    def to_newick(self, n: str = "") -> str:
+        # 'n' is unused on Rust side, kept for parity with Python signature
+        return self._inner.to_newick()
+
+    def update_region(
+        self,
+        region_id: str,
+        region_type: str,
+        name: str,
+        sequence_type: str,
+        sequence: str,
+        min_len: int,
+        max_len: int,
+        onlist: Optional[Onlist],
+    ) -> None:
+        raw_ol = _RustOnlist.from_json(onlist.model_dump_json()) if onlist else None
+        self._inner.update_region(
+            region_id,
+            region_type,
+            name,
+            sequence_type,
+            sequence,
+            int(min_len),
+            int(max_len),
+            raw_ol,
+        )
+
+    def update_region_by_id(
+        self,
+        target_region_id: str,
+        region_id: Optional[str] = None,
+        region_type: Optional[str] = None,
+        name: Optional[str] = None,
+        sequence_type: Optional[str] = None,
+        sequence: Optional[str] = None,
+        min_len: Optional[int] = None,
+        max_len: Optional[int] = None,
+    ) -> None:
+        self._inner.update_region_by_id(
+            target_region_id,
+            region_id,
+            region_type,
+            name,
+            sequence_type,
+            sequence,
+            min_len,
+            max_len,
+        )
+
+    def reverse(self) -> None:
+        self._inner.reverse()
+
+    def complement(self) -> None:
+        self._inner.complement()
+
+    def __repr__(self) -> str:
+        return self._inner.__repr__()
 
 
 class RegionInput(BaseModel):

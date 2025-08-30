@@ -444,13 +444,26 @@ def load_spec_stream(spec_stream: IO) -> Assay:
     return assay
 
 
+# def yaml_safe_dump(obj):
+#     if isinstance(obj, list):
+#         return [o.model_dump() if hasattr(o, "model_dump") else o for o in obj]
+#     elif hasattr(obj, "model_dump"):
+#         return obj.model_dump()
+#     else:
+#         return obj
+
+
+# # rust compatible via snapshot
 def yaml_safe_dump(obj):
     if isinstance(obj, list):
-        return [o.model_dump() if hasattr(o, "model_dump") else o for o in obj]
-    elif hasattr(obj, "model_dump"):
+        return [yaml_safe_dump(o) for o in obj]
+    if hasattr(obj, "model_dump"):
         return obj.model_dump()
-    else:
-        return obj
+    # allow engines/proxies to serialize via snapshot()
+    snap = getattr(obj, "snapshot", None)
+    if callable(snap):
+        return yaml_safe_dump(snap())
+    return obj
 
 
 def load_genbank(gbk_fn: str):
