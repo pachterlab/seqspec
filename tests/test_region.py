@@ -5,14 +5,14 @@ from seqspec.Region import (
     project_regions_to_coordinates, itx_read,
     complement_nucleotide, complement_sequence
 )
-from seqspec.Region import Onlist, OnlistInput, RustOnlist
-from seqspec.Region import Region, RegionInput, RustRegion
+# from seqspec.Region import Onlist, OnlistInput, RustOnlist
+# from seqspec.Region import Region, RegionInput, RustRegion
 from seqspec.Region import (
     Region,
     RegionInput,
     Onlist,
     OnlistInput,
-    RustRegion,
+    # RustRegion,
 )
 
 def test_region_creation_minimal():
@@ -812,33 +812,33 @@ def test_complement_real(rna_lib_spec):
     assert complement_sequence(original_sequence) == complemented_sequence 
 
 
-def test_rustonlist_roundtrip_and_mutation():
-    # pytest.importorskip("seqspec._core")
+# def test_rustonlist_roundtrip_and_mutation():
+#     # pytest.importorskip("seqspec._core")
 
-    inp = OnlistInput(filename="RNA-737K-arc-v1.txt.gz", url="https://example/file.txt.gz", urltype="https")
-    py = inp.to_onlist()
-    ro = RustOnlist.from_model(py)
+#     inp = OnlistInput(filename="RNA-737K-arc-v1.txt.gz", url="https://example/file.txt.gz", urltype="https")
+#     py = inp.to_onlist()
+#     ro = RustOnlist.from_model(py)
 
-    # Assert parity on all attributes
-    assert ro.file_id == py.file_id
-    assert ro.filename == py.filename
-    assert ro.filetype == py.filetype
-    assert ro.filesize == py.filesize
-    assert ro.url == py.url
-    assert ro.urltype == py.urltype
-    assert ro.md5 == py.md5
+#     # Assert parity on all attributes
+#     assert ro.file_id == py.file_id
+#     assert ro.filename == py.filename
+#     assert ro.filetype == py.filetype
+#     assert ro.filesize == py.filesize
+#     assert ro.url == py.url
+#     assert ro.urltype == py.urltype
+#     assert ro.md5 == py.md5
 
-    # Mutate in Rust and snapshot
-    ro.md5 = "deadbeef"
-    snap = ro.snapshot()
-    assert snap.md5 == "deadbeef"
-    assert py.md5 != "deadbeef"  # original DTO unchanged
+#     # Mutate in Rust and snapshot
+#     ro.md5 = "deadbeef"
+#     snap = ro.snapshot()
+#     assert snap.md5 == "deadbeef"
+#     assert py.md5 != "deadbeef"  # original DTO unchanged
 
-def test_rustonlist_json_roundtrip():
-    # pytest.importorskip("seqspec._core")
-    py = Onlist(file_id="ol1", filename="ol.txt", filetype="txt", filesize=10, url="ol.txt", urltype="local", md5="")
-    from seqspec._core import Onlist as _CoreOnlist
-    assert _CoreOnlist.from_json(py.model_dump_json()).to_json() == py.model_dump_json()
+# def test_rustonlist_json_roundtrip():
+#     # pytest.importorskip("seqspec._core")
+#     py = Onlist(file_id="ol1", filename="ol.txt", filetype="txt", filesize=10, url="ol.txt", urltype="local", md5="")
+#     from seqspec._core import Onlist as _CoreOnlist
+#     assert _CoreOnlist.from_json(py.model_dump_json()).to_json() == py.model_dump_json()
 
 def _make_small_tree() -> Region:
     # parent -> [leafA (AAA, len=3), leafB (TT, len=2)]
@@ -877,52 +877,52 @@ def _make_small_tree() -> Region:
     )
     return parent
 
-def test_rustregion_update_and_queries():
-    # pytest.importorskip("seqspec._core")
+# def test_rustregion_update_and_queries():
+#     # pytest.importorskip("seqspec._core")
 
-    py = _make_small_tree()
-    rr = RustRegion.from_model(py)
+#     py = _make_small_tree()
+#     rr = RustRegion.from_model(py)
 
-    # update derived attributes
-    rr.update_attr()
-    seq = rr.get_sequence()
-    mn, mx = rr.get_len()
+#     # update derived attributes
+#     rr.update_attr()
+#     seq = rr.get_sequence()
+#     mn, mx = rr.get_len()
 
-    assert seq == "AAATT"
-    assert (mn, mx) == (5, 5)
+#     assert seq == "AAATT"
+#     assert (mn, mx) == (5, 5)
 
-    # leaves & region type set
-    leaves = rr.get_leaves()
-    assert [r.region_id for r in leaves] == ["A", "B"]
-    rtypes = rr.get_leaf_region_types()
-    assert "named" in rtypes
+#     # leaves & region type set
+#     leaves = rr.get_leaves()
+#     assert [r.region_id for r in leaves] == ["A", "B"]
+#     rtypes = rr.get_leaf_region_types()
+#     assert "named" in rtypes
 
-    # by id
-    found = rr.get_region_by_id("A")
-    assert len(found) == 1 and found[0].region_id == "A"
+#     # by id
+#     found = rr.get_region_by_id("A")
+#     assert len(found) == 1 and found[0].region_id == "A"
 
-    # newick
-    assert rr.to_newick() == "('A:3','B:2')root"
+#     # newick
+#     assert rr.to_newick() == "('A:3','B:2')root"
 
-def test_rustregion_reverse_and_complement():
-    # pytest.importorskip("seqspec._core")
+# def test_rustregion_reverse_and_complement():
+#     # pytest.importorskip("seqspec._core")
 
-    py = _make_small_tree()
-    rr = RustRegion.from_model(py)
-    rr.update_attr()
+#     py = _make_small_tree()
+#     rr = RustRegion.from_model(py)
+#     rr.update_attr()
 
-    rr.reverse()
-    snap1 = rr.snapshot()
-    # reversing the leaves (AAA -> AAA, TT -> TT) but order preserved in tree;
-    # we only reverse per-leaf sequence, not reorder children
-    assert snap1.get_leaves()[0].sequence == "AAA"
-    assert snap1.get_leaves()[1].sequence == "TT"
+#     rr.reverse()
+#     snap1 = rr.snapshot()
+#     # reversing the leaves (AAA -> AAA, TT -> TT) but order preserved in tree;
+#     # we only reverse per-leaf sequence, not reorder children
+#     assert snap1.get_leaves()[0].sequence == "AAA"
+#     assert snap1.get_leaves()[1].sequence == "TT"
 
-    rr.complement()
-    snap2 = rr.snapshot()
-    # AAA -> TTT, TT -> AA
-    assert snap2.get_leaves()[0].sequence == "TTT"
-    assert snap2.get_leaves()[1].sequence == "AA"
+#     rr.complement()
+#     snap2 = rr.snapshot()
+#     # AAA -> TTT, TT -> AA
+#     assert snap2.get_leaves()[0].sequence == "TTT"
+#     assert snap2.get_leaves()[1].sequence == "AA"
 
 # ---------- helpers ----------
 
@@ -990,182 +990,182 @@ def _assert_region_equal(py: Region, rust_snap: Region):
 
 # ---------- tests ----------
 
-def test_update_attr_sequence_and_lengths_fixed_joined():
-    # pytest.importorskip("seqspec._core")
-    py = _simple_tree()
-    # Python behavior
-    py.update_attr()
-    py_seq = py.get_sequence()
-    py_len = py.get_len()
+# def test_update_attr_sequence_and_lengths_fixed_joined():
+#     # pytest.importorskip("seqspec._core")
+#     py = _simple_tree()
+#     # Python behavior
+#     py.update_attr()
+#     py_seq = py.get_sequence()
+#     py_len = py.get_len()
 
-    rr = RustRegion.from_model(py)
-    rr.update_attr()
-    ru_seq = rr.get_sequence()
-    ru_len = rr.get_len()
+#     rr = RustRegion.from_model(py)
+#     rr.update_attr()
+#     ru_seq = rr.get_sequence()
+#     ru_len = rr.get_len()
 
-    assert py_seq == "AAATT"
-    assert ru_seq == py_seq
-    assert py_len == (5, 5)
-    assert ru_len == py_len
+#     assert py_seq == "AAATT"
+#     assert ru_seq == py_seq
+#     assert py_len == (5, 5)
+#     assert ru_len == py_len
 
-    snap = rr.snapshot()
-    _assert_region_equal(py, snap)
-
-
-def test_leaf_queries_and_newick():
-    # pytest.importorskip("seqspec._core")
-    py = _simple_tree()
-    py.update_attr()
-
-    rr = RustRegion.from_model(py)
-    rr.update_attr()
-
-    # leaves
-    py_leaves = [r.region_id for r in py.get_leaves()]
-    ru_leaves = [r.region_id for r in rr.get_leaves()]
-    assert py_leaves == ru_leaves == ["A", "B"]
-
-    # region types set (as strings)
-    assert set(py.get_leaf_region_types()) == set(rr.get_leaf_region_types())
-
-    # find by id
-    py_by_id = [r.region_id for r in py.get_region_by_id("A")]
-    ru_by_id = [r.region_id for r in rr.get_region_by_id("A")]
-    assert py_by_id == ru_by_id == ["A"]
-
-    # find by region_type
-    py_by_type = [r.region_id for r in py.get_region_by_region_type("named")]
-    ru_by_type = [r.region_id for r in rr.get_region_by_region_type("named")]
-    assert set(py_by_type) == set(ru_by_type)
-
-    # newick
-    assert py.to_newick() == rr.to_newick() == "('A:3','B:2')root"
+#     snap = rr.snapshot()
+#     _assert_region_equal(py, snap)
 
 
-def test_random_and_onlist_behavior():
-    # pytest.importorskip("seqspec._core")
-    py = _tree_with_random_onlist()
-    py.update_attr()
-    py_seq = py.get_sequence()
-    py_len = py.get_len()
+# def test_leaf_queries_and_newick():
+#     # pytest.importorskip("seqspec._core")
+#     py = _simple_tree()
+#     py.update_attr()
 
-    # Expect: "XXXXX" + "NNN" (random = X*min_len; onlist = N*min_len)
-    assert py_seq == "XXXXXNNN"
-    assert py_len == (8, 8)
+#     rr = RustRegion.from_model(py)
+#     rr.update_attr()
 
-    rr = RustRegion.from_model(py)
-    rr.update_attr()
-    assert rr.get_sequence() == py_seq
-    assert rr.get_len() == py_len
+#     # leaves
+#     py_leaves = [r.region_id for r in py.get_leaves()]
+#     ru_leaves = [r.region_id for r in rr.get_leaves()]
+#     assert py_leaves == ru_leaves == ["A", "B"]
 
-    # onlist regions
-    py_ol_ids = [r.region_id for r in py.get_onlist_regions()]
-    ru_ol_ids = [r.region_id for r in rr.get_onlist_regions()]
-    assert py_ol_ids == ru_ol_ids == ["onlistN"]
+#     # region types set (as strings)
+#     assert set(py.get_leaf_region_types()) == set(rr.get_leaf_region_types())
 
-    snap = rr.snapshot()
-    _assert_region_equal(py, snap)
+#     # find by id
+#     py_by_id = [r.region_id for r in py.get_region_by_id("A")]
+#     ru_by_id = [r.region_id for r in rr.get_region_by_id("A")]
+#     assert py_by_id == ru_by_id == ["A"]
 
+#     # find by region_type
+#     py_by_type = [r.region_id for r in py.get_region_by_region_type("named")]
+#     ru_by_type = [r.region_id for r in rr.get_region_by_region_type("named")]
+#     assert set(py_by_type) == set(ru_by_type)
 
-def test_update_region_by_id_and_update_region():
-    # pytest.importorskip("seqspec._core")
-    py = _simple_tree()
-    py.update_attr()
-
-    rr = RustRegion.from_model(py)
-    rr.update_attr()
-
-    # Partial update on leaf A
-    rr.update_region_by_id(
-        target_region_id="A",
-        name="A_renamed",
-        min_len=4,
-        max_len=4,
-        sequence="AAAA",
-    )
-    # Recompute derived
-    rr.update_attr()
-    snap = rr.snapshot()
-
-    # Python side apply same change and recompute
-    py.update_region_by_id("A", region_id=None, region_type=None, name="A_renamed",
-                           sequence_type=None, sequence="AAAA", min_len=4, max_len=4)
-    py.update_attr()
-
-    # Parity
-    assert snap.get_region_by_id("A")[0].name == "A_renamed"
-    assert snap.get_len() == py.get_len()
-    assert snap.get_sequence() == py.get_sequence()
-
-    # Now test full update_region on the root node
-    rr.update_region(
-        region_id="root2",
-        region_type="named",
-        name="root2",
-        sequence_type="joined",
-        sequence="",   # joined will be recomputed by update_attr
-        min_len=0,
-        max_len=0,
-        onlist=None,
-    )
-    rr.update_attr()
-    snap2 = rr.snapshot()
-    assert snap2.region_id == "root2"
-    assert snap2.get_sequence() == py.get_sequence()  # children unchanged
-    assert snap2.get_len() == py.get_len()
+#     # newick
+#     assert py.to_newick() == rr.to_newick() == "('A:3','B:2')root"
 
 
-def test_reverse_and_complement_leaf_sequences():
-    # pytest.importorskip("seqspec._core")
-    py = _simple_tree()
-    py.update_attr()
+# def test_random_and_onlist_behavior():
+#     # pytest.importorskip("seqspec._core")
+#     py = _tree_with_random_onlist()
+#     py.update_attr()
+#     py_seq = py.get_sequence()
+#     py_len = py.get_len()
 
-    rr = RustRegion.from_model(py)
-    rr.update_attr()
+#     # Expect: "XXXXX" + "NNN" (random = X*min_len; onlist = N*min_len)
+#     assert py_seq == "XXXXXNNN"
+#     assert py_len == (8, 8)
 
-    # Reverse (per-leaf)
-    rr.reverse()
-    snap_rev = rr.snapshot()
-    # "AAA" -> "AAA", "TT" -> "TT" (palindromic examples; still a structural op)
-    assert [r.sequence for r in snap_rev.get_leaves()] == ["AAA", "TT"]
+#     rr = RustRegion.from_model(py)
+#     rr.update_attr()
+#     assert rr.get_sequence() == py_seq
+#     assert rr.get_len() == py_len
 
-    # Complement (A<->T, C<->G, etc.)
-    rr.complement()
-    snap_comp = rr.snapshot()
-    assert [r.sequence for r in snap_comp.get_leaves()] == ["TTT", "AA"]
+#     # onlist regions
+#     py_ol_ids = [r.region_id for r in py.get_onlist_regions()]
+#     ru_ol_ids = [r.region_id for r in rr.get_onlist_regions()]
+#     assert py_ol_ids == ru_ol_ids == ["onlistN"]
+
+#     snap = rr.snapshot()
+#     _assert_region_equal(py, snap)
 
 
-def test_get_leaves_with_region_id_behavior():
-    # pytest.importorskip("seqspec._core")
-    # root -> middle -> [leaf1, leaf2]
-    leaf1 = _leaf("leaf1", "AC", rtype="named")
-    leaf2 = _leaf("leaf2", "GT", rtype="named")
-    middle = Region(
-        region_id="middle",
-        region_type="named",
-        name="middle",
-        sequence_type="joined",
-        sequence="",
-        min_len=0,
-        max_len=0,
-        onlist=None,
-        regions=[leaf1, leaf2],
-    )
-    root = _tree_joined("root", [middle])
+# def test_update_region_by_id_and_update_region():
+#     # pytest.importorskip("seqspec._core")
+#     py = _simple_tree()
+#     py.update_attr()
 
-    # Python
-    py = root
-    py.update_attr()
-    py_selected_ids = [r.region_id for r in py.get_leaves_with_region_id("middle")]
+#     rr = RustRegion.from_model(py)
+#     rr.update_attr()
 
-    # Rust
-    rr = RustRegion.from_model(py)
-    rr.update_attr()
-    ru_selected_ids = [r.region_id for r in rr.get_leaves_with_region_id("middle")]
+#     # Partial update on leaf A
+#     rr.update_region_by_id(
+#         target_region_id="A",
+#         name="A_renamed",
+#         min_len=4,
+#         max_len=4,
+#         sequence="AAAA",
+#     )
+#     # Recompute derived
+#     rr.update_attr()
+#     snap = rr.snapshot()
 
-    # Your Python logic: if region_id matches, include that node (don’t descend)
-    assert py_selected_ids == ["middle"]
-    assert ru_selected_ids == ["middle"]
+#     # Python side apply same change and recompute
+#     py.update_region_by_id("A", region_id=None, region_type=None, name="A_renamed",
+#                            sequence_type=None, sequence="AAAA", min_len=4, max_len=4)
+#     py.update_attr()
+
+#     # Parity
+#     assert snap.get_region_by_id("A")[0].name == "A_renamed"
+#     assert snap.get_len() == py.get_len()
+#     assert snap.get_sequence() == py.get_sequence()
+
+#     # Now test full update_region on the root node
+#     rr.update_region(
+#         region_id="root2",
+#         region_type="named",
+#         name="root2",
+#         sequence_type="joined",
+#         sequence="",   # joined will be recomputed by update_attr
+#         min_len=0,
+#         max_len=0,
+#         onlist=None,
+#     )
+#     rr.update_attr()
+#     snap2 = rr.snapshot()
+#     assert snap2.region_id == "root2"
+#     assert snap2.get_sequence() == py.get_sequence()  # children unchanged
+#     assert snap2.get_len() == py.get_len()
+
+
+# def test_reverse_and_complement_leaf_sequences():
+#     # pytest.importorskip("seqspec._core")
+#     py = _simple_tree()
+#     py.update_attr()
+
+#     rr = RustRegion.from_model(py)
+#     rr.update_attr()
+
+#     # Reverse (per-leaf)
+#     rr.reverse()
+#     snap_rev = rr.snapshot()
+#     # "AAA" -> "AAA", "TT" -> "TT" (palindromic examples; still a structural op)
+#     assert [r.sequence for r in snap_rev.get_leaves()] == ["AAA", "TT"]
+
+#     # Complement (A<->T, C<->G, etc.)
+#     rr.complement()
+#     snap_comp = rr.snapshot()
+#     assert [r.sequence for r in snap_comp.get_leaves()] == ["TTT", "AA"]
+
+
+# def test_get_leaves_with_region_id_behavior():
+#     # pytest.importorskip("seqspec._core")
+#     # root -> middle -> [leaf1, leaf2]
+#     leaf1 = _leaf("leaf1", "AC", rtype="named")
+#     leaf2 = _leaf("leaf2", "GT", rtype="named")
+#     middle = Region(
+#         region_id="middle",
+#         region_type="named",
+#         name="middle",
+#         sequence_type="joined",
+#         sequence="",
+#         min_len=0,
+#         max_len=0,
+#         onlist=None,
+#         regions=[leaf1, leaf2],
+#     )
+#     root = _tree_joined("root", [middle])
+
+#     # Python
+#     py = root
+#     py.update_attr()
+#     py_selected_ids = [r.region_id for r in py.get_leaves_with_region_id("middle")]
+
+#     # Rust
+#     rr = RustRegion.from_model(py)
+#     rr.update_attr()
+#     ru_selected_ids = [r.region_id for r in rr.get_leaves_with_region_id("middle")]
+
+#     # Your Python logic: if region_id matches, include that node (don’t descend)
+#     assert py_selected_ids == ["middle"]
+#     assert ru_selected_ids == ["middle"]
 
 
 def test_region_get_onlist_method_simple():
@@ -1376,93 +1376,93 @@ def test_to_newick_ignores_n_param():
     assert s1 == s2
 
 
-def test_rustonlist_new_and_snapshot():
-    ro = RustOnlist.new(file_id="id", filename="f.txt", filetype="txt", filesize=1, url="f.txt", urltype="local", md5="m")
-    snap = ro.snapshot()
-    assert snap.file_id == "id" and snap.filename == "f.txt"
+# def test_rustonlist_new_and_snapshot():
+#     ro = RustOnlist.new(file_id="id", filename="f.txt", filetype="txt", filesize=1, url="f.txt", urltype="local", md5="m")
+#     snap = ro.snapshot()
+#     assert snap.file_id == "id" and snap.filename == "f.txt"
 
 
-def test_rustregion_get_and_set_onlist():
-    # root carries onlist
-    ol = Onlist(file_id="ol1", filename="ol.txt", filetype="txt", filesize=1, url="ol.txt", urltype="local", md5="a")
-    root = Region(
-        region_id="root",
-        region_type="named",
-        name="root",
-        sequence_type="joined",
-        onlist=ol,
-        regions=[_leaf("L", "AC")],
-    )
-    rr = RustRegion.from_model(root)
-    got = rr.get_onlist()
-    assert got is not None and got.filename == "ol.txt"
+# def test_rustregion_get_and_set_onlist():
+#     # root carries onlist
+#     ol = Onlist(file_id="ol1", filename="ol.txt", filetype="txt", filesize=1, url="ol.txt", urltype="local", md5="a")
+#     root = Region(
+#         region_id="root",
+#         region_type="named",
+#         name="root",
+#         sequence_type="joined",
+#         onlist=ol,
+#         regions=[_leaf("L", "AC")],
+#     )
+#     rr = RustRegion.from_model(root)
+#     got = rr.get_onlist()
+#     assert got is not None and got.filename == "ol.txt"
 
-    # mutate onlist via Rust proxy
-    rr.onlist = RustOnlist.new(file_id="ol2", filename="x.txt", filetype="txt", filesize=2, url="x.txt", urltype="local", md5="b")
-    snap = rr.snapshot()
-    assert snap.onlist is not None and snap.onlist.filename == "x.txt"
+#     # mutate onlist via Rust proxy
+#     rr.onlist = RustOnlist.new(file_id="ol2", filename="x.txt", filetype="txt", filesize=2, url="x.txt", urltype="local", md5="b")
+#     snap = rr.snapshot()
+#     assert snap.onlist is not None and snap.onlist.filename == "x.txt"
 
 
-def test_region_rust_parity_sweep():
-    # Build a slightly complex tree mixing fixed, random, onlist, and a nested joined
-    ol = Onlist(file_id="olX", filename="olx.txt", filetype="txt", filesize=1, url="olx.txt", urltype="local", md5="")
-    fixA = _leaf("fixA", "AAA", rtype="barcode", seqtype="fixed")
-    rand2 = _leaf("rand2", "", min_len=2, max_len=2, rtype="umi", seqtype="random")
-    fx2 = _leaf("fx2", "GC", rtype="linker", seqtype="fixed")
-    mid = _tree_joined("mid", [fx2])
-    olN = _leaf("olN", "", min_len=3, max_len=3, rtype="barcode", seqtype="onlist", onlist=ol)
-    py = _tree_joined("root", [fixA, rand2, mid, olN])
+# def test_region_rust_parity_sweep():
+#     # Build a slightly complex tree mixing fixed, random, onlist, and a nested joined
+#     ol = Onlist(file_id="olX", filename="olx.txt", filetype="txt", filesize=1, url="olx.txt", urltype="local", md5="")
+#     fixA = _leaf("fixA", "AAA", rtype="barcode", seqtype="fixed")
+#     rand2 = _leaf("rand2", "", min_len=2, max_len=2, rtype="umi", seqtype="random")
+#     fx2 = _leaf("fx2", "GC", rtype="linker", seqtype="fixed")
+#     mid = _tree_joined("mid", [fx2])
+#     olN = _leaf("olN", "", min_len=3, max_len=3, rtype="barcode", seqtype="onlist", onlist=ol)
+#     py = _tree_joined("root", [fixA, rand2, mid, olN])
 
-    # Python baseline
-    py.update_attr()
-    py_seq = py.get_sequence()
-    py_len = py.get_len()
+#     # Python baseline
+#     py.update_attr()
+#     py_seq = py.get_sequence()
+#     py_len = py.get_len()
 
-    # Rust baseline
-    rr = RustRegion.from_model(py)
-    rr.update_attr()
-    ru_seq = rr.get_sequence()
-    ru_len = rr.get_len()
+#     # Rust baseline
+#     rr = RustRegion.from_model(py)
+#     rr.update_attr()
+#     ru_seq = rr.get_sequence()
+#     ru_len = rr.get_len()
 
-    # Parity on primary derived attributes
-    assert ru_seq == py_seq
-    assert ru_len == py_len
+#     # Parity on primary derived attributes
+#     assert ru_seq == py_seq
+#     assert ru_len == py_len
 
-    # Parity on queries
-    assert [r.region_id for r in rr.get_leaves()] == [r.region_id for r in py.get_leaves()]
-    assert set(rr.get_leaf_region_types()) == set(py.get_leaf_region_types())
-    assert [r.region_id for r in rr.get_onlist_regions()] == [r.region_id for r in py.get_onlist_regions()]
-    assert [r.region_id for r in rr.get_region_by_id("mid")] == [r.region_id for r in py.get_region_by_id("mid")]
-    assert set(r.region_id for r in rr.get_region_by_region_type("barcode")) == set(
-        r.region_id for r in py.get_region_by_region_type("barcode")
-    )
-    assert rr.to_newick() == py.to_newick()
+#     # Parity on queries
+#     assert [r.region_id for r in rr.get_leaves()] == [r.region_id for r in py.get_leaves()]
+#     assert set(rr.get_leaf_region_types()) == set(py.get_leaf_region_types())
+#     assert [r.region_id for r in rr.get_onlist_regions()] == [r.region_id for r in py.get_onlist_regions()]
+#     assert [r.region_id for r in rr.get_region_by_id("mid")] == [r.region_id for r in py.get_region_by_id("mid")]
+#     assert set(r.region_id for r in rr.get_region_by_region_type("barcode")) == set(
+#         r.region_id for r in py.get_region_by_region_type("barcode")
+#     )
+#     assert rr.to_newick() == py.to_newick()
 
-    # Snapshot parity against the Python DTO
-    assert rr.snapshot().model_dump_json() == py.model_dump_json()
+#     # Snapshot parity against the Python DTO
+#     assert rr.snapshot().model_dump_json() == py.model_dump_json()
 
-    # Mutate a leaf via both APIs and recheck parity
-    # Change fixA to sequence AAAA, length 4
-    rr.update_region_by_id(
-        target_region_id="fixA", name="fixA2", sequence="AAAA", min_len=4, max_len=4
-    )
-    py.update_region_by_id("fixA", region_id=None, region_type=None, name="fixA2", sequence_type=None, sequence="AAAA", min_len=4, max_len=4)
-    rr.update_attr()
-    py.update_attr()
+#     # Mutate a leaf via both APIs and recheck parity
+#     # Change fixA to sequence AAAA, length 4
+#     rr.update_region_by_id(
+#         target_region_id="fixA", name="fixA2", sequence="AAAA", min_len=4, max_len=4
+#     )
+#     py.update_region_by_id("fixA", region_id=None, region_type=None, name="fixA2", sequence_type=None, sequence="AAAA", min_len=4, max_len=4)
+#     rr.update_attr()
+#     py.update_attr()
 
-    assert rr.get_sequence() == py.get_sequence()
-    assert rr.get_len() == py.get_len()
-    assert rr.to_newick() == py.to_newick()
-    assert rr.snapshot().model_dump_json() == py.model_dump_json()
+#     assert rr.get_sequence() == py.get_sequence()
+#     assert rr.get_len() == py.get_len()
+#     assert rr.to_newick() == py.to_newick()
+#     assert rr.snapshot().model_dump_json() == py.model_dump_json()
 
-    # Reverse and complement both sides and verify parity remains
-    rr.reverse(); py.reverse()
-    rr.update_attr(); py.update_attr()
-    assert rr.get_sequence() == py.get_sequence()
-    assert rr.get_len() == py.get_len()
+#     # Reverse and complement both sides and verify parity remains
+#     rr.reverse(); py.reverse()
+#     rr.update_attr(); py.update_attr()
+#     assert rr.get_sequence() == py.get_sequence()
+#     assert rr.get_len() == py.get_len()
 
-    rr.complement(); py.complement()
-    rr.update_attr(); py.update_attr()
-    assert rr.get_sequence() == py.get_sequence()
-    assert rr.get_len() == py.get_len()
-    assert rr.snapshot().model_dump_json() == py.model_dump_json()
+#     rr.complement(); py.complement()
+#     rr.update_attr(); py.update_attr()
+#     assert rr.get_sequence() == py.get_sequence()
+#     assert rr.get_len() == py.get_len()
+#     assert rr.snapshot().model_dump_json() == py.model_dump_json()

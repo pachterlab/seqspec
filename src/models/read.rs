@@ -1,25 +1,23 @@
-use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
-use crate::file::File;
+use crate::models::file::File;
+use crate::models::region::RegionCoordinate;
 
-#[pyclass(module = "seqspec._core")]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Read {
-    #[pyo3(get, set)] pub read_id: String,
-    #[pyo3(get, set)] pub name: String,
-    #[pyo3(get, set)] pub modality: String,
-    #[pyo3(get, set)] pub primer_id: String,
-    #[pyo3(get, set)] pub min_len: i64,
-    #[pyo3(get, set)] pub max_len: i64,
+    pub read_id: String,
+    pub name: String,
+    pub modality: String,
+    pub primer_id: String,
+    pub min_len: i64,
+    pub max_len: i64,
     /// "pos" | "neg"
-    #[pyo3(get, set)] pub strand: String,
-    #[pyo3(get, set)] pub files: Vec<File>,
+    pub strand: String,
+    pub files: Vec<File>,
 }
 
-#[pymethods]
+
 impl Read {
-    #[new]
-    #[pyo3(signature = (read_id, name, modality, primer_id, min_len, max_len, strand, files = Vec::new()))]
     pub fn new(
         read_id: String, name: String, modality: String, primer_id: String,
         min_len: i64, max_len: i64, strand: String, files: Vec<File>
@@ -27,15 +25,12 @@ impl Read {
         Self { read_id, name, modality, primer_id, min_len, max_len, strand, files }
     }
 
-    #[staticmethod]
-    pub fn from_json(json_str: &str) -> PyResult<Self> {
+    pub fn from_json(json_str: &str) -> Result<Self, serde_json::Error> {
         serde_json::from_str(json_str)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Failed to parse JSON: {}", e)))
     }
 
-    pub fn to_json(&self) -> PyResult<String> {
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
         serde_json::to_string(self)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Failed to serialize to JSON: {}", e)))
     }
 
     pub fn update_files(&mut self, files: Vec<File>) { self.files = files; }
@@ -68,8 +63,21 @@ impl Read {
         } else { None }
     }
 
-    pub fn __repr__(&self) -> String {
+    pub fn repr(&self) -> String {
         let sign = if self.strand == "pos" { "+" } else { "-" };
         format!("{sign}({}, {}){}:{}", self.min_len, self.max_len, self.read_id, self.primer_id)
+    }
+}
+
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct ReadCoordinate {
+    pub read: Read,
+    pub rcv: Vec<RegionCoordinate>, // rcv: "read coordinate vector"
+}
+
+impl ReadCoordinate {
+    pub fn new(read: Read, rcv: Vec<RegionCoordinate>) -> Self {
+        Self { read, rcv }
     }
 }

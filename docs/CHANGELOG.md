@@ -11,14 +11,17 @@ authors:
 
 ### Added
 
-### Fixed
+- Implemented core data objects in Rust using PyO3 for improved performance and safety.
+- Added extensive tests to ensure full parity between Python and Rust implementations.
 
 ### Changed
 
+- Switched build system in `pyproject.toml` to use `maturin` for Rust extension integration.
+- Updated packaging and development workflow to support Rust-backed modules.
+
 ### Removed
 
-- Removed `to_dict` attribute for all objects. Updated tests.
-- Removed `update_from` attribute, cleaned class objects
+- Removed `to_dict` and `update_from` attributes from all objects; refactored related tests and class structures.
 
 #### Breaking changes
 

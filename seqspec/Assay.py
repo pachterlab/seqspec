@@ -7,9 +7,10 @@ from seqspec.Read import Read, ReadInput
 from seqspec.Region import Region, RegionInput
 
 from . import __version__
-from ._core import Assay as _RustAssay
-from ._core import Read as _RustRead
-from ._core import Region as _RustRegion
+
+# from ._core import Assay as _RustAssay
+# from ._core import Read as _RustRead
+# from ._core import Region as _RustRegion
 
 
 class SeqProtocol(BaseModel):
@@ -371,65 +372,65 @@ Regions:
         )
 
 
-class RustAssay:
-    __slots__ = ("_inner",)
+# class RustAssay:
+#     __slots__ = ("_inner",)
 
-    def __init__(self, inner: _RustAssay) -> None:
-        object.__setattr__(self, "_inner", inner)
+#     def __init__(self, inner: _RustAssay) -> None:
+#         object.__setattr__(self, "_inner", inner)
 
-    # generic forwarding
-    def __getattr__(self, name):
-        return getattr(self._inner, name)
+#     # generic forwarding
+#     def __getattr__(self, name):
+#         return getattr(self._inner, name)
 
-    def __setattr__(self, name, value):
-        if name == "_inner":
-            return object.__setattr__(self, name, value)
-        return setattr(self._inner, name, value)
+#     def __setattr__(self, name, value):
+#         if name == "_inner":
+#             return object.__setattr__(self, name, value)
+#         return setattr(self._inner, name, value)
 
-    # constructors
-    @classmethod
-    def from_model(cls, m: "Assay") -> "RustAssay":
-        return cls(_RustAssay.from_json(m.model_dump_json()))
+#     # constructors
+#     @classmethod
+#     def from_model(cls, m: "Assay") -> "RustAssay":
+#         return cls(_RustAssay.from_json(m.model_dump_json()))
 
-    def snapshot(self) -> "Assay":
-        return Assay.model_validate_json(self._inner.to_json())
+#     def snapshot(self) -> "Assay":
+#         return Assay.model_validate_json(self._inner.to_json())
 
-    # helpers: DTO outputs for downstream Python code
-    def list_modalities(self) -> List[str]:
-        return list(self._inner.list_modalities())
+#     # helpers: DTO outputs for downstream Python code
+#     def list_modalities(self) -> List[str]:
+#         return list(self._inner.list_modalities())
 
-    def get_libspec(self, modality: str) -> Region:
-        r: _RustRegion = self._inner.get_libspec(modality)
-        return Region.model_validate_json(r.to_json())
+#     def get_libspec(self, modality: str) -> Region:
+#         r: _RustRegion = self._inner.get_libspec(modality)
+#         return Region.model_validate_json(r.to_json())
 
-    def get_seqspec(self, modality: str) -> List[Read]:
-        rlist: List[_RustRead] = self._inner.get_seqspec(modality)
-        return [Read.model_validate_json(r.to_json()) for r in rlist]
+#     def get_seqspec(self, modality: str) -> List[Read]:
+#         rlist: List[_RustRead] = self._inner.get_seqspec(modality)
+#         return [Read.model_validate_json(r.to_json()) for r in rlist]
 
-    def get_read(self, read_id: str) -> Read:
-        r: _RustRead = self._inner.get_read(read_id)
-        return Read.model_validate_json(r.to_json())
+#     def get_read(self, read_id: str) -> Read:
+#         r: _RustRead = self._inner.get_read(read_id)
+#         return Read.model_validate_json(r.to_json())
 
-    def update_spec(self) -> None:
-        self._inner.update_spec()
+#     def update_spec(self) -> None:
+#         self._inner.update_spec()
 
-    def insert_reads(
-        self, reads: List[Read], modality: str, after: Optional[str] = None
-    ) -> None:
-        # Convert DTOs to Rust via JSON (serde builds Vec<Read>)
-        raw: List[_RustRead] = [_RustRead.from_json(r.model_dump_json()) for r in reads]
-        self._inner.insert_reads(raw, modality, after)
+#     def insert_reads(
+#         self, reads: List[Read], modality: str, after: Optional[str] = None
+#     ) -> None:
+#         # Convert DTOs to Rust via JSON (serde builds Vec<Read>)
+#         raw: List[_RustRead] = [_RustRead.from_json(r.model_dump_json()) for r in reads]
+#         self._inner.insert_reads(raw, modality, after)
 
-    def insert_regions(
-        self, regions: List[Region], modality: str, after: Optional[str] = None
-    ) -> None:
-        raw: List[_RustRegion] = [
-            _RustRegion.from_json(r.model_dump_json()) for r in regions
-        ]
-        self._inner.insert_regions(raw, modality, after)
+#     def insert_regions(
+#         self, regions: List[Region], modality: str, after: Optional[str] = None
+#     ) -> None:
+#         raw: List[_RustRegion] = [
+#             _RustRegion.from_json(r.model_dump_json()) for r in regions
+#         ]
+#         self._inner.insert_regions(raw, modality, after)
 
-    def __repr__(self) -> str:
-        return self._inner.__repr__()
+#     def __repr__(self) -> str:
+#         return self._inner.__repr__()
 
 
 class AssayInput(BaseModel):

@@ -12,8 +12,9 @@ name = "seqspec"
 crate-type = ["rlib", "cdylib"]
 
 [dependencies]
+clap = { version = "4.5.46", features = ["derive"] }
 pyo3 = { version = "0.25", optional = true, features = ["extension-module", "abi3-py312"] }
-pythonize = "0.25.0"
+# pythonize = "0.25.0"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 serde_yaml = "0.9"

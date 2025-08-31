@@ -1,27 +1,22 @@
-use pyo3::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::onlist::Onlist;
-use crate::types::complement_seq;
+use crate::models::onlist::Onlist;
+use crate::utils::complement_seq;
 
-#[pyclass(module = "seqspec._core")]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Region {
-    #[pyo3(get, set)] pub region_id: String,
-    #[pyo3(get, set)] pub region_type: String,       // keep String for simplicity
-    #[pyo3(get, set)] pub name: String,
-    #[pyo3(get, set)] pub sequence_type: String,     // "fixed" | "random" | "onlist" | "joined"
-    #[pyo3(get, set)] pub sequence: String,
-    #[pyo3(get, set)] pub min_len: i64,
-    #[pyo3(get, set)] pub max_len: i64,
-    #[pyo3(get, set)] pub onlist: Option<Onlist>,
-    #[pyo3(get, set)] pub regions: Vec<Region>,
+    pub region_id: String,
+    pub region_type: String,       // keep String for simplicity
+    pub name: String,
+    pub sequence_type: String,     // "fixed" | "random" | "onlist" | "joined"
+    pub sequence: String,
+    pub min_len: i64,
+    pub max_len: i64,
+    pub onlist: Option<Onlist>,
+    pub regions: Vec<Region>,
 }
 
-#[pymethods]
 impl Region {
-    #[new]
-    #[pyo3(signature = (region_id, region_type, name, sequence_type, sequence, min_len, max_len, onlist=None, regions=Vec::new()))]
     pub fn new(
         region_id: String,
         region_type: String,
@@ -37,14 +32,11 @@ impl Region {
     }
 
     // ---- JSON I/O ---------------------------------------------------
-    #[staticmethod]
-    pub fn from_json(json_str: &str) -> PyResult<Self> {
+    pub fn from_json(json_str: &str) -> Result<Self, serde_json::Error> {
         serde_json::from_str(json_str)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Failed to parse JSON: {e}")))
     }
-    pub fn to_json(&self) -> PyResult<String> {
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
         serde_json::to_string(self)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Failed to serialize to JSON: {e}")))
     }
 
     // ---- Core helpers -----------------------------------------------
@@ -200,7 +192,6 @@ impl Region {
         self.onlist = onlist;
     }
 
-    #[pyo3(signature = (target_region_id, region_id=None, region_type=None, name=None, sequence_type=None, sequence=None, min_len=None, max_len=None))]
     pub fn update_region_by_id(
         &mut self,
         target_region_id: String,
@@ -257,7 +248,92 @@ impl Region {
         }
     }
 
-    pub fn __repr__(&self) -> String {
+    pub fn repr(&self) -> String {
         format!("{}({}, {})", self.region_type, self.min_len, self.max_len)
+    }
+}
+
+/// Region + half-open coordinates [start, stop)
+/// (Python: RegionCoordinate(Region) with start/stop)
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct RegionCoordinate {
+    /// Flatten so JSON/YAML has Region fields at top-level (like inheritance)
+    #[serde(flatten)]
+    pub region: Region,
+    pub start: i64,
+    pub stop: i64,
+}
+
+
+impl RegionCoordinate {
+    pub fn new(region: Region, start: i64, stop: i64) -> Self {
+        Self { region, start, stop }
+    }
+
+    pub fn repr(&self) -> String {
+        format!("{}({}, {})", self.region.region_type, self.start, self.stop)
+    }
+
+    pub fn display_string(&self) -> String {
+        format!(
+            "RegionCoordinate {} [{}]: [{}, {})",
+            self.region.name, self.region.region_type, self.start, self.stop
+        )
+    }
+
+    /// Compute the "difference" interval per Python __sub__ logic.
+    /// Returns a new RegionCoordinate with region_type="difference",
+    /// sequence_type="diff", and sequence = "X" * len.
+    pub fn difference(&self, other: &Self) -> Option<Self> {
+        let (new_start, new_stop) = if self.stop <= other.start {
+            (self.stop, other.start)          // self .. other gap
+        } else if other.stop <= self.start {
+            (other.stop, self.start)          // other .. self gap
+        } else if self.start == other.start && self.stop == other.stop {
+            (self.start, self.stop)           // identical intervals
+        } else {
+            return None;                      // overlapping but not identical
+        };
+
+        let len = (new_stop - new_start) as usize; // guaranteed >= 0 here
+        let seq = "X".repeat(len);
+
+        let new_region = Region {
+            region_id: format!("{} - {}", self.region.region_id, other.region.region_id),
+            region_type: "difference".to_string(),
+            name: format!("{} - {}", self.region.name, other.region.name),
+            sequence_type: "diff".to_string(),
+            sequence: seq,
+            min_len: (new_stop - new_start) as i64,
+            max_len: (new_stop - new_start) as i64,
+            onlist: None,
+            regions: Vec::new(),
+        };
+
+        Some(Self { region: new_region, start: new_start, stop: new_stop })
+    }
+}
+
+/// Python: RegionCoordinateDifference
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct RegionCoordinateDifference {
+    pub obj: RegionCoordinate,
+    pub fixed: RegionCoordinate,
+    pub rgncdiff: RegionCoordinate,
+    /// "", "-", or "+"
+    #[serde(default)]
+    pub loc: String,
+}
+
+impl RegionCoordinateDifference {
+    pub fn new(obj: RegionCoordinate, fixed: RegionCoordinate, rgncdiff: RegionCoordinate) -> Self {
+        let loc = if obj.stop <= fixed.start {
+            "-".to_string()
+        } else if obj.start >= fixed.stop {
+            "+".to_string()
+        } else {
+            "".to_string()
+        };
+        Self { obj, fixed, rgncdiff, loc }
     }
 }

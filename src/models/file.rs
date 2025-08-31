@@ -1,0 +1,34 @@
+use serde::{Deserialize, Serialize};
+
+
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
+pub struct File {
+   pub file_id: String,
+   pub filename: String,
+   pub filetype: String,
+   pub filesize: i64,
+   pub url: String,
+   pub urltype: String,
+   pub md5: String,
+}
+
+impl File {
+    pub fn new(
+        file_id: String, 
+        filename: String, 
+        filetype: String, 
+        filesize: i64,
+        url: String, 
+        urltype: String, 
+        md5: String) -> Self {
+        Self { file_id, filename, filetype, filesize, url, urltype, md5 }
+    }
+
+    pub fn from_json(json_str: &str) -> Result<Self, serde_json::Error> {
+        serde_json::from_str(json_str)
+    }
+
+    pub fn to_json(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(self)
+    }
+}
