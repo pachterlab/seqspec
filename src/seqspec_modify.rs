@@ -1,0 +1,245 @@
+use crate::models::assay::Assay;
+use crate::models::file::File;
+use crate::models::read::Read;
+use crate::utils;
+use clap::Args;
+use serde_json::Value;
+use std::fs;
+use std::io::Write;
+use std::path::PathBuf;
+
+#[derive(Debug, Args)]
+pub struct ModifyArgs {
+    #[clap(help = "Sequencing specification yaml file", required = true)]
+    yaml: PathBuf,
+
+    #[clap(
+        short,
+        long,
+        help = "Modality of the assay",
+        value_name = "MODALITY",
+        required = true
+    )]
+    modality: String,
+
+    #[clap(
+        short,
+        long,
+        help = "JSON array of objects to modify",
+        value_name = "KEYS",
+        required = true
+    )]
+    keys: String,
+
+    #[clap(
+        short,
+        long,
+        help = "Selector",
+        value_name = "SELECTOR",
+        default_value = "read",
+        value_parser = ["read","region","file","seqkit","seqprotocol","libkit","libprotocol","assay"]
+    )]
+    selector: String,
+
+    #[clap(short, long, help = "Path to output file", value_name = "OUT")]
+    output: Option<PathBuf>,
+}
+
+pub fn run_modify(args: &ModifyArgs) {
+    validate_modify_args(args);
+    let mut spec = utils::load_spec(&args.yaml);
+
+    let keys: Vec<Value> = serde_json::from_str(&args.keys).expect("--keys must be a JSON array");
+    let selector = args.selector.as_str();
+    spec = seqspec_modify(spec, &args.modality, keys, selector);
+
+    spec.update_spec();
+
+    let yaml = spec.to_bytes(crate::models::assay::Codec::Yaml).unwrap();
+    if let Some(out) = &args.output {
+        let mut f = fs::File::create(out).unwrap();
+        f.write_all(&yaml).unwrap();
+    } else {
+        println!("{}", String::from_utf8_lossy(&yaml));
+    }
+}
+
+fn validate_modify_args(args: &ModifyArgs) {
+    if !args.yaml.exists() {
+        eprintln!("Please use `seqspec modify -h` for help.");
+        std::process::exit(1);
+    }
+    if let Some(out) = &args.output {
+        if out.exists() && !out.is_file() {
+            eprintln!("Output path exists but is not a file: {}", out.display());
+            std::process::exit(1);
+        }
+    }
+}
+
+pub fn seqspec_modify(mut spec: Assay, modality: &str, keys: Vec<Value>, selector: &str) -> Assay {
+    match selector {
+        "read" => modify_reads(&mut spec, modality, &keys),
+        "region" => modify_regions(&mut spec, modality, &keys),
+        "file" => modify_files(&mut spec, modality, &keys),
+        "seqkit" => modify_seqkits(&mut spec, &keys),
+        "seqprotocol" => modify_seqprotocols(&mut spec, &keys),
+        "libkit" => modify_libkits(&mut spec, &keys),
+        "libprotocol" => modify_libprotocols(&mut spec, &keys),
+        "assay" => modify_assay(&mut spec, &keys),
+        _ => (),
+    }
+    spec
+}
+
+fn vstr(v: &Value, key: &str) -> Option<String> {
+    v.get(key).and_then(|x| x.as_str().map(|s| s.to_string()))
+}
+fn vi64(v: &Value, key: &str) -> Option<i64> {
+    v.get(key).and_then(|x| x.as_i64())
+}
+
+fn modify_reads(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
+    let reads: Vec<Read> = spec.get_seqspec(modality);
+    let mut updated: Vec<Read> = reads.clone();
+    for patch in keys {
+        let Some(read_id) = vstr(patch, "read_id") else { continue };
+        if let Some(rd) = updated.iter_mut().find(|r| r.read_id == read_id) {
+            // files optional
+            let files_opt: Option<Vec<File>> = patch.get("files").and_then(|arr| {
+                arr.as_array().map(|items| {
+                    items
+                        .iter()
+                        .filter_map(|it| {
+                            Some(File::new(
+                                it.get("file_id")?.as_str()?.to_string(),
+                                it.get("filename").and_then(|x| x.as_str()).unwrap_or("").to_string(),
+                                it.get("filetype").and_then(|x| x.as_str()).unwrap_or("").to_string(),
+                                it.get("filesize").and_then(|x| x.as_i64()).unwrap_or(0),
+                                it.get("url").and_then(|x| x.as_str()).unwrap_or("").to_string(),
+                                it.get("urltype").and_then(|x| x.as_str()).unwrap_or("").to_string(),
+                                it.get("md5").and_then(|x| x.as_str()).unwrap_or("").to_string(),
+                            ))
+                        })
+                        .collect()
+                })
+            });
+
+            rd.update_read_by_id(
+                vstr(patch, "read_id"),
+                vstr(patch, "name"),
+                vstr(patch, "modality"),
+                vstr(patch, "primer_id"),
+                vi64(patch, "min_len"),
+                vi64(patch, "max_len"),
+                vstr(patch, "strand"),
+                files_opt,
+            );
+        }
+    }
+    // replace reads for modality: simplest is to drop existing ones of modality and extend
+    spec.sequence_spec.retain(|r| r.modality != modality);
+    spec.sequence_spec.extend(updated);
+}
+
+fn modify_regions(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
+    // find index for modality to get mutable region tree
+    if let Some(idx) = spec.modalities.iter().position(|m| m == modality) {
+        if let Some(target) = spec.library_spec.get_mut(idx) {
+            for patch in keys {
+                let Some(target_region_id) = vstr(patch, "region_id") else { continue };
+                target.update_region_by_id(
+                    target_region_id,
+                    vstr(patch, "region_id"),
+                    vstr(patch, "region_type"),
+                    vstr(patch, "name"),
+                    vstr(patch, "sequence_type"),
+                    vstr(patch, "sequence"),
+                    vi64(patch, "min_len"),
+                    vi64(patch, "max_len"),
+                );
+            }
+        }
+    }
+}
+
+fn modify_files(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
+    for patch in keys {
+        let Some(file_id) = vstr(patch, "file_id") else { continue };
+        for r in spec.sequence_spec.iter_mut().filter(|r| r.modality == modality) {
+            for f in &mut r.files {
+                if f.file_id == file_id {
+                    if let Some(v) = vstr(patch, "filename") { f.filename = v; }
+                    if let Some(v) = vstr(patch, "filetype") { f.filetype = v; }
+                    if let Some(v) = vi64(patch, "filesize") { f.filesize = v; }
+                    if let Some(v) = vstr(patch, "url") { f.url = v; }
+                    if let Some(v) = vstr(patch, "urltype") { f.urltype = v; }
+                    if let Some(v) = vstr(patch, "md5") { f.md5 = v; }
+                }
+            }
+        }
+    }
+}
+
+fn modify_seqkits(spec: &mut Assay, keys: &Vec<Value>) {
+    if let Some(kits) = spec.sequence_kit.as_mut() {
+        for patch in keys {
+            let Some(kit_id) = vstr(patch, "kit_id") else { continue };
+            if let Some(k) = kits.iter_mut().find(|k| k.kit_id == kit_id) {
+                if let Some(v) = vstr(patch, "name") { k.name = Some(v); }
+                if let Some(v) = vstr(patch, "modality") { k.modality = v; }
+            }
+        }
+    }
+}
+
+fn modify_seqprotocols(spec: &mut Assay, keys: &Vec<Value>) {
+    if let Some(protocols) = spec.sequence_protocol.as_mut() {
+        for patch in keys {
+            let Some(protocol_id) = vstr(patch, "protocol_id") else { continue };
+            if let Some(p) = protocols.iter_mut().find(|p| p.protocol_id == protocol_id) {
+                if let Some(v) = vstr(patch, "name") { p.name = v; }
+                if let Some(v) = vstr(patch, "modality") { p.modality = v; }
+            }
+        }
+    }
+}
+
+fn modify_libkits(spec: &mut Assay, keys: &Vec<Value>) {
+    if let Some(kits) = spec.library_kit.as_mut() {
+        for patch in keys {
+            let Some(kit_id) = vstr(patch, "kit_id") else { continue };
+            if let Some(k) = kits.iter_mut().find(|k| k.kit_id == kit_id) {
+                if let Some(v) = vstr(patch, "name") { k.name = Some(v); }
+                if let Some(v) = vstr(patch, "modality") { k.modality = v; }
+            }
+        }
+    }
+}
+
+fn modify_libprotocols(spec: &mut Assay, keys: &Vec<Value>) {
+    if let Some(protocols) = spec.library_protocol.as_mut() {
+        for patch in keys {
+            let Some(protocol_id) = vstr(patch, "protocol_id") else { continue };
+            if let Some(p) = protocols.iter_mut().find(|p| p.protocol_id == protocol_id) {
+                if let Some(v) = vstr(patch, "name") { p.name = v; }
+                if let Some(v) = vstr(patch, "modality") { p.modality = v; }
+            }
+        }
+    }
+}
+
+fn modify_assay(spec: &mut Assay, keys: &Vec<Value>) {
+    for patch in keys {
+        let Some(assay_id) = vstr(patch, "assay_id") else { continue };
+        if assay_id != spec.assay_id { continue; }
+        if let Some(v) = vstr(patch, "name") { spec.name = v; }
+        if let Some(v) = vstr(patch, "doi") { spec.doi = v; }
+        if let Some(v) = vstr(patch, "date") { spec.date = v; }
+        if let Some(v) = vstr(patch, "description") { spec.description = v; }
+        if let Some(v) = vstr(patch, "lib_struct") { spec.lib_struct = v; }
+        if let Some(v) = vstr(patch, "assay_id") { spec.assay_id = v; }
+    }
+}
+
+

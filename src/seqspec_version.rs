@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{Write};
+use std::io::Write;
 use std::path::{Path, PathBuf};
 
 use clap::Args;
@@ -21,13 +21,14 @@ pub struct VersionArgs {
 
 pub fn validate_version_args(args: &VersionArgs) {
     // just call the runner and print any error nicely
-    if let Err(e) = run_version(args) {
-        eprintln!("[error] {e}");
+    if !args.yaml.exists() {
+        eprintln!("Please use `seqspec version -h` for help.");
         std::process::exit(1);
     }
 }
 
-pub fn run_version(args: &VersionArgs) -> std::io::Result<()> {
+pub fn run_version(args: &VersionArgs) {
+    validate_version_args(args);
     let spec = utils::load_spec(&args.yaml);
     let vinfo = seqspec_version(&spec);
     let out = format_version(&vinfo);
@@ -41,11 +42,10 @@ pub fn run_version(args: &VersionArgs) -> std::io::Result<()> {
             println!("{out}");
         }
         Some(p) => {
-            let mut fh = File::create(p)?;
-            writeln!(fh, "{out}")?;
+            let mut fh = File::create(p).unwrap();
+            writeln!(fh, "{out}").unwrap();
         }
     }
-    Ok(())
 }
 
 /// Return both tool and file versions

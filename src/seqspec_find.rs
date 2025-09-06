@@ -1,23 +1,22 @@
 use crate::utils;
-use crate::utils::load_spec;
-use std::fs::File;
+use std::fs;
 use std::io::Write;
-use std::str::FromStr;
 
-use crate::assay::Assay;
-use crate::region::Region;
 use clap::Args;
 use crate::models::file::File;
 use crate::models::read::Read;
 use crate::models::region::Region;
+use crate::models::assay::Assay;
+use serde::{Serialize, Deserialize};
+use std::path::PathBuf;
 
 #[derive(Debug, Args)]
 pub struct FindArgs {
     #[clap(short, long, help = "Output file path", value_name = "OUT")]
-    output: Option<String>,
+    output: Option<PathBuf>,
 
     #[clap(help = "Sequencing specification yaml file", required = true)]
-    yaml: String,
+    yaml: PathBuf,
 
     #[clap(
         short,
@@ -25,7 +24,7 @@ pub struct FindArgs {
         help = "Selector",
         value_name = "SELECTOR",
         required = true,
-        possible_values = &["read", "region", "file", "region-type"]
+        value_parser = ["read", "region", "file", "region-type"]
     )]
     selector: String,
 
@@ -43,40 +42,56 @@ pub struct FindArgs {
 }
 
 pub fn validate_find_args(args: &FindArgs) -> () {
-    let fn_ = &args.yaml;
-    let m = &args.modality;
-    let id = &args.id;
-    let o = &args.output;
-    let selector = &args.selector;
-    let spec = utils::load_spec(&std::path::PathBuf::from_str(fn_).unwrap());
+    if !args.yaml.exists() {
+        eprintln!("Please use `seqspec find -h` for help.");
+        std::process::exit(1);
+    }
+    if args.selector.is_empty() {
+        eprintln!("Please use `seqspec find -h` for help.");
+        std::process::exit(1);
+    }
+}
 
-    let regions = if *rt {
-        run_find_by_type(&spec, m, r)
-    } else {
-        run_find(&spec, m, r)
+pub fn run_find(args: &FindArgs) {
+    validate_find_args(args);
+    let spec = utils::load_spec(&args.yaml);
+
+
+    let found = seqspec_find(&spec, &args.selector, &args.modality, &args.id);
+    let yaml_str = match found {
+        FindResult::Reads(v) => serde_yaml::to_string(&v).unwrap(),
+        FindResult::Regions(v) => serde_yaml::to_string(&v).unwrap(),
+        FindResult::Files(v) => serde_yaml::to_string(&v).unwrap(),
     };
-
-    if let Some(output) = o {
-        let mut file = File::create(output).unwrap();
-        writeln!(file, "{}", serde_yaml::to_string(&regions).unwrap()).unwrap();
+    // write to output
+    if let Some(output) = &args.output {
+        let mut file = fs::File::create(output).unwrap();
+        writeln!(file, "{}", yaml_str).unwrap();
     } else {
-        println!("{}", serde_yaml::to_string(&regions).unwrap());
+        println!("{}", yaml_str);
     }
 }
 
 pub fn find_by_region_type(spec: &Assay, modality: &str, region_type: &str) -> Vec<Region> {
     let m = spec.get_libspec(modality);
-    m.get_region_by_region_type(region_type)
+    m.unwrap().get_region_by_region_type(region_type)
 }
 
 pub fn find_by_region_id(spec: &Assay, modality: &str, region_id: &str) -> Vec<Region> {
     let m = spec.get_libspec(modality);
-    m.get_region_by_id(region_id)
+    match m {
+        Some(m) => m.get_region_by_id(region_id),
+        None => Vec::new(),
+    }
 }
 
 pub fn find_by_file_id(spec: &Assay, modality: &str, file_id: &str) -> Vec<File> {
     let m = spec.get_seqspec(modality);
-    m.iter().filter(|r| r.files.iter().any(|f| f.file_id == file_id)).cloned().collect()
+    m.iter()
+    .flat_map(|r| r.files.iter())
+    .filter(|f| f.file_id == file_id)
+    .cloned()
+    .collect()
 }
 
 pub fn find_by_read_id(spec: &Assay, modality: &str, read_id: &str) -> Vec<Read> {
@@ -84,10 +99,12 @@ pub fn find_by_read_id(spec: &Assay, modality: &str, read_id: &str) -> Vec<Read>
     m.iter().filter(|r| r.read_id == read_id).cloned().collect()
 }
 
+
+#[derive(Debug, Serialize, Deserialize)]
 pub enum FindResult {
     Regions(Vec<Region>),
-    Files(Vec<File>),
     Reads(Vec<Read>),
+    Files(Vec<File>),
 }
 
 pub fn seqspec_find(spec: &Assay, selector: &str, modality: &str, id: &str) -> FindResult {

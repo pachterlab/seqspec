@@ -156,7 +156,7 @@ impl Region {
         use std::collections::BTreeSet;
         let mut set = BTreeSet::new();
         for r in self.get_leaves() {
-            set.insert(r.region_type);
+            set.insert(r.region_type.clone());
         }
         set.into_iter().collect()
     }

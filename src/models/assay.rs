@@ -52,6 +52,9 @@ pub struct Assay {
     pub library_spec:  Vec<Region>,
 }
 
+pub enum Codec { Yaml, Json }
+
+
 impl Assay {
     pub fn new(
         assay_id: String,
@@ -85,8 +88,21 @@ impl Assay {
         serde_json::to_string(self)
     }
 
+    pub fn to_bytes(&self, codec: Codec) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+        Ok(match codec {
+            Codec::Yaml => serde_yaml::to_string(self)?.into_bytes(),
+            Codec::Json => serde_json::to_vec(self)?,
+        })
+    }
+    pub fn from_bytes(bytes: &[u8], codec: Codec) -> Result<Self, Box<dyn std::error::Error>> {
+        Ok(match codec {
+            Codec::Yaml => serde_yaml::from_slice(bytes)?,
+            Codec::Json => serde_json::from_slice(bytes)?,
+        })
+    }
+
     // Core helpers ----------------------------------------------------
-    pub fn update_spec(&mut self) {
+    pub fn update_spec(&mut self) -> () {
         for r in &mut self.library_spec {
             r.update_attr();
         }
@@ -110,9 +126,9 @@ impl Assay {
 
     pub fn get_read(&self, read_id: &str) -> Option<Read> {
         self.sequence_spec
-            .iter()
-            .find(|r| r.read_id == read_id)
-            .cloned()
+        .iter()
+        .find(|r| r.read_id == read_id)
+        .cloned()
     }
 
     /// Insert regions under the top-level region for `modality`.

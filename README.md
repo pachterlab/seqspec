@@ -37,3 +37,22 @@ Ali Sina Booeshaghi, Xi Chen, Lior Pachter, A machine-readable specification for
 - [Contribute a `seqspec` : `docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
 - [Watch a YouTube video about `seqspec`](https://youtu.be/NSj6Vpzy8tU)
 - [Read the manuscript that describes `seqspec`](https://doi.org/10.1093/bioinformatics/btae168)
+
+## Rust implementation
+
+- [] build : Generate a complete seqspec with natural language.
+- [x] check : Validate seqspec file against specification (verify check)
+- [x] find : Find objects in seqspec file
+- [x] file : List files present in seqspec file
+- [x] format : Autoformat seqspec file
+- [x] index : Identify position of elements in seqspec file
+- [x] info : Get information from seqspec file
+- [x] init : Generate a new empty seqspec file
+- [x] insert : Insert regions or reads into an existing spec (TODO: move Input structs to models)
+- [x] methods : Convert seqspec file into methods section
+- [x] modify : Modify attributes of various elements in seqspec file
+- [x] onlist : Get onlist file for elements in seqspec file
+- [] print : Display the sequence and/or library structure from seqspec file
+- [x] split : Split seqspec file by modality
+- [x] upgrade : Upgrade seqspec file to current version
+- [x] version: Get seqspec tool version and seqspec file version
