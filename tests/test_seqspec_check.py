@@ -1,8 +1,9 @@
-from argparse import ArgumentParser
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import TestCase
 from unittest.mock import patch
+from seqspec.seqspec_check import run_check
+from argparse import ArgumentParser, Namespace
 
 from seqspec.seqspec_check import (
     setup_check_args,
@@ -53,8 +54,6 @@ class TestSeqspecCheck(TestCase):
 
     def test_check_with_igvf_skip(self):
         """Test that 'igvf' skip condition filters out some IGVF-related errors but not read_id pattern errors."""
-        from seqspec.seqspec_check import run_check
-        from argparse import ArgumentParser, Namespace
 
         # Create a parser
         parser = ArgumentParser()
@@ -104,16 +103,14 @@ class TestSeqspecCheck(TestCase):
 
     def test_check_with_igvf_onlist_skip(self):
         """Test that 'igvf_onlist_skip' skip condition filters out IGVF and onlist errors including read_id pattern."""
-        from seqspec.seqspec_check import run_check
-        from argparse import ArgumentParser, Namespace
-
+        file_path = "tests/data/seqspec_valid_ignore_onlist.yaml"
         # Create a parser
         parser = ArgumentParser()
         subparser = parser.add_subparsers(dest="command")
         subparser = setup_check_args(subparser)
 
         # Test file path
-        test_file = Path("tests/data/seqspec_valid_ignore_onlist.yaml")
+        test_file = Path(file_path)
 
         # Test with 'igvf_onlist_skip' skip
         args = Namespace()
@@ -131,9 +128,6 @@ class TestSeqspecCheck(TestCase):
 
     def test_check_without_skip(self):
         """Test that without skip condition, validation errors are reported."""
-        from seqspec.seqspec_check import run_check
-        from argparse import ArgumentParser, Namespace
-
         # Create a parser
         parser = ArgumentParser()
         subparser = parser.add_subparsers(dest="command")
@@ -176,3 +170,26 @@ class TestSeqspecCheck(TestCase):
         self.assertEqual(
             len(onlist_errors), 1, f"Expected 1 onlist error, got {len(onlist_errors)}"
         )
+
+    def test_check_sequence_type_random_x(self):
+        file_path = (
+            "tests/data/2881_corces_measurementSet_X056_G4_RNA_rna_seqspec.yaml.gz"
+        )
+        # Create a parser
+        parser = ArgumentParser()
+        subparser = parser.add_subparsers(dest="command")
+        subparser = setup_check_args(subparser)
+
+        # Test file path
+        test_file = Path(file_path)
+
+        # Test without skip
+        args = Namespace()
+        args.yaml = test_file
+        args.output = None
+        args.skip = None
+
+        # Run check without skip
+        errors = run_check(parser, args)
+        # should have no errors
+        self.assertEqual(len(errors), 0)

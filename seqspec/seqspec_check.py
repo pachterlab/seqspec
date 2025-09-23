@@ -453,20 +453,17 @@ def check(spec: Assay, spec_fn: str, skip: str = None):
                     "error_message": f"'{rgn.region_id}' sequence_type is 'random' and contains subregions",
                     "error_object": "region",
                 }
-                # errors.append(
-                #     f"[error {idx}] '{rgn.region_id}' sequence_type is 'random' and contains subregions"
-                # )
                 errors.append(errobj)
                 idx += 1
-            if rgn.sequence_type == "random" and rgn.sequence != "X" * rgn.max_len:
+            if rgn.sequence_type == "random" and (
+                set(rgn.sequence) != {"X"}
+                or not (rgn.min_len <= len(rgn.sequence) <= rgn.max_len)
+            ):
                 errobj = {
                     "error_type": "check_sequence_types",
                     "error_message": f"'{rgn.region_id}' sequence_type is 'random' and sequence is not all X's",
                     "error_object": "region",
                 }
-                # errors.append(
-                #     f"[error {idx}] '{rgn.region_id}' sequence_type is 'random' and sequence is not all X's"
-                # )
                 errors.append(errobj)
                 idx += 1
             if rgn.sequence_type == "onlist" and not rgn.onlist:
@@ -475,9 +472,6 @@ def check(spec: Assay, spec_fn: str, skip: str = None):
                     "error_message": f"'{rgn.region_id}' sequence_type is 'onlist' and does not have an onlist object",
                     "error_object": "region",
                 }
-                # errors.append(
-                #     f"[error {idx}] '{rgn.region_id}' sequence_type is 'onlist' and does not have an onlist object"
-                # )
                 errors.append(errobj)
                 idx += 1
             if rgn.regions:
