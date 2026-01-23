@@ -7,16 +7,8 @@ authors:
 
 # Installation
 
-The development version can be installed with
-
 ```bash
-pip install git+https://github.com/pachterlab/seqspec@devel
-```
-
-The official release can be installed directly from pypi
-
-```bash
-pip install seqspec
+pip install git+https://github.com/IGVF-DACC/seqspec.git@v25-09-23
 ```
 
 Verify the installation
