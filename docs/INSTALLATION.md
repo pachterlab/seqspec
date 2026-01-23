@@ -8,7 +8,7 @@ authors:
 # Installation
 
 ```bash
-pip install git+https://github.com/IGVF-DACC/seqspec.git@v25-09-23
+pip install git+https://github.com/IGVF-DACC/seqspec.git@main
 ```
 
 Verify the installation
