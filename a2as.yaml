@@ -1,0 +1,1048 @@
+manifest:
+  version: "0.1.2"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: pachterlab/seqspec
+    source: https://github.com/pachterlab/seqspec
+    branch: main
+    commit: "fba4255b"
+    scope: [seqspec/Assay.py, seqspec/seqspec_build.py, seqspec/seqspec_check.py, seqspec/seqspec_format.py, seqspec/seqspec_init.py,
+      seqspec/seqspec_insert.py, seqspec/seqspec_modify.py, seqspec/utils.py]
+  issued:
+    by: A2AS.org
+    at: '2026-01-26T16:11:05Z'
+  signatures:
+    digest: sha256:6mMLs7yvqhxQ_fl2cfWGNbDOiVjPMb5lfEsE0lvzGqA
+    key: ed25519:ooN2gEDjslTmmN02eIZRHuAyDNwiKPqF0zFoJzFZRWQ
+    sig: ed25519:h9rrHEY8vunakhmo_wNUhrzmEabRraWjXZNdYiTkEiKN2P962sW5kFIMfik9KtUw1k0IX9pFLVkQ75Q-3PqyAA
+
+agents:
+  agent:
+    type: instance
+    models: [o4-mini]
+    tools: [seqspec_check, seqspec_insert_reads, seqspec_insert_regions, seqspec_modify_read, seqspec_modify_region, seqspec_format]
+    params:
+      function: seqspec_build_async
+      name: seqspec agent
+      output_type: Assay
+      model_settings: ModelSettings(temperature=1, tool_choice=auto)
+      instructions: [Use the given tools to build a correct and complete seqspec file., Do not hallucinate any data that is
+          not provided., The list of the top-most regions in the library_spec have region_ids that correspond to the "modality".,
+        Add the sequencing library structure with seqspec_insert_region., 'After, add the sequencing reads with seqspec_insert_read.',
+        Check the file with seqspec_check., Modify attributes of any elements with seqspec_modify if necessary., 'At the very
+          end, run seqspec_format then return the final spec.']
+
+models:
+  o4-mini:
+    type: literal
+    agents: [agent]
+
+tools:
+  seqspec_check:
+    type: wrapper
+    agents: [agent]
+    params:
+      wraps: seqspec_check
+      description: |-
+        Core functionality to check a seqspec and return filtered errors.
+
+        Args:
+            spec: The Assay object to check
+            filter_type: Optional filter type to apply to errors (e.g. "igvf", "igvf_onlist_skip")
+
+        Returns:
+            List of error dictionaries
+  seqspec_format:
+    type: wrapper
+    agents: [agent]
+    params:
+      wraps: seqspec_format
+      description: |-
+        Format a seqspec specification by updating its fields.
+
+        Args:
+            spec: The seqspec specification to format.
+  seqspec_insert_reads:
+    type: wrapper
+    agents: [agent]
+    params:
+      wraps: seqspec_insert_reads
+      description: |-
+        Insert reads into the spec for the given modality.
+
+        Converts each ``ReadInput`` to a ``Read`` and inserts them into the
+        ``sequence_spec`` via ``Assay.insert_reads``. If ``after`` is provided, the
+        reads are inserted immediately after the read with ID ``after``; otherwise,
+        they are inserted at the beginning.
+
+        Args:
+            spec: The ``Assay`` to modify. Mutated in place and returned.
+            modality: Target modality under which the reads should be inserted.
+            reads: A list of ``ReadInput`` objects to insert.
+            after: Optional read ID. When provided, insert after this read; when
+                ``None``, insert at the start of the reads for the assay.
+
+        Returns:
+            The same ``Assay`` instance with reads inserted.
+
+        Example:
+            >>> seqspec_insert_reads(spec, "rna", [ReadInput(read_id="R2")], after="R1")
+  seqspec_insert_regions:
+    type: wrapper
+    agents: [agent]
+    params:
+      wraps: seqspec_insert_regions
+      description: |-
+        Insert regions into the library spec for the given modality.
+
+        Converts each ``RegionInput`` to a ``Region`` and inserts them into the
+        modality's library via ``Assay.insert_regions``. If ``after`` is provided,
+        the regions are inserted immediately after the region with ID ``after``;
+        otherwise, they are inserted at the beginning. The library attributes are
+        updated by ``Assay.insert_regions``.
+
+        Args:
+            spec: The ``Assay`` to modify. Mutated in place and returned.
+            modality: Target modality under which the regions should be inserted.
+            regions: A list of ``RegionInput`` objects to insert.
+            after: Optional region ID. When provided, insert after this region;
+                when ``None``, insert at the start of the modality's library.
+
+        Returns:
+            The same ``Assay`` instance with regions inserted.
+
+        Example:
+            >>> seqspec_insert_regions(spec, "rna", [RegionInput(region_id="new_bc")], after="rna_primer")
+  seqspec_modify:
+    type: wrapper
+    params:
+      wraps: seqspec_modify
+      description: |-
+        Modify a loaded spec in-place according to selector-specific updates.
+
+        This is the core implementation behind the ``seqspec modify`` CLI.
+        It dispatches to a section-specific updater based on ``selector`` and
+        applies partial updates to items identified by their stable IDs. Only
+        fields present in each input object and not ``None`` are applied.
+
+        Args:
+            spec: Parsed ``Assay`` object to modify. Mutated in place and returned.
+            modality: Target modality within the spec (for example, "rna", "atac").
+            keys: List of JSON-like dictionaries describing updates. Each dict must
+                include the identifying field for the chosen ``selector``:
+                - selector == "read": use "read_id"
+                - selector == "region": use "region_id"
+                - selector == "file": use "file_id"
+                - selector == "seqkit": use "kit_id"
+                - selector == "seqprotocol": use "protocol_id"
+                - selector == "libkit": use "kit_id"
+                - selector == "libprotocol": use "protocol_id"
+                - selector == "assay": use "assay_id" (must match ``spec.assay_id``)
+            selector: Section of the spec to modify. See ``Selector`` enum.
+
+        Returns:
+            The same ``Assay`` instance with updates applied.
+
+        Notes:
+            - Read updates support the optional "files" field; when provided, the
+              inputs are converted to ``File`` models before assignment.
+            - Region updates are applied via ``Region.update_region_by_id`` within
+              the library spec of the given modality.
+            - Sequence/Library kits and protocols are updated field-by-field when
+              the item with the matching ID is found; unknown IDs are ignored.
+            - Unknown or missing identifiers in ``keys`` are skipped without error.
+
+        Examples:
+            Update a read name:
+                >>> seqspec_modify(spec, "rna", [{"read_id": "rna_R1", "name": "R1_renamed"}], "read")
+
+            Update a region sequence:
+                >>> seqspec_modify(spec, "rna", [{"region_id": "rna_cell_bc", "sequence": "NNNN"}], "region")
+
+            Update an assay description:
+                >>> seqspec_modify(spec, "rna", [{"assay_id": spec.assay_id, "description": "New desc"}], "assay")
+  seqspec_modify_read:
+    type: wrapper
+    agents: [agent]
+    params:
+      wraps: seqspec_modify_read
+      description: Modify read properties in spec using ``ReadInput`` objects.
+  seqspec_modify_region:
+    type: wrapper
+    agents: [agent]
+    params:
+      wraps: seqspec_modify_region
+      description: Modify region properties in spec using ``RegionInput`` objects.
+
+imports:
+  __version__: __version__
+  _Path: pathlib.Path
+  Agent: agents.Agent
+  annotations: __future__.annotations
+  Any: typing.Any
+  ArgumentParser: argparse.ArgumentParser
+  Assay: seqspec.Assay.Assay
+  AssayInput: seqspec.Assay.AssayInput
+  asyncio: asyncio
+  BaseModel: pydantic.BaseModel
+  Callable: typing.Callable
+  ConsoleSpanExporter: opentelemetry.sdk.trace.export.ConsoleSpanExporter
+  Dict: typing.Dict
+  Draft4Validator: jsonschema.Draft4Validator
+  Enum: enum.Enum
+  Field: pydantic.Field
+  File: seqspec.File.File
+  file_exists: seqspec.utils.file_exists
+  FileInput: seqspec.File.FileInput
+  function_tool: agents.function_tool
+  GenBank: Bio.GenBank
+  gzip: gzip
+  IO: typing.IO
+  io: io
+  json: json
+  JsonlSpanExporter: seqspec.utils.JsonlSpanExporter
+  LibKitInput: seqspec.Assay.LibKitInput
+  LibProtocolInput: seqspec.Assay.LibProtocolInput
+  List: typing.List
+  load_assays: seqspec.utils.load_assays
+  load_files: seqspec.utils.load_files
+  load_libkits: seqspec.utils.load_libkits
+  load_libprotocols: seqspec.utils.load_libprotocols
+  load_reads: seqspec.utils.load_reads
+  load_regions: seqspec.utils.load_regions
+  load_seqkits: seqspec.utils.load_seqkits
+  load_seqprotocols: seqspec.utils.load_seqprotocols
+  load_spec: seqspec.utils.load_spec
+  logging: logging
+  ModelSettings: agents.ModelSettings
+  Namespace: argparse.Namespace
+  Onlist: seqspec.Region.Onlist
+  OpenAIAgentsInstrumentor: openinference.instrumentation.openai_agents.OpenAIAgentsInstrumentor
+  Optional: typing.Optional
+  os: os
+  Path: pathlib.Path
+  path: os.path
+  PrivateAttr: pydantic.PrivateAttr
+  RawTextHelpFormatter: argparse.RawTextHelpFormatter
+  re: re
+  Read: seqspec.Read.Read
+  ReadInput: seqspec.Read.ReadInput
+  Region: seqspec.Region.Region
+  RegionCoordinate: seqspec.Region.RegionCoordinate
+  RegionInput: seqspec.Region.RegionInput
+  requests: requests
+  run_build: seqspec_build.run_build
+  run_check: seqspec_check.run_check
+  run_file: seqspec_file.run_file
+  run_find: seqspec_find.run_find
+  run_format: seqspec_format.run_format
+  run_index: seqspec_index.run_index
+  run_info: seqspec_info.run_info
+  run_init: seqspec_init.run_init
+  run_insert: seqspec_insert.run_insert
+  run_methods: seqspec_methods.run_methods
+  run_modify: seqspec_modify.run_modify
+  run_onlist: seqspec_onlist.run_onlist
+  run_print: seqspec_print.run_print
+  run_split: seqspec_split.run_split
+  run_upgrade: seqspec_upgrade.run_upgrade
+  run_version: seqspec_version.run_version
+  Runner: agents.Runner
+  SeqKitInput: seqspec.Assay.SeqKitInput
+  SeqProtocolInput: seqspec.Assay.SeqProtocolInput
+  seqspec_check: seqspec.seqspec_check.seqspec_check
+  seqspec_format: seqspec.seqspec_format.seqspec_format
+  seqspec_init: seqspec.seqspec_init.seqspec_init
+  seqspec_insert_reads: seqspec.seqspec_insert.seqspec_insert_reads
+  seqspec_insert_regions: seqspec.seqspec_insert.seqspec_insert_regions
+  seqspec_modify: seqspec.seqspec_modify.seqspec_modify
+  seqspec_modify_read: seqspec.seqspec_modify.seqspec_modify_read
+  seqspec_modify_region: seqspec.seqspec_modify.seqspec_modify_region
+  Set: typing.Set
+  setup_build_args: seqspec_build.setup_build_args
+  setup_check_args: seqspec_check.setup_check_args
+  setup_file_args: seqspec_file.setup_file_args
+  setup_find_args: seqspec_find.setup_find_args
+  setup_format_args: seqspec_format.setup_format_args
+  setup_index_args: seqspec_index.setup_index_args
+  setup_info_args: seqspec_info.setup_info_args
+  setup_init_args: seqspec_init.setup_init_args
+  setup_insert_args: seqspec_insert.setup_insert_args
+  setup_methods_args: seqspec_methods.setup_methods_args
+  setup_modify_args: seqspec_modify.setup_modify_args
+  setup_onlist_args: seqspec_onlist.setup_onlist_args
+  setup_print_args: seqspec_print.setup_print_args
+  setup_split_args: seqspec_split.setup_split_args
+  setup_upgrade_args: seqspec_upgrade.setup_upgrade_args
+  setup_version_args: seqspec_version.setup_version_args
+  SimpleSpanProcessor: opentelemetry.sdk.trace.export.SimpleSpanProcessor
+  SpanExporter: opentelemetry.sdk.trace.export.SpanExporter
+  SpanExportResult: opentelemetry.sdk.trace.export.SpanExportResult
+  StatusCode: opentelemetry.trace.StatusCode
+  SummarySpanExporter: seqspec.utils.SummarySpanExporter
+  SUPPRESS: argparse.SUPPRESS
+  sys: sys
+  trace_sdk: opentelemetry.sdk.trace
+  Tuple: typing.Tuple
+  Union: typing.Union
+  ValidationError: pydantic.ValidationError
+  warnings: warnings
+  write_pydantic_to_file_or_stdout: seqspec.utils.write_pydantic_to_file_or_stdout
+  yaml: yaml
+
+functions:
+  __init__:
+    type: sync
+    module: seqspec.utils
+    args: [self, path]
+  __repr__:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+    params:
+      returns: str
+  __str__:
+    type: sync
+    module: seqspec.Region
+    args: [self]
+  __sub__:
+    type: sync
+    module: seqspec.Region
+    args: [self, other]
+  _json_safe:
+    type: sync
+    module: seqspec.utils
+    args: [obj]
+  _json_safe_dict:
+    type: sync
+    module: seqspec.utils
+    args: [d]
+  _load_generic_items:
+    type: sync
+    module: seqspec.utils
+    args: [source]
+  _truncate_for_console:
+    type: sync
+    module: seqspec.utils
+    args: [val, limit]
+    params:
+      returns: str
+  check:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec]
+  check_md5sum:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_onlist_files_exist:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_primer_ids_in_region_ids:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_read_file_count:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_read_files_exist:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_read_length_against_library:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_read_modalities:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_region_against_subregion_length:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_region_against_subregion_sequence:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_region_ids_modalities:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_region_lengths:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_schema:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_sequence_lengths:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_sequence_types:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_sub_length:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [rgn, errors, idx]
+  check_sub_sequences:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [rgn, errors, idx]
+  check_unique_modalities:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_unique_read_ids:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_unique_read_primer_strand_pairs:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  check_unique_region_ids:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, errors, idx]
+  complement:
+    type: sync
+    module: seqspec.Region
+    args: [self]
+  complement_nucleotide:
+    type: sync
+    module: seqspec.Region
+    args: [nucleotide]
+    params:
+      returns: str
+  complement_sequence:
+    type: sync
+    module: seqspec.Region
+    args: [sequence]
+    params:
+      returns: str
+  export:
+    type: sync
+    module: seqspec.utils
+    args: [self, spans]
+  file_exists:
+    type: sync
+    module: seqspec.utils
+    args: [uri]
+  filter_errors:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [errors, filter_type]
+  format_error:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [errobj, idx]
+  format_pydantic_validation_object:
+    type: sync
+    module: seqspec.utils
+    args: [error_path]
+    params:
+      returns: str
+  get_leaf_region_types:
+    type: sync
+    module: seqspec.Region
+    args: [self]
+    params:
+      returns: Set[str]
+  get_leaves:
+    type: sync
+    module: seqspec.Region
+    args: [self, leaves]
+    params:
+      returns: List[Region]
+  get_leaves_with_region_id:
+    type: sync
+    module: seqspec.Region
+    args: [self, region_id, leaves]
+    params:
+      returns: List[Region]
+  get_len:
+    type: sync
+    module: seqspec.Region
+    args: [self, min_l, max_l]
+  get_libspec:
+    type: sync
+    module: seqspec.Assay
+    args: [self, modality]
+    params:
+      returns: Region
+  get_onlist:
+    type: sync
+    module: seqspec.Region
+    args: [self]
+    params:
+      returns: Optional[Onlist]
+  get_onlist_regions:
+    type: sync
+    module: seqspec.Region
+    args: [self, found]
+    params:
+      returns: List[Region]
+  get_read:
+    type: sync
+    module: seqspec.Assay
+    args: [self, read_id]
+  get_read_by_file_id:
+    type: sync
+    module: seqspec.Read
+    args: [self, file_id]
+  get_region_by_id:
+    type: sync
+    module: seqspec.Region
+    args: [self, region_id, found]
+    params:
+      returns: List[Region]
+  get_region_by_region_type:
+    type: sync
+    module: seqspec.Region
+    args: [self, region_type, found]
+    params:
+      returns: List[Region]
+  get_remote_auth_token:
+    type: sync
+    module: seqspec.utils
+  get_seqspec:
+    type: sync
+    module: seqspec.Assay
+    args: [self, modality]
+  get_sequence:
+    type: sync
+    module: seqspec.Region
+    args: [self, s]
+    params:
+      returns: str
+  handle_no_args:
+    type: sync
+    module: seqspec.main
+    args: [parser, command_to_parser]
+    params:
+      returns: None
+  insert_reads:
+    type: sync
+    module: seqspec.Assay
+    args: [self, reads, modality, after]
+    params:
+      returns: None
+  insert_regions:
+    type: sync
+    module: seqspec.Assay
+    args: [self, regions, modality, after]
+    params:
+      returns: None
+  itx_read:
+    type: sync
+    module: seqspec.Region
+    args: [region_coordinates, read_start, read_stop]
+    params:
+      returns: List[RegionCoordinate]
+  len_check:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [rgn, errors, idx]
+  list_modalities:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+  load_assays:
+    type: sync
+    module: seqspec.utils
+    args: [assays_source]
+    params:
+      returns: List[AssayInput]
+  load_files:
+    type: sync
+    module: seqspec.utils
+    args: [files_source]
+    params:
+      returns: List[FileInput]
+  load_genbank:
+    type: sync
+    module: seqspec.utils
+    args: [gbk_fn]
+  load_genbank_stream:
+    type: sync
+    module: seqspec.utils
+    args: [gbk_stream]
+  load_libkits:
+    type: sync
+    module: seqspec.utils
+    args: [kits_source]
+    params:
+      returns: List[LibKitInput]
+  load_libprotocols:
+    type: sync
+    module: seqspec.utils
+    args: [protocols_source]
+    params:
+      returns: List[LibProtocolInput]
+  load_reads:
+    type: sync
+    module: seqspec.utils
+    args: [reads_source]
+    params:
+      returns: List[ReadInput]
+  load_regions:
+    type: sync
+    module: seqspec.utils
+    args: [regions_source]
+    params:
+      returns: List[RegionInput]
+  load_seqkits:
+    type: sync
+    module: seqspec.utils
+    args: [kits_source]
+    params:
+      returns: List[SeqKitInput]
+  load_seqprotocols:
+    type: sync
+    module: seqspec.utils
+    args: [protocols_source]
+    params:
+      returns: List[SeqProtocolInput]
+  load_spec:
+    type: sync
+    module: seqspec.utils
+    args: [spec_fn, strict]
+    params:
+      returns: Assay
+  load_spec_stream:
+    type: sync
+    module: seqspec.utils
+    args: [spec_stream]
+    params:
+      returns: Assay
+  main:
+    type: sync
+    module: seqspec.main
+    params:
+      returns: None
+  map_read_id_to_regions:
+    type: sync
+    module: seqspec.utils
+    args: [spec, modality, read_id]
+    params:
+      returns: Tuple
+  print_sequence:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+  project_regions_to_coordinates:
+    type: sync
+    module: seqspec.Region
+    args: [regions, rcs]
+    params:
+      returns: List[RegionCoordinate]
+  read_local_list:
+    type: sync
+    module: seqspec.utils
+    args: [onlist, base_path]
+    params:
+      returns: List[str]
+  read_remote_list:
+    type: sync
+    module: seqspec.utils
+    args: [onlist, base_path]
+    params:
+      returns: List[str]
+  region_ids_in_spec:
+    type: sync
+    module: seqspec.utils
+    args: [seqspec, modality, region_ids]
+  reverse:
+    type: sync
+    module: seqspec.Region
+    args: [self]
+  run_build:
+    type: sync
+    module: seqspec.seqspec_build
+    args: [parser, args]
+    params:
+      returns: None
+  run_check:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [parser, args]
+  run_format:
+    type: sync
+    module: seqspec.seqspec_format
+    args: [parser, args]
+    params:
+      returns: None
+  run_init:
+    type: sync
+    module: seqspec.seqspec_init
+    args: [parser, args]
+    params:
+      returns: None
+  run_insert:
+    type: sync
+    module: seqspec.seqspec_insert
+    args: [_, args]
+    params:
+      returns: None
+  run_modify:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [parser, args]
+    params:
+      returns: None
+  safe_load_strip_tags:
+    type: sync
+    module: seqspec.utils
+    args: [stream]
+    params:
+      returns: dict
+  seq_len_check:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [rgn, errors, idx]
+  seqspec_build:
+    type: sync
+    module: seqspec.seqspec_build
+    args: [name, doi, date, description, modalities, trace_path, verbose_mode]
+    params:
+      returns: Assay
+  seqspec_build_async:
+    type: async
+    module: seqspec.seqspec_build
+    args: [name, doi, date, description, modalities, trace_path, verbose_mode]
+    params:
+      returns: Assay
+  seqspec_check:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [spec, filter_type]
+    params:
+      returns: List[Dict]
+  seqspec_format:
+    type: sync
+    module: seqspec.seqspec_format
+    args: [spec]
+    params:
+      returns: Assay
+  seqspec_init:
+    type: sync
+    module: seqspec.seqspec_init
+    args: [name, doi, date, description, modalities]
+    params:
+      returns: Assay
+  seqspec_insert_reads:
+    type: sync
+    module: seqspec.seqspec_insert
+    args: [spec, modality, reads, after]
+    params:
+      returns: Assay
+  seqspec_insert_regions:
+    type: sync
+    module: seqspec.seqspec_insert
+    args: [spec, modality, regions, after]
+    params:
+      returns: Assay
+  seqspec_modify:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [spec, modality, keys, selector]
+    params:
+      returns: Assay
+  seqspec_modify_assay:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [spec, modality, new_assay_data]
+    params:
+      returns: Assay
+  seqspec_modify_files:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [spec, modality, new_files]
+    params:
+      returns: Assay
+  seqspec_modify_libkit:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [spec, modality, new_libkits]
+    params:
+      returns: Assay
+  seqspec_modify_libprotocol:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [spec, modality, new_libprotocols]
+    params:
+      returns: Assay
+  seqspec_modify_read:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [spec, modality, new_reads]
+    params:
+      returns: Assay
+  seqspec_modify_region:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [spec, modality, new_regions]
+    params:
+      returns: Assay
+  seqspec_modify_seqkit:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [spec, modality, new_seqkits]
+    params:
+      returns: Assay
+  seqspec_modify_seqprotocol:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [spec, modality, new_seqprotocols]
+    params:
+      returns: Assay
+  seqtype_check:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [rgn, errors, idx]
+  set_files:
+    type: sync
+    module: seqspec.Read
+    args: [self, files]
+  setup_build_args:
+    type: sync
+    module: seqspec.seqspec_build
+    args: [parser]
+    params:
+      returns: ArgumentParser
+  setup_check_args:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [parser]
+  setup_format_args:
+    type: sync
+    module: seqspec.seqspec_format
+    args: [parser]
+    params:
+      returns: ArgumentParser
+  setup_init_args:
+    type: sync
+    module: seqspec.seqspec_init
+    args: [parser]
+    params:
+      returns: ArgumentParser
+  setup_insert_args:
+    type: sync
+    module: seqspec.seqspec_insert
+    args: [subparsers]
+    params:
+      returns: ArgumentParser
+  setup_modify_args:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [parser]
+    params:
+      returns: ArgumentParser
+  setup_parser:
+    type: sync
+    module: seqspec.main
+  shutdown:
+    type: sync
+    module: seqspec.utils
+    args: [self]
+  strip_yaml_tags:
+    type: sync
+    module: seqspec.utils
+    args: [yaml_str]
+    params:
+      returns: str
+  to_assay:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+    params:
+      returns: Assay
+  to_dict:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+  to_file:
+    type: sync
+    module: seqspec.File
+    args: [self]
+    params:
+      returns: File
+  to_JSON:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+  to_libkit:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+    params:
+      returns: LibKit
+  to_libprotocol:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+    params:
+      returns: LibProtocol
+  to_newick:
+    type: sync
+    module: seqspec.Region
+    args: [self, n]
+    params:
+      returns: str
+  to_onlist:
+    type: sync
+    module: seqspec.Region
+    args: [self]
+    params:
+      returns: Onlist
+  to_read:
+    type: sync
+    module: seqspec.Read
+    args: [self]
+    params:
+      returns: Read
+  to_region:
+    type: sync
+    module: seqspec.Region
+    args: [self]
+    params:
+      returns: Region
+  to_seqkit:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+    params:
+      returns: SeqKit
+  to_seqprotocol:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+    params:
+      returns: SeqProtocol
+  to_YAML:
+    type: sync
+    module: seqspec.Assay
+    args: [self, fname]
+  update_attr:
+    type: sync
+    module: seqspec.Region
+    args: [self]
+  update_file_id:
+    type: sync
+    module: seqspec.File
+    args: [self, file_id]
+  update_from:
+    type: sync
+    module: seqspec.Assay
+    args: [self, patch]
+    params:
+      returns: None
+  update_read_by_id:
+    type: sync
+    module: seqspec.Read
+    args: [self, read_id, name, modality, primer_id, min_len, max_len, strand, files]
+  update_region:
+    type: sync
+    module: seqspec.Region
+    args: [self, region_id, region_type, name, sequence_type, sequence, min_len, max_len, onlist]
+  update_region_by_id:
+    type: sync
+    module: seqspec.Region
+    args: [self, target_region_id, region_id, region_type, name, sequence_type, sequence, min_len, max_len]
+  update_spec:
+    type: sync
+    module: seqspec.Assay
+    args: [self]
+  validate_build_args:
+    type: sync
+    module: seqspec.seqspec_build
+    args: [_, args]
+    params:
+      returns: None
+  validate_check_args:
+    type: sync
+    module: seqspec.seqspec_check
+    args: [parser, args]
+    params:
+      returns: None
+  validate_format_args:
+    type: sync
+    module: seqspec.seqspec_format
+    args: [parser, args]
+    params:
+      returns: None
+  validate_init_args:
+    type: sync
+    module: seqspec.seqspec_init
+    args: [_, args]
+    params:
+      returns: None
+  validate_insert_args:
+    type: sync
+    module: seqspec.seqspec_insert
+    args: [args]
+  validate_modify_args:
+    type: sync
+    module: seqspec.seqspec_modify
+    args: [parser, args]
+    params:
+      returns: None
+  write_pydantic_to_file_or_stdout:
+    type: sync
+    module: seqspec.utils
+    args: [resource, output]
+    params:
+      returns: None
+  write_read:
+    type: sync
+    module: seqspec.utils
+    args: [header, seq, qual, f]
+  yaml_safe_dump:
+    type: sync
+    module: seqspec.utils
+    args: [obj]
+  yield_onlist_contents:
+    type: sync
+    module: seqspec.utils
+    args: [stream]
+
+variables:
+  IGVF_API_KEY:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [seqspec.utils]
+  IGVF_SECRET_KEY:
+    type: env
+    params:
+      caller: [os.environ.get]
+      path: [seqspec.utils]
+
+files:
+  args.yaml:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  schema/seqspec.schema.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [path.join]
+  spec_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
