@@ -1,4 +1,4 @@
-use crate::models::assay::{Assay, Codec};
+use crate::models::assay::Assay;
 use crate::models::file::File;
 use crate::models::onlist::Onlist;
 use crate::utils;
@@ -22,7 +22,7 @@ pub fn run_upgrade(args: &UpgradeArgs) {
     let version = spec.seqspec_version.clone().unwrap_or_else(|| "0.0.0".to_string());
     let upgraded = seqspec_upgrade(spec, &version);
 
-    let bytes = upgraded.to_bytes(Codec::Yaml).unwrap();
+    let bytes = upgraded.to_bytes().unwrap();
     if let Some(out) = &args.output {
         let mut f = fs::File::create(out).unwrap();
         f.write_all(&bytes).unwrap();

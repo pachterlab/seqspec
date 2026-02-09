@@ -293,7 +293,7 @@ fn format_starsolo(indices: &Vec<Coordinate>) -> String {
         for cut in &coord.rcv {
             let rt = cut.region.region_type.to_uppercase();
             if rt == "BARCODE" {
-                bcs.push(format!("--soloCBstart {} --soloCBlen {}", cut.start + 1, cut.stop));
+                bcs.push(format!("--soloCBstart {} --soloCBlen {}", cut.start + 1, cut.stop - cut.start));
             } else if rt == "UMI" {
                 umi.push(format!("--soloUMIstart {} --soloUMIlen {}", cut.start + 1, cut.stop - cut.start));
             }
@@ -578,4 +578,189 @@ fn list_files_by_file_id(spec: &Assay, modality: &String, file_ids: &Vec<String>
         }
     }
     files
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::load_spec;
+
+    fn dogma_spec() -> Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    #[test]
+    fn test_index_by_reads() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let indices = get_index_by_reads(&spec, &modality);
+        assert!(!indices.is_empty());
+        for coord in &indices {
+            assert!(!coord.rcv.is_empty());
+        }
+    }
+
+    #[test]
+    fn test_index_by_read_ids() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let rna_reads = spec.get_seqspec("rna");
+        assert!(!rna_reads.is_empty());
+        let read_ids: Vec<String> = vec![rna_reads[0].read_id.clone()];
+        let indices = get_index_by_read_ids(&spec, &modality, &read_ids);
+        assert_eq!(indices.len(), 1);
+        assert!(!indices[0].rcv.is_empty());
+    }
+
+    #[test]
+    fn test_index_by_regions() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let indices = get_index_by_regions(&spec, &modality);
+        assert!(!indices.is_empty());
+    }
+
+    #[test]
+    fn test_format_tab() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let indices = get_index_by_reads(&spec, &modality);
+        let result = format_index(&indices, &"tab".to_string(), &None);
+        assert!(!result.is_empty());
+        // Tab format should contain tab separators
+        assert!(result.contains('\t'));
+    }
+
+    #[test]
+    fn test_format_kb() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let indices = get_index_by_reads(&spec, &modality);
+        let result = format_index(&indices, &"kb".to_string(), &None);
+        // kb format produces comma-separated coordinate strings
+        assert!(!result.is_empty());
+    }
+
+    #[test]
+    fn test_seqspec_index_dispatch() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let ids: Vec<String> = vec![];
+        let idtype = "read".to_string();
+        let rev = false;
+        let indices = seqspec_index(&spec, &modality, &ids, &idtype, &rev);
+        assert!(!indices.is_empty());
+    }
+
+    // ---- Format function tests ----
+
+    fn rna_indices() -> Vec<Coordinate> {
+        let spec = dogma_spec();
+        get_index_by_reads(&spec, &"rna".to_string())
+    }
+
+    #[test]
+    fn test_format_starsolo() {
+        let indices = rna_indices();
+        let result = format_index(&indices, &"starsolo".to_string(), &None);
+        // STARsolo format should contain --soloType or be empty if no barcode/UMI
+        if !result.is_empty() {
+            assert!(result.contains("--soloType") || result.contains("--solo"));
+        }
+    }
+
+    #[test]
+    fn test_format_simpleaf() {
+        let indices = rna_indices();
+        let result = format_index(&indices, &"simpleaf".to_string(), &None);
+        assert!(!result.is_empty());
+        // simpleaf format uses {b[], u[], r[]} notation
+        assert!(result.contains("{") || result.contains("["));
+    }
+
+    #[test]
+    fn test_format_zumis() {
+        let indices = rna_indices();
+        let result = format_index(&indices, &"zumis".to_string(), &None);
+        // zumis uses BCS(), UMI(), cDNA() format
+        if !result.is_empty() {
+            assert!(result.contains("BCS") || result.contains("UMI") || result.contains("cDNA"));
+        }
+    }
+
+    #[test]
+    fn test_format_kb_single() {
+        let indices = rna_indices();
+        let result = format_index(&indices, &"kb-single".to_string(), &None);
+        // kb-single format uses colon-separated sections like kb
+        assert!(!result.is_empty());
+        assert!(result.contains(":"));
+    }
+
+    #[test]
+    fn test_index_by_files() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let indices = get_index_by_files(&spec, &modality);
+        assert!(!indices.is_empty());
+        for coord in &indices {
+            assert_eq!(coord.query_type, "File");
+        }
+    }
+
+    #[test]
+    fn test_index_by_region_ids() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let lib = spec.get_libspec("rna").unwrap();
+        let region_id = lib.region_id.clone();
+        let indices = get_index_by_region_ids(&spec, &modality, &vec![region_id]);
+        assert_eq!(indices.len(), 1);
+        assert_eq!(indices[0].query_type, "Region");
+    }
+
+    #[test]
+    fn test_index_different_modalities() {
+        let spec = dogma_spec();
+        for modality in ["rna", "atac", "protein", "tag"] {
+            let m = modality.to_string();
+            let indices = get_index_by_reads(&spec, &m);
+            assert!(!indices.is_empty(), "modality {} should have indices", modality);
+        }
+    }
+
+    #[test]
+    fn test_filter_index_no_overlap() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let indices = get_index_by_reads(&spec, &modality);
+        let orig_count: usize = indices.iter().map(|i| i.rcv.len()).sum();
+        let filtered = filter_index_no_overlap(indices);
+        // Filtered should have same or fewer total region coordinates
+        let filt_count: usize = filtered.iter().map(|i| i.rcv.len()).sum();
+        assert!(filt_count <= orig_count);
+    }
+
+    #[test]
+    fn test_index_dispatch_file_selector() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let ids: Vec<String> = vec![];
+        let idtype = "file".to_string();
+        let rev = false;
+        let indices = seqspec_index(&spec, &modality, &ids, &idtype, &rev);
+        assert!(!indices.is_empty());
+    }
+
+    #[test]
+    fn test_index_dispatch_region_with_ids() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let lib = spec.get_libspec("rna").unwrap();
+        let ids = vec![lib.region_id.clone()];
+        let idtype = "region".to_string();
+        let rev = false;
+        let indices = seqspec_index(&spec, &modality, &ids, &idtype, &rev);
+        assert_eq!(indices.len(), 1);
+    }
 }

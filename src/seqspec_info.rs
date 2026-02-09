@@ -217,4 +217,146 @@ fn format_library_spec_json(info: &InfoData) -> String {
     } else { String::new() }
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::load_spec;
 
+    fn dogma_spec() -> Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    #[test]
+    fn test_info_modalities() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "modalities");
+        if let InfoData::Modalities(v) = info {
+            assert!(v.contains(&"rna".to_string()));
+            assert!(v.contains(&"atac".to_string()));
+            assert_eq!(v.len(), 4);
+        } else {
+            panic!("Expected Modalities variant");
+        }
+    }
+
+    #[test]
+    fn test_info_meta() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "meta");
+        if let InfoData::Meta(v) = info {
+            let obj = v.as_object().unwrap();
+            assert!(obj.contains_key("assay_id"));
+            assert!(obj.contains_key("name"));
+            assert_eq!(obj["assay_id"].as_str().unwrap(), "DOGMAseq-DIG");
+        } else {
+            panic!("Expected Meta variant");
+        }
+    }
+
+    #[test]
+    fn test_info_sequence_spec() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "sequence_spec");
+        if let InfoData::SequenceSpec(reads) = info {
+            assert!(!reads.is_empty());
+            // All reads should have a modality
+            for r in &reads {
+                assert!(!r.modality.is_empty());
+            }
+        } else {
+            panic!("Expected SequenceSpec variant");
+        }
+    }
+
+    #[test]
+    fn test_info_library_spec() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "library_spec");
+        if let InfoData::LibrarySpec(map) = info {
+            assert!(map.contains_key("rna"));
+            assert!(map.contains_key("atac"));
+            // Each modality should have leaf regions
+            for (_mod_name, regions) in &map {
+                assert!(!regions.is_empty());
+            }
+        } else {
+            panic!("Expected LibrarySpec variant");
+        }
+    }
+
+    #[test]
+    fn test_format_modalities_tab() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "modalities");
+        let result = format_info(&spec, info, "modalities", "tab");
+        assert!(result.contains("rna"));
+        assert!(result.contains("\t"));
+    }
+
+    #[test]
+    fn test_format_meta_json() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "meta");
+        let result = format_info(&spec, info, "meta", "json");
+        let parsed: Value = serde_json::from_str(&result).unwrap();
+        assert!(parsed.is_object());
+        assert_eq!(parsed["assay_id"].as_str().unwrap(), "DOGMAseq-DIG");
+    }
+
+    #[test]
+    fn test_format_meta_tab() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "meta");
+        let result = format_info(&spec, info, "meta", "tab");
+        assert!(result.contains("DOGMAseq-DIG"));
+        assert!(result.contains("\t"));
+    }
+
+    #[test]
+    fn test_format_sequence_spec_tab() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "sequence_spec");
+        let result = format_info(&spec, info, "sequence_spec", "tab");
+        assert!(!result.is_empty());
+        assert!(result.contains("rna") || result.contains("atac"));
+        assert!(result.contains("\t"));
+    }
+
+    #[test]
+    fn test_format_sequence_spec_json() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "sequence_spec");
+        let result = format_info(&spec, info, "sequence_spec", "json");
+        let parsed: Value = serde_json::from_str(&result).unwrap();
+        assert!(parsed.is_array());
+        assert!(!parsed.as_array().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_format_library_spec_tab() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "library_spec");
+        let result = format_info(&spec, info, "library_spec", "tab");
+        assert!(!result.is_empty());
+        assert!(result.contains("\t"));
+    }
+
+    #[test]
+    fn test_format_library_spec_json() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "library_spec");
+        let result = format_info(&spec, info, "library_spec", "json");
+        let parsed: Value = serde_json::from_str(&result).unwrap();
+        assert!(parsed.is_object());
+        assert!(parsed.as_object().unwrap().contains_key("rna"));
+    }
+
+    #[test]
+    fn test_format_modalities_json() {
+        let spec = dogma_spec();
+        let info = seqspec_info(&spec, "modalities");
+        let result = format_info(&spec, info, "modalities", "json");
+        let parsed: Value = serde_json::from_str(&result).unwrap();
+        assert!(parsed.is_array());
+    }
+}

@@ -1,4 +1,4 @@
-use crate::models::assay::{Assay, Codec};
+use crate::models::assay::Assay;
 use crate::models::region::Region;
 use clap::Args;
 use std::fs;
@@ -52,7 +52,7 @@ pub fn run_init(args: &InitArgs) {
     spec.update_spec();
 
     let yaml = spec
-        .to_bytes(Codec::Yaml)
+        .to_bytes()
         .expect("Failed to serialize assay to YAML");
     if let Some(out) = &args.output {
         let mut f = fs::File::create(out).unwrap();
@@ -113,6 +113,37 @@ pub fn seqspec_init(
         None,                          // library_kit
         None,                          // seqspec_version
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_init_creates_assay() {
+        let spec = seqspec_init("TestAssay", "10.1234/test", "2024-01-01", "A test assay", vec!["rna".into(), "atac".into()]);
+        assert_eq!(spec.name, "TestAssay");
+        assert_eq!(spec.doi, "10.1234/test");
+        assert_eq!(spec.modalities, vec!["rna", "atac"]);
+        assert_eq!(spec.library_spec.len(), 2);
+        assert!(spec.sequence_spec.is_empty());
+    }
+
+    #[test]
+    fn test_init_library_spec_regions() {
+        let spec = seqspec_init("Test", "", "", "", vec!["rna".into()]);
+        let lib = spec.get_libspec("rna").unwrap();
+        assert_eq!(lib.region_id, "rna");
+        assert_eq!(lib.region_type, "meta");
+    }
+
+    #[test]
+    fn test_init_single_modality() {
+        let spec = seqspec_init("Test", "", "", "", vec!["protein".into()]);
+        assert_eq!(spec.modalities.len(), 1);
+        assert_eq!(spec.library_spec.len(), 1);
+        assert_eq!(spec.library_spec[0].region_id, "protein");
+    }
 }
 
 

@@ -567,4 +567,123 @@ fn check_read_length_against_library(spec: &Assay, mut errors: Vec<ErrorObj>, mu
     (errors, idx)
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::load_spec;
 
+    fn dogma_spec() -> Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    #[test]
+    fn test_check_valid_spec() {
+        let spec = dogma_spec();
+        let spec_path = PathBuf::from("tests/fixtures/spec.yaml");
+        let errors = seqspec_check(&spec, None, &spec_path);
+        // DOGMAseq-dig is a well-formed spec; expect few or no errors
+        // (some checks may flag missing local files, which is acceptable)
+        for e in &errors {
+            // Ensure error structure is well-formed
+            assert!(!e.error_type.is_empty());
+            assert!(!e.error_message.is_empty());
+        }
+    }
+
+    #[test]
+    fn test_error_obj_structure() {
+        let e = ErrorObj {
+            error_type: "test_check".into(),
+            error_message: "something went wrong".into(),
+            error_object: "region".into(),
+        };
+        assert_eq!(e.error_type, "test_check");
+        assert_eq!(e.error_message, "something went wrong");
+        assert_eq!(e.error_object, "region");
+    }
+
+    #[test]
+    fn test_filter_errors_igvf() {
+        let errors = vec![
+            ErrorObj {
+                error_type: "check_schema".into(),
+                error_message: "missing field".into(),
+                error_object: "'lib_struct'".into(),
+            },
+            ErrorObj {
+                error_type: "check_unique_modalities".into(),
+                error_message: "duplicate".into(),
+                error_object: "modality".into(),
+            },
+        ];
+        let filtered = filter_errors(errors, "igvf");
+        // The check_schema/'lib_struct' error should be filtered out
+        assert_eq!(filtered.len(), 1);
+        assert_eq!(filtered[0].error_type, "check_unique_modalities");
+    }
+
+    #[test]
+    fn test_filter_errors_unknown_type() {
+        let errors = vec![
+            ErrorObj {
+                error_type: "test".into(),
+                error_message: "msg".into(),
+                error_object: "obj".into(),
+            },
+        ];
+        let filtered = filter_errors(errors, "unknown_filter");
+        assert_eq!(filtered.len(), 1); // no filtering applied
+    }
+
+    #[test]
+    fn test_filter_errors_igvf_onlist_skip() {
+        let errors = vec![
+            ErrorObj {
+                error_type: "check_schema".into(),
+                error_message: "missing field".into(),
+                error_object: "'lib_struct'".into(),
+            },
+            ErrorObj {
+                error_type: "check_onlist_files_exist".into(),
+                error_message: "file missing".into(),
+                error_object: "onlist".into(),
+            },
+            ErrorObj {
+                error_type: "check_unique_modalities".into(),
+                error_message: "duplicate".into(),
+                error_object: "modality".into(),
+            },
+        ];
+        let filtered = filter_errors(errors, "igvf_onlist_skip");
+        // Both check_schema/'lib_struct' and check_onlist_files_exist/onlist should be filtered
+        assert_eq!(filtered.len(), 1);
+        assert_eq!(filtered[0].error_type, "check_unique_modalities");
+    }
+
+    #[test]
+    fn test_check_with_igvf_filter() {
+        let spec = dogma_spec();
+        let spec_path = PathBuf::from("tests/fixtures/spec.yaml");
+        let unfiltered = seqspec_check(&spec, None, &spec_path);
+        let filtered = seqspec_check(&spec, Some("igvf"), &spec_path);
+        assert!(filtered.len() <= unfiltered.len());
+    }
+
+    #[test]
+    fn test_check_invalid_spec_duplicate_modalities() {
+        use crate::models::region::Region;
+        let spec = Assay::new(
+            "test".into(), "test".into(), "".into(), "".into(), "".into(),
+            vec!["rna".into(), "rna".into()], // duplicate
+            "".into(), vec![], vec![
+                Region::new("rna".into(), "rna".into(), "rna".into(), "joined".into(), "".into(), 0, 0, None, vec![]),
+                Region::new("rna".into(), "rna".into(), "rna".into(), "joined".into(), "".into(), 0, 0, None, vec![]),
+            ],
+            None, None, None, None, None,
+        );
+        let spec_path = PathBuf::from("tests/fixtures/spec.yaml");
+        let errors = seqspec_check(&spec, None, &spec_path);
+        let has_dup = errors.iter().any(|e| e.error_type == "check_unique_modalities");
+        assert!(has_dup, "Should detect duplicate modalities");
+    }
+}

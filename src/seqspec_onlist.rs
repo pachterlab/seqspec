@@ -162,4 +162,116 @@ fn join_multi_onlist(lsts: Vec<Vec<String>>) -> Vec<String> {
     out
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
 
+    #[test]
+    fn test_join_product() {
+        let lists = vec![
+            vec!["A".into(), "B".into()],
+            vec!["1".into(), "2".into()],
+        ];
+        let result = join_product_onlist(lists);
+        assert_eq!(result.len(), 4);
+        assert!(result.contains(&"A1".to_string()));
+        assert!(result.contains(&"A2".to_string()));
+        assert!(result.contains(&"B1".to_string()));
+        assert!(result.contains(&"B2".to_string()));
+    }
+
+    #[test]
+    fn test_join_product_three_lists() {
+        let lists = vec![
+            vec!["A".into(), "B".into()],
+            vec!["1".into()],
+            vec!["x".into(), "y".into()],
+        ];
+        let result = join_product_onlist(lists);
+        assert_eq!(result.len(), 4); // 2 * 1 * 2
+        assert!(result.contains(&"A1x".to_string()));
+        assert!(result.contains(&"B1y".to_string()));
+    }
+
+    #[test]
+    fn test_join_product_empty() {
+        let lists: Vec<Vec<String>> = vec![];
+        let result = join_product_onlist(lists);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_join_multi() {
+        let lists = vec![
+            vec!["A".into(), "B".into(), "C".into()],
+            vec!["1".into(), "2".into()],
+        ];
+        let result = join_multi_onlist(lists);
+        assert_eq!(result.len(), 3); // max length
+        assert_eq!(result[0], "A 1");
+        assert_eq!(result[1], "B 2");
+        assert_eq!(result[2], "C -"); // padded with "-"
+    }
+
+    #[test]
+    fn test_join_multi_empty() {
+        let lists: Vec<Vec<String>> = vec![];
+        let result = join_multi_onlist(lists);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_join_onlist_contents_dispatches() {
+        let lists = vec![
+            vec!["A".into(), "B".into()],
+            vec!["1".into(), "2".into()],
+        ];
+        let product = join_onlist_contents(lists.clone(), "product");
+        assert_eq!(product.len(), 4);
+
+        let multi = join_onlist_contents(lists, "multi");
+        assert_eq!(multi.len(), 2);
+
+        let unknown = join_onlist_contents(vec![], "invalid");
+        assert!(unknown.is_empty());
+    }
+
+    #[test]
+    fn test_get_onlists_by_region_type() {
+        let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
+        let onlists = get_onlists(&spec, "rna", "region-type", Some("barcode"));
+        // RNA modality should have barcode regions with onlists
+        assert!(!onlists.is_empty());
+    }
+
+    #[test]
+    fn test_get_onlists_by_region() {
+        let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
+        // Find a region that has an onlist
+        let lib = spec.get_libspec("rna").unwrap();
+        let onlist_regions = lib.get_onlist_regions();
+        if let Some(r) = onlist_regions.first() {
+            let onlists = get_onlists(&spec, "rna", "region", Some(&r.region_id));
+            assert!(!onlists.is_empty());
+        }
+    }
+
+    #[test]
+    fn test_get_onlists_by_read() {
+        let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
+        let rna_reads = spec.get_seqspec("rna");
+        if !rna_reads.is_empty() {
+            let onlists = get_onlists(&spec, "rna", "read", Some(&rna_reads[0].read_id));
+            // May or may not have onlists depending on read
+            // Just verify it doesn't panic
+            let _ = onlists;
+        }
+    }
+
+    #[test]
+    fn test_get_onlists_empty_modality() {
+        let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
+        let onlists = get_onlists(&spec, "rna", "region-type", Some("nonexistent_type"));
+        assert!(onlists.is_empty());
+    }
+}

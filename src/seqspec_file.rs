@@ -406,4 +406,79 @@ fn full_path(spec_fn: &PathBuf, url: &String) -> String {
     parent.join(url).to_string_lossy().to_string()
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::load_spec;
+
+    fn dogma_spec() -> Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    #[test]
+    fn test_seqspec_file_read_selector() {
+        let spec = dogma_spec();
+        let files = seqspec_file(&spec, &"rna".into(), None, &"read".into());
+        assert!(!files.is_empty());
+        // Each key should be a read_id
+        for (read_id, file_list) in &files {
+            assert!(!read_id.is_empty());
+            assert!(!file_list.is_empty());
+        }
+    }
+
+    #[test]
+    fn test_seqspec_file_region_selector() {
+        let spec = dogma_spec();
+        let files = seqspec_file(&spec, &"rna".into(), None, &"region".into());
+        // Region files come from onlists, which the rna modality should have
+        assert!(!files.is_empty());
+    }
+
+    #[test]
+    fn test_seqspec_file_all_selector() {
+        let spec = dogma_spec();
+        let all_files = seqspec_file(&spec, &"rna".into(), None, &"file".into());
+        let read_files = seqspec_file(&spec, &"rna".into(), None, &"read".into());
+        let region_files = seqspec_file(&spec, &"rna".into(), None, &"region".into());
+        // "file" selector returns union of read and region files
+        assert!(all_files.len() >= read_files.len());
+        assert!(all_files.len() >= region_files.len());
+    }
+
+    #[test]
+    fn test_seqspec_file_by_read_id() {
+        let spec = dogma_spec();
+        let rna_reads = spec.get_seqspec("rna");
+        let read_id = rna_reads[0].read_id.clone();
+        let ids = vec![read_id.clone()];
+        let files = seqspec_file(&spec, &"rna".into(), Some(&ids), &"read".into());
+        assert!(files.contains_key(&read_id));
+    }
+
+    #[test]
+    fn test_full_path() {
+        let spec_fn = PathBuf::from("/data/specs/spec.yaml");
+        let url = "barcodes.txt".to_string();
+        let result = full_path(&spec_fn, &url);
+        assert_eq!(result, "/data/specs/barcodes.txt");
+    }
+
+    #[test]
+    fn test_maybe_full_local() {
+        let spec_fn = PathBuf::from("/data/specs/spec.yaml");
+        let url = "file.txt".to_string();
+        let result = maybe_full(&url, &"local".to_string(), &spec_fn, true);
+        assert_eq!(result, "/data/specs/file.txt");
+    }
+
+    #[test]
+    fn test_maybe_full_remote() {
+        let spec_fn = PathBuf::from("/data/specs/spec.yaml");
+        let url = "http://example.com/file.txt".to_string();
+        let result = maybe_full(&url, &"http".to_string(), &spec_fn, true);
+        assert_eq!(result, "http://example.com/file.txt");
+    }
+}
+
 

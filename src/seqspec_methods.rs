@@ -144,4 +144,95 @@ fn format_read_file(file: &ReadFile, idx: i32) -> String {
     format!("- File {}: {}\n", idx, file.filename)
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::load_spec;
+    use std::path::PathBuf;
 
+    fn dogma_spec() -> Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    #[test]
+    fn test_methods_output_rna() {
+        let spec = dogma_spec();
+        let text = seqspec_methods(&spec, "rna");
+        assert!(text.contains("Methods"));
+        assert!(text.contains("rna"));
+        assert!(text.contains("Libary structure"));
+        assert!(text.contains("Sequence structure"));
+    }
+
+    #[test]
+    fn test_format_region() {
+        let region = Region::new(
+            "bc".into(), "barcode".into(), "Cell Barcode".into(),
+            "onlist".into(), "NNNNNNNNNNNNNNNN".into(),
+            16, 16, None, vec![],
+        );
+        let s = format_region(&region, 1);
+        assert!(s.contains("1. Cell Barcode"));
+        assert!(s.contains("16-16bp"));
+        assert!(s.contains("onlist"));
+    }
+
+    #[test]
+    fn test_format_region_with_onlist() {
+        let onlist = crate::models::onlist::Onlist::new(
+            "ol".into(), "barcodes.txt".into(), "txt".into(),
+            0, "".into(), "local".into(), "".into(),
+        );
+        let region = Region::new(
+            "bc".into(), "barcode".into(), "Cell Barcode".into(),
+            "onlist".into(), "N".repeat(16),
+            16, 16, Some(onlist), vec![],
+        );
+        let s = format_region(&region, 1);
+        assert!(s.contains("onlist file: barcodes.txt"));
+    }
+
+    #[test]
+    fn test_format_read() {
+        let read = Read::new(
+            "R1".into(), "Read 1".into(), "rna".into(), "truseq_read1".into(),
+            28, 28, "pos".into(), vec![],
+        );
+        let s = format_read(&read, 1);
+        assert!(s.contains("Read 1"));
+        assert!(s.contains("28 cycles"));
+        assert!(s.contains("positive strand"));
+        assert!(s.contains("truseq_read1"));
+    }
+
+    #[test]
+    fn test_format_read_file() {
+        let f = ReadFile::new(
+            "f1".into(), "reads_R1.fastq.gz".into(), "fastq".into(),
+            1024, "reads_R1.fastq.gz".into(), "local".into(), "".into(),
+        );
+        let s = format_read_file(&f, 1);
+        assert!(s.contains("File 1"));
+        assert!(s.contains("reads_R1.fastq.gz"));
+    }
+
+    #[test]
+    fn test_methods_other_modalities() {
+        let spec = dogma_spec();
+        for modality in ["atac", "protein", "tag"] {
+            let text = seqspec_methods(&spec, modality);
+            assert!(text.contains("Methods"));
+            assert!(text.contains(modality));
+        }
+    }
+
+    #[test]
+    fn test_format_library_spec_sections() {
+        let spec = dogma_spec();
+        let text = format_library_spec(&spec, "rna");
+        assert!(text.contains("Libary structure"));
+        assert!(text.contains("Sequence structure"));
+        assert!(text.contains("library protocol"));
+        assert!(text.contains("sequencing kit"));
+    }
+}

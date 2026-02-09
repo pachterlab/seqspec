@@ -337,3 +337,510 @@ impl RegionCoordinateDifference {
         Self { obj, fixed, rgncdiff, loc }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::load_spec;
+    use std::path::PathBuf;
+
+    fn leaf(id: &str, seq: &str, len: i64) -> Region {
+        Region::new(
+            id.into(), "barcode".into(), id.into(), "fixed".into(),
+            seq.into(), len, len, None, vec![],
+        )
+    }
+
+    fn joined(id: &str, children: Vec<Region>) -> Region {
+        Region::new(
+            id.into(), "joined".into(), id.into(), "joined".into(),
+            "".into(), 0, 0, None, children,
+        )
+    }
+
+    fn dogma_spec() -> crate::models::assay::Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    // ---- Creation ----
+
+    #[test]
+    fn test_region_creation() {
+        let r = leaf("bc", "ATCG", 4);
+        assert_eq!(r.region_id, "bc");
+        assert_eq!(r.region_type, "barcode");
+        assert_eq!(r.sequence_type, "fixed");
+        assert_eq!(r.sequence, "ATCG");
+        assert_eq!(r.min_len, 4);
+        assert_eq!(r.max_len, 4);
+        assert!(r.onlist.is_none());
+        assert!(r.regions.is_empty());
+    }
+
+    // ---- get_sequence ----
+
+    #[test]
+    fn test_get_sequence_simple() {
+        let r = leaf("bc", "ATCG", 4);
+        assert_eq!(r.get_sequence(), "ATCG");
+    }
+
+    #[test]
+    fn test_get_sequence_empty() {
+        let r = Region::new(
+            "bc".into(), "barcode".into(), "bc".into(), "random".into(),
+            "".into(), 8, 8, None, vec![],
+        );
+        assert_eq!(r.get_sequence(), "XXXXXXXX");
+    }
+
+    #[test]
+    fn test_get_sequence_nested() {
+        let parent = joined("parent", vec![
+            leaf("a", "AAAA", 4),
+            leaf("b", "CCCC", 4),
+        ]);
+        assert_eq!(parent.get_sequence(), "AAAACCCC");
+    }
+
+    // ---- get_len ----
+
+    #[test]
+    fn test_get_len_simple() {
+        let r = Region::new(
+            "r".into(), "umi".into(), "r".into(), "random".into(),
+            "".into(), 10, 12, None, vec![],
+        );
+        assert_eq!(r.get_len(), (10, 12));
+    }
+
+    #[test]
+    fn test_get_len_nested() {
+        let parent = joined("parent", vec![
+            leaf("a", "AAAA", 4),
+            Region::new(
+                "b".into(), "umi".into(), "b".into(), "random".into(),
+                "".into(), 10, 12, None, vec![],
+            ),
+        ]);
+        assert_eq!(parent.get_len(), (14, 16));
+    }
+
+    // ---- update_attr ----
+
+    #[test]
+    fn test_update_attr_fixed() {
+        let mut parent = joined("parent", vec![
+            leaf("a", "AAAA", 4),
+            leaf("b", "CCCC", 4),
+        ]);
+        parent.update_attr();
+        assert_eq!(parent.min_len, 8);
+        assert_eq!(parent.max_len, 8);
+        assert_eq!(parent.sequence, "AAAACCCC");
+    }
+
+    #[test]
+    fn test_update_attr_random() {
+        let mut r = Region::new(
+            "r".into(), "umi".into(), "r".into(), "random".into(),
+            "".into(), 10, 10, None, vec![],
+        );
+        r.update_attr();
+        assert_eq!(r.sequence, "XXXXXXXXXX");
+    }
+
+    #[test]
+    fn test_update_attr_onlist() {
+        let onlist = Onlist::new(
+            "ol".into(), "list.txt".into(), "txt".into(),
+            0, "list.txt".into(), "local".into(), "".into(),
+        );
+        let mut r = Region::new(
+            "r".into(), "barcode".into(), "r".into(), "onlist".into(),
+            "".into(), 16, 16, Some(onlist), vec![],
+        );
+        r.update_attr();
+        assert_eq!(r.sequence, "NNNNNNNNNNNNNNNN");
+        assert_eq!(r.sequence.len(), 16);
+    }
+
+    // ---- Queries ----
+
+    #[test]
+    fn test_get_region_by_id() {
+        let parent = joined("parent", vec![
+            leaf("target", "ATCG", 4),
+            leaf("other", "GGGG", 4),
+        ]);
+        let found = parent.get_region_by_id("target");
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].region_id, "target");
+    }
+
+    #[test]
+    fn test_get_region_by_id_not_found() {
+        let r = leaf("bc", "ATCG", 4);
+        assert!(r.get_region_by_id("missing").is_empty());
+    }
+
+    #[test]
+    fn test_get_region_by_region_type() {
+        let parent = joined("parent", vec![
+            leaf("a", "AAAA", 4),
+            Region::new(
+                "u".into(), "umi".into(), "u".into(), "random".into(),
+                "".into(), 10, 10, None, vec![],
+            ),
+        ]);
+        let barcodes = parent.get_region_by_region_type("barcode");
+        assert_eq!(barcodes.len(), 1);
+        assert_eq!(barcodes[0].region_id, "a");
+
+        let umis = parent.get_region_by_region_type("umi");
+        assert_eq!(umis.len(), 1);
+    }
+
+    #[test]
+    fn test_get_onlist_regions() {
+        let onlist = Onlist::new(
+            "ol".into(), "list.txt".into(), "txt".into(),
+            0, "".into(), "local".into(), "".into(),
+        );
+        let parent = joined("parent", vec![
+            Region::new(
+                "bc".into(), "barcode".into(), "bc".into(), "onlist".into(),
+                "".into(), 16, 16, Some(onlist), vec![],
+            ),
+            leaf("other", "AAAA", 4),
+        ]);
+        let onlist_regions = parent.get_onlist_regions();
+        assert_eq!(onlist_regions.len(), 1);
+        assert_eq!(onlist_regions[0].region_id, "bc");
+    }
+
+    #[test]
+    fn test_get_onlist() {
+        let r = leaf("bc", "ATCG", 4);
+        assert!(r.get_onlist().is_none());
+
+        let onlist = Onlist::new(
+            "ol".into(), "list.txt".into(), "txt".into(),
+            0, "".into(), "local".into(), "".into(),
+        );
+        let r2 = Region::new(
+            "bc".into(), "barcode".into(), "bc".into(), "onlist".into(),
+            "".into(), 16, 16, Some(onlist.clone()), vec![],
+        );
+        assert_eq!(r2.get_onlist().unwrap(), onlist);
+    }
+
+    #[test]
+    fn test_get_leaves() {
+        let parent = joined("parent", vec![
+            leaf("a", "AAAA", 4),
+            joined("inner", vec![
+                leaf("b", "CCCC", 4),
+                leaf("c", "GGGG", 4),
+            ]),
+        ]);
+        let leaves = parent.get_leaves();
+        assert_eq!(leaves.len(), 3);
+        assert_eq!(leaves[0].region_id, "a");
+        assert_eq!(leaves[1].region_id, "b");
+        assert_eq!(leaves[2].region_id, "c");
+    }
+
+    #[test]
+    fn test_get_leaves_with_region_id() {
+        let parent = joined("parent", vec![
+            leaf("a", "AAAA", 4),
+            joined("inner", vec![
+                leaf("b", "CCCC", 4),
+                leaf("c", "GGGG", 4),
+            ]),
+        ]);
+        // Stops at "inner" and includes it instead of descending
+        let leaves = parent.get_leaves_with_region_id("inner");
+        assert_eq!(leaves.len(), 2);
+        assert_eq!(leaves[0].region_id, "a");
+        assert_eq!(leaves[1].region_id, "inner");
+    }
+
+    #[test]
+    fn test_get_leaf_region_types() {
+        let parent = joined("parent", vec![
+            leaf("a", "AAAA", 4), // barcode
+            Region::new(
+                "u".into(), "umi".into(), "u".into(), "random".into(),
+                "".into(), 10, 10, None, vec![],
+            ),
+            leaf("b", "CCCC", 4), // barcode
+        ]);
+        let types = parent.get_leaf_region_types();
+        assert_eq!(types, vec!["barcode", "umi"]);
+    }
+
+    // ---- Newick ----
+
+    #[test]
+    fn test_to_newick_leaf() {
+        let r = Region::new(
+            "bc".into(), "barcode".into(), "bc".into(), "fixed".into(),
+            "ATCG".into(), 4, 4, None, vec![],
+        );
+        assert_eq!(r.to_newick(), "'bc:4'");
+    }
+
+    #[test]
+    fn test_to_newick_nested() {
+        let parent = joined("parent", vec![
+            leaf("a", "AAAA", 4),
+            leaf("b", "CCCC", 4),
+        ]);
+        assert_eq!(parent.to_newick(), "('a:4','b:4')parent");
+    }
+
+    // ---- Mutations ----
+
+    #[test]
+    fn test_reverse_leaf() {
+        let mut r = leaf("bc", "ATCG", 4);
+        r.reverse();
+        assert_eq!(r.sequence, "GCTA");
+    }
+
+    #[test]
+    fn test_reverse_nested() {
+        let mut parent = joined("parent", vec![
+            leaf("a", "ATCG", 4),
+            leaf("b", "GGCC", 4),
+        ]);
+        parent.reverse();
+        assert_eq!(parent.regions[0].sequence, "GCTA");
+        assert_eq!(parent.regions[1].sequence, "CCGG");
+    }
+
+    #[test]
+    fn test_complement_leaf() {
+        let mut r = leaf("bc", "ATCG", 4);
+        r.complement();
+        assert_eq!(r.sequence, "TAGC");
+    }
+
+    #[test]
+    fn test_complement_nested() {
+        let mut parent = joined("parent", vec![
+            leaf("a", "ATCG", 4),
+            leaf("b", "AAAA", 4),
+        ]);
+        parent.complement();
+        assert_eq!(parent.regions[0].sequence, "TAGC");
+        assert_eq!(parent.regions[1].sequence, "TTTT");
+    }
+
+    #[test]
+    fn test_update_region() {
+        let mut r = leaf("old", "ATCG", 4);
+        r.update_region(
+            "new".into(), "umi".into(), "New Name".into(),
+            "random".into(), "XXXX".into(), 4, 4, None,
+        );
+        assert_eq!(r.region_id, "new");
+        assert_eq!(r.region_type, "umi");
+        assert_eq!(r.name, "New Name");
+        assert_eq!(r.sequence_type, "random");
+        assert_eq!(r.sequence, "XXXX");
+    }
+
+    #[test]
+    fn test_update_region_by_id() {
+        let mut parent = joined("parent", vec![
+            leaf("target", "ATCG", 4),
+            leaf("other", "GGGG", 4),
+        ]);
+        parent.update_region_by_id(
+            "target".into(),
+            None, None, Some("Updated Name".into()),
+            None, Some("CCCC".into()), None, None,
+        );
+        assert_eq!(parent.regions[0].region_id, "target"); // unchanged
+        assert_eq!(parent.regions[0].name, "Updated Name");
+        assert_eq!(parent.regions[0].sequence, "CCCC");
+    }
+
+    #[test]
+    fn test_update_region_by_id_none_keeps_original() {
+        let mut r = leaf("bc", "ATCG", 4);
+        r.update_region_by_id(
+            "bc".into(), None, None, None, None, None, None, None,
+        );
+        assert_eq!(r.region_id, "bc");
+        assert_eq!(r.name, "bc");
+        assert_eq!(r.sequence, "ATCG");
+    }
+
+    #[test]
+    fn test_region_repr() {
+        let r = Region::new(
+            "bc".into(), "barcode".into(), "bc".into(), "fixed".into(),
+            "ATCG".into(), 16, 16, None, vec![],
+        );
+        assert_eq!(r.repr(), "barcode(16, 16)");
+    }
+
+    #[test]
+    fn test_region_json_roundtrip() {
+        let r = leaf("bc", "ATCG", 4);
+        let json = r.to_json().unwrap();
+        let r2 = Region::from_json(&json).unwrap();
+        assert_eq!(r, r2);
+    }
+
+    // ---- RegionCoordinate ----
+
+    #[test]
+    fn test_region_coordinate_creation() {
+        let r = leaf("bc", "ATCG", 4);
+        let rc = RegionCoordinate::new(r.clone(), 0, 4);
+        assert_eq!(rc.start, 0);
+        assert_eq!(rc.stop, 4);
+        assert_eq!(rc.region.region_id, "bc");
+    }
+
+    #[test]
+    fn test_region_coordinate_repr() {
+        let r = leaf("bc", "ATCG", 4);
+        let rc = RegionCoordinate::new(r, 10, 20);
+        assert_eq!(rc.repr(), "barcode(10, 20)");
+    }
+
+    #[test]
+    fn test_region_coordinate_difference_gap() {
+        let r1 = leaf("a", "AAAA", 4);
+        let r2 = leaf("b", "CCCC", 4);
+        let rc1 = RegionCoordinate::new(r1, 0, 4);
+        let rc2 = RegionCoordinate::new(r2, 10, 14);
+
+        let diff = rc1.difference(&rc2).unwrap();
+        assert_eq!(diff.start, 4);
+        assert_eq!(diff.stop, 10);
+        assert_eq!(diff.region.region_type, "difference");
+        assert_eq!(diff.region.sequence, "XXXXXX");
+    }
+
+    #[test]
+    fn test_region_coordinate_difference_identical() {
+        let r1 = leaf("a", "AAAA", 4);
+        let r2 = leaf("b", "CCCC", 4);
+        let rc1 = RegionCoordinate::new(r1, 5, 10);
+        let rc2 = RegionCoordinate::new(r2, 5, 10);
+
+        let diff = rc1.difference(&rc2).unwrap();
+        assert_eq!(diff.start, 5);
+        assert_eq!(diff.stop, 10);
+    }
+
+    #[test]
+    fn test_region_coordinate_difference_overlap_returns_none() {
+        let r1 = leaf("a", "AAAA", 4);
+        let r2 = leaf("b", "CCCC", 4);
+        let rc1 = RegionCoordinate::new(r1, 0, 10);
+        let rc2 = RegionCoordinate::new(r2, 5, 15);
+
+        assert!(rc1.difference(&rc2).is_none());
+    }
+
+    #[test]
+    fn test_region_coordinate_difference_loc() {
+        let r1 = leaf("a", "AAAA", 4);
+        let r2 = leaf("b", "CCCC", 4);
+        let r3 = leaf("d", "XXXX", 4);
+
+        let obj = RegionCoordinate::new(r1.clone(), 0, 4);
+        let fixed = RegionCoordinate::new(r2, 10, 14);
+        let rgncdiff = RegionCoordinate::new(r3, 4, 10);
+
+        let diff = RegionCoordinateDifference::new(obj, fixed.clone(), rgncdiff);
+        assert_eq!(diff.loc, "-"); // obj.stop <= fixed.start
+
+        let obj2 = RegionCoordinate::new(r1, 20, 24);
+        let r4 = leaf("e", "YYYY", 4);
+        let rgncdiff2 = RegionCoordinate::new(r4, 14, 20);
+        let diff2 = RegionCoordinateDifference::new(obj2, fixed, rgncdiff2);
+        assert_eq!(diff2.loc, "+"); // obj.start >= fixed.stop
+    }
+
+    // ---- Real spec tests ----
+
+    #[test]
+    fn test_get_sequence_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let seq = rna_lib.get_sequence();
+        assert!(!seq.is_empty());
+    }
+
+    #[test]
+    fn test_get_len_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let (mn, mx) = rna_lib.get_len();
+        assert!(mn > 0);
+        assert!(mx >= mn);
+    }
+
+    #[test]
+    fn test_get_region_by_id_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let found = rna_lib.get_region_by_id("rna_cell_bc");
+        assert!(!found.is_empty());
+        assert_eq!(found[0].region_id, "rna_cell_bc");
+    }
+
+    #[test]
+    fn test_get_region_by_type_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let barcodes = rna_lib.get_region_by_region_type("barcode");
+        assert!(!barcodes.is_empty());
+    }
+
+    #[test]
+    fn test_get_onlist_regions_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let onlists = rna_lib.get_onlist_regions();
+        assert!(!onlists.is_empty());
+    }
+
+    #[test]
+    fn test_get_leaves_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let leaves = rna_lib.get_leaves();
+        assert!(leaves.len() >= 2); // at minimum barcode + umi + cdna
+    }
+
+    #[test]
+    fn test_get_leaf_region_types_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let types = rna_lib.get_leaf_region_types();
+        assert!(!types.is_empty());
+        // Should contain common RNA region types
+        let has_barcode = types.iter().any(|t| t == "barcode");
+        let has_umi = types.iter().any(|t| t == "umi");
+        assert!(has_barcode || has_umi);
+    }
+
+    #[test]
+    fn test_to_newick_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let newick = rna_lib.to_newick();
+        assert!(newick.contains("rna"));
+        assert!(newick.contains("("));
+    }
+}

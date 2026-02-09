@@ -158,3 +158,219 @@ pub fn itx_read(region_coordinates: Vec<RegionCoordinate>, read_start: i64, read
     }
     new_rcs
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::models::region::Region;
+    use std::path::PathBuf;
+
+    fn dogma_spec() -> Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    fn leaf(id: &str, len: i64) -> Region {
+        Region::new(
+            id.into(), "barcode".into(), id.into(), "fixed".into(),
+            "A".repeat(len as usize), len, len, None, vec![],
+        )
+    }
+
+    // ---- complement ----
+
+    #[test]
+    fn test_complement_base_standard() {
+        assert_eq!(complement_base('A'), 'T');
+        assert_eq!(complement_base('T'), 'A');
+        assert_eq!(complement_base('C'), 'G');
+        assert_eq!(complement_base('G'), 'C');
+    }
+
+    #[test]
+    fn test_complement_base_iupac() {
+        assert_eq!(complement_base('R'), 'Y');
+        assert_eq!(complement_base('Y'), 'R');
+        assert_eq!(complement_base('S'), 'S');
+        assert_eq!(complement_base('W'), 'W');
+        assert_eq!(complement_base('K'), 'M');
+        assert_eq!(complement_base('M'), 'K');
+        assert_eq!(complement_base('B'), 'V');
+        assert_eq!(complement_base('V'), 'B');
+        assert_eq!(complement_base('D'), 'H');
+        assert_eq!(complement_base('H'), 'D');
+        assert_eq!(complement_base('N'), 'N');
+        assert_eq!(complement_base('X'), 'X');
+    }
+
+    #[test]
+    fn test_complement_base_unknown() {
+        assert_eq!(complement_base('Z'), 'N');
+        assert_eq!(complement_base('?'), 'N');
+    }
+
+    #[test]
+    fn test_complement_seq() {
+        assert_eq!(complement_seq("ATCG"), "TAGC");
+        assert_eq!(complement_seq("AAAA"), "TTTT");
+        assert_eq!(complement_seq(""), "");
+    }
+
+    #[test]
+    fn test_complement_seq_lowercase() {
+        assert_eq!(complement_seq("atcg"), "TAGC");
+        assert_eq!(complement_seq("AaTt"), "TTAA");
+    }
+
+    // ---- load_spec ----
+
+    #[test]
+    fn test_load_spec() {
+        let spec = dogma_spec();
+        assert_eq!(spec.assay_id, "DOGMAseq-DIG");
+        assert!(!spec.modalities.is_empty());
+        assert!(!spec.sequence_spec.is_empty());
+        assert!(!spec.library_spec.is_empty());
+    }
+
+    // ---- map_read_id_to_regions ----
+
+    #[test]
+    fn test_map_read_id_to_regions_pos() {
+        let spec = dogma_spec();
+        // Find a positive-strand RNA read
+        let rna_reads = spec.get_seqspec("rna");
+        let pos_read = rna_reads.iter().find(|r| r.strand == "pos");
+        if let Some(read) = pos_read {
+            let result = map_read_id_to_regions(&spec, "rna", &read.read_id);
+            assert!(result.is_ok());
+            let (r, regions) = result.unwrap();
+            assert_eq!(r.read_id, read.read_id);
+            assert!(!regions.is_empty());
+        }
+    }
+
+    #[test]
+    fn test_map_read_id_to_regions_neg() {
+        let spec = dogma_spec();
+        // Find a negative-strand read (if any)
+        let all_reads = &spec.sequence_spec;
+        let neg_read = all_reads.iter().find(|r| r.strand == "neg");
+        if let Some(read) = neg_read {
+            let result = map_read_id_to_regions(&spec, &read.modality, &read.read_id);
+            assert!(result.is_ok());
+            let (r, regions) = result.unwrap();
+            assert_eq!(r.strand, "neg");
+            assert!(!regions.is_empty());
+        }
+    }
+
+    #[test]
+    fn test_map_read_id_to_regions_invalid_read() {
+        let spec = dogma_spec();
+        let result = map_read_id_to_regions(&spec, "rna", "nonexistent_read");
+        assert!(result.is_err());
+        assert!(result.unwrap_err().contains("not found"));
+    }
+
+    #[test]
+    fn test_map_read_id_to_regions_invalid_modality() {
+        let spec = dogma_spec();
+        let rna_reads = spec.get_seqspec("rna");
+        if !rna_reads.is_empty() {
+            let result = map_read_id_to_regions(&spec, "nonexistent", &rna_reads[0].read_id);
+            assert!(result.is_err());
+        }
+    }
+
+    // ---- project_regions_to_coordinates ----
+
+    #[test]
+    fn test_project_regions_to_coordinates() {
+        let regions = vec![
+            leaf("a", 10),
+            leaf("b", 20),
+            leaf("c", 5),
+        ];
+        let coords = project_regions_to_coordinates(regions);
+        assert_eq!(coords.len(), 3);
+        assert_eq!(coords[0].start, 0);
+        assert_eq!(coords[0].stop, 10);
+        assert_eq!(coords[1].start, 10);
+        assert_eq!(coords[1].stop, 30);
+        assert_eq!(coords[2].start, 30);
+        assert_eq!(coords[2].stop, 35);
+    }
+
+    // ---- itx_read ----
+
+    #[test]
+    fn test_itx_read() {
+        let regions = vec![
+            leaf("a", 10),
+            leaf("b", 20),
+            leaf("c", 5),
+        ];
+        let coords = project_regions_to_coordinates(regions);
+
+        // Read window [5, 25) — should trim a and b, exclude c
+        let result = itx_read(coords, 5, 25);
+        assert_eq!(result.len(), 2);
+        assert_eq!(result[0].start, 5);
+        assert_eq!(result[0].stop, 10);
+        assert_eq!(result[1].start, 10);
+        assert_eq!(result[1].stop, 25);
+    }
+
+    #[test]
+    fn test_itx_read_no_overlap() {
+        let regions = vec![leaf("a", 10)];
+        let coords = project_regions_to_coordinates(regions);
+        let result = itx_read(coords, 20, 30);
+        assert!(result.is_empty());
+    }
+
+    #[test]
+    fn test_itx_read_full_overlap() {
+        let regions = vec![leaf("a", 10)];
+        let coords = project_regions_to_coordinates(regions);
+        let result = itx_read(coords, 0, 100);
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].start, 0);
+        assert_eq!(result[0].stop, 10);
+    }
+
+    // ---- read_local_list ----
+
+    #[test]
+    fn test_read_local_list_plain() {
+        let path = PathBuf::from("tests/fixtures/onlist_joined.txt");
+        let result = read_local_list(&path).unwrap();
+        assert!(!result.is_empty());
+        // Each line should be a barcode (non-empty)
+        for line in &result {
+            assert!(!line.is_empty());
+        }
+    }
+
+    #[test]
+    fn test_read_local_list_gz() {
+        let path = PathBuf::from("tests/fixtures/RNA-737K-arc-v1.txt.gz");
+        let result = read_local_list(&path).unwrap();
+        assert!(!result.is_empty());
+    }
+
+    #[test]
+    fn test_read_local_list_gz_fallback() {
+        // Try path without .gz extension — read_local_list should find the .gz variant
+        let path = PathBuf::from("tests/fixtures/RNA-737K-arc-v1.txt");
+        let result = read_local_list(&path).unwrap();
+        assert!(!result.is_empty());
+    }
+
+    #[test]
+    fn test_read_local_list_not_found() {
+        let path = PathBuf::from("tests/fixtures/nonexistent.txt");
+        let result = read_local_list(&path);
+        assert!(result.is_err());
+    }
+}

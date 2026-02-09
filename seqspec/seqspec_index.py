@@ -444,7 +444,9 @@ def format_starsolo(indices: List[Coordinate], subregion_type=None) -> str:
     for idx, coord in enumerate(indices):
         for cut in coord.rcv:
             if cut.region_type.upper() == "BARCODE":
-                bcs.append(f"--soloCBstart {cut.start + 1} --soloCBlen {cut.stop}")
+                bcs.append(
+                    f"--soloCBstart {cut.start + 1} --soloCBlen {cut.stop - cut.start}"
+                )
             elif cut.region_type.upper() == "UMI":
                 umi.append(
                     f"--soloUMIstart {cut.start + 1} --soloUMIlen {cut.stop - cut.start}"

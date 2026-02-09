@@ -55,7 +55,7 @@ pub fn run_modify(args: &ModifyArgs) {
 
     spec.update_spec();
 
-    let yaml = spec.to_bytes(crate::models::assay::Codec::Yaml).unwrap();
+    let yaml = spec.to_bytes().unwrap();
     if let Some(out) = &args.output {
         let mut f = fs::File::create(out).unwrap();
         f.write_all(&yaml).unwrap();
@@ -239,6 +239,76 @@ fn modify_assay(spec: &mut Assay, keys: &Vec<Value>) {
         if let Some(v) = vstr(patch, "description") { spec.description = v; }
         if let Some(v) = vstr(patch, "lib_struct") { spec.lib_struct = v; }
         if let Some(v) = vstr(patch, "assay_id") { spec.assay_id = v; }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::load_spec;
+    use serde_json::json;
+
+    fn dogma_spec() -> Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    #[test]
+    fn test_modify_read_name() {
+        let spec = dogma_spec();
+        let rna_reads = spec.get_seqspec("rna");
+        let read_id = rna_reads[0].read_id.clone();
+        let keys = vec![json!({"read_id": read_id, "name": "Updated Name"})];
+        let modified = seqspec_modify(spec, "rna", keys, "read");
+        let read = modified.get_read(&read_id).unwrap();
+        assert_eq!(read.name, "Updated Name");
+    }
+
+    #[test]
+    fn test_modify_region_name() {
+        let spec = dogma_spec();
+        let lib = spec.get_libspec("rna").unwrap();
+        let leaves = lib.get_leaves();
+        let target = &leaves[0];
+        let keys = vec![json!({"region_id": target.region_id, "name": "New Name"})];
+        let modified = seqspec_modify(spec, "rna", keys, "region");
+        let lib = modified.get_libspec("rna").unwrap();
+        let found = lib.get_region_by_id(&target.region_id);
+        assert!(!found.is_empty());
+        assert_eq!(found[0].name, "New Name");
+    }
+
+    #[test]
+    fn test_modify_file_url() {
+        let spec = dogma_spec();
+        let rna_reads = spec.get_seqspec("rna");
+        // Find a read with files
+        let read_with_files = rna_reads.iter().find(|r| !r.files.is_empty());
+        if let Some(rd) = read_with_files {
+            let file_id = rd.files[0].file_id.clone();
+            let keys = vec![json!({"file_id": file_id, "url": "http://new.url/file.fq.gz"})];
+            let modified = seqspec_modify(spec, "rna", keys, "file");
+            let updated_read = modified.get_read(&rd.read_id).unwrap();
+            let f = updated_read.files.iter().find(|f| f.file_id == file_id).unwrap();
+            assert_eq!(f.url, "http://new.url/file.fq.gz");
+        }
+    }
+
+    #[test]
+    fn test_modify_assay_fields() {
+        let spec = dogma_spec();
+        let assay_id = spec.assay_id.clone();
+        let keys = vec![json!({"assay_id": assay_id, "name": "New Assay Name", "description": "Updated desc"})];
+        let modified = seqspec_modify(spec, "rna", keys, "assay");
+        assert_eq!(modified.name, "New Assay Name");
+        assert_eq!(modified.description, "Updated desc");
+    }
+
+    #[test]
+    fn test_modify_unknown_selector() {
+        let spec = dogma_spec();
+        let keys = vec![json!({"id": "x"})];
+        let modified = seqspec_modify(spec.clone(), "rna", keys, "unknown");
+        assert_eq!(modified.assay_id, spec.assay_id);
     }
 }
 

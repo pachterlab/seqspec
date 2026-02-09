@@ -1,4 +1,4 @@
-use crate::models::assay::{Assay, Codec};
+use crate::models::assay::Assay;
 use crate::models::file::File;
 use crate::models::read::Read;
 use crate::models::region::Region;
@@ -68,7 +68,7 @@ pub fn run_insert(args: &InsertArgs) {
     }
 
     spec.update_spec();
-    let bytes = spec.to_bytes(Codec::Yaml).unwrap();
+    let bytes = spec.to_bytes().unwrap();
     if let Some(out) = &args.output {
         let mut f = fs::File::create(out).unwrap();
         f.write_all(&bytes).unwrap();

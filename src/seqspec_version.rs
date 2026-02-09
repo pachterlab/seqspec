@@ -68,3 +68,41 @@ pub fn format_version(v: &VersionInfo) -> String {
         v.tool_version, v.file_version
     )
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::load_spec;
+
+    fn dogma_spec() -> Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    #[test]
+    fn test_seqspec_version() {
+        let spec = dogma_spec();
+        let v = seqspec_version(&spec);
+        assert!(!v.tool_version.is_empty());
+        assert!(!v.file_version.is_empty());
+    }
+
+    #[test]
+    fn test_format_version_output() {
+        let v = VersionInfo {
+            tool_version: "1.0.0".into(),
+            file_version: "0.3.0".into(),
+        };
+        let out = format_version(&v);
+        assert!(out.contains("seqspec version: 1.0.0"));
+        assert!(out.contains("seqspec file version: 0.3.0"));
+    }
+
+    #[test]
+    fn test_version_roundtrip() {
+        let spec = dogma_spec();
+        let v = seqspec_version(&spec);
+        let out = format_version(&v);
+        assert!(out.contains(&v.tool_version));
+        assert!(out.contains(&v.file_version));
+    }
+}
