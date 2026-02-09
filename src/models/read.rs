@@ -164,11 +164,7 @@ mod tests {
     fn test_read_repr_pos() {
         let r = sample_read();
         let repr = r.repr();
-        assert!(repr.starts_with("+"));
-        assert!(repr.contains("test_read"));
-        assert!(repr.contains("test_primer"));
-        assert!(repr.contains("100"));
-        assert!(repr.contains("150"));
+        assert_eq!(repr, "+(100, 150)test_read:test_primer");
     }
 
     #[test]
@@ -176,7 +172,7 @@ mod tests {
         let mut r = sample_read();
         r.strand = "neg".into();
         let repr = r.repr();
-        assert!(repr.starts_with("-"));
+        assert_eq!(repr, "-(100, 150)test_read:test_primer");
     }
 
     #[test]
@@ -204,11 +200,17 @@ mod tests {
     fn test_read_real_spec_properties() {
         let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
         let rna_reads = spec.get_seqspec("rna");
-        assert!(!rna_reads.is_empty());
-        let r = &rna_reads[0];
-        assert_eq!(r.modality, "rna");
-        assert!(r.min_len > 0);
-        assert!(r.max_len >= r.min_len);
-        assert!(r.strand == "pos" || r.strand == "neg");
+        assert_eq!(rna_reads.len(), 2);
+        // rna_R1
+        assert_eq!(rna_reads[0].read_id, "rna_R1");
+        assert_eq!(rna_reads[0].modality, "rna");
+        assert_eq!(rna_reads[0].strand, "pos");
+        assert_eq!(rna_reads[0].min_len, 28);
+        assert_eq!(rna_reads[0].max_len, 28);
+        // rna_R2
+        assert_eq!(rna_reads[1].read_id, "rna_R2");
+        assert_eq!(rna_reads[1].strand, "neg");
+        assert_eq!(rna_reads[1].min_len, 102);
+        assert_eq!(rna_reads[1].max_len, 102);
     }
 }

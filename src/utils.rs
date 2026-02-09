@@ -227,9 +227,9 @@ mod tests {
     fn test_load_spec() {
         let spec = dogma_spec();
         assert_eq!(spec.assay_id, "DOGMAseq-DIG");
-        assert!(!spec.modalities.is_empty());
-        assert!(!spec.sequence_spec.is_empty());
-        assert!(!spec.library_spec.is_empty());
+        assert_eq!(spec.modalities.len(), 4);
+        assert_eq!(spec.sequence_spec.len(), 9); // 2 RNA + 3 ATAC + 2 Protein + 2 Tag
+        assert_eq!(spec.library_spec.len(), 4);
     }
 
     // ---- map_read_id_to_regions ----
@@ -237,31 +237,28 @@ mod tests {
     #[test]
     fn test_map_read_id_to_regions_pos() {
         let spec = dogma_spec();
-        // Find a positive-strand RNA read
-        let rna_reads = spec.get_seqspec("rna");
-        let pos_read = rna_reads.iter().find(|r| r.strand == "pos");
-        if let Some(read) = pos_read {
-            let result = map_read_id_to_regions(&spec, "rna", &read.read_id);
-            assert!(result.is_ok());
-            let (r, regions) = result.unwrap();
-            assert_eq!(r.read_id, read.read_id);
-            assert!(!regions.is_empty());
-        }
+        let result = map_read_id_to_regions(&spec, "rna", "rna_R1");
+        assert!(result.is_ok());
+        let (r, regions) = result.unwrap();
+        assert_eq!(r.read_id, "rna_R1");
+        assert_eq!(r.strand, "pos");
+        assert_eq!(regions.len(), 4);
+        let region_ids: Vec<&str> = regions.iter().map(|r| r.region_id.as_str()).collect();
+        assert_eq!(region_ids, vec!["rna_cell_bc", "rna_umi", "cdna", "rna_truseq_read2"]);
     }
 
     #[test]
     fn test_map_read_id_to_regions_neg() {
         let spec = dogma_spec();
-        // Find a negative-strand read (if any)
-        let all_reads = &spec.sequence_spec;
-        let neg_read = all_reads.iter().find(|r| r.strand == "neg");
-        if let Some(read) = neg_read {
-            let result = map_read_id_to_regions(&spec, &read.modality, &read.read_id);
-            assert!(result.is_ok());
-            let (r, regions) = result.unwrap();
-            assert_eq!(r.strand, "neg");
-            assert!(!regions.is_empty());
-        }
+        let result = map_read_id_to_regions(&spec, "rna", "rna_R2");
+        assert!(result.is_ok());
+        let (r, regions) = result.unwrap();
+        assert_eq!(r.read_id, "rna_R2");
+        assert_eq!(r.strand, "neg");
+        assert_eq!(regions.len(), 4);
+        // Negative strand reverses the region order
+        let region_ids: Vec<&str> = regions.iter().map(|r| r.region_id.as_str()).collect();
+        assert_eq!(region_ids, vec!["cdna", "rna_umi", "rna_cell_bc", "rna_truseq_read1"]);
     }
 
     #[test]
@@ -275,11 +272,8 @@ mod tests {
     #[test]
     fn test_map_read_id_to_regions_invalid_modality() {
         let spec = dogma_spec();
-        let rna_reads = spec.get_seqspec("rna");
-        if !rna_reads.is_empty() {
-            let result = map_read_id_to_regions(&spec, "nonexistent", &rna_reads[0].read_id);
-            assert!(result.is_err());
-        }
+        let result = map_read_id_to_regions(&spec, "nonexistent", "rna_R1");
+        assert!(result.is_err());
     }
 
     // ---- project_regions_to_coordinates ----
@@ -345,18 +339,15 @@ mod tests {
     fn test_read_local_list_plain() {
         let path = PathBuf::from("tests/fixtures/onlist_joined.txt");
         let result = read_local_list(&path).unwrap();
-        assert!(!result.is_empty());
-        // Each line should be a barcode (non-empty)
-        for line in &result {
-            assert!(!line.is_empty());
-        }
+        assert_eq!(result.len(), 736320);
+        assert_eq!(result[0], "AAACAGCCAAACAACA");
     }
 
     #[test]
     fn test_read_local_list_gz() {
         let path = PathBuf::from("tests/fixtures/RNA-737K-arc-v1.txt.gz");
         let result = read_local_list(&path).unwrap();
-        assert!(!result.is_empty());
+        assert_eq!(result.len(), 736320);
     }
 
     #[test]
@@ -364,7 +355,7 @@ mod tests {
         // Try path without .gz extension — read_local_list should find the .gz variant
         let path = PathBuf::from("tests/fixtures/RNA-737K-arc-v1.txt");
         let result = read_local_list(&path).unwrap();
-        assert!(!result.is_empty());
+        assert_eq!(result.len(), 736320);
     }
 
     #[test]

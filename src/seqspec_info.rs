@@ -258,11 +258,11 @@ mod tests {
         let spec = dogma_spec();
         let info = seqspec_info(&spec, "sequence_spec");
         if let InfoData::SequenceSpec(reads) = info {
-            assert!(!reads.is_empty());
-            // All reads should have a modality
-            for r in &reads {
-                assert!(!r.modality.is_empty());
-            }
+            assert_eq!(reads.len(), 9); // 2 RNA + 3 ATAC + 2 Protein + 2 Tag
+            let rna_reads: Vec<_> = reads.iter().filter(|r| r.modality == "rna").collect();
+            assert_eq!(rna_reads.len(), 2);
+            let atac_reads: Vec<_> = reads.iter().filter(|r| r.modality == "atac").collect();
+            assert_eq!(atac_reads.len(), 3);
         } else {
             panic!("Expected SequenceSpec variant");
         }
@@ -273,12 +273,9 @@ mod tests {
         let spec = dogma_spec();
         let info = seqspec_info(&spec, "library_spec");
         if let InfoData::LibrarySpec(map) = info {
-            assert!(map.contains_key("rna"));
-            assert!(map.contains_key("atac"));
-            // Each modality should have leaf regions
-            for (_mod_name, regions) in &map {
-                assert!(!regions.is_empty());
-            }
+            assert_eq!(map.len(), 4);
+            assert_eq!(map["rna"].len(), 5); // 5 RNA leaf regions
+            assert_eq!(map["rna"][0].region_id, "rna_truseq_read1");
         } else {
             panic!("Expected LibrarySpec variant");
         }
@@ -289,8 +286,12 @@ mod tests {
         let spec = dogma_spec();
         let info = seqspec_info(&spec, "modalities");
         let result = format_info(&spec, info, "modalities", "tab");
-        assert!(result.contains("rna"));
-        assert!(result.contains("\t"));
+        let parts: Vec<&str> = result.split('\t').collect();
+        assert_eq!(parts.len(), 4);
+        assert!(parts.contains(&"rna"));
+        assert!(parts.contains(&"atac"));
+        assert!(parts.contains(&"protein"));
+        assert!(parts.contains(&"tag"));
     }
 
     #[test]
@@ -308,8 +309,11 @@ mod tests {
         let spec = dogma_spec();
         let info = seqspec_info(&spec, "meta");
         let result = format_info(&spec, info, "meta", "tab");
-        assert!(result.contains("DOGMAseq-DIG"));
-        assert!(result.contains("\t"));
+        let parts: Vec<&str> = result.split('\t').collect();
+        // Tab format includes: version, assay_id, name, doi, date, description, lib_struct, ...
+        assert!(parts.len() >= 7);
+        assert!(parts.contains(&"DOGMAseq-DIG")); // assay_id
+        assert!(parts.contains(&"DOGMAseq-DIG")); // name too
     }
 
     #[test]
@@ -317,9 +321,15 @@ mod tests {
         let spec = dogma_spec();
         let info = seqspec_info(&spec, "sequence_spec");
         let result = format_info(&spec, info, "sequence_spec", "tab");
-        assert!(!result.is_empty());
-        assert!(result.contains("rna") || result.contains("atac"));
-        assert!(result.contains("\t"));
+        let lines: Vec<&str> = result.lines().collect();
+        assert_eq!(lines.len(), 9); // 9 reads total
+        // First line should be an RNA read
+        assert!(lines[0].starts_with("rna\t") || lines[0].starts_with("protein\t") || lines[0].starts_with("tag\t") || lines[0].starts_with("atac\t"));
+        // Check that rna and atac both appear
+        let rna_lines = lines.iter().filter(|l| l.starts_with("rna\t")).count();
+        assert_eq!(rna_lines, 2);
+        let atac_lines = lines.iter().filter(|l| l.starts_with("atac\t")).count();
+        assert_eq!(atac_lines, 3);
     }
 
     #[test]
@@ -328,8 +338,8 @@ mod tests {
         let info = seqspec_info(&spec, "sequence_spec");
         let result = format_info(&spec, info, "sequence_spec", "json");
         let parsed: Value = serde_json::from_str(&result).unwrap();
-        assert!(parsed.is_array());
-        assert!(!parsed.as_array().unwrap().is_empty());
+        let arr = parsed.as_array().unwrap();
+        assert_eq!(arr.len(), 9);
     }
 
     #[test]
@@ -337,8 +347,10 @@ mod tests {
         let spec = dogma_spec();
         let info = seqspec_info(&spec, "library_spec");
         let result = format_info(&spec, info, "library_spec", "tab");
-        assert!(!result.is_empty());
-        assert!(result.contains("\t"));
+        let lines: Vec<&str> = result.lines().collect();
+        // Count lines per modality
+        let rna_lines = lines.iter().filter(|l| l.starts_with("rna\t")).count();
+        assert_eq!(rna_lines, 5); // 5 RNA leaf regions
     }
 
     #[test]
@@ -347,8 +359,9 @@ mod tests {
         let info = seqspec_info(&spec, "library_spec");
         let result = format_info(&spec, info, "library_spec", "json");
         let parsed: Value = serde_json::from_str(&result).unwrap();
-        assert!(parsed.is_object());
-        assert!(parsed.as_object().unwrap().contains_key("rna"));
+        let obj = parsed.as_object().unwrap();
+        assert_eq!(obj.len(), 4);
+        assert_eq!(obj["rna"].as_array().unwrap().len(), 5);
     }
 
     #[test]
@@ -357,6 +370,7 @@ mod tests {
         let info = seqspec_info(&spec, "modalities");
         let result = format_info(&spec, info, "modalities", "json");
         let parsed: Value = serde_json::from_str(&result).unwrap();
-        assert!(parsed.is_array());
+        let arr = parsed.as_array().unwrap();
+        assert_eq!(arr.len(), 4);
     }
 }

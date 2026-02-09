@@ -158,10 +158,13 @@ mod tests {
     fn test_methods_output_rna() {
         let spec = dogma_spec();
         let text = seqspec_methods(&spec, "rna");
-        assert!(text.contains("Methods"));
-        assert!(text.contains("rna"));
+        assert!(text.starts_with("Methods\nThe rna portion of the DOGMAseq-DIG/Illumina assay"));
         assert!(text.contains("Libary structure"));
         assert!(text.contains("Sequence structure"));
+        // Should mention the 5 RNA leaf regions
+        assert!(text.contains("Cell Barcode"));
+        assert!(text.contains("umi"));
+        assert!(text.contains("cdna"));
     }
 
     #[test]
@@ -172,9 +175,7 @@ mod tests {
             16, 16, None, vec![],
         );
         let s = format_region(&region, 1);
-        assert!(s.contains("1. Cell Barcode"));
-        assert!(s.contains("16-16bp"));
-        assert!(s.contains("onlist"));
+        assert_eq!(s, "1. Cell Barcode: 16-16bp onlist sequence (NNNNNNNNNNNNNNNN).\n");
     }
 
     #[test]
@@ -189,7 +190,7 @@ mod tests {
             16, 16, Some(onlist), vec![],
         );
         let s = format_region(&region, 1);
-        assert!(s.contains("onlist file: barcodes.txt"));
+        assert_eq!(s, "1. Cell Barcode: 16-16bp onlist sequence (NNNNNNNNNNNNNNNN), onlist file: barcodes.txt.\n");
     }
 
     #[test]
@@ -199,10 +200,7 @@ mod tests {
             28, 28, "pos".into(), vec![],
         );
         let s = format_read(&read, 1);
-        assert!(s.contains("Read 1"));
-        assert!(s.contains("28 cycles"));
-        assert!(s.contains("positive strand"));
-        assert!(s.contains("truseq_read1"));
+        assert_eq!(s, "- Read 1: 28 cycles on the positive strand using the truseq_read1 primer. The following files contain the sequences in Read 1:\n");
     }
 
     #[test]
@@ -212,8 +210,7 @@ mod tests {
             1024, "reads_R1.fastq.gz".into(), "local".into(), "".into(),
         );
         let s = format_read_file(&f, 1);
-        assert!(s.contains("File 1"));
-        assert!(s.contains("reads_R1.fastq.gz"));
+        assert_eq!(s, "- File 1: reads_R1.fastq.gz\n");
     }
 
     #[test]

@@ -131,41 +131,38 @@ mod tests {
     fn test_find_by_region_type() {
         let spec = dogma_spec();
         let barcodes = find_by_region_type(&spec, "rna", "barcode");
-        assert!(!barcodes.is_empty());
-        for r in &barcodes {
-            assert_eq!(r.region_type, "barcode");
-        }
+        assert_eq!(barcodes.len(), 1);
+        assert_eq!(barcodes[0].region_id, "rna_cell_bc");
+        assert_eq!(barcodes[0].region_type, "barcode");
     }
 
     #[test]
     fn test_find_by_region_id() {
         let spec = dogma_spec();
         let found = find_by_region_id(&spec, "rna", "rna_cell_bc");
-        assert!(!found.is_empty());
+        assert_eq!(found.len(), 1);
         assert_eq!(found[0].region_id, "rna_cell_bc");
+        assert_eq!(found[0].min_len, 16);
     }
 
     #[test]
     fn test_find_by_read_id() {
         let spec = dogma_spec();
-        let rna_reads = spec.get_seqspec("rna");
-        assert!(!rna_reads.is_empty());
-        let read_id = &rna_reads[0].read_id;
-        let found = find_by_read_id(&spec, "rna", read_id);
+        let found = find_by_read_id(&spec, "rna", "rna_R1");
         assert_eq!(found.len(), 1);
-        assert_eq!(&found[0].read_id, read_id);
+        assert_eq!(found[0].read_id, "rna_R1");
+        assert_eq!(found[0].strand, "pos");
+        assert_eq!(found[0].max_len, 28);
     }
 
     #[test]
     fn test_find_by_file_id() {
         let spec = dogma_spec();
         let rna_reads = spec.get_seqspec("rna");
-        if let Some(read) = rna_reads.iter().find(|r| !r.files.is_empty()) {
-            let file_id = &read.files[0].file_id;
-            let found = find_by_file_id(&spec, "rna", file_id);
-            assert!(!found.is_empty());
-            assert_eq!(&found[0].file_id, file_id);
-        }
+        let file_id = &rna_reads[0].files[0].file_id;
+        let found = find_by_file_id(&spec, "rna", file_id);
+        assert_eq!(found.len(), 1);
+        assert_eq!(&found[0].file_id, file_id);
     }
 
     #[test]
@@ -183,17 +180,20 @@ mod tests {
         let spec = dogma_spec();
         let result = seqspec_find(&spec, "region-type", "rna", "barcode");
         match result {
-            FindResult::Regions(v) => assert!(!v.is_empty()),
+            FindResult::Regions(v) => {
+                assert_eq!(v.len(), 1);
+                assert_eq!(v[0].region_id, "rna_cell_bc");
+            },
             _ => panic!("Expected Regions variant"),
         }
 
-        let rna_reads = spec.get_seqspec("rna");
-        if !rna_reads.is_empty() {
-            let result = seqspec_find(&spec, "read", "rna", &rna_reads[0].read_id);
-            match result {
-                FindResult::Reads(v) => assert_eq!(v.len(), 1),
-                _ => panic!("Expected Reads variant"),
-            }
+        let result = seqspec_find(&spec, "read", "rna", "rna_R1");
+        match result {
+            FindResult::Reads(v) => {
+                assert_eq!(v.len(), 1);
+                assert_eq!(v[0].read_id, "rna_R1");
+            },
+            _ => panic!("Expected Reads variant"),
         }
     }
 }

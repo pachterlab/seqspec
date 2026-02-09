@@ -594,10 +594,12 @@ mod tests {
         let spec = dogma_spec();
         let modality = "rna".to_string();
         let indices = get_index_by_reads(&spec, &modality);
-        assert!(!indices.is_empty());
-        for coord in &indices {
-            assert!(!coord.rcv.is_empty());
-        }
+        assert_eq!(indices.len(), 2); // RNA has 2 reads: rna_R1, rna_R2
+        assert_eq!(indices[0].query_id, "rna_R1");
+        assert_eq!(indices[1].query_id, "rna_R2");
+        // R1 has barcode + UMI = 2 regions, R2 has cDNA = 1 region
+        assert_eq!(indices[0].rcv.len(), 2);
+        assert_eq!(indices[1].rcv.len(), 1);
     }
 
     #[test]
@@ -617,28 +619,29 @@ mod tests {
         let spec = dogma_spec();
         let modality = "rna".to_string();
         let indices = get_index_by_regions(&spec, &modality);
-        assert!(!indices.is_empty());
+        assert_eq!(indices.len(), 1);
+        assert_eq!(indices[0].query_id, "rna");
+        assert_eq!(indices[0].query_type, "Region");
+        // RNA library has 5 leaf regions
+        assert_eq!(indices[0].rcv.len(), 5);
     }
 
     #[test]
     fn test_format_tab() {
-        let spec = dogma_spec();
-        let modality = "rna".to_string();
-        let indices = get_index_by_reads(&spec, &modality);
+        let indices = rna_indices();
         let result = format_index(&indices, &"tab".to_string(), &None);
-        assert!(!result.is_empty());
-        // Tab format should contain tab separators
-        assert!(result.contains('\t'));
+        let lines: Vec<&str> = result.lines().collect();
+        assert_eq!(lines.len(), 3);
+        assert_eq!(lines[0], "rna_R1\tCell Barcode\tbarcode\t0\t16");
+        assert_eq!(lines[1], "rna_R1\tumi\tumi\t16\t28");
+        assert_eq!(lines[2], "rna_R2\tcdna\tcdna\t0\t102");
     }
 
     #[test]
     fn test_format_kb() {
-        let spec = dogma_spec();
-        let modality = "rna".to_string();
-        let indices = get_index_by_reads(&spec, &modality);
+        let indices = rna_indices();
         let result = format_index(&indices, &"kb".to_string(), &None);
-        // kb format produces comma-separated coordinate strings
-        assert!(!result.is_empty());
+        assert_eq!(result, "0,0,16:0,16,28:1,0,102");
     }
 
     #[test]
@@ -649,7 +652,9 @@ mod tests {
         let idtype = "read".to_string();
         let rev = false;
         let indices = seqspec_index(&spec, &modality, &ids, &idtype, &rev);
-        assert!(!indices.is_empty());
+        assert_eq!(indices.len(), 2);
+        assert_eq!(indices[0].query_id, "rna_R1");
+        assert_eq!(indices[1].query_id, "rna_R2");
     }
 
     // ---- Format function tests ----
@@ -663,38 +668,34 @@ mod tests {
     fn test_format_starsolo() {
         let indices = rna_indices();
         let result = format_index(&indices, &"starsolo".to_string(), &None);
-        // STARsolo format should contain --soloType or be empty if no barcode/UMI
-        if !result.is_empty() {
-            assert!(result.contains("--soloType") || result.contains("--solo"));
-        }
+        assert_eq!(
+            result,
+            "--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 12"
+        );
     }
 
     #[test]
     fn test_format_simpleaf() {
         let indices = rna_indices();
         let result = format_index(&indices, &"simpleaf".to_string(), &None);
-        assert!(!result.is_empty());
-        // simpleaf format uses {b[], u[], r[]} notation
-        assert!(result.contains("{") || result.contains("["));
+        assert_eq!(result, "1{b[16]u[12]x:}2{r[102]x:}");
     }
 
     #[test]
     fn test_format_zumis() {
         let indices = rna_indices();
         let result = format_index(&indices, &"zumis".to_string(), &None);
-        // zumis uses BCS(), UMI(), cDNA() format
-        if !result.is_empty() {
-            assert!(result.contains("BCS") || result.contains("UMI") || result.contains("cDNA"));
-        }
+        assert!(result.contains("BCS(1-16)"));
+        assert!(result.contains("UMI(17-28)"));
+        assert!(result.contains("cDNA(1-102)"));
     }
 
     #[test]
     fn test_format_kb_single() {
         let indices = rna_indices();
         let result = format_index(&indices, &"kb-single".to_string(), &None);
-        // kb-single format uses colon-separated sections like kb
-        assert!(!result.is_empty());
-        assert!(result.contains(":"));
+        // kb-single selects only the longest feature read
+        assert_eq!(result, "0,0,16:0,16,28:1,0,102");
     }
 
     #[test]

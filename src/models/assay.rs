@@ -441,8 +441,7 @@ mod tests {
     fn test_assay_repr() {
         let a = sample_assay();
         let repr = a.__repr__();
-        assert!(repr.contains("test_assay"));
-        assert!(repr.contains("rna"));
+        assert_eq!(repr, "Assay: test_assay  Modalities: [\"rna\"]");
     }
 
     // ---- Real spec tests ----
@@ -475,7 +474,9 @@ mod tests {
     fn test_dogma_get_seqspec_rna() {
         let spec = dogma_spec();
         let reads = spec.get_seqspec("rna");
-        assert!(!reads.is_empty());
+        assert_eq!(reads.len(), 2);
+        assert_eq!(reads[0].read_id, "rna_R1");
+        assert_eq!(reads[1].read_id, "rna_R2");
         for r in &reads {
             assert_eq!(r.modality, "rna");
         }

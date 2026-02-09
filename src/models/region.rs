@@ -778,7 +778,12 @@ mod tests {
         let spec = dogma_spec();
         let rna_lib = spec.get_libspec("rna").expect("rna modality");
         let seq = rna_lib.get_sequence();
-        assert!(!seq.is_empty());
+        assert_eq!(seq.len(), 197);
+        assert!(seq.starts_with("ACACTCTTTCCCTACACGACGCTCTTCCGATCT"));
+        assert!(seq.ends_with("AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"));
+        // middle contains N (barcode) and X (UMI/cDNA)
+        assert!(seq.contains('N'));
+        assert!(seq.contains('X'));
     }
 
     #[test]
@@ -786,8 +791,8 @@ mod tests {
         let spec = dogma_spec();
         let rna_lib = spec.get_libspec("rna").expect("rna modality");
         let (mn, mx) = rna_lib.get_len();
-        assert!(mn > 0);
-        assert!(mx >= mn);
+        assert_eq!(mn, 197);
+        assert_eq!(mx, 197);
     }
 
     #[test]
@@ -795,8 +800,12 @@ mod tests {
         let spec = dogma_spec();
         let rna_lib = spec.get_libspec("rna").expect("rna modality");
         let found = rna_lib.get_region_by_id("rna_cell_bc");
-        assert!(!found.is_empty());
+        assert_eq!(found.len(), 1);
         assert_eq!(found[0].region_id, "rna_cell_bc");
+        assert_eq!(found[0].region_type, "barcode");
+        assert_eq!(found[0].min_len, 16);
+        assert_eq!(found[0].max_len, 16);
+        assert_eq!(found[0].sequence, "NNNNNNNNNNNNNNNN");
     }
 
     #[test]
@@ -804,7 +813,8 @@ mod tests {
         let spec = dogma_spec();
         let rna_lib = spec.get_libspec("rna").expect("rna modality");
         let barcodes = rna_lib.get_region_by_region_type("barcode");
-        assert!(!barcodes.is_empty());
+        assert_eq!(barcodes.len(), 1);
+        assert_eq!(barcodes[0].region_id, "rna_cell_bc");
     }
 
     #[test]
@@ -812,7 +822,8 @@ mod tests {
         let spec = dogma_spec();
         let rna_lib = spec.get_libspec("rna").expect("rna modality");
         let onlists = rna_lib.get_onlist_regions();
-        assert!(!onlists.is_empty());
+        assert_eq!(onlists.len(), 1);
+        assert_eq!(onlists[0].region_id, "rna_cell_bc");
     }
 
     #[test]
@@ -820,7 +831,9 @@ mod tests {
         let spec = dogma_spec();
         let rna_lib = spec.get_libspec("rna").expect("rna modality");
         let leaves = rna_lib.get_leaves();
-        assert!(leaves.len() >= 2); // at minimum barcode + umi + cdna
+        assert_eq!(leaves.len(), 5);
+        let leaf_ids: Vec<&str> = leaves.iter().map(|l| l.region_id.as_str()).collect();
+        assert_eq!(leaf_ids, vec!["rna_truseq_read1", "rna_cell_bc", "rna_umi", "cdna", "rna_truseq_read2"]);
     }
 
     #[test]
@@ -828,11 +841,8 @@ mod tests {
         let spec = dogma_spec();
         let rna_lib = spec.get_libspec("rna").expect("rna modality");
         let types = rna_lib.get_leaf_region_types();
-        assert!(!types.is_empty());
-        // Should contain common RNA region types
-        let has_barcode = types.iter().any(|t| t == "barcode");
-        let has_umi = types.iter().any(|t| t == "umi");
-        assert!(has_barcode || has_umi);
+        // Returns sorted via BTreeSet
+        assert_eq!(types, vec!["barcode", "cdna", "truseq_read1", "truseq_read2", "umi"]);
     }
 
     #[test]
@@ -840,7 +850,69 @@ mod tests {
         let spec = dogma_spec();
         let rna_lib = spec.get_libspec("rna").expect("rna modality");
         let newick = rna_lib.to_newick();
-        assert!(newick.contains("rna"));
-        assert!(newick.contains("("));
+        assert_eq!(
+            newick,
+            "('rna_truseq_read1:33','rna_cell_bc:16','rna_umi:12','cdna:102','rna_truseq_read2:34')rna"
+        );
+    }
+
+    #[test]
+    fn test_update_attr_real_spec() {
+        let spec = dogma_spec();
+        let mut rna_lib = spec.get_libspec("rna").expect("rna modality").clone();
+        let (mn_before, mx_before) = rna_lib.get_len();
+        rna_lib.update_attr();
+        // After update_attr, min/max should match computed values
+        assert_eq!(rna_lib.min_len, mn_before);
+        assert_eq!(rna_lib.max_len, mx_before);
+        assert_eq!(rna_lib.min_len, 197);
+        assert_eq!(rna_lib.max_len, 197);
+        assert_eq!(rna_lib.sequence_type, "joined");
+    }
+
+    #[test]
+    fn test_reverse_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        // Get a leaf with a known sequence
+        let read1 = rna_lib.get_region_by_id("rna_truseq_read1");
+        assert_eq!(read1.len(), 1);
+        let mut r = read1[0].clone();
+        let orig_seq = r.sequence.clone();
+        assert_eq!(orig_seq, "ACACTCTTTCCCTACACGACGCTCTTCCGATCT");
+        r.reverse();
+        let expected: String = orig_seq.chars().rev().collect();
+        assert_eq!(r.sequence, expected);
+        assert_eq!(r.sequence, "TCTAGCCTTCTCGCAGCACATCCCTTTCTCACA");
+    }
+
+    #[test]
+    fn test_complement_real_spec() {
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let read1 = rna_lib.get_region_by_id("rna_truseq_read1");
+        assert_eq!(read1.len(), 1);
+        let mut r = read1[0].clone();
+        assert_eq!(r.sequence, "ACACTCTTTCCCTACACGACGCTCTTCCGATCT");
+        r.complement();
+        assert_eq!(r.sequence, "TGTGAGAAAGGGATGTGCTGCGAGAAGGCTAGA");
+    }
+
+    #[test]
+    fn test_reverse_complement_barcode() {
+        // Barcode with all N's: reverse and complement should both be N's
+        let spec = dogma_spec();
+        let rna_lib = spec.get_libspec("rna").expect("rna modality");
+        let bc = rna_lib.get_region_by_id("rna_cell_bc");
+        assert_eq!(bc.len(), 1);
+
+        let mut r = bc[0].clone();
+        assert_eq!(r.sequence, "NNNNNNNNNNNNNNNN");
+        r.reverse();
+        assert_eq!(r.sequence, "NNNNNNNNNNNNNNNN");
+
+        let mut r2 = bc[0].clone();
+        r2.complement();
+        assert_eq!(r2.sequence, "NNNNNNNNNNNNNNNN");
     }
 }

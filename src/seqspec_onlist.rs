@@ -240,32 +240,27 @@ mod tests {
     fn test_get_onlists_by_region_type() {
         let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
         let onlists = get_onlists(&spec, "rna", "region-type", Some("barcode"));
-        // RNA modality should have barcode regions with onlists
-        assert!(!onlists.is_empty());
+        assert_eq!(onlists.len(), 1);
+        assert_eq!(onlists[0].filename, "RNA-737K-arc-v1.txt");
     }
 
     #[test]
     fn test_get_onlists_by_region() {
         let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
-        // Find a region that has an onlist
-        let lib = spec.get_libspec("rna").unwrap();
-        let onlist_regions = lib.get_onlist_regions();
-        if let Some(r) = onlist_regions.first() {
-            let onlists = get_onlists(&spec, "rna", "region", Some(&r.region_id));
-            assert!(!onlists.is_empty());
-        }
+        let onlists = get_onlists(&spec, "rna", "region", Some("rna_cell_bc"));
+        assert_eq!(onlists.len(), 1);
+        assert_eq!(onlists[0].filename, "RNA-737K-arc-v1.txt");
     }
 
     #[test]
     fn test_get_onlists_by_read() {
         let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
         let rna_reads = spec.get_seqspec("rna");
-        if !rna_reads.is_empty() {
-            let onlists = get_onlists(&spec, "rna", "read", Some(&rna_reads[0].read_id));
-            // May or may not have onlists depending on read
-            // Just verify it doesn't panic
-            let _ = onlists;
-        }
+        assert_eq!(rna_reads.len(), 2);
+        // rna_R1 maps to regions including rna_cell_bc which has an onlist
+        let onlists = get_onlists(&spec, "rna", "read", Some(&rna_reads[0].read_id));
+        assert_eq!(onlists.len(), 1);
+        assert_eq!(onlists[0].filename, "RNA-737K-arc-v1.txt");
     }
 
     #[test]

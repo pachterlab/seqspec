@@ -129,3 +129,62 @@ fn upgrade_0_2_0_to_0_4_0(spec: Assay) -> Assay {
     spec.seqspec_version = Some("0.4.0".to_string());
     spec
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::load_spec;
+    use std::path::PathBuf;
+
+    fn dogma_spec() -> Assay {
+        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    #[test]
+    fn test_upgrade_0_4_0_is_idempotent() {
+        let spec = dogma_spec();
+        let orig_version = spec.seqspec_version.clone();
+        let upgraded = seqspec_upgrade(spec.clone(), "0.4.0");
+        assert_eq!(upgraded.seqspec_version, orig_version);
+        assert_eq!(upgraded.modalities, spec.modalities);
+        assert_eq!(upgraded.sequence_spec.len(), spec.sequence_spec.len());
+    }
+
+    #[test]
+    fn test_upgrade_0_3_0_sets_version() {
+        let mut spec = dogma_spec();
+        spec.seqspec_version = Some("0.3.0".to_string());
+        let upgraded = seqspec_upgrade(spec, "0.3.0");
+        assert_eq!(upgraded.seqspec_version, Some("0.4.0".to_string()));
+    }
+
+    #[test]
+    fn test_upgrade_0_2_0_adds_files_to_reads() {
+        let mut spec = dogma_spec();
+        // Remove files from a read to simulate 0.2.0
+        spec.sequence_spec[0].files.clear();
+        assert!(spec.sequence_spec[0].files.is_empty());
+        let upgraded = upgrade_0_2_0_to_0_4_0(spec);
+        // After upgrade, the read should have a placeholder file
+        assert!(!upgraded.sequence_spec[0].files.is_empty());
+        assert_eq!(upgraded.sequence_spec[0].files[0].file_id, upgraded.sequence_spec[0].read_id);
+    }
+
+    #[test]
+    fn test_upgrade_0_2_0_preserves_existing_files() {
+        let spec = dogma_spec();
+        let orig_files_len = spec.sequence_spec[0].files.len();
+        assert!(orig_files_len > 0);
+        let upgraded = upgrade_0_2_0_to_0_4_0(spec);
+        // Reads that already had files should keep them unchanged
+        assert_eq!(upgraded.sequence_spec[0].files.len(), orig_files_len);
+    }
+
+    #[test]
+    fn test_upgrade_sets_version_0_4_0() {
+        let mut spec = dogma_spec();
+        spec.seqspec_version = Some("0.2.0".to_string());
+        let upgraded = seqspec_upgrade(spec, "0.2.0");
+        assert_eq!(upgraded.seqspec_version, Some("0.4.0".to_string()));
+    }
+}

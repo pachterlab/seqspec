@@ -581,13 +581,20 @@ mod tests {
         let spec = dogma_spec();
         let spec_path = PathBuf::from("tests/fixtures/spec.yaml");
         let errors = seqspec_check(&spec, None, &spec_path);
-        // DOGMAseq-dig is a well-formed spec; expect few or no errors
-        // (some checks may flag missing local files, which is acceptable)
+        // DOGMAseq-DIG is well-formed; only file-existence errors expected
         for e in &errors {
-            // Ensure error structure is well-formed
-            assert!(!e.error_type.is_empty());
-            assert!(!e.error_message.is_empty());
+            assert!(
+                e.error_type == "check_onlist_files_exist" || e.error_type == "check_read_files_exist",
+                "Unexpected error type: {} - {}",
+                e.error_type,
+                e.error_message,
+            );
         }
+        // No structural/validation errors
+        let structural_errors: Vec<_> = errors.iter()
+            .filter(|e| e.error_type != "check_onlist_files_exist" && e.error_type != "check_read_files_exist")
+            .collect();
+        assert!(structural_errors.is_empty());
     }
 
     #[test]
