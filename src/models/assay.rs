@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::io::{Error, ErrorKind};
 
 use crate::models::file::File;
 use crate::models::read::Read;
@@ -87,10 +88,13 @@ impl Assay {
     }
 
     pub fn to_bytes(&self) -> Result<Vec<u8>,  std::io::Error> {
-        Ok(serde_yaml::to_string(self).unwrap().into_bytes())
+        serde_yaml::to_string(self)
+            .map(|s| s.into_bytes())
+            .map_err(|e| Error::new(ErrorKind::InvalidData, format!("failed to serialize assay: {e}")))
     }
     pub fn from_bytes(bytes: &[u8]) -> Result<Self,  std::io::Error> {
-        Ok(serde_yaml::from_slice(bytes).unwrap())
+        serde_yaml::from_slice(bytes)
+            .map_err(|e| Error::new(ErrorKind::InvalidData, format!("failed to parse assay YAML: {e}")))
     }
 
     // Core helpers ----------------------------------------------------
@@ -209,7 +213,7 @@ impl Assay {
 
     pub fn get_read_by_group_id(&self, modality: &str, group_id: usize) -> Option<String> {
         let reads = self.get_seqspec(modality);
-        let n_files = Self::file_count(&reads)?;
+        let _n_files = Self::file_count(&reads)?;
         if reads.is_empty() {
             return None;
         }
@@ -219,7 +223,7 @@ impl Assay {
 
     pub fn get_files_by_group_id(&self, modality: &str, group_id: usize) -> Option<Vec<File>> {
         let reads = self.get_seqspec(modality);
-        let n_files = Self::file_count(&reads)?;
+        let _n_files = Self::file_count(&reads)?;
         if reads.is_empty() {
             return None;
         }

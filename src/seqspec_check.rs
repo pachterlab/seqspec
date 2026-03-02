@@ -19,7 +19,7 @@ pub struct CheckArgs {
         help = "Skip checks",
         value_name = "SKIP",
         default_value = None,
-        value_parser = ["igvf", "igvf_onlist_skip"],
+        value_parser = ["igvf", "igvf_onlist_skip", "structural"],
     )]
     skip: Option<String>,
 
@@ -75,7 +75,32 @@ pub fn seqspec_check(spec: &Assay, filter_type: Option<&str>, spec_path: &Path) 
     errors
 }
 
+/// All error_type values produced by structural (non-filesystem) checks.
+const STRUCTURAL_CHECK_TYPES: &[&str] = &[
+    "check_unique_modalities",
+    "check_region_ids_modalities",
+    "check_unique_read_ids",
+    "check_unique_read_primer_strand_pairs",
+    "check_unique_region_ids",
+    "check_read_modalities",
+    "check_primer_ids_in_region_ids",
+    "check_sequence_types",
+    "check_region_lengths",
+    "check_sequence_lengths",
+    "check_read_file_count",
+    "check_region_against_subregion_length",
+    "check_region_against_subregion_sequence",
+    "check_read_length_against_library",
+];
+
 fn filter_errors(errors: Vec<ErrorObj>, filter_type: &str) -> Vec<ErrorObj> {
+    if filter_type == "structural" {
+        return errors
+            .into_iter()
+            .filter(|e| !STRUCTURAL_CHECK_TYPES.contains(&e.error_type.as_str()))
+            .collect();
+    }
+
     let igvf_filters = vec![
         ("check_schema", "'lib_struct'"),
         ("check_schema", "'library_protocol'"),
@@ -101,45 +126,54 @@ fn filter_errors(errors: Vec<ErrorObj>, filter_type: &str) -> Vec<ErrorObj> {
         .collect()
 }
 
+/// Run all structural (non-filesystem) checks on a seqspec.
+/// This excludes check_schema, check_onlist_files_exist, and check_read_files_exist
+/// which require filesystem access or CARGO_MANIFEST_DIR.
+pub fn seqspec_check_structural(spec: &Assay) -> Vec<ErrorObj> {
+    let errors: Vec<ErrorObj> = Vec::new();
+    let idx = 0usize;
+
+    macro_rules! run {
+        ($f:ident, $errors:expr) => {{
+            let (e2, _i2) = $f(spec, $errors, idx);
+            e2
+        }};
+    }
+
+    let errors = run!(check_unique_modalities, errors);
+    let errors = run!(check_region_ids_modalities, errors);
+    let errors = run!(check_unique_read_ids, errors);
+    let errors = run!(check_unique_read_primer_strand_pairs, errors);
+    let errors = run!(check_unique_region_ids, errors);
+    let errors = run!(check_read_modalities, errors);
+    let errors = run!(check_primer_ids_in_region_ids, errors);
+    let errors = run!(check_sequence_types, errors);
+    let errors = run!(check_region_lengths, errors);
+    let errors = run!(check_sequence_lengths, errors);
+    let errors = run!(check_read_file_count, errors);
+    let errors = run!(check_region_against_subregion_length, errors);
+    let errors = run!(check_region_against_subregion_sequence, errors);
+    let errors = run!(check_read_length_against_library, errors);
+    errors
+}
+
 fn check(spec: &Assay, spec_path: &Path) -> Vec<ErrorObj> {
     let errors: Vec<ErrorObj> = Vec::new();
     let idx = 0usize;
 
-    // check_schema (no-op placeholder for now)
+    // check_schema
     let (e, _i) = check_schema(spec, errors, idx);
     let mut errors = e;
 
-    macro_rules! run {
-        ($f:ident) => {
-            let (e2, _i2) = $f(spec, errors, idx);
-            errors = e2;
-        };
-        ($f:ident, $arg:expr) => {
-            let (e2, _i2) = $f(spec, errors, idx, $arg);
-            errors = e2;
-        };
-    }
+    // Structural checks
+    errors.extend(seqspec_check_structural(spec));
 
-    run!(check_unique_modalities);
-    run!(check_region_ids_modalities);
-    // pass spec base path
+    // Filesystem checks
     let spec_base = spec_path.parent().map(|p| p.to_path_buf());
     let (e_on, _i_on) = check_onlist_files_exist(spec, errors, idx, spec_base.as_ref());
     errors = e_on;
-    run!(check_unique_read_ids);
     let (e_rf, _i_rf) = check_read_files_exist(spec, errors, idx, spec_base.as_ref());
     errors = e_rf;
-    run!(check_unique_read_primer_strand_pairs);
-    run!(check_unique_region_ids);
-    run!(check_read_modalities);
-    run!(check_primer_ids_in_region_ids);
-    run!(check_sequence_types);
-    run!(check_region_lengths);
-    run!(check_sequence_lengths);
-    run!(check_read_file_count);
-    run!(check_region_against_subregion_length);
-    run!(check_region_against_subregion_sequence);
-    run!(check_read_length_against_library);
 
     errors
 }

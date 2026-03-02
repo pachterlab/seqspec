@@ -1,6 +1,6 @@
 pub mod models;
 
-pub use models::{file, region, read, onlist, assay};
+pub use models::{file, region, read, onlist, assay, coordinate};
 pub mod utils;
 pub mod seqspec_version;
 pub mod seqspec_format;
