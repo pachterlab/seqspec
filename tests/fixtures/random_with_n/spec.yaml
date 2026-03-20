@@ -1,0 +1,53 @@
+seqspec_version: 0.4.0
+assay_id: random-with-n
+name: Random With N Fixture
+doi: https://doi.org/10.0000/random-with-n
+date: 2026-03-20
+description: Minimal fixture that uses N in a random region sequence
+modalities:
+  - rna
+lib_struct: ""
+sequence_spec:
+  - read_id: I1
+    name: Index Read
+    modality: rna
+    primer_id: primer
+    min_len: 4
+    max_len: 4
+    strand: pos
+    files:
+      - file_id: I1.fastq
+        filename: I1.fastq
+        filetype: fastq
+        filesize: 0
+        url: fastqs/I1.fastq
+        urltype: local
+        md5: ""
+library_spec:
+  - region_id: rna
+    region_type: rna
+    name: RNA
+    sequence_type: joined
+    sequence: AAAANNNN
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+      - region_id: primer
+        region_type: truseq_read1
+        name: Primer
+        sequence_type: fixed
+        sequence: AAAA
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
+      - region_id: index7
+        region_type: index7
+        name: Index 7
+        sequence_type: random
+        sequence: NNNN
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
