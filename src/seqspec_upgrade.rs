@@ -19,7 +19,10 @@ pub struct UpgradeArgs {
 pub fn run_upgrade(args: &UpgradeArgs) {
     validate_upgrade_args(args);
     let spec = utils::load_spec(&args.yaml);
-    let version = spec.seqspec_version.clone().unwrap_or_else(|| "0.0.0".to_string());
+    let version = spec
+        .seqspec_version
+        .clone()
+        .unwrap_or_else(|| "0.0.0".to_string());
     let upgraded = seqspec_upgrade(spec, &version);
 
     let bytes = upgraded.to_bytes().unwrap();
@@ -113,7 +116,11 @@ fn upgrade_0_2_0_to_0_4_0(spec: Assay) -> Assay {
                 );
                 // We cannot directly set onlist via update_region_by_id, so re-find and set
                 // Traverse mutably to set onlist on matching leaf
-                fn set_onlist_mut(r: &mut crate::models::region::Region, id: &str, new_ol: &Onlist) {
+                fn set_onlist_mut(
+                    r: &mut crate::models::region::Region,
+                    id: &str,
+                    new_ol: &Onlist,
+                ) {
                     if r.region_id == id {
                         r.onlist = Some(new_ol.clone());
                         return;
@@ -167,7 +174,10 @@ mod tests {
         let upgraded = upgrade_0_2_0_to_0_4_0(spec);
         // After upgrade, the read should have a placeholder file
         assert!(!upgraded.sequence_spec[0].files.is_empty());
-        assert_eq!(upgraded.sequence_spec[0].files[0].file_id, upgraded.sequence_spec[0].read_id);
+        assert_eq!(
+            upgraded.sequence_spec[0].files[0].file_id,
+            upgraded.sequence_spec[0].read_id
+        );
     }
 
     #[test]
@@ -186,5 +196,31 @@ mod tests {
         spec.seqspec_version = Some("0.2.0".to_string());
         let upgraded = seqspec_upgrade(spec, "0.2.0");
         assert_eq!(upgraded.seqspec_version, Some("0.4.0".to_string()));
+    }
+
+    #[test]
+    fn test_upgrade_loaded_legacy_0_2_spec() {
+        let spec = load_spec(&PathBuf::from(
+            "tests/fixtures/legacy_0_2_missing_fields.yaml",
+        ));
+        assert!(spec.sequence_spec[0].files.is_empty());
+
+        let upgraded = seqspec_upgrade(spec, "0.2.0");
+        assert_eq!(upgraded.seqspec_version, Some("0.4.0".to_string()));
+        assert_eq!(upgraded.sequence_spec[0].files.len(), 1);
+        assert_eq!(
+            upgraded.sequence_spec[0].files[0].file_id,
+            upgraded.sequence_spec[0].read_id
+        );
+
+        let barcode = upgraded.library_spec[0]
+            .get_region_by_id("barcode")
+            .into_iter()
+            .next()
+            .expect("barcode region");
+        let onlist = barcode.onlist.expect("barcode onlist");
+        assert_eq!(onlist.file_id, "whitelist.txt.gz");
+        assert_eq!(onlist.filename, "whitelist.txt.gz");
+        assert_eq!(onlist.md5, "abc123");
     }
 }

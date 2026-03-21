@@ -1,3 +1,5 @@
+mod compat;
+
 pub mod models;
 
 pub use models::{file, region, read, onlist, assay, coordinate};

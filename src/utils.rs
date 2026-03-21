@@ -1,24 +1,38 @@
+use crate::compat::AssayCompat;
 use crate::models::assay::Assay;
 use crate::models::read::Read;
 use crate::models::region::{Region, RegionCoordinate};
 
-use serde_yaml;
-use reqwest;
 use flate2::read::GzDecoder;
-
+use reqwest;
+use serde_yaml;
 
 pub fn complement_base(c: char) -> char {
     match c {
-        'A' => 'T', 'T' => 'A', 'G' => 'C', 'C' => 'G',
-        'R' => 'Y', 'Y' => 'R', 'S' => 'S', 'W' => 'W',
-        'K' => 'M', 'M' => 'K', 'B' => 'V', 'D' => 'H',
-        'V' => 'B', 'H' => 'D', 'N' => 'N', 'X' => 'X',
+        'A' => 'T',
+        'T' => 'A',
+        'G' => 'C',
+        'C' => 'G',
+        'R' => 'Y',
+        'Y' => 'R',
+        'S' => 'S',
+        'W' => 'W',
+        'K' => 'M',
+        'M' => 'K',
+        'B' => 'V',
+        'D' => 'H',
+        'V' => 'B',
+        'H' => 'D',
+        'N' => 'N',
+        'X' => 'X',
         _ => 'N',
     }
 }
 
 pub fn complement_seq(s: &str) -> String {
-    s.chars().map(|c| complement_base(c.to_ascii_uppercase())).collect()
+    s.chars()
+        .map(|c| complement_base(c.to_ascii_uppercase()))
+        .collect()
 }
 
 // pub fn to_pydict<T: serde::Serialize>(py: Python<'_>, v: &T) -> Result<PyObject, serde_json::Error> {
@@ -26,52 +40,69 @@ pub fn complement_seq(s: &str) -> String {
 //     Ok(obj.into())
 // }
 
-
 pub fn load_spec(spec: &std::path::PathBuf) -> Assay {
     // read in the spec file
     let f: std::fs::File = std::fs::File::open(spec).expect("Could not open file.");
 
-    // convert it to an assay object
-    let spec: Assay = serde_yaml::from_reader(f).expect("Could not read values.");
+    // parse through a permissive compatibility layer, then normalize into Assay
+    let spec: AssayCompat = serde_yaml::from_reader(f).expect("Could not read values.");
 
-    return spec;
+    spec.into_assay()
 }
 
 /// Read a local text file into Vec<String>, handling optional .gz
 pub fn read_local_list(path: &std::path::Path) -> Result<Vec<String>, String> {
-    let p = if path.exists() { path.to_path_buf() } else {
+    let p = if path.exists() {
+        path.to_path_buf()
+    } else {
         let gz = std::path::PathBuf::from(format!("{}.gz", path.display()));
         gz
     };
-    if !p.exists() { return Err(format!("path not found: {}", path.display())); }
+    if !p.exists() {
+        return Err(format!("path not found: {}", path.display()));
+    }
     if p.extension().map(|e| e == "gz").unwrap_or(false) {
         let f = std::fs::File::open(&p).map_err(|e| e.to_string())?;
         let mut dec = GzDecoder::new(f);
         let mut s = String::new();
-        use std::io::Read; dec.read_to_string(&mut s).map_err(|e| e.to_string())?;
-        Ok(s.lines().map(|l| l.trim().to_string()).filter(|l| !l.is_empty()).collect())
+        use std::io::Read;
+        dec.read_to_string(&mut s).map_err(|e| e.to_string())?;
+        Ok(s.lines()
+            .map(|l| l.trim().to_string())
+            .filter(|l| !l.is_empty())
+            .collect())
     } else {
         let s = std::fs::read_to_string(&p).map_err(|e| e.to_string())?;
-        Ok(s.lines().map(|l| l.trim().to_string()).filter(|l| !l.is_empty()).collect())
+        Ok(s.lines()
+            .map(|l| l.trim().to_string())
+            .filter(|l| !l.is_empty())
+            .collect())
     }
 }
 
 /// Fetch a remote text file (http/https/ftp) and return lines
 pub fn read_remote_list(url: &str) -> Result<Vec<String>, String> {
     let resp = reqwest::blocking::get(url).map_err(|e| e.to_string())?;
-    if !resp.status().is_success() { return Err(format!("bad status: {}", resp.status())); }
+    if !resp.status().is_success() {
+        return Err(format!("bad status: {}", resp.status()));
+    }
     let bytes = resp.bytes().map_err(|e| e.to_string())?;
     let data: Vec<u8> = bytes.to_vec();
     // Try gunzip if looks like gz
     let text = if url.ends_with(".gz") {
         let mut dec = GzDecoder::new(&data[..]);
         let mut s = String::new();
-        use std::io::Read; dec.read_to_string(&mut s).map_err(|e| e.to_string())?;
+        use std::io::Read;
+        dec.read_to_string(&mut s).map_err(|e| e.to_string())?;
         s
     } else {
         String::from_utf8(data).map_err(|e| e.to_string())?
     };
-    Ok(text.lines().map(|l| l.trim().to_string()).filter(|l| !l.is_empty()).collect())
+    Ok(text
+        .lines()
+        .map(|l| l.trim().to_string())
+        .filter(|l| !l.is_empty())
+        .collect())
 }
 
 /// Map a read_id to the ordered list of regions on that read's strand.
@@ -107,10 +138,7 @@ pub fn map_read_id_to_regions(
         .position(|leaf| leaf.region_id == primer_id)
         .ok_or_else(|| {
             let ids: Vec<String> = leaves.iter().map(|l| l.region_id.clone()).collect();
-            format!(
-                "primer_id '{}' not found in regions {:?}",
-                primer_id, ids
-            )
+            format!("primer_id '{}' not found in regions {:?}", primer_id, ids)
         })?;
 
     // If we are on the opposite strand, we go in the opposite way
@@ -140,7 +168,11 @@ pub fn project_regions_to_coordinates(regions: Vec<Region>) -> Vec<RegionCoordin
 
 /// Intersect a list of RegionCoordinates with a read window [read_start, read_stop).
 /// Returns only overlapping coordinates, trimmed to the window.
-pub fn itx_read(region_coordinates: Vec<RegionCoordinate>, read_start: i64, read_stop: i64) -> Vec<RegionCoordinate> {
+pub fn itx_read(
+    region_coordinates: Vec<RegionCoordinate>,
+    read_start: i64,
+    read_stop: i64,
+) -> Vec<RegionCoordinate> {
     let mut new_rcs: Vec<RegionCoordinate> = Vec::new();
     for rc in region_coordinates.into_iter() {
         if read_start >= rc.stop || read_stop <= rc.start {
@@ -171,8 +203,15 @@ mod tests {
 
     fn leaf(id: &str, len: i64) -> Region {
         Region::new(
-            id.into(), "barcode".into(), id.into(), "fixed".into(),
-            "A".repeat(len as usize), len, len, None, vec![],
+            id.into(),
+            "barcode".into(),
+            id.into(),
+            "fixed".into(),
+            "A".repeat(len as usize),
+            len,
+            len,
+            None,
+            vec![],
         )
     }
 
@@ -232,6 +271,50 @@ mod tests {
         assert_eq!(spec.library_spec.len(), 4);
     }
 
+    #[test]
+    fn test_load_spec_accepts_legacy_scalar_protocol_fields() {
+        let spec = load_spec(&PathBuf::from(
+            "tests/fixtures/legacy_0_3_scalar_protocols.yaml",
+        ));
+
+        assert_eq!(spec.seqspec_version, Some("0.3.0".to_string()));
+        assert_eq!(spec.modalities, vec!["rna".to_string()]);
+
+        let sequence_protocol = spec.sequence_protocol.expect("sequence protocol");
+        assert_eq!(sequence_protocol.len(), 1);
+        assert_eq!(sequence_protocol[0].protocol_id, "NovaSeq");
+        assert_eq!(sequence_protocol[0].name, "NovaSeq");
+        assert_eq!(sequence_protocol[0].modality, "rna");
+
+        let library_kit = spec.library_kit.expect("library kit");
+        assert_eq!(library_kit.len(), 1);
+        assert_eq!(library_kit[0].kit_id, "LegacyKit");
+        assert_eq!(library_kit[0].name.as_deref(), Some("LegacyKit"));
+        assert_eq!(library_kit[0].modality, "rna");
+    }
+
+    #[test]
+    fn test_load_spec_accepts_legacy_missing_files_and_short_onlist() {
+        let spec = load_spec(&PathBuf::from(
+            "tests/fixtures/legacy_0_2_missing_fields.yaml",
+        ));
+
+        assert_eq!(spec.seqspec_version, Some("0.2.0".to_string()));
+        assert_eq!(spec.sequence_spec.len(), 1);
+        assert!(spec.sequence_spec[0].files.is_empty());
+
+        let barcode = spec.library_spec[0]
+            .get_region_by_id("barcode")
+            .into_iter()
+            .next()
+            .expect("barcode region");
+        let onlist = barcode.onlist.expect("barcode onlist");
+        assert_eq!(onlist.filename, "whitelist.txt.gz");
+        assert_eq!(onlist.md5, "abc123");
+        assert_eq!(onlist.file_id, "");
+        assert_eq!(onlist.urltype, "local");
+    }
+
     // ---- map_read_id_to_regions ----
 
     #[test]
@@ -244,7 +327,10 @@ mod tests {
         assert_eq!(r.strand, "pos");
         assert_eq!(regions.len(), 4);
         let region_ids: Vec<&str> = regions.iter().map(|r| r.region_id.as_str()).collect();
-        assert_eq!(region_ids, vec!["rna_cell_bc", "rna_umi", "cdna", "rna_truseq_read2"]);
+        assert_eq!(
+            region_ids,
+            vec!["rna_cell_bc", "rna_umi", "cdna", "rna_truseq_read2"]
+        );
     }
 
     #[test]
@@ -258,7 +344,10 @@ mod tests {
         assert_eq!(regions.len(), 4);
         // Negative strand reverses the region order
         let region_ids: Vec<&str> = regions.iter().map(|r| r.region_id.as_str()).collect();
-        assert_eq!(region_ids, vec!["cdna", "rna_umi", "rna_cell_bc", "rna_truseq_read1"]);
+        assert_eq!(
+            region_ids,
+            vec!["cdna", "rna_umi", "rna_cell_bc", "rna_truseq_read1"]
+        );
     }
 
     #[test]
@@ -280,11 +369,7 @@ mod tests {
 
     #[test]
     fn test_project_regions_to_coordinates() {
-        let regions = vec![
-            leaf("a", 10),
-            leaf("b", 20),
-            leaf("c", 5),
-        ];
+        let regions = vec![leaf("a", 10), leaf("b", 20), leaf("c", 5)];
         let coords = project_regions_to_coordinates(regions);
         assert_eq!(coords.len(), 3);
         assert_eq!(coords[0].start, 0);
@@ -299,11 +384,7 @@ mod tests {
 
     #[test]
     fn test_itx_read() {
-        let regions = vec![
-            leaf("a", 10),
-            leaf("b", 20),
-            leaf("c", 5),
-        ];
+        let regions = vec![leaf("a", 10), leaf("b", 20), leaf("c", 5)];
         let coords = project_regions_to_coordinates(regions);
 
         // Read window [5, 25) — should trim a and b, exclude c
