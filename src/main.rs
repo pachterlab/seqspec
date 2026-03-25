@@ -3,22 +3,22 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-use seqspec::seqspec_version;
 use seqspec::seqspec_auth;
-use seqspec::seqspec_format;
-use seqspec::seqspec_find;
-use seqspec::seqspec_index;
+use seqspec::seqspec_check;
 use seqspec::seqspec_file;
-use seqspec::seqspec_split;
+use seqspec::seqspec_find;
+use seqspec::seqspec_format;
+use seqspec::seqspec_index;
 use seqspec::seqspec_info;
 use seqspec::seqspec_init;
+use seqspec::seqspec_insert;
 use seqspec::seqspec_methods;
 use seqspec::seqspec_modify;
-use seqspec::seqspec_upgrade;
-use seqspec::seqspec_insert;
-use seqspec::seqspec_check;
 use seqspec::seqspec_onlist;
 use seqspec::seqspec_print;
+use seqspec::seqspec_split;
+use seqspec::seqspec_upgrade;
+use seqspec::seqspec_version;
 use seqspec::utils;
 
 use clap::{Parser, Subcommand};
@@ -59,16 +59,18 @@ fn main() {
         Commands::Format(args) => seqspec_format::run_format(&args),
         Commands::Find(args) => seqspec_find::run_find(&args),
         Commands::Index(args) => seqspec_index::run_index(&args),
-        Commands::File(args) => seqspec_file::run_file(&args)
-        ,Commands::Split(args) => seqspec_split::run_split(&args)
-        ,Commands::Info(args) => seqspec_info::run_info(&args)
-        ,Commands::Init(args) => seqspec_init::run_init(&args)
-        ,Commands::Methods(args) => seqspec_methods::run_methods(&args)
-        ,Commands::Modify(args) => seqspec_modify::run_modify(&args)
-        ,Commands::Upgrade(args) => seqspec_upgrade::run_upgrade(&args)
-        ,Commands::Insert(args) => seqspec_insert::run_insert(&args)
-        ,Commands::Check(args) => { seqspec_check::run_check(&args); }
-        ,Commands::Onlist(args) => seqspec_onlist::run_onlist(&args)
-        ,Commands::Print(args) => seqspec_print::run_print(&args)
+        Commands::File(args) => seqspec_file::run_file(&args),
+        Commands::Split(args) => seqspec_split::run_split(&args),
+        Commands::Info(args) => seqspec_info::run_info(&args),
+        Commands::Init(args) => seqspec_init::run_init(&args),
+        Commands::Methods(args) => seqspec_methods::run_methods(&args),
+        Commands::Modify(args) => seqspec_modify::run_modify(&args),
+        Commands::Upgrade(args) => seqspec_upgrade::run_upgrade(&args),
+        Commands::Insert(args) => seqspec_insert::run_insert(&args),
+        Commands::Check(args) => {
+            seqspec_check::run_check(&args);
+        }
+        Commands::Onlist(args) => seqspec_onlist::run_onlist(&args),
+        Commands::Print(args) => seqspec_print::run_print(&args),
     }
 }

@@ -103,7 +103,9 @@ fn modify_reads(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
     let reads: Vec<Read> = spec.get_seqspec(modality);
     let mut updated: Vec<Read> = reads.clone();
     for patch in keys {
-        let Some(read_id) = vstr(patch, "read_id") else { continue };
+        let Some(read_id) = vstr(patch, "read_id") else {
+            continue;
+        };
         if let Some(rd) = updated.iter_mut().find(|r| r.read_id == read_id) {
             // files optional
             let files_opt: Option<Vec<File>> = patch.get("files").and_then(|arr| {
@@ -113,12 +115,27 @@ fn modify_reads(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
                         .filter_map(|it| {
                             Some(File::new(
                                 it.get("file_id")?.as_str()?.to_string(),
-                                it.get("filename").and_then(|x| x.as_str()).unwrap_or("").to_string(),
-                                it.get("filetype").and_then(|x| x.as_str()).unwrap_or("").to_string(),
+                                it.get("filename")
+                                    .and_then(|x| x.as_str())
+                                    .unwrap_or("")
+                                    .to_string(),
+                                it.get("filetype")
+                                    .and_then(|x| x.as_str())
+                                    .unwrap_or("")
+                                    .to_string(),
                                 it.get("filesize").and_then(|x| x.as_i64()).unwrap_or(0),
-                                it.get("url").and_then(|x| x.as_str()).unwrap_or("").to_string(),
-                                it.get("urltype").and_then(|x| x.as_str()).unwrap_or("").to_string(),
-                                it.get("md5").and_then(|x| x.as_str()).unwrap_or("").to_string(),
+                                it.get("url")
+                                    .and_then(|x| x.as_str())
+                                    .unwrap_or("")
+                                    .to_string(),
+                                it.get("urltype")
+                                    .and_then(|x| x.as_str())
+                                    .unwrap_or("")
+                                    .to_string(),
+                                it.get("md5")
+                                    .and_then(|x| x.as_str())
+                                    .unwrap_or("")
+                                    .to_string(),
                             ))
                         })
                         .collect()
@@ -147,7 +164,9 @@ fn modify_regions(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
     if let Some(idx) = spec.modalities.iter().position(|m| m == modality) {
         if let Some(target) = spec.library_spec.get_mut(idx) {
             for patch in keys {
-                let Some(target_region_id) = vstr(patch, "region_id") else { continue };
+                let Some(target_region_id) = vstr(patch, "region_id") else {
+                    continue;
+                };
                 target.update_region_by_id(
                     target_region_id,
                     vstr(patch, "region_id"),
@@ -165,16 +184,34 @@ fn modify_regions(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
 
 fn modify_files(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
     for patch in keys {
-        let Some(file_id) = vstr(patch, "file_id") else { continue };
-        for r in spec.sequence_spec.iter_mut().filter(|r| r.modality == modality) {
+        let Some(file_id) = vstr(patch, "file_id") else {
+            continue;
+        };
+        for r in spec
+            .sequence_spec
+            .iter_mut()
+            .filter(|r| r.modality == modality)
+        {
             for f in &mut r.files {
                 if f.file_id == file_id {
-                    if let Some(v) = vstr(patch, "filename") { f.filename = v; }
-                    if let Some(v) = vstr(patch, "filetype") { f.filetype = v; }
-                    if let Some(v) = vi64(patch, "filesize") { f.filesize = v; }
-                    if let Some(v) = vstr(patch, "url") { f.url = v; }
-                    if let Some(v) = vstr(patch, "urltype") { f.urltype = v; }
-                    if let Some(v) = vstr(patch, "md5") { f.md5 = v; }
+                    if let Some(v) = vstr(patch, "filename") {
+                        f.filename = v;
+                    }
+                    if let Some(v) = vstr(patch, "filetype") {
+                        f.filetype = v;
+                    }
+                    if let Some(v) = vi64(patch, "filesize") {
+                        f.filesize = v;
+                    }
+                    if let Some(v) = vstr(patch, "url") {
+                        f.url = v;
+                    }
+                    if let Some(v) = vstr(patch, "urltype") {
+                        f.urltype = v;
+                    }
+                    if let Some(v) = vstr(patch, "md5") {
+                        f.md5 = v;
+                    }
                 }
             }
         }
@@ -184,10 +221,16 @@ fn modify_files(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
 fn modify_seqkits(spec: &mut Assay, keys: &Vec<Value>) {
     if let Some(kits) = spec.sequence_kit.as_mut() {
         for patch in keys {
-            let Some(kit_id) = vstr(patch, "kit_id") else { continue };
+            let Some(kit_id) = vstr(patch, "kit_id") else {
+                continue;
+            };
             if let Some(k) = kits.iter_mut().find(|k| k.kit_id == kit_id) {
-                if let Some(v) = vstr(patch, "name") { k.name = Some(v); }
-                if let Some(v) = vstr(patch, "modality") { k.modality = v; }
+                if let Some(v) = vstr(patch, "name") {
+                    k.name = Some(v);
+                }
+                if let Some(v) = vstr(patch, "modality") {
+                    k.modality = v;
+                }
             }
         }
     }
@@ -196,10 +239,16 @@ fn modify_seqkits(spec: &mut Assay, keys: &Vec<Value>) {
 fn modify_seqprotocols(spec: &mut Assay, keys: &Vec<Value>) {
     if let Some(protocols) = spec.sequence_protocol.as_mut() {
         for patch in keys {
-            let Some(protocol_id) = vstr(patch, "protocol_id") else { continue };
+            let Some(protocol_id) = vstr(patch, "protocol_id") else {
+                continue;
+            };
             if let Some(p) = protocols.iter_mut().find(|p| p.protocol_id == protocol_id) {
-                if let Some(v) = vstr(patch, "name") { p.name = v; }
-                if let Some(v) = vstr(patch, "modality") { p.modality = v; }
+                if let Some(v) = vstr(patch, "name") {
+                    p.name = v;
+                }
+                if let Some(v) = vstr(patch, "modality") {
+                    p.modality = v;
+                }
             }
         }
     }
@@ -208,10 +257,16 @@ fn modify_seqprotocols(spec: &mut Assay, keys: &Vec<Value>) {
 fn modify_libkits(spec: &mut Assay, keys: &Vec<Value>) {
     if let Some(kits) = spec.library_kit.as_mut() {
         for patch in keys {
-            let Some(kit_id) = vstr(patch, "kit_id") else { continue };
+            let Some(kit_id) = vstr(patch, "kit_id") else {
+                continue;
+            };
             if let Some(k) = kits.iter_mut().find(|k| k.kit_id == kit_id) {
-                if let Some(v) = vstr(patch, "name") { k.name = Some(v); }
-                if let Some(v) = vstr(patch, "modality") { k.modality = v; }
+                if let Some(v) = vstr(patch, "name") {
+                    k.name = Some(v);
+                }
+                if let Some(v) = vstr(patch, "modality") {
+                    k.modality = v;
+                }
             }
         }
     }
@@ -220,10 +275,16 @@ fn modify_libkits(spec: &mut Assay, keys: &Vec<Value>) {
 fn modify_libprotocols(spec: &mut Assay, keys: &Vec<Value>) {
     if let Some(protocols) = spec.library_protocol.as_mut() {
         for patch in keys {
-            let Some(protocol_id) = vstr(patch, "protocol_id") else { continue };
+            let Some(protocol_id) = vstr(patch, "protocol_id") else {
+                continue;
+            };
             if let Some(p) = protocols.iter_mut().find(|p| p.protocol_id == protocol_id) {
-                if let Some(v) = vstr(patch, "name") { p.name = v; }
-                if let Some(v) = vstr(patch, "modality") { p.modality = v; }
+                if let Some(v) = vstr(patch, "name") {
+                    p.name = v;
+                }
+                if let Some(v) = vstr(patch, "modality") {
+                    p.modality = v;
+                }
             }
         }
     }
@@ -231,14 +292,30 @@ fn modify_libprotocols(spec: &mut Assay, keys: &Vec<Value>) {
 
 fn modify_assay(spec: &mut Assay, keys: &Vec<Value>) {
     for patch in keys {
-        let Some(assay_id) = vstr(patch, "assay_id") else { continue };
-        if assay_id != spec.assay_id { continue; }
-        if let Some(v) = vstr(patch, "name") { spec.name = v; }
-        if let Some(v) = vstr(patch, "doi") { spec.doi = v; }
-        if let Some(v) = vstr(patch, "date") { spec.date = v; }
-        if let Some(v) = vstr(patch, "description") { spec.description = v; }
-        if let Some(v) = vstr(patch, "lib_struct") { spec.lib_struct = v; }
-        if let Some(v) = vstr(patch, "assay_id") { spec.assay_id = v; }
+        let Some(assay_id) = vstr(patch, "assay_id") else {
+            continue;
+        };
+        if assay_id != spec.assay_id {
+            continue;
+        }
+        if let Some(v) = vstr(patch, "name") {
+            spec.name = v;
+        }
+        if let Some(v) = vstr(patch, "doi") {
+            spec.doi = v;
+        }
+        if let Some(v) = vstr(patch, "date") {
+            spec.date = v;
+        }
+        if let Some(v) = vstr(patch, "description") {
+            spec.description = v;
+        }
+        if let Some(v) = vstr(patch, "lib_struct") {
+            spec.lib_struct = v;
+        }
+        if let Some(v) = vstr(patch, "assay_id") {
+            spec.assay_id = v;
+        }
     }
 }
 
@@ -288,7 +365,11 @@ mod tests {
             let keys = vec![json!({"file_id": file_id, "url": "http://new.url/file.fq.gz"})];
             let modified = seqspec_modify(spec, "rna", keys, "file");
             let updated_read = modified.get_read(&rd.read_id).unwrap();
-            let f = updated_read.files.iter().find(|f| f.file_id == file_id).unwrap();
+            let f = updated_read
+                .files
+                .iter()
+                .find(|f| f.file_id == file_id)
+                .unwrap();
             assert_eq!(f.url, "http://new.url/file.fq.gz");
         }
     }
@@ -297,7 +378,9 @@ mod tests {
     fn test_modify_assay_fields() {
         let spec = dogma_spec();
         let assay_id = spec.assay_id.clone();
-        let keys = vec![json!({"assay_id": assay_id, "name": "New Assay Name", "description": "Updated desc"})];
+        let keys = vec![
+            json!({"assay_id": assay_id, "name": "New Assay Name", "description": "Updated desc"}),
+        ];
         let modified = seqspec_modify(spec, "rna", keys, "assay");
         assert_eq!(modified.name, "New Assay Name");
         assert_eq!(modified.description, "Updated desc");
@@ -311,5 +394,3 @@ mod tests {
         assert_eq!(modified.assay_id, spec.assay_id);
     }
 }
-
-

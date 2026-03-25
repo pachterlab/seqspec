@@ -11,7 +11,6 @@ pub struct Onlist {
     pub md5: String,
 }
 
-
 impl Onlist {
     pub fn new(
         file_id: String,
@@ -22,7 +21,15 @@ impl Onlist {
         urltype: String,
         md5: String,
     ) -> Self {
-        Self { file_id, filename, filetype, filesize, url, urltype, md5 }
+        Self {
+            file_id,
+            filename,
+            filetype,
+            filesize,
+            url,
+            urltype,
+            md5,
+        }
     }
 
     pub fn from_json(json_str: &str) -> Result<Self, serde_json::Error> {
@@ -39,8 +46,13 @@ mod tests {
 
     fn sample_onlist() -> Onlist {
         Onlist::new(
-            "ol1".into(), "barcodes.txt".into(), "txt".into(),
-            1024, "barcodes.txt".into(), "local".into(), "abc123".into(),
+            "ol1".into(),
+            "barcodes.txt".into(),
+            "txt".into(),
+            1024,
+            "barcodes.txt".into(),
+            "local".into(),
+            "abc123".into(),
         )
     }
 

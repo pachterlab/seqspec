@@ -156,5 +156,3 @@ mod tests {
         assert_eq!(split_total, total_reads);
     }
 }
-
-

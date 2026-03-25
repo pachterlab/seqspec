@@ -1,7 +1,6 @@
-use serde::{Deserialize, Serialize};
 use crate::models::file::File;
 use crate::models::region::RegionCoordinate;
-
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Read {
@@ -16,13 +15,27 @@ pub struct Read {
     pub files: Vec<File>,
 }
 
-
 impl Read {
     pub fn new(
-        read_id: String, name: String, modality: String, primer_id: String,
-        min_len: i64, max_len: i64, strand: String, files: Vec<File>
+        read_id: String,
+        name: String,
+        modality: String,
+        primer_id: String,
+        min_len: i64,
+        max_len: i64,
+        strand: String,
+        files: Vec<File>,
     ) -> Self {
-        Self { read_id, name, modality, primer_id, min_len, max_len, strand, files }
+        Self {
+            read_id,
+            name,
+            modality,
+            primer_id,
+            min_len,
+            max_len,
+            strand,
+            files,
+        }
     }
 
     pub fn from_json(json_str: &str) -> Result<Self, serde_json::Error> {
@@ -33,7 +46,9 @@ impl Read {
         serde_json::to_string(self)
     }
 
-    pub fn update_files(&mut self, files: Vec<File>) { self.files = files; }
+    pub fn update_files(&mut self, files: Vec<File>) {
+        self.files = files;
+    }
 
     pub fn update_read_by_id(
         &mut self,
@@ -46,29 +61,49 @@ impl Read {
         strand: Option<String>,
         files: Option<Vec<File>>,
     ) {
-        if let Some(v) = read_id { self.read_id = v; }
-        if let Some(v) = name { self.name = v; }
-        if let Some(v) = modality { self.modality = v; }
-        if let Some(v) = primer_id { self.primer_id = v; }
-        if let Some(v) = min_len { self.min_len = v; }
-        if let Some(v) = max_len { self.max_len = v; }
-        if let Some(v) = strand { self.strand = v; }
-        if let Some(v) = files { self.files = v; }
+        if let Some(v) = read_id {
+            self.read_id = v;
+        }
+        if let Some(v) = name {
+            self.name = v;
+        }
+        if let Some(v) = modality {
+            self.modality = v;
+        }
+        if let Some(v) = primer_id {
+            self.primer_id = v;
+        }
+        if let Some(v) = min_len {
+            self.min_len = v;
+        }
+        if let Some(v) = max_len {
+            self.max_len = v;
+        }
+        if let Some(v) = strand {
+            self.strand = v;
+        }
+        if let Some(v) = files {
+            self.files = v;
+        }
     }
 
     /// Return self if any File has matching file_id, else None.
     pub fn get_read_by_file_id(&self, file_id: &str) -> Option<Self> {
         if self.files.iter().any(|f| f.file_id == file_id) {
             Some(self.clone())
-        } else { None }
+        } else {
+            None
+        }
     }
 
     pub fn repr(&self) -> String {
         let sign = if self.strand == "pos" { "+" } else { "-" };
-        format!("{sign}({}, {}){}:{}", self.min_len, self.max_len, self.read_id, self.primer_id)
+        format!(
+            "{sign}({}, {}){}:{}",
+            self.min_len, self.max_len, self.read_id, self.primer_id
+        )
     }
 }
-
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ReadCoordinate {
@@ -88,15 +123,26 @@ mod tests {
 
     fn sample_file() -> File {
         File::new(
-            "file1".into(), "R1.fq.gz".into(), "fastq".into(),
-            1024, "R1.fq.gz".into(), "local".into(), "".into(),
+            "file1".into(),
+            "R1.fq.gz".into(),
+            "fastq".into(),
+            1024,
+            "R1.fq.gz".into(),
+            "local".into(),
+            "".into(),
         )
     }
 
     fn sample_read() -> Read {
         Read::new(
-            "test_read".into(), "Test Read".into(), "rna".into(),
-            "test_primer".into(), 100, 150, "pos".into(), vec![sample_file()],
+            "test_read".into(),
+            "Test Read".into(),
+            "rna".into(),
+            "test_primer".into(),
+            100,
+            150,
+            "pos".into(),
+            vec![sample_file()],
         )
     }
 
@@ -116,9 +162,15 @@ mod tests {
     #[test]
     fn test_read_update_files() {
         let mut r = sample_read();
-        let new_files = vec![
-            File::new("f2".into(), "R2.fq".into(), "fastq".into(), 0, "".into(), "local".into(), "".into()),
-        ];
+        let new_files = vec![File::new(
+            "f2".into(),
+            "R2.fq".into(),
+            "fastq".into(),
+            0,
+            "".into(),
+            "local".into(),
+            "".into(),
+        )];
         r.update_files(new_files);
         assert_eq!(r.files.len(), 1);
         assert_eq!(r.files[0].file_id, "f2");
@@ -128,8 +180,14 @@ mod tests {
     fn test_read_update_by_id_partial() {
         let mut r = sample_read();
         r.update_read_by_id(
-            None, Some("Updated Name".into()), None, None,
-            Some(200), None, None, None,
+            None,
+            Some("Updated Name".into()),
+            None,
+            None,
+            Some(200),
+            None,
+            None,
+            None,
         );
         assert_eq!(r.read_id, "test_read"); // unchanged
         assert_eq!(r.name, "Updated Name");
@@ -187,8 +245,15 @@ mod tests {
     fn test_read_coordinate_creation() {
         let r = sample_read();
         let region = crate::models::region::Region::new(
-            "bc".into(), "barcode".into(), "barcode".into(), "fixed".into(),
-            "ATCG".into(), 4, 4, None, vec![],
+            "bc".into(),
+            "barcode".into(),
+            "barcode".into(),
+            "fixed".into(),
+            "ATCG".into(),
+            4,
+            4,
+            None,
+            vec![],
         );
         let rc = crate::models::region::RegionCoordinate::new(region, 0, 4);
         let read_coord = ReadCoordinate::new(r.clone(), vec![rc]);

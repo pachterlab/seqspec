@@ -38,16 +38,12 @@ pub fn run_check(args: &CheckArgs) -> Vec<ErrorObj> {
         eprintln!("{}", err);
         std::process::exit(1);
     });
-    let errors = seqspec_check_with_remote_access(
-        &spec,
-        args.skip.as_deref(),
-        &args.yaml,
-        &remote_access,
-    )
-    .unwrap_or_else(|err| {
-        eprintln!("{}", err);
-        std::process::exit(1);
-    });
+    let errors =
+        seqspec_check_with_remote_access(&spec, args.skip.as_deref(), &args.yaml, &remote_access)
+            .unwrap_or_else(|err| {
+                eprintln!("{}", err);
+                std::process::exit(1);
+            });
 
     if let Some(out) = &args.output {
         let mut f = fs::File::create(out).unwrap();
@@ -196,7 +192,11 @@ pub fn seqspec_check_structural(spec: &Assay) -> Vec<ErrorObj> {
     errors
 }
 
-fn check(spec: &Assay, spec_path: &Path, remote_access: &RemoteAccess) -> anyhow::Result<Vec<ErrorObj>> {
+fn check(
+    spec: &Assay,
+    spec_path: &Path,
+    remote_access: &RemoteAccess,
+) -> anyhow::Result<Vec<ErrorObj>> {
     let errors: Vec<ErrorObj> = Vec::new();
     let idx = 0usize;
 

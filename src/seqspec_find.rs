@@ -2,12 +2,12 @@ use crate::utils;
 use std::fs;
 use std::io::Write;
 
-use clap::Args;
+use crate::models::assay::Assay;
 use crate::models::file::File;
 use crate::models::read::Read;
 use crate::models::region::Region;
-use crate::models::assay::Assay;
-use serde::{Serialize, Deserialize};
+use clap::Args;
+use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Debug, Args)]
@@ -56,7 +56,6 @@ pub fn run_find(args: &FindArgs) {
     validate_find_args(args);
     let spec = utils::load_spec(&args.yaml);
 
-
     let found = seqspec_find(&spec, &args.selector, &args.modality, &args.id);
     let yaml_str = match found {
         FindResult::Reads(v) => serde_yaml::to_string(&v).unwrap(),
@@ -88,17 +87,16 @@ pub fn find_by_region_id(spec: &Assay, modality: &str, region_id: &str) -> Vec<R
 pub fn find_by_file_id(spec: &Assay, modality: &str, file_id: &str) -> Vec<File> {
     let m = spec.get_seqspec(modality);
     m.iter()
-    .flat_map(|r| r.files.iter())
-    .filter(|f| f.file_id == file_id)
-    .cloned()
-    .collect()
+        .flat_map(|r| r.files.iter())
+        .filter(|f| f.file_id == file_id)
+        .cloned()
+        .collect()
 }
 
 pub fn find_by_read_id(spec: &Assay, modality: &str, read_id: &str) -> Vec<Read> {
     let m = spec.get_seqspec(modality);
     m.iter().filter(|r| r.read_id == read_id).cloned().collect()
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum FindResult {
@@ -183,7 +181,7 @@ mod tests {
             FindResult::Regions(v) => {
                 assert_eq!(v.len(), 1);
                 assert_eq!(v[0].region_id, "rna_cell_bc");
-            },
+            }
             _ => panic!("Expected Regions variant"),
         }
 
@@ -192,7 +190,7 @@ mod tests {
             FindResult::Reads(v) => {
                 assert_eq!(v.len(), 1);
                 assert_eq!(v[0].read_id, "rna_R1");
-            },
+            }
             _ => panic!("Expected Reads variant"),
         }
     }

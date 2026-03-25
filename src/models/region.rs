@@ -6,9 +6,9 @@ use crate::utils::complement_seq;
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Region {
     pub region_id: String,
-    pub region_type: String,       // keep String for simplicity
+    pub region_type: String, // keep String for simplicity
     pub name: String,
-    pub sequence_type: String,     // "fixed" | "random" | "onlist" | "joined"
+    pub sequence_type: String, // "fixed" | "random" | "onlist" | "joined"
     pub sequence: String,
     pub min_len: i64,
     pub max_len: i64,
@@ -28,7 +28,17 @@ impl Region {
         onlist: Option<Onlist>,
         regions: Vec<Region>,
     ) -> Self {
-        Self { region_id, region_type, name, sequence_type, sequence, min_len, max_len, onlist, regions }
+        Self {
+            region_id,
+            region_type,
+            name,
+            sequence_type,
+            sequence,
+            min_len,
+            max_len,
+            onlist,
+            regions,
+        }
     }
 
     // ---- JSON I/O ---------------------------------------------------
@@ -204,13 +214,27 @@ impl Region {
         max_len: Option<i64>,
     ) {
         if self.region_id == target_region_id {
-            if let Some(v) = region_id { self.region_id = v; }
-            if let Some(v) = region_type { self.region_type = v; }
-            if let Some(v) = name { self.name = v; }
-            if let Some(v) = sequence_type { self.sequence_type = v; }
-            if let Some(v) = sequence { self.sequence = v; }
-            if let Some(v) = min_len { self.min_len = v; }
-            if let Some(v) = max_len { self.max_len = v; }
+            if let Some(v) = region_id {
+                self.region_id = v;
+            }
+            if let Some(v) = region_type {
+                self.region_type = v;
+            }
+            if let Some(v) = name {
+                self.name = v;
+            }
+            if let Some(v) = sequence_type {
+                self.sequence_type = v;
+            }
+            if let Some(v) = sequence {
+                self.sequence = v;
+            }
+            if let Some(v) = min_len {
+                self.min_len = v;
+            }
+            if let Some(v) = max_len {
+                self.max_len = v;
+            }
             return;
         }
         for r in &mut self.regions {
@@ -264,10 +288,13 @@ pub struct RegionCoordinate {
     pub stop: i64,
 }
 
-
 impl RegionCoordinate {
     pub fn new(region: Region, start: i64, stop: i64) -> Self {
-        Self { region, start, stop }
+        Self {
+            region,
+            start,
+            stop,
+        }
     }
 
     pub fn repr(&self) -> String {
@@ -286,13 +313,13 @@ impl RegionCoordinate {
     /// sequence_type="diff", and sequence = "X" * len.
     pub fn difference(&self, other: &Self) -> Option<Self> {
         let (new_start, new_stop) = if self.stop <= other.start {
-            (self.stop, other.start)          // self .. other gap
+            (self.stop, other.start) // self .. other gap
         } else if other.stop <= self.start {
-            (other.stop, self.start)          // other .. self gap
+            (other.stop, self.start) // other .. self gap
         } else if self.start == other.start && self.stop == other.stop {
-            (self.start, self.stop)           // identical intervals
+            (self.start, self.stop) // identical intervals
         } else {
-            return None;                      // overlapping but not identical
+            return None; // overlapping but not identical
         };
 
         let len = (new_stop - new_start) as usize; // guaranteed >= 0 here
@@ -310,7 +337,11 @@ impl RegionCoordinate {
             regions: Vec::new(),
         };
 
-        Some(Self { region: new_region, start: new_start, stop: new_stop })
+        Some(Self {
+            region: new_region,
+            start: new_start,
+            stop: new_stop,
+        })
     }
 }
 
@@ -334,7 +365,12 @@ impl RegionCoordinateDifference {
         } else {
             "".to_string()
         };
-        Self { obj, fixed, rgncdiff, loc }
+        Self {
+            obj,
+            fixed,
+            rgncdiff,
+            loc,
+        }
     }
 }
 
@@ -346,15 +382,29 @@ mod tests {
 
     fn leaf(id: &str, seq: &str, len: i64) -> Region {
         Region::new(
-            id.into(), "barcode".into(), id.into(), "fixed".into(),
-            seq.into(), len, len, None, vec![],
+            id.into(),
+            "barcode".into(),
+            id.into(),
+            "fixed".into(),
+            seq.into(),
+            len,
+            len,
+            None,
+            vec![],
         )
     }
 
     fn joined(id: &str, children: Vec<Region>) -> Region {
         Region::new(
-            id.into(), "joined".into(), id.into(), "joined".into(),
-            "".into(), 0, 0, None, children,
+            id.into(),
+            "joined".into(),
+            id.into(),
+            "joined".into(),
+            "".into(),
+            0,
+            0,
+            None,
+            children,
         )
     }
 
@@ -388,18 +438,22 @@ mod tests {
     #[test]
     fn test_get_sequence_empty() {
         let r = Region::new(
-            "bc".into(), "barcode".into(), "bc".into(), "random".into(),
-            "".into(), 8, 8, None, vec![],
+            "bc".into(),
+            "barcode".into(),
+            "bc".into(),
+            "random".into(),
+            "".into(),
+            8,
+            8,
+            None,
+            vec![],
         );
         assert_eq!(r.get_sequence(), "XXXXXXXX");
     }
 
     #[test]
     fn test_get_sequence_nested() {
-        let parent = joined("parent", vec![
-            leaf("a", "AAAA", 4),
-            leaf("b", "CCCC", 4),
-        ]);
+        let parent = joined("parent", vec![leaf("a", "AAAA", 4), leaf("b", "CCCC", 4)]);
         assert_eq!(parent.get_sequence(), "AAAACCCC");
     }
 
@@ -408,21 +462,38 @@ mod tests {
     #[test]
     fn test_get_len_simple() {
         let r = Region::new(
-            "r".into(), "umi".into(), "r".into(), "random".into(),
-            "".into(), 10, 12, None, vec![],
+            "r".into(),
+            "umi".into(),
+            "r".into(),
+            "random".into(),
+            "".into(),
+            10,
+            12,
+            None,
+            vec![],
         );
         assert_eq!(r.get_len(), (10, 12));
     }
 
     #[test]
     fn test_get_len_nested() {
-        let parent = joined("parent", vec![
-            leaf("a", "AAAA", 4),
-            Region::new(
-                "b".into(), "umi".into(), "b".into(), "random".into(),
-                "".into(), 10, 12, None, vec![],
-            ),
-        ]);
+        let parent = joined(
+            "parent",
+            vec![
+                leaf("a", "AAAA", 4),
+                Region::new(
+                    "b".into(),
+                    "umi".into(),
+                    "b".into(),
+                    "random".into(),
+                    "".into(),
+                    10,
+                    12,
+                    None,
+                    vec![],
+                ),
+            ],
+        );
         assert_eq!(parent.get_len(), (14, 16));
     }
 
@@ -430,10 +501,7 @@ mod tests {
 
     #[test]
     fn test_update_attr_fixed() {
-        let mut parent = joined("parent", vec![
-            leaf("a", "AAAA", 4),
-            leaf("b", "CCCC", 4),
-        ]);
+        let mut parent = joined("parent", vec![leaf("a", "AAAA", 4), leaf("b", "CCCC", 4)]);
         parent.update_attr();
         assert_eq!(parent.min_len, 8);
         assert_eq!(parent.max_len, 8);
@@ -443,8 +511,15 @@ mod tests {
     #[test]
     fn test_update_attr_random() {
         let mut r = Region::new(
-            "r".into(), "umi".into(), "r".into(), "random".into(),
-            "".into(), 10, 10, None, vec![],
+            "r".into(),
+            "umi".into(),
+            "r".into(),
+            "random".into(),
+            "".into(),
+            10,
+            10,
+            None,
+            vec![],
         );
         r.update_attr();
         assert_eq!(r.sequence, "XXXXXXXXXX");
@@ -453,12 +528,24 @@ mod tests {
     #[test]
     fn test_update_attr_onlist() {
         let onlist = Onlist::new(
-            "ol".into(), "list.txt".into(), "txt".into(),
-            0, "list.txt".into(), "local".into(), "".into(),
+            "ol".into(),
+            "list.txt".into(),
+            "txt".into(),
+            0,
+            "list.txt".into(),
+            "local".into(),
+            "".into(),
         );
         let mut r = Region::new(
-            "r".into(), "barcode".into(), "r".into(), "onlist".into(),
-            "".into(), 16, 16, Some(onlist), vec![],
+            "r".into(),
+            "barcode".into(),
+            "r".into(),
+            "onlist".into(),
+            "".into(),
+            16,
+            16,
+            Some(onlist),
+            vec![],
         );
         r.update_attr();
         assert_eq!(r.sequence, "NNNNNNNNNNNNNNNN");
@@ -469,10 +556,10 @@ mod tests {
 
     #[test]
     fn test_get_region_by_id() {
-        let parent = joined("parent", vec![
-            leaf("target", "ATCG", 4),
-            leaf("other", "GGGG", 4),
-        ]);
+        let parent = joined(
+            "parent",
+            vec![leaf("target", "ATCG", 4), leaf("other", "GGGG", 4)],
+        );
         let found = parent.get_region_by_id("target");
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].region_id, "target");
@@ -486,13 +573,23 @@ mod tests {
 
     #[test]
     fn test_get_region_by_region_type() {
-        let parent = joined("parent", vec![
-            leaf("a", "AAAA", 4),
-            Region::new(
-                "u".into(), "umi".into(), "u".into(), "random".into(),
-                "".into(), 10, 10, None, vec![],
-            ),
-        ]);
+        let parent = joined(
+            "parent",
+            vec![
+                leaf("a", "AAAA", 4),
+                Region::new(
+                    "u".into(),
+                    "umi".into(),
+                    "u".into(),
+                    "random".into(),
+                    "".into(),
+                    10,
+                    10,
+                    None,
+                    vec![],
+                ),
+            ],
+        );
         let barcodes = parent.get_region_by_region_type("barcode");
         assert_eq!(barcodes.len(), 1);
         assert_eq!(barcodes[0].region_id, "a");
@@ -504,16 +601,31 @@ mod tests {
     #[test]
     fn test_get_onlist_regions() {
         let onlist = Onlist::new(
-            "ol".into(), "list.txt".into(), "txt".into(),
-            0, "".into(), "local".into(), "".into(),
+            "ol".into(),
+            "list.txt".into(),
+            "txt".into(),
+            0,
+            "".into(),
+            "local".into(),
+            "".into(),
         );
-        let parent = joined("parent", vec![
-            Region::new(
-                "bc".into(), "barcode".into(), "bc".into(), "onlist".into(),
-                "".into(), 16, 16, Some(onlist), vec![],
-            ),
-            leaf("other", "AAAA", 4),
-        ]);
+        let parent = joined(
+            "parent",
+            vec![
+                Region::new(
+                    "bc".into(),
+                    "barcode".into(),
+                    "bc".into(),
+                    "onlist".into(),
+                    "".into(),
+                    16,
+                    16,
+                    Some(onlist),
+                    vec![],
+                ),
+                leaf("other", "AAAA", 4),
+            ],
+        );
         let onlist_regions = parent.get_onlist_regions();
         assert_eq!(onlist_regions.len(), 1);
         assert_eq!(onlist_regions[0].region_id, "bc");
@@ -525,25 +637,37 @@ mod tests {
         assert!(r.get_onlist().is_none());
 
         let onlist = Onlist::new(
-            "ol".into(), "list.txt".into(), "txt".into(),
-            0, "".into(), "local".into(), "".into(),
+            "ol".into(),
+            "list.txt".into(),
+            "txt".into(),
+            0,
+            "".into(),
+            "local".into(),
+            "".into(),
         );
         let r2 = Region::new(
-            "bc".into(), "barcode".into(), "bc".into(), "onlist".into(),
-            "".into(), 16, 16, Some(onlist.clone()), vec![],
+            "bc".into(),
+            "barcode".into(),
+            "bc".into(),
+            "onlist".into(),
+            "".into(),
+            16,
+            16,
+            Some(onlist.clone()),
+            vec![],
         );
         assert_eq!(r2.get_onlist().unwrap(), onlist);
     }
 
     #[test]
     fn test_get_leaves() {
-        let parent = joined("parent", vec![
-            leaf("a", "AAAA", 4),
-            joined("inner", vec![
-                leaf("b", "CCCC", 4),
-                leaf("c", "GGGG", 4),
-            ]),
-        ]);
+        let parent = joined(
+            "parent",
+            vec![
+                leaf("a", "AAAA", 4),
+                joined("inner", vec![leaf("b", "CCCC", 4), leaf("c", "GGGG", 4)]),
+            ],
+        );
         let leaves = parent.get_leaves();
         assert_eq!(leaves.len(), 3);
         assert_eq!(leaves[0].region_id, "a");
@@ -553,13 +677,13 @@ mod tests {
 
     #[test]
     fn test_get_leaves_with_region_id() {
-        let parent = joined("parent", vec![
-            leaf("a", "AAAA", 4),
-            joined("inner", vec![
-                leaf("b", "CCCC", 4),
-                leaf("c", "GGGG", 4),
-            ]),
-        ]);
+        let parent = joined(
+            "parent",
+            vec![
+                leaf("a", "AAAA", 4),
+                joined("inner", vec![leaf("b", "CCCC", 4), leaf("c", "GGGG", 4)]),
+            ],
+        );
         // Stops at "inner" and includes it instead of descending
         let leaves = parent.get_leaves_with_region_id("inner");
         assert_eq!(leaves.len(), 2);
@@ -569,14 +693,24 @@ mod tests {
 
     #[test]
     fn test_get_leaf_region_types() {
-        let parent = joined("parent", vec![
-            leaf("a", "AAAA", 4), // barcode
-            Region::new(
-                "u".into(), "umi".into(), "u".into(), "random".into(),
-                "".into(), 10, 10, None, vec![],
-            ),
-            leaf("b", "CCCC", 4), // barcode
-        ]);
+        let parent = joined(
+            "parent",
+            vec![
+                leaf("a", "AAAA", 4), // barcode
+                Region::new(
+                    "u".into(),
+                    "umi".into(),
+                    "u".into(),
+                    "random".into(),
+                    "".into(),
+                    10,
+                    10,
+                    None,
+                    vec![],
+                ),
+                leaf("b", "CCCC", 4), // barcode
+            ],
+        );
         let types = parent.get_leaf_region_types();
         assert_eq!(types, vec!["barcode", "umi"]);
     }
@@ -586,18 +720,22 @@ mod tests {
     #[test]
     fn test_to_newick_leaf() {
         let r = Region::new(
-            "bc".into(), "barcode".into(), "bc".into(), "fixed".into(),
-            "ATCG".into(), 4, 4, None, vec![],
+            "bc".into(),
+            "barcode".into(),
+            "bc".into(),
+            "fixed".into(),
+            "ATCG".into(),
+            4,
+            4,
+            None,
+            vec![],
         );
         assert_eq!(r.to_newick(), "'bc:4'");
     }
 
     #[test]
     fn test_to_newick_nested() {
-        let parent = joined("parent", vec![
-            leaf("a", "AAAA", 4),
-            leaf("b", "CCCC", 4),
-        ]);
+        let parent = joined("parent", vec![leaf("a", "AAAA", 4), leaf("b", "CCCC", 4)]);
         assert_eq!(parent.to_newick(), "('a:4','b:4')parent");
     }
 
@@ -612,10 +750,7 @@ mod tests {
 
     #[test]
     fn test_reverse_nested() {
-        let mut parent = joined("parent", vec![
-            leaf("a", "ATCG", 4),
-            leaf("b", "GGCC", 4),
-        ]);
+        let mut parent = joined("parent", vec![leaf("a", "ATCG", 4), leaf("b", "GGCC", 4)]);
         parent.reverse();
         assert_eq!(parent.regions[0].sequence, "GCTA");
         assert_eq!(parent.regions[1].sequence, "CCGG");
@@ -630,10 +765,7 @@ mod tests {
 
     #[test]
     fn test_complement_nested() {
-        let mut parent = joined("parent", vec![
-            leaf("a", "ATCG", 4),
-            leaf("b", "AAAA", 4),
-        ]);
+        let mut parent = joined("parent", vec![leaf("a", "ATCG", 4), leaf("b", "AAAA", 4)]);
         parent.complement();
         assert_eq!(parent.regions[0].sequence, "TAGC");
         assert_eq!(parent.regions[1].sequence, "TTTT");
@@ -643,8 +775,14 @@ mod tests {
     fn test_update_region() {
         let mut r = leaf("old", "ATCG", 4);
         r.update_region(
-            "new".into(), "umi".into(), "New Name".into(),
-            "random".into(), "XXXX".into(), 4, 4, None,
+            "new".into(),
+            "umi".into(),
+            "New Name".into(),
+            "random".into(),
+            "XXXX".into(),
+            4,
+            4,
+            None,
         );
         assert_eq!(r.region_id, "new");
         assert_eq!(r.region_type, "umi");
@@ -655,14 +793,19 @@ mod tests {
 
     #[test]
     fn test_update_region_by_id() {
-        let mut parent = joined("parent", vec![
-            leaf("target", "ATCG", 4),
-            leaf("other", "GGGG", 4),
-        ]);
+        let mut parent = joined(
+            "parent",
+            vec![leaf("target", "ATCG", 4), leaf("other", "GGGG", 4)],
+        );
         parent.update_region_by_id(
             "target".into(),
-            None, None, Some("Updated Name".into()),
-            None, Some("CCCC".into()), None, None,
+            None,
+            None,
+            Some("Updated Name".into()),
+            None,
+            Some("CCCC".into()),
+            None,
+            None,
         );
         assert_eq!(parent.regions[0].region_id, "target"); // unchanged
         assert_eq!(parent.regions[0].name, "Updated Name");
@@ -672,9 +815,7 @@ mod tests {
     #[test]
     fn test_update_region_by_id_none_keeps_original() {
         let mut r = leaf("bc", "ATCG", 4);
-        r.update_region_by_id(
-            "bc".into(), None, None, None, None, None, None, None,
-        );
+        r.update_region_by_id("bc".into(), None, None, None, None, None, None, None);
         assert_eq!(r.region_id, "bc");
         assert_eq!(r.name, "bc");
         assert_eq!(r.sequence, "ATCG");
@@ -683,8 +824,15 @@ mod tests {
     #[test]
     fn test_region_repr() {
         let r = Region::new(
-            "bc".into(), "barcode".into(), "bc".into(), "fixed".into(),
-            "ATCG".into(), 16, 16, None, vec![],
+            "bc".into(),
+            "barcode".into(),
+            "bc".into(),
+            "fixed".into(),
+            "ATCG".into(),
+            16,
+            16,
+            None,
+            vec![],
         );
         assert_eq!(r.repr(), "barcode(16, 16)");
     }
@@ -833,7 +981,16 @@ mod tests {
         let leaves = rna_lib.get_leaves();
         assert_eq!(leaves.len(), 5);
         let leaf_ids: Vec<&str> = leaves.iter().map(|l| l.region_id.as_str()).collect();
-        assert_eq!(leaf_ids, vec!["rna_truseq_read1", "rna_cell_bc", "rna_umi", "cdna", "rna_truseq_read2"]);
+        assert_eq!(
+            leaf_ids,
+            vec![
+                "rna_truseq_read1",
+                "rna_cell_bc",
+                "rna_umi",
+                "cdna",
+                "rna_truseq_read2"
+            ]
+        );
     }
 
     #[test]
@@ -842,7 +999,10 @@ mod tests {
         let rna_lib = spec.get_libspec("rna").expect("rna modality");
         let types = rna_lib.get_leaf_region_types();
         // Returns sorted via BTreeSet
-        assert_eq!(types, vec!["barcode", "cdna", "truseq_read1", "truseq_read2", "umi"]);
+        assert_eq!(
+            types,
+            vec!["barcode", "cdna", "truseq_read1", "truseq_read2", "umi"]
+        );
     }
 
     #[test]

@@ -1,7 +1,7 @@
-use crate::utils;
 use crate::models::assay::Assay;
 use crate::models::file::File;
 use crate::models::onlist::Onlist;
+use crate::utils;
 use clap::Args;
 use std::collections::{HashMap, HashSet};
 use std::fs;
@@ -16,7 +16,14 @@ pub struct FileArgs {
     #[clap(help = "Sequencing specification yaml file", required = true)]
     yaml: PathBuf,
 
-    #[clap(short, long, help = "IDs", value_name = "IDs", required = false, value_delimiter = ',')]
+    #[clap(
+        short,
+        long,
+        help = "IDs",
+        value_name = "IDs",
+        required = false,
+        value_delimiter = ','
+    )]
     ids: Option<Vec<String>>,
 
     #[clap(
@@ -72,7 +79,13 @@ pub fn run_file(args: &FileArgs) {
     if !files.is_empty() {
         let result = match args.format.as_str() {
             "list" => format_list_files_metadata(&files, &args.key, &args.yaml, args.fullpath),
-            "paired" | "interleaved" | "index" => format_list_files(&files, &args.format, Some(&args.key), &args.yaml, args.fullpath),
+            "paired" | "interleaved" | "index" => format_list_files(
+                &files,
+                &args.format,
+                Some(&args.key),
+                &args.yaml,
+                args.fullpath,
+            ),
             "json" => format_json_files(&files, &args.key, &args.yaml, args.fullpath),
             _ => String::new(),
         };
@@ -94,7 +107,10 @@ fn validate_file_args(args: &FileArgs) {
     if ["filesize", "filetype", "urltype", "md5"].contains(&args.key.as_str())
         && ["paired", "interleaved", "index"].contains(&args.format.as_str())
     {
-        eprintln!("Format '{}' valid only with key 'file_id', 'filename', or 'url'", args.format);
+        eprintln!(
+            "Format '{}' valid only with key 'file_id', 'filename', or 'url'",
+            args.format
+        );
         std::process::exit(1);
     }
 }
@@ -181,7 +197,12 @@ fn list_region_files(spec: &Assay, modality: &String) -> HashMap<String, Vec<Fil
     files
 }
 
-fn format_list_files_metadata(files: &HashMap<String, Vec<File>>, k: &String, spec_fn: &PathBuf, fp: bool) -> String {
+fn format_list_files_metadata(
+    files: &HashMap<String, Vec<File>>,
+    k: &String,
+    spec_fn: &PathBuf,
+    fp: bool,
+) -> String {
     let mut x: Vec<String> = Vec::new();
     if k == "all" {
         for (_key, items) in files {
@@ -219,7 +240,12 @@ fn format_list_files_metadata(files: &HashMap<String, Vec<File>>, k: &String, sp
     x.join("\n")
 }
 
-fn format_json_files(files: &HashMap<String, Vec<File>>, k: &String, spec_fn: &PathBuf, fp: bool) -> String {
+fn format_json_files(
+    files: &HashMap<String, Vec<File>>,
+    k: &String,
+    spec_fn: &PathBuf,
+    fp: bool,
+) -> String {
     use serde_json::json;
     let mut x: Vec<serde_json::Value> = Vec::new();
     for (_key, items) in files {
@@ -255,7 +281,13 @@ fn format_json_files(files: &HashMap<String, Vec<File>>, k: &String, spec_fn: &P
     serde_json::to_string_pretty(&x).unwrap()
 }
 
-fn format_list_files(files: &HashMap<String, Vec<File>>, fmt: &String, k: Option<&String>, spec_fn: &PathBuf, fp: bool) -> String {
+fn format_list_files(
+    files: &HashMap<String, Vec<File>>,
+    fmt: &String,
+    k: Option<&String>,
+    spec_fn: &PathBuf,
+    fp: bool,
+) -> String {
     let mut out: Vec<String> = Vec::new();
     if fmt == "paired" {
         for (_key, items) in files {
@@ -343,7 +375,11 @@ fn format_list_files(files: &HashMap<String, Vec<File>>, fmt: &String, k: Option
     out.join("\n")
 }
 
-fn list_files_by_read_id(spec: &Assay, modality: &String, read_ids: &Vec<String>) -> HashMap<String, Vec<File>> {
+fn list_files_by_read_id(
+    spec: &Assay,
+    modality: &String,
+    read_ids: &Vec<String>,
+) -> HashMap<String, Vec<File>> {
     let mut files: HashMap<String, Vec<File>> = HashMap::new();
     let ids: HashSet<String> = read_ids.iter().cloned().collect();
     for read in spec.get_seqspec(modality) {
@@ -354,7 +390,11 @@ fn list_files_by_read_id(spec: &Assay, modality: &String, read_ids: &Vec<String>
     files
 }
 
-fn list_files_by_file_id(spec: &Assay, modality: &String, file_ids: &Vec<String>) -> HashMap<String, Vec<File>> {
+fn list_files_by_file_id(
+    spec: &Assay,
+    modality: &String,
+    file_ids: &Vec<String>,
+) -> HashMap<String, Vec<File>> {
     let mut files: HashMap<String, Vec<File>> = HashMap::new();
     let ids: HashSet<String> = file_ids.iter().cloned().collect();
     for read in spec.get_seqspec(modality) {
@@ -367,7 +407,11 @@ fn list_files_by_file_id(spec: &Assay, modality: &String, file_ids: &Vec<String>
     files
 }
 
-fn list_files_by_region_id(spec: &Assay, modality: &String, region_ids: &Vec<String>) -> HashMap<String, Vec<File>> {
+fn list_files_by_region_id(
+    spec: &Assay,
+    modality: &String,
+    region_ids: &Vec<String>,
+) -> HashMap<String, Vec<File>> {
     let files = list_region_files(spec, modality);
     let ids: HashSet<String> = region_ids.iter().cloned().collect();
     let mut new_files: HashMap<String, Vec<File>> = HashMap::new();
@@ -379,7 +423,11 @@ fn list_files_by_region_id(spec: &Assay, modality: &String, region_ids: &Vec<Str
     new_files
 }
 
-fn list_files_by_region_type(spec: &Assay, modality: &String, region_types: &Vec<String>) -> HashMap<String, Vec<File>> {
+fn list_files_by_region_type(
+    spec: &Assay,
+    modality: &String,
+    region_types: &Vec<String>,
+) -> HashMap<String, Vec<File>> {
     let files = list_region_files(spec, modality);
     let ids: HashSet<String> = region_types.iter().cloned().collect();
     let mut new_files: HashMap<String, Vec<File>> = HashMap::new();
@@ -395,7 +443,11 @@ fn list_files_by_region_type(spec: &Assay, modality: &String, region_types: &Vec
 }
 
 fn maybe_full(url: &String, urltype: &String, spec_fn: &PathBuf, fp: bool) -> String {
-    if urltype == "local" && fp { full_path(spec_fn, url) } else { url.clone() }
+    if urltype == "local" && fp {
+        full_path(spec_fn, url)
+    } else {
+        url.clone()
+    }
 }
 
 fn full_path(spec_fn: &PathBuf, url: &String) -> String {
@@ -480,5 +532,3 @@ mod tests {
         assert_eq!(result, "http://example.com/file.txt");
     }
 }
-
-

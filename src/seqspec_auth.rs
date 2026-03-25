@@ -104,7 +104,10 @@ fn run_path(args: &AuthPathArgs) -> Result<()> {
     let output = PathOutput {
         kind: "auth_config_path",
         source: &location.source,
-        path: location.path.as_ref().map(|path| path.display().to_string()),
+        path: location
+            .path
+            .as_ref()
+            .map(|path| path.display().to_string()),
         exists: location.exists,
     };
     print_value(args.format, &output)

@@ -46,12 +46,12 @@ pub struct Assay {
 
     // Note we don't support the string type, only the object type
     pub sequence_protocol: Option<Vec<SeqProtocol>>,
-    pub sequence_kit:      Option<Vec<SeqKit>>,
-    pub library_protocol:  Option<Vec<LibProtocol>>,
-    pub library_kit:       Option<Vec<LibKit>>,
+    pub sequence_kit: Option<Vec<SeqKit>>,
+    pub library_protocol: Option<Vec<LibProtocol>>,
+    pub library_kit: Option<Vec<LibKit>>,
 
     pub sequence_spec: Vec<Read>,
-    pub library_spec:  Vec<Region>,
+    pub library_spec: Vec<Region>,
 }
 
 impl Assay {
@@ -72,9 +72,20 @@ impl Assay {
         seqspec_version: Option<String>,
     ) -> Self {
         Self {
-            seqspec_version, assay_id, name, doi, date, description, modalities, lib_struct,
-            sequence_protocol, sequence_kit, library_protocol, library_kit,
-            sequence_spec, library_spec
+            seqspec_version,
+            assay_id,
+            name,
+            doi,
+            date,
+            description,
+            modalities,
+            lib_struct,
+            sequence_protocol,
+            sequence_kit,
+            library_protocol,
+            library_kit,
+            sequence_spec,
+            library_spec,
         }
     }
 
@@ -87,14 +98,23 @@ impl Assay {
         serde_json::to_string(self)
     }
 
-    pub fn to_bytes(&self) -> Result<Vec<u8>,  std::io::Error> {
+    pub fn to_bytes(&self) -> Result<Vec<u8>, std::io::Error> {
         serde_yaml::to_string(self)
             .map(|s| s.into_bytes())
-            .map_err(|e| Error::new(ErrorKind::InvalidData, format!("failed to serialize assay: {e}")))
+            .map_err(|e| {
+                Error::new(
+                    ErrorKind::InvalidData,
+                    format!("failed to serialize assay: {e}"),
+                )
+            })
     }
-    pub fn from_bytes(bytes: &[u8]) -> Result<Self,  std::io::Error> {
-        serde_yaml::from_slice(bytes)
-            .map_err(|e| Error::new(ErrorKind::InvalidData, format!("failed to parse assay YAML: {e}")))
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self, std::io::Error> {
+        serde_yaml::from_slice(bytes).map_err(|e| {
+            Error::new(
+                ErrorKind::InvalidData,
+                format!("failed to parse assay YAML: {e}"),
+            )
+        })
     }
 
     // Core helpers ----------------------------------------------------
@@ -109,7 +129,10 @@ impl Assay {
     }
 
     pub fn get_libspec(&self, modality: &str) -> Option<Region> {
-        self.modalities.iter().position(|m| m == modality).map(|idx| self.library_spec[idx].clone())
+        self.modalities
+            .iter()
+            .position(|m| m == modality)
+            .map(|idx| self.library_spec[idx].clone())
     }
 
     pub fn get_seqspec(&self, modality: &str) -> Vec<Read> {
@@ -122,9 +145,9 @@ impl Assay {
 
     pub fn get_read(&self, read_id: &str) -> Option<Read> {
         self.sequence_spec
-        .iter()
-        .find(|r| r.read_id == read_id)
-        .cloned()
+            .iter()
+            .find(|r| r.read_id == read_id)
+            .cloned()
     }
 
     /// Insert regions under the top-level region for `modality`.
@@ -183,9 +206,9 @@ impl Assay {
                 .sequence_spec
                 .iter()
                 .position(|r| r.read_id == aid)
-                .map(|p| p + 1)                       // insert after the found read
+                .map(|p| p + 1) // insert after the found read
                 .unwrap_or(self.sequence_spec.len()), // if not found, append
-            None => 0,                                 // insert at beginning
+            None => 0, // insert at beginning
         };
 
         // insert all reads at once
@@ -195,19 +218,31 @@ impl Assay {
     }
 
     pub fn __repr__(&self) -> String {
-        format!("Assay: {}  Modalities: {:?}", self.assay_id, self.modalities)
+        format!(
+            "Assay: {}  Modalities: {:?}",
+            self.assay_id, self.modalities
+        )
     }
 
     /// Returns the common file count if all reads have the same, non-zero length.
     fn file_count(reads: &[Read]) -> Option<usize> {
         let first = reads.first()?.files.len();
-        if first == 0 { return None; }
-        if reads.iter().all(|r| r.files.len() == first) { Some(first) } else { None }
+        if first == 0 {
+            return None;
+        }
+        if reads.iter().all(|r| r.files.len() == first) {
+            Some(first)
+        } else {
+            None
+        }
     }
 
     pub fn generate_group_ids(&self, modality: &str) -> Vec<usize> {
         let reads = self.get_seqspec(modality);
-        let n = match Self::file_count(&reads) { Some(n) => n, None => return vec![] };
+        let n = match Self::file_count(&reads) {
+            Some(n) => n,
+            None => return vec![],
+        };
         (0..n).collect()
     }
 
@@ -230,7 +265,6 @@ impl Assay {
         let read_idx = group_id % reads.len();
         reads.get(read_idx).map(|r| r.files.clone())
     }
-
 }
 
 #[cfg(test)]
@@ -241,22 +275,40 @@ mod tests {
 
     fn sample_file() -> File {
         File::new(
-            "f1".into(), "R1.fq.gz".into(), "fastq".into(),
-            1024, "R1.fq.gz".into(), "local".into(), "".into(),
+            "f1".into(),
+            "R1.fq.gz".into(),
+            "fastq".into(),
+            1024,
+            "R1.fq.gz".into(),
+            "local".into(),
+            "".into(),
         )
     }
 
     fn sample_read(id: &str, modality: &str) -> Read {
         Read::new(
-            id.into(), id.into(), modality.into(), "primer1".into(),
-            100, 150, "pos".into(), vec![sample_file()],
+            id.into(),
+            id.into(),
+            modality.into(),
+            "primer1".into(),
+            100,
+            150,
+            "pos".into(),
+            vec![sample_file()],
         )
     }
 
     fn sample_region(id: &str) -> Region {
         Region::new(
-            id.into(), "barcode".into(), id.into(), "fixed".into(),
-            "ATCG".into(), 4, 4, None, vec![],
+            id.into(),
+            "barcode".into(),
+            id.into(),
+            "fixed".into(),
+            "ATCG".into(),
+            4,
+            4,
+            None,
+            vec![],
         )
     }
 
@@ -271,18 +323,34 @@ mod tests {
             "".into(),
             vec![sample_read("R1", "rna"), sample_read("R2", "rna")],
             vec![Region::new(
-                "rna".into(), "rna".into(), "rna".into(), "joined".into(),
-                "".into(), 0, 0, None,
+                "rna".into(),
+                "rna".into(),
+                "rna".into(),
+                "joined".into(),
+                "".into(),
+                0,
+                0,
+                None,
                 vec![
                     Region::new(
-                        "primer1".into(), "truseq_read1".into(), "primer1".into(),
-                        "fixed".into(), "".into(), 0, 0, None, vec![],
+                        "primer1".into(),
+                        "truseq_read1".into(),
+                        "primer1".into(),
+                        "fixed".into(),
+                        "".into(),
+                        0,
+                        0,
+                        None,
+                        vec![],
                     ),
                     sample_region("bc"),
                     sample_region("umi"),
                 ],
             )],
-            None, None, None, None,
+            None,
+            None,
+            None,
+            None,
             Some("0.3.0".into()),
         )
     }
@@ -378,12 +446,21 @@ mod tests {
     fn test_assay_insert_regions_after() {
         let mut a = sample_assay();
         let new_region = sample_region("new_bc");
-        a.insert_regions(vec![new_region], "rna", Some("bc")).unwrap();
+        a.insert_regions(vec![new_region], "rna", Some("bc"))
+            .unwrap();
 
         let lib = a.get_libspec("rna").unwrap();
         // Find position of new_bc — should be right after "bc"
-        let bc_pos = lib.regions.iter().position(|r| r.region_id == "bc").unwrap();
-        let new_pos = lib.regions.iter().position(|r| r.region_id == "new_bc").unwrap();
+        let bc_pos = lib
+            .regions
+            .iter()
+            .position(|r| r.region_id == "bc")
+            .unwrap();
+        let new_pos = lib
+            .regions
+            .iter()
+            .position(|r| r.region_id == "new_bc")
+            .unwrap();
         assert_eq!(new_pos, bc_pos + 1);
     }
 
@@ -399,8 +476,14 @@ mod tests {
         let mut a = sample_assay();
         let orig_count = a.sequence_spec.len();
         let new_read = Read::new(
-            "I1".into(), "Index 1".into(), "".into(), "p".into(),
-            8, 8, "pos".into(), vec![],
+            "I1".into(),
+            "Index 1".into(),
+            "".into(),
+            "p".into(),
+            8,
+            8,
+            "pos".into(),
+            vec![],
         );
         a.insert_reads(vec![new_read], "rna", None).unwrap();
 
@@ -413,13 +496,27 @@ mod tests {
     fn test_assay_insert_reads_after() {
         let mut a = sample_assay();
         let new_read = Read::new(
-            "I1".into(), "Index 1".into(), "".into(), "p".into(),
-            8, 8, "pos".into(), vec![],
+            "I1".into(),
+            "Index 1".into(),
+            "".into(),
+            "p".into(),
+            8,
+            8,
+            "pos".into(),
+            vec![],
         );
         a.insert_reads(vec![new_read], "rna", Some("R1")).unwrap();
 
-        let r1_pos = a.sequence_spec.iter().position(|r| r.read_id == "R1").unwrap();
-        let i1_pos = a.sequence_spec.iter().position(|r| r.read_id == "I1").unwrap();
+        let r1_pos = a
+            .sequence_spec
+            .iter()
+            .position(|r| r.read_id == "R1")
+            .unwrap();
+        let i1_pos = a
+            .sequence_spec
+            .iter()
+            .position(|r| r.read_id == "I1")
+            .unwrap();
         assert_eq!(i1_pos, r1_pos + 1);
     }
 

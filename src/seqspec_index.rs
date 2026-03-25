@@ -1,15 +1,15 @@
 use crate::utils;
-use std::path::PathBuf;
 use std::fs;
 use std::io::Write;
+use std::path::PathBuf;
 // use std::str::FromStr;
 
-use clap::Args;
 use crate::models::assay::Assay;
 use crate::models::coordinate::Coordinate;
 use crate::models::file::File;
 use crate::models::region::{Region, RegionCoordinate, RegionCoordinateDifference};
 use crate::seqspec_find::find_by_region_id;
+use clap::Args;
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Args)]
@@ -52,16 +52,41 @@ pub struct IndexArgs {
     )]
     modality: String,
 
-    #[clap(short, long, help = "IDs (comma-separated)", value_name = "IDS", required = false, value_delimiter = ',')]
+    #[clap(
+        short,
+        long,
+        help = "IDs (comma-separated)",
+        value_name = "IDS",
+        required = false,
+        value_delimiter = ','
+    )]
     ids: Option<Vec<String>>,
 
-    #[clap(short, long, help = "Rev", value_name = "REV", required = false, default_value = "false")]
+    #[clap(
+        short,
+        long,
+        help = "Rev",
+        value_name = "REV",
+        required = false,
+        default_value = "false"
+    )]
     rev: bool,
 
-    #[clap(long, help = "Subregion Type", value_name = "SUBREGIONTYPE", required = false)]
+    #[clap(
+        long,
+        help = "Subregion Type",
+        value_name = "SUBREGIONTYPE",
+        required = false
+    )]
     subregion_type: Option<String>,
 
-    #[clap(long, help = "No Overlap", value_name = "NOOVERLAP", required = false, default_value = "false")]
+    #[clap(
+        long,
+        help = "No Overlap",
+        value_name = "NOOVERLAP",
+        required = false,
+        default_value = "false"
+    )]
     no_overlap: bool,
 }
 
@@ -86,7 +111,6 @@ pub fn run_index(args: &IndexArgs) {
 
     let ids = args.ids.as_ref().unwrap_or(&Vec::new()).clone();
 
-
     let mut index = seqspec_index(&spec, &args.modality, &ids, &args.selector, &args.rev);
     if args.no_overlap {
         index = filter_index_no_overlap(index);
@@ -101,7 +125,13 @@ pub fn run_index(args: &IndexArgs) {
     }
 }
 
-pub fn seqspec_index(spec: &Assay, modality: &String, ids: &Vec<String>, idtype: &String, _rev: &bool) -> Vec<Coordinate> {
+pub fn seqspec_index(
+    spec: &Assay,
+    modality: &String,
+    ids: &Vec<String>,
+    idtype: &String,
+    _rev: &bool,
+) -> Vec<Coordinate> {
     match (idtype.as_str(), ids.is_empty()) {
         ("file", true) => get_index_by_files(spec, modality),
         ("read", true) => get_index_by_reads(spec, modality),
@@ -113,7 +143,11 @@ pub fn seqspec_index(spec: &Assay, modality: &String, ids: &Vec<String>, idtype:
     }
 }
 
-pub fn format_index(index: &Vec<Coordinate>, tool: &String, subregion_type: &Option<String>) -> String {
+pub fn format_index(
+    index: &Vec<Coordinate>,
+    tool: &String,
+    subregion_type: &Option<String>,
+) -> String {
     match tool.as_str() {
         "chromap" => format_chromap(index),
         "kb" => format_kallisto_bus(index),
@@ -133,20 +167,30 @@ pub fn format_index(index: &Vec<Coordinate>, tool: &String, subregion_type: &Opt
 fn get_index_by_files(spec: &Assay, modality: &String) -> Vec<Coordinate> {
     let mut all_files: Vec<File> = Vec::new();
     for r in spec.get_seqspec(modality) {
-        for f in r.files { all_files.push(f); }
+        for f in r.files {
+            all_files.push(f);
+        }
     }
     let file_ids: Vec<String> = all_files.into_iter().map(|f| f.file_id).collect();
     get_index_by_file_ids(spec, modality, &file_ids)
 }
 fn get_index_by_reads(spec: &Assay, modality: &String) -> Vec<Coordinate> {
-    let read_ids: Vec<String> = spec.get_seqspec(modality).into_iter().map(|r| r.read_id).collect();
+    let read_ids: Vec<String> = spec
+        .get_seqspec(modality)
+        .into_iter()
+        .map(|r| r.read_id)
+        .collect();
     get_index_by_read_ids(spec, modality, &read_ids)
 }
 fn get_index_by_regions(spec: &Assay, modality: &String) -> Vec<Coordinate> {
     let rgn = spec.get_libspec(modality).expect("Modality not found");
     get_index_by_region_ids(spec, modality, &vec![rgn.region_id])
 }
-fn get_index_by_file_ids(spec: &Assay, modality: &String, file_ids: &Vec<String>) -> Vec<Coordinate> {
+fn get_index_by_file_ids(
+    spec: &Assay,
+    modality: &String,
+    file_ids: &Vec<String>,
+) -> Vec<Coordinate> {
     let files_map = list_files_by_file_id(spec, modality, file_ids);
     let mut indices: Vec<Coordinate> = Vec::new();
     for (read_id, files) in files_map {
@@ -160,7 +204,11 @@ fn get_index_by_file_ids(spec: &Assay, modality: &String, file_ids: &Vec<String>
     }
     indices
 }
-fn get_index_by_region_ids(spec: &Assay, modality: &String, region_ids: &Vec<String>) -> Vec<Coordinate> {
+fn get_index_by_region_ids(
+    spec: &Assay,
+    modality: &String,
+    region_ids: &Vec<String>,
+) -> Vec<Coordinate> {
     let mut indices: Vec<Coordinate> = Vec::new();
     for id in region_ids {
         let coord = get_coordinate_by_region_id(spec, modality, id);
@@ -168,7 +216,11 @@ fn get_index_by_region_ids(spec: &Assay, modality: &String, region_ids: &Vec<Str
     }
     indices
 }
-fn get_index_by_read_ids(spec: &Assay, modality: &String, read_ids: &Vec<String>) -> Vec<Coordinate> {
+fn get_index_by_read_ids(
+    spec: &Assay,
+    modality: &String,
+    read_ids: &Vec<String>,
+) -> Vec<Coordinate> {
     let mut indices: Vec<Coordinate> = Vec::new();
     for id in read_ids {
         let coord = get_coordinate_by_read_id(spec, modality, id);
@@ -190,7 +242,8 @@ fn get_coordinate_by_region_id(spec: &Assay, modality: &String, region_id: &str)
     }
 }
 fn get_coordinate_by_read_id(spec: &Assay, modality: &String, read_id: &str) -> Coordinate {
-    let (read, rgns) = utils::map_read_id_to_regions(spec, modality, read_id).expect("read mapping failed");
+    let (read, rgns) =
+        utils::map_read_id_to_regions(spec, modality, read_id).expect("read mapping failed");
     let rcs: Vec<RegionCoordinate> = utils::project_regions_to_coordinates(rgns);
     let new_rcs: Vec<RegionCoordinate> = utils::itx_read(rcs, 0, read.max_len);
     Coordinate {
@@ -227,13 +280,20 @@ fn format_kallisto_bus(indices: &Vec<Coordinate>) -> String {
                 bcs.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
             } else if rt == "UMI" {
                 umi.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
-            } else if matches!(rt.as_str(), "CDNA" | "GDNA" | "PROTEIN" | "TAG" | "SGRNA_TARGET") {
+            } else if matches!(
+                rt.as_str(),
+                "CDNA" | "GDNA" | "PROTEIN" | "TAG" | "SGRNA_TARGET"
+            ) {
                 feature.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
             }
         }
     }
-    if umi.is_empty() { umi.push("-1,-1,-1".to_string()); }
-    if bcs.is_empty() { bcs.push("-1,-1,-1".to_string()); }
+    if umi.is_empty() {
+        umi.push("-1,-1,-1".to_string());
+    }
+    if bcs.is_empty() {
+        bcs.push("-1,-1,-1".to_string());
+    }
     format!("{}:{}:{}", bcs.join(","), umi.join(","), feature.join(","))
 }
 fn format_kallisto_bus_force_single(indices: &Vec<Coordinate>) -> String {
@@ -249,7 +309,10 @@ fn format_kallisto_bus_force_single(indices: &Vec<Coordinate>) -> String {
                 bcs.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
             } else if rt == "UMI" {
                 umi.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
-            } else if matches!(rt.as_str(), "CDNA" | "GDNA" | "PROTEIN" | "TAG" | "SGRNA_TARGET") {
+            } else if matches!(
+                rt.as_str(),
+                "CDNA" | "GDNA" | "PROTEIN" | "TAG" | "SGRNA_TARGET"
+            ) {
                 let length = cut.stop - cut.start;
                 if length > max_length {
                     max_length = length;
@@ -258,13 +321,21 @@ fn format_kallisto_bus_force_single(indices: &Vec<Coordinate>) -> String {
             }
         }
     }
-    if umi.is_empty() { umi.push("-1,-1,-1".to_string()); }
-    if bcs.is_empty() { bcs.push("-1,-1,-1".to_string()); }
-    if let Some(lf) = longest_feature { feature.push(lf); }
+    if umi.is_empty() {
+        umi.push("-1,-1,-1".to_string());
+    }
+    if bcs.is_empty() {
+        bcs.push("-1,-1,-1".to_string());
+    }
+    if let Some(lf) = longest_feature {
+        feature.push(lf);
+    }
     format!("{}:{}:{}", bcs.join(","), umi.join(","), feature.join(","))
 }
 fn format_seqkit_subseq(indices: &Vec<Coordinate>, subregion_type: Option<&str>) -> String {
-    if indices.is_empty() { return String::new(); }
+    if indices.is_empty() {
+        return String::new();
+    }
     let coord = &indices[0];
     let mut x = String::new();
     if let Some(srt) = subregion_type {
@@ -280,10 +351,15 @@ fn format_tab(indices: &Vec<Coordinate>) -> String {
     let mut x = String::new();
     for coord in indices {
         for cut in &coord.rcv {
-            x.push_str(&format!("{}\t{}\t{}\t{}\t{}\n", coord.query_id, cut.region.name, cut.region.region_type, cut.start, cut.stop));
+            x.push_str(&format!(
+                "{}\t{}\t{}\t{}\t{}\n",
+                coord.query_id, cut.region.name, cut.region.region_type, cut.start, cut.stop
+            ));
         }
     }
-    if x.ends_with('\n') { x.pop(); }
+    if x.ends_with('\n') {
+        x.pop();
+    }
     x
 }
 fn format_starsolo(indices: &Vec<Coordinate>) -> String {
@@ -293,15 +369,25 @@ fn format_starsolo(indices: &Vec<Coordinate>) -> String {
         for cut in &coord.rcv {
             let rt = cut.region.region_type.to_uppercase();
             if rt == "BARCODE" {
-                bcs.push(format!("--soloCBstart {} --soloCBlen {}", cut.start + 1, cut.stop - cut.start));
+                bcs.push(format!(
+                    "--soloCBstart {} --soloCBlen {}",
+                    cut.start + 1,
+                    cut.stop - cut.start
+                ));
             } else if rt == "UMI" {
-                umi.push(format!("--soloUMIstart {} --soloUMIlen {}", cut.start + 1, cut.stop - cut.start));
+                umi.push(format!(
+                    "--soloUMIstart {} --soloUMIlen {}",
+                    cut.start + 1,
+                    cut.stop - cut.start
+                ));
             }
         }
     }
     if let (Some(bc), Some(u)) = (bcs.first(), umi.first()) {
         format!("--soloType CB_UMI_Simple {} {}", bc, u)
-    } else { String::new() }
+    } else {
+        String::new()
+    }
 }
 fn format_simpleaf(indices: &Vec<Coordinate>) -> String {
     let mut xl: Vec<String> = Vec::new();
@@ -310,9 +396,13 @@ fn format_simpleaf(indices: &Vec<Coordinate>) -> String {
         for cut in &coord.rcv {
             let rt = cut.region.region_type.to_uppercase();
             let len = cut.stop - cut.start;
-            if rt == "BARCODE" { x.push_str(&format!("b[{}]", len)); }
-            else if rt == "UMI" { x.push_str(&format!("u[{}]", len)); }
-            else if rt == "CDNA" { x.push_str(&format!("r[{}]", len)); }
+            if rt == "BARCODE" {
+                x.push_str(&format!("b[{}]", len));
+            } else if rt == "UMI" {
+                x.push_str(&format!("u[{}]", len));
+            } else if rt == "CDNA" {
+                x.push_str(&format!("r[{}]", len));
+            }
         }
         x.push_str("x:}");
         xl.push(x);
@@ -336,7 +426,9 @@ fn format_zumis(indices: &Vec<Coordinate>) -> String {
         xl.push(x);
     }
     let mut out = xl.join("\n");
-    if out.ends_with('\n') { out.pop(); }
+    if out.ends_with('\n') {
+        out.pop();
+    }
     out
 }
 fn format_chromap(indices: &Vec<Coordinate>) -> String {
@@ -345,20 +437,33 @@ fn format_chromap(indices: &Vec<Coordinate>) -> String {
     let mut gdna_fqs: Vec<String> = Vec::new();
     let mut gdna_str: Vec<String> = Vec::new();
     for coord in indices {
-        let strand_suffix = if coord.strand == "pos" { String::new() } else { ":-".to_string() };
+        let strand_suffix = if coord.strand == "pos" {
+            String::new()
+        } else {
+            ":-".to_string()
+        };
         for cut in &coord.rcv {
             let rt = cut.region.region_type.to_uppercase();
             if rt == "BARCODE" {
                 bc_fqs.push(coord.query_id.clone());
-                bc_str.push(format!("bc:{}:{}{}", cut.start, cut.stop - 1, strand_suffix));
+                bc_str.push(format!(
+                    "bc:{}:{}{}",
+                    cut.start,
+                    cut.stop - 1,
+                    strand_suffix
+                ));
             } else if rt == "GDNA" {
                 gdna_fqs.push(coord.query_id.clone());
                 gdna_str.push(format!("{}:{}", cut.start, cut.stop - 1));
             }
         }
     }
-    if bc_fqs.iter().collect::<HashSet<_>>().len() > 1 { panic!("chromap only supports barcodes from one fastq"); }
-    if gdna_fqs.iter().collect::<HashSet<_>>().len() > 2 { panic!("chromap only supports genomic dna from two fastqs"); }
+    if bc_fqs.iter().collect::<HashSet<_>>().len() > 1 {
+        panic!("chromap only supports barcodes from one fastq");
+    }
+    if gdna_fqs.iter().collect::<HashSet<_>>().len() > 2 {
+        panic!("chromap only supports genomic dna from two fastqs");
+    }
     let barcode_fq = bc_fqs.first().cloned().unwrap_or_default();
     let dedup_gdna_fqs = {
         let mut seen: HashSet<String> = HashSet::new();
@@ -373,25 +478,42 @@ fn format_chromap(indices: &Vec<Coordinate>) -> String {
     };
     let read1_fq = dedup_gdna_fqs.get(0).cloned().unwrap_or_default();
     let read2_fq = dedup_gdna_fqs.get(1).cloned().unwrap_or_default();
-    let read_str = gdna_str.iter().enumerate().map(|(i, ele)| format!("r{}:{}", i+1, ele)).collect::<Vec<_>>().join(",");
+    let read_str = gdna_str
+        .iter()
+        .enumerate()
+        .map(|(i, ele)| format!("r{}:{}", i + 1, ele))
+        .collect::<Vec<_>>()
+        .join(",");
     let bc_str_join = bc_str.join(",");
-    format!("-1 {} -2 {} --barcode {} --read-format {},{}", read1_fq, read2_fq, barcode_fq, bc_str_join, read_str)
+    format!(
+        "-1 {} -2 {} --barcode {} --read-format {},{}",
+        read1_fq, read2_fq, barcode_fq, bc_str_join, read_str
+    )
 }
 fn compute_relative(rcs: &Vec<RegionCoordinate>) -> Vec<RegionCoordinateDifference> {
     let mut d: Vec<RegionCoordinateDifference> = Vec::new();
     for obj in rcs {
         for fixed in rcs {
             if let Some(diff) = obj.difference(fixed) {
-                d.push(RegionCoordinateDifference::new(obj.clone(), fixed.clone(), diff));
+                d.push(RegionCoordinateDifference::new(
+                    obj.clone(),
+                    fixed.clone(),
+                    diff,
+                ));
             }
         }
     }
     d
 }
-fn filter_differences(d: Vec<RegionCoordinateDifference>, filter_region_type: &str) -> Vec<RegionCoordinateDifference> {
+fn filter_differences(
+    d: Vec<RegionCoordinateDifference>,
+    filter_region_type: &str,
+) -> Vec<RegionCoordinateDifference> {
     let mut f: Vec<RegionCoordinateDifference> = Vec::new();
     for rcd in d.into_iter() {
-        if rcd.obj.region.region_type != filter_region_type && rcd.fixed.region.region_type == filter_region_type {
+        if rcd.obj.region.region_type != filter_region_type
+            && rcd.fixed.region.region_type == filter_region_type
+        {
             f.push(rcd);
         }
     }
@@ -418,7 +540,10 @@ fn format_relative(indices: &Vec<Coordinate>) -> String {
 }
 // Splitcode formatting: port essential behavior (forward/complement/reverse/rc groups)
 #[derive(Clone)]
-struct SplitRow { region_type: String, fmt: String }
+struct SplitRow {
+    region_type: String,
+    fmt: String,
+}
 
 fn format_splitcode(indices: &Vec<Coordinate>) -> String {
     use std::collections::HashMap;
@@ -428,56 +553,96 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
         for obj in rcs {
             for fixed in rcs {
                 if let Some(diff) = obj.difference(fixed) {
-                    d.push(RegionCoordinateDifference::new(obj.clone(), fixed.clone(), diff));
+                    d.push(RegionCoordinateDifference::new(
+                        obj.clone(),
+                        fixed.clone(),
+                        diff,
+                    ));
                 }
             }
         }
         d
     }
 
-    fn filter_differences(d: Vec<RegionCoordinateDifference>, filter_region_type: &str) -> Vec<RegionCoordinateDifference> {
+    fn filter_differences(
+        d: Vec<RegionCoordinateDifference>,
+        filter_region_type: &str,
+    ) -> Vec<RegionCoordinateDifference> {
         let mut f: Vec<RegionCoordinateDifference> = Vec::new();
         for rcd in d.into_iter() {
-            if rcd.obj.region.region_type != filter_region_type && rcd.fixed.region.region_type == filter_region_type {
+            if rcd.obj.region.region_type != filter_region_type
+                && rcd.fixed.region.region_type == filter_region_type
+            {
                 f.push(rcd);
             }
         }
         f
     }
 
-    fn groupby_region_id(rgns: &Vec<RegionCoordinateDifference>) -> HashMap<String, (RegionCoordinate, Vec<RegionCoordinateDifference>)> {
-        let mut d: HashMap<String, (RegionCoordinate, Vec<RegionCoordinateDifference>)> = HashMap::new();
+    fn groupby_region_id(
+        rgns: &Vec<RegionCoordinateDifference>,
+    ) -> HashMap<String, (RegionCoordinate, Vec<RegionCoordinateDifference>)> {
+        let mut d: HashMap<String, (RegionCoordinate, Vec<RegionCoordinateDifference>)> =
+            HashMap::new();
         for rgn in rgns {
             let key = rgn.obj.region.region_id.clone();
-            d.entry(key).and_modify(|(_, v)| v.push(rgn.clone())).or_insert((rgn.obj.clone(), vec![rgn.clone()]));
+            d.entry(key)
+                .and_modify(|(_, v)| v.push(rgn.clone()))
+                .or_insert((rgn.obj.clone(), vec![rgn.clone()]));
         }
         d
     }
 
-    fn filter_groupby_region_type(g: &mut HashMap<String, (RegionCoordinate, Vec<RegionCoordinateDifference>)>) {
+    fn filter_groupby_region_type(
+        g: &mut HashMap<String, (RegionCoordinate, Vec<RegionCoordinateDifference>)>,
+    ) {
         let keys: Vec<String> = g.keys().cloned().collect();
         for k in keys {
             let (obj, _) = g.get(&k).unwrap();
             let t = obj.region.region_type.to_lowercase();
-            if t != "umi" && t != "barcode" && t != "cdna" { g.remove(&k); }
+            if t != "umi" && t != "barcode" && t != "cdna" {
+                g.remove(&k);
+            }
         }
     }
 
-    fn format_splitcode_row(obj: &RegionCoordinate, rgncdiffs: &Vec<RegionCoordinateDifference>, idx: i32, rev: bool, complement: bool) -> SplitRow {
+    fn format_splitcode_row(
+        obj: &RegionCoordinate,
+        rgncdiffs: &Vec<RegionCoordinateDifference>,
+        idx: i32,
+        rev: bool,
+        complement: bool,
+    ) -> SplitRow {
         let mut e = String::new();
         if obj.region.region_type.to_lowercase() == "cdna" {
-            if rev && !complement { e.push_str(&format!("<r_{}>", obj.region.region_id)); }
-            else if rev && complement { e.push_str(&format!("<~rc_{}>", obj.region.region_id)); }
-            else if !rev && complement { e.push_str(&format!("<~c_{}>", obj.region.region_id)); }
-            else { e.push_str(&format!("<f_{}>", obj.region.region_id)); }
-            if idx == 0 { e = format!("0:0{}", e); }
-            else if idx == -1 { e = format!("{}0:-1", e); }
+            if rev && !complement {
+                e.push_str(&format!("<r_{}>", obj.region.region_id));
+            } else if rev && complement {
+                e.push_str(&format!("<~rc_{}>", obj.region.region_id));
+            } else if !rev && complement {
+                e.push_str(&format!("<~c_{}>", obj.region.region_id));
+            } else {
+                e.push_str(&format!("<f_{}>", obj.region.region_id));
+            }
+            if idx == 0 {
+                e = format!("0:0{}", e);
+            } else if idx == -1 {
+                e = format!("{}0:-1", e);
+            }
         } else {
-            let tag = if rev && !complement { "r" }
-                      else if rev && complement { "rc" }
-                      else if !rev && complement { "c" }
-                      else { "f" };
-            e.push_str(&format!("<{}_{}[{}]>", tag, obj.region.region_type, obj.region.min_len));
+            let tag = if rev && !complement {
+                "r"
+            } else if rev && complement {
+                "rc"
+            } else if !rev && complement {
+                "c"
+            } else {
+                "f"
+            };
+            e.push_str(&format!(
+                "<{}_{}[{}]>",
+                tag, obj.region.region_type, obj.region.min_len
+            ));
         }
 
         let mut p1 = false;
@@ -490,23 +655,40 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
             let diff = &diffs.rgncdiff;
             if fixed.region_type == "linker" {
                 let minl = diff.region.min_len;
-                let minl_str = if minl == 0 { String::new() } else { format!("{}", minl) };
+                let minl_str = if minl == 0 {
+                    String::new()
+                } else {
+                    format!("{}", minl)
+                };
                 if loc == "+" && !p1 {
-                    if rev && !complement { e = format!("{}{}{{{}r}}", e, minl_str, fixed.region_id); }
-                    else if rev && complement { e = format!("{}{}{{{}rc}}", e, minl_str, fixed.region_id); }
-                    else if !rev && complement { e = format!("{{{}c}}{}{}", fixed.region_id, minl_str, e); }
-                    else { e = format!("{{{}f}}{}{}", fixed.region_id, minl_str, e); }
+                    if rev && !complement {
+                        e = format!("{}{}{{{}r}}", e, minl_str, fixed.region_id);
+                    } else if rev && complement {
+                        e = format!("{}{}{{{}rc}}", e, minl_str, fixed.region_id);
+                    } else if !rev && complement {
+                        e = format!("{{{}c}}{}{}", fixed.region_id, minl_str, e);
+                    } else {
+                        e = format!("{{{}f}}{}{}", fixed.region_id, minl_str, e);
+                    }
                     p1 = true;
                 } else if loc == "-" && !m1 {
-                    if rev && !complement { e = format!("{{{}r}}{}{}", fixed.region_id, minl_str, e); }
-                    else if rev && complement { e = format!("{{{}rc}}{}{}", fixed.region_id, minl_str, e); }
-                    else if !rev && complement { e = format!("{}{}{{{}c}}", e, minl_str, fixed.region_id); }
-                    else { e = format!("{}{}{{{}f}}", e, minl_str, fixed.region_id); }
+                    if rev && !complement {
+                        e = format!("{{{}r}}{}{}", fixed.region_id, minl_str, e);
+                    } else if rev && complement {
+                        e = format!("{{{}rc}}{}{}", fixed.region_id, minl_str, e);
+                    } else if !rev && complement {
+                        e = format!("{}{}{{{}c}}", e, minl_str, fixed.region_id);
+                    } else {
+                        e = format!("{}{}{{{}f}}", e, minl_str, fixed.region_id);
+                    }
                     m1 = true;
                 }
             }
         }
-        SplitRow { region_type: obj.region.region_type.clone(), fmt: e }
+        SplitRow {
+            region_type: obj.region.region_type.clone(),
+            fmt: e,
+        }
     }
 
     let mut x = String::new();
@@ -516,7 +698,8 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
         let f = filter_differences(d, "linker");
         let mut g = groupby_region_id(&f);
         filter_groupby_region_type(&mut g);
-        let gv: Vec<(RegionCoordinate, Vec<RegionCoordinateDifference>)> = g.into_values().collect();
+        let gv: Vec<(RegionCoordinate, Vec<RegionCoordinateDifference>)> =
+            g.into_values().collect();
 
         let mut frows: Vec<SplitRow> = Vec::new();
         let mut rrows: Vec<SplitRow> = Vec::new();
@@ -526,25 +709,65 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
         for (i, (gb_obj, gb_rgncdiffs)) in gv.iter().enumerate() {
             let last = i + 1 == gv.len();
             let idx_val: i32 = if last { -1 } else { i as i32 };
-            frows.push(format_splitcode_row(gb_obj, gb_rgncdiffs, idx_val, false, false));
-            rrows.push(format_splitcode_row(gb_obj, gb_rgncdiffs, idx_val, true, false));
-            crows.push(format_splitcode_row(gb_obj, gb_rgncdiffs, idx_val, false, true));
-            rcrows.push(format_splitcode_row(gb_obj, gb_rgncdiffs, idx_val, true, true));
+            frows.push(format_splitcode_row(
+                gb_obj,
+                gb_rgncdiffs,
+                idx_val,
+                false,
+                false,
+            ));
+            rrows.push(format_splitcode_row(
+                gb_obj,
+                gb_rgncdiffs,
+                idx_val,
+                true,
+                false,
+            ));
+            crows.push(format_splitcode_row(
+                gb_obj,
+                gb_rgncdiffs,
+                idx_val,
+                false,
+                true,
+            ));
+            rcrows.push(format_splitcode_row(
+                gb_obj,
+                gb_rgncdiffs,
+                idx_val,
+                true,
+                true,
+            ));
         }
 
         let mut g_frows: HashMap<String, Vec<String>> = HashMap::new();
         let mut g_crows: HashMap<String, Vec<String>> = HashMap::new();
         let mut g_rrows: HashMap<String, Vec<String>> = HashMap::new();
         let mut g_rcrows: HashMap<String, Vec<String>> = HashMap::new();
-        for r in frows { g_frows.entry(r.region_type).or_default().push(r.fmt); }
-        for r in crows { g_crows.entry(r.region_type).or_default().push(r.fmt); }
-        for r in rrows { g_rrows.entry(r.region_type).or_default().push(r.fmt); }
-        for r in rcrows { g_rcrows.entry(r.region_type).or_default().push(r.fmt); }
+        for r in frows {
+            g_frows.entry(r.region_type).or_default().push(r.fmt);
+        }
+        for r in crows {
+            g_crows.entry(r.region_type).or_default().push(r.fmt);
+        }
+        for r in rrows {
+            g_rrows.entry(r.region_type).or_default().push(r.fmt);
+        }
+        for r in rcrows {
+            g_rcrows.entry(r.region_type).or_default().push(r.fmt);
+        }
 
-        for (_gr, v) in g_frows { e.push_str(&format!("@extract {}\n", v.join(","))); }
-        for (_gr, v) in g_crows { e.push_str(&format!("@extract {}\n", v.join(","))); }
-        for (_gr, v) in g_rrows { e.push_str(&format!("@extract {}\n", v.join(","))); }
-        for (_gr, v) in g_rcrows { e.push_str(&format!("@extract {}\n", v.join(","))); }
+        for (_gr, v) in g_frows {
+            e.push_str(&format!("@extract {}\n", v.join(",")));
+        }
+        for (_gr, v) in g_crows {
+            e.push_str(&format!("@extract {}\n", v.join(",")));
+        }
+        for (_gr, v) in g_rrows {
+            e.push_str(&format!("@extract {}\n", v.join(",")));
+        }
+        for (_gr, v) in g_rcrows {
+            e.push_str(&format!("@extract {}\n", v.join(",")));
+        }
     }
     x.push_str(&e);
 
@@ -553,18 +776,38 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
         let mut idx = 1;
         for cut in &coord.rcv {
             if cut.region.region_type == "linker" {
-                x.push_str(&format!("group{}\t{}f\t{}\t3:3:3\t0:0:0\n", idx, cut.region.name, cut.region.sequence));
+                x.push_str(&format!(
+                    "group{}\t{}f\t{}\t3:3:3\t0:0:0\n",
+                    idx, cut.region.name, cut.region.sequence
+                ));
                 let comp = utils::complement_seq(&cut.region.sequence);
-                x.push_str(&format!("group{}\t{}c\t{}\t3:3:3\t0:0:0\n", idx, cut.region.name, comp));
-                x.push_str(&format!("group{}\t{}r\t{}\t3:3:3\t0:0:0\n", idx, cut.region.name, cut.region.sequence.chars().rev().collect::<String>()));
-                x.push_str(&format!("group{}\t{}rc\t{}\t3:3:3\t0:0:0\n", idx, cut.region.name, comp.chars().rev().collect::<String>()));
+                x.push_str(&format!(
+                    "group{}\t{}c\t{}\t3:3:3\t0:0:0\n",
+                    idx, cut.region.name, comp
+                ));
+                x.push_str(&format!(
+                    "group{}\t{}r\t{}\t3:3:3\t0:0:0\n",
+                    idx,
+                    cut.region.name,
+                    cut.region.sequence.chars().rev().collect::<String>()
+                ));
+                x.push_str(&format!(
+                    "group{}\t{}rc\t{}\t3:3:3\t0:0:0\n",
+                    idx,
+                    cut.region.name,
+                    comp.chars().rev().collect::<String>()
+                ));
                 idx += 1;
             }
         }
     }
     x
 }
-fn list_files_by_file_id(spec: &Assay, modality: &String, file_ids: &Vec<String>) -> HashMap<String, Vec<File>> {
+fn list_files_by_file_id(
+    spec: &Assay,
+    modality: &String,
+    file_ids: &Vec<String>,
+) -> HashMap<String, Vec<File>> {
     let mut files: HashMap<String, Vec<File>> = HashMap::new();
     let ids: HashSet<String> = file_ids.iter().cloned().collect();
     for read in spec.get_seqspec(modality) {
@@ -726,7 +969,11 @@ mod tests {
         for modality in ["rna", "atac", "protein", "tag"] {
             let m = modality.to_string();
             let indices = get_index_by_reads(&spec, &m);
-            assert!(!indices.is_empty(), "modality {} should have indices", modality);
+            assert!(
+                !indices.is_empty(),
+                "modality {} should have indices",
+                modality
+            );
         }
     }
 

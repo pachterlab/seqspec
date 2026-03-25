@@ -1,27 +1,35 @@
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct File {
-   pub file_id: String,
-   pub filename: String,
-   pub filetype: String,
-   pub filesize: i64,
-   pub url: String,
-   pub urltype: String,
-   pub md5: String,
+    pub file_id: String,
+    pub filename: String,
+    pub filetype: String,
+    pub filesize: i64,
+    pub url: String,
+    pub urltype: String,
+    pub md5: String,
 }
 
 impl File {
     pub fn new(
-        file_id: String, 
-        filename: String, 
-        filetype: String, 
+        file_id: String,
+        filename: String,
+        filetype: String,
         filesize: i64,
-        url: String, 
-        urltype: String, 
-        md5: String) -> Self {
-        Self { file_id, filename, filetype, filesize, url, urltype, md5 }
+        url: String,
+        urltype: String,
+        md5: String,
+    ) -> Self {
+        Self {
+            file_id,
+            filename,
+            filetype,
+            filesize,
+            url,
+            urltype,
+            md5,
+        }
     }
 
     pub fn from_json(json_str: &str) -> Result<Self, serde_json::Error> {
@@ -76,8 +84,13 @@ mod tests {
         assert_eq!(f1, f2);
 
         let f3 = File::new(
-            "file2".into(), "other.fq".into(), "fastq".into(),
-            0, "".into(), "local".into(), "".into(),
+            "file2".into(),
+            "other.fq".into(),
+            "fastq".into(),
+            0,
+            "".into(),
+            "local".into(),
+            "".into(),
         );
         assert_ne!(f1, f3);
     }

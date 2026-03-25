@@ -53,20 +53,45 @@ mod tests {
 
     fn leaf(id: &str, seq: &str, stype: &str, len: i64) -> Region {
         Region::new(
-            id.into(), "barcode".into(), id.into(), stype.into(),
-            seq.into(), len, len, None, vec![],
+            id.into(),
+            "barcode".into(),
+            id.into(),
+            stype.into(),
+            seq.into(),
+            len,
+            len,
+            None,
+            vec![],
         )
     }
 
     fn make_joined(children: Vec<Region>) -> Assay {
         let parent = Region::new(
-            "rna".into(), "rna".into(), "rna".into(), "joined".into(),
-            "".into(), 0, 0, None, children,
+            "rna".into(),
+            "rna".into(),
+            "rna".into(),
+            "joined".into(),
+            "".into(),
+            0,
+            0,
+            None,
+            children,
         );
         Assay::new(
-            "test".into(), "test".into(), "".into(), "".into(), "".into(),
-            vec!["rna".into()], "".into(), vec![], vec![parent],
-            None, None, None, None, None,
+            "test".into(),
+            "test".into(),
+            "".into(),
+            "".into(),
+            "".into(),
+            vec!["rna".into()],
+            "".into(),
+            vec![],
+            vec![parent],
+            None,
+            None,
+            None,
+            None,
+            None,
         )
     }
 
@@ -85,9 +110,7 @@ mod tests {
 
     #[test]
     fn test_format_random_sequences() {
-        let mut spec = make_joined(vec![
-            leaf("bc", "", "random", 16),
-        ]);
+        let mut spec = make_joined(vec![leaf("bc", "", "random", 16)]);
         seqspec_format(&mut spec);
         let lib = spec.get_libspec("rna").unwrap();
         let bc = &lib.regions[0];
@@ -96,9 +119,7 @@ mod tests {
 
     #[test]
     fn test_format_onlist_sequences() {
-        let mut spec = make_joined(vec![
-            leaf("bc", "", "onlist", 16),
-        ]);
+        let mut spec = make_joined(vec![leaf("bc", "", "onlist", 16)]);
         seqspec_format(&mut spec);
         let lib = spec.get_libspec("rna").unwrap();
         let bc = &lib.regions[0];
@@ -107,9 +128,7 @@ mod tests {
 
     #[test]
     fn test_format_preserves_fixed() {
-        let mut spec = make_joined(vec![
-            leaf("linker", "ATCGATCG", "fixed", 8),
-        ]);
+        let mut spec = make_joined(vec![leaf("linker", "ATCGATCG", "fixed", 8)]);
         seqspec_format(&mut spec);
         let lib = spec.get_libspec("rna").unwrap();
         assert_eq!(lib.regions[0].sequence, "ATCGATCG");
@@ -118,9 +137,18 @@ mod tests {
     #[test]
     fn test_format_nested_regions() {
         let inner = Region::new(
-            "inner".into(), "inner".into(), "inner".into(), "joined".into(),
-            "".into(), 0, 0, None,
-            vec![leaf("bc", "ATCG", "fixed", 4), leaf("umi", "AACC", "fixed", 4)],
+            "inner".into(),
+            "inner".into(),
+            "inner".into(),
+            "joined".into(),
+            "".into(),
+            0,
+            0,
+            None,
+            vec![
+                leaf("bc", "ATCG", "fixed", 4),
+                leaf("umi", "AACC", "fixed", 4),
+            ],
         );
         let mut spec = make_joined(vec![inner, leaf("linker", "GG", "fixed", 2)]);
         seqspec_format(&mut spec);

@@ -75,7 +75,10 @@ fn format_library_spec(spec: &Assay, modality: &str) -> String {
         None => None,
     };
     let lib_kit: Option<String> = match &spec.library_kit {
-        Some(v) => v.iter().find(|k| k.modality == modality).map(|k| k.kit_id.clone()),
+        Some(v) => v
+            .iter()
+            .find(|k| k.modality == modality)
+            .map(|k| k.kit_id.clone()),
         None => None,
     };
     let seq_prot: Option<String> = match &spec.sequence_protocol {
@@ -86,7 +89,10 @@ fn format_library_spec(spec: &Assay, modality: &str) -> String {
         None => None,
     };
     let seq_kit: Option<String> = match &spec.sequence_kit {
-        Some(v) => v.iter().find(|k| k.modality == modality).map(|k| k.kit_id.clone()),
+        Some(v) => v
+            .iter()
+            .find(|k| k.modality == modality)
+            .map(|k| k.kit_id.clone()),
         None => None,
     };
 
@@ -127,7 +133,11 @@ fn format_region(region: &Region, idx: i32) -> String {
 }
 
 fn format_read(read: &Read, idx: i32) -> String {
-    let strand = if read.strand == "pos" { "positive" } else { "negative" };
+    let strand = if read.strand == "pos" {
+        "positive"
+    } else {
+        "negative"
+    };
     let mut s = format!(
         "- {}: {} cycles on the {} strand using the {} primer. The following files contain the sequences in Read {}:\n",
         read.name, read.max_len, strand, read.primer_id, idx
@@ -170,24 +180,44 @@ mod tests {
     #[test]
     fn test_format_region() {
         let region = Region::new(
-            "bc".into(), "barcode".into(), "Cell Barcode".into(),
-            "onlist".into(), "NNNNNNNNNNNNNNNN".into(),
-            16, 16, None, vec![],
+            "bc".into(),
+            "barcode".into(),
+            "Cell Barcode".into(),
+            "onlist".into(),
+            "NNNNNNNNNNNNNNNN".into(),
+            16,
+            16,
+            None,
+            vec![],
         );
         let s = format_region(&region, 1);
-        assert_eq!(s, "1. Cell Barcode: 16-16bp onlist sequence (NNNNNNNNNNNNNNNN).\n");
+        assert_eq!(
+            s,
+            "1. Cell Barcode: 16-16bp onlist sequence (NNNNNNNNNNNNNNNN).\n"
+        );
     }
 
     #[test]
     fn test_format_region_with_onlist() {
         let onlist = crate::models::onlist::Onlist::new(
-            "ol".into(), "barcodes.txt".into(), "txt".into(),
-            0, "".into(), "local".into(), "".into(),
+            "ol".into(),
+            "barcodes.txt".into(),
+            "txt".into(),
+            0,
+            "".into(),
+            "local".into(),
+            "".into(),
         );
         let region = Region::new(
-            "bc".into(), "barcode".into(), "Cell Barcode".into(),
-            "onlist".into(), "N".repeat(16),
-            16, 16, Some(onlist), vec![],
+            "bc".into(),
+            "barcode".into(),
+            "Cell Barcode".into(),
+            "onlist".into(),
+            "N".repeat(16),
+            16,
+            16,
+            Some(onlist),
+            vec![],
         );
         let s = format_region(&region, 1);
         assert_eq!(s, "1. Cell Barcode: 16-16bp onlist sequence (NNNNNNNNNNNNNNNN), onlist file: barcodes.txt.\n");
@@ -196,8 +226,14 @@ mod tests {
     #[test]
     fn test_format_read() {
         let read = Read::new(
-            "R1".into(), "Read 1".into(), "rna".into(), "truseq_read1".into(),
-            28, 28, "pos".into(), vec![],
+            "R1".into(),
+            "Read 1".into(),
+            "rna".into(),
+            "truseq_read1".into(),
+            28,
+            28,
+            "pos".into(),
+            vec![],
         );
         let s = format_read(&read, 1);
         assert_eq!(s, "- Read 1: 28 cycles on the positive strand using the truseq_read1 primer. The following files contain the sequences in Read 1:\n");
@@ -206,8 +242,13 @@ mod tests {
     #[test]
     fn test_format_read_file() {
         let f = ReadFile::new(
-            "f1".into(), "reads_R1.fastq.gz".into(), "fastq".into(),
-            1024, "reads_R1.fastq.gz".into(), "local".into(), "".into(),
+            "f1".into(),
+            "reads_R1.fastq.gz".into(),
+            "fastq".into(),
+            1024,
+            "reads_R1.fastq.gz".into(),
+            "local".into(),
+            "".into(),
         );
         let s = format_read_file(&f, 1);
         assert_eq!(s, "- File 1: reads_R1.fastq.gz\n");
