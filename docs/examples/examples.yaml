@@ -1,0 +1,645 @@
+manifest_version: 1
+assays:
+- slug: 10x_atac
+  name: 10x-ATAC
+  assay_id: 10xATAC
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium_scATAC.html
+  canonical_path: assays/10x_atac.spec.yaml
+  sequence_protocol: Illumina
+  date: 19 October 2018
+  status: example
+  modalities:
+  - atac
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/10x_atac.html
+- slug: 10x_rna_5prime
+  name: 10x-RNA-5prime
+  assay_id: 10xRNA5prime
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium5.html
+  canonical_path: assays/10x_rna_5prime.spec.yaml
+  sequence_protocol: Illumina
+  date: '2016-08-01'
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/10x_rna_5prime.html
+- slug: 10x_rna_atac
+  name: 10x-ATAC-RNA
+  assay_id: 10xMultiome
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium_multiome.html
+  canonical_path: assays/10x_rna_atac.spec.yaml
+  sequence_protocol: Illumina NovaSeq 6000
+  date: 15 September 2020
+  status: example
+  modalities:
+  - rna
+  - atac
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/10x_rna_atac.html
+- slug: 10x_rna_atac_multi
+  name: 10x-ATAC-RNA-MULTI/Illumina
+  assay_id: 10x-ATAC-RNA-MULTI
+  assay_link: https://igvf.github.io/seqspec/
+  canonical_path: assays/10x_rna_atac_multi.spec.yaml
+  sequence_protocol: Illumina NovaSeq 6000
+  date: 17 June 2019
+  status: example
+  modalities:
+  - rna
+  - atac
+  - tag
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/10x_rna_atac_multi.html
+- slug: 10x_rna_v1
+  name: 10x-RNA-v1
+  assay_id: 10xRNAv1
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3v1.html
+  canonical_path: assays/10x_rna_v1.spec.yaml
+  sequence_protocol: Illumina
+  date: 15 April 2016
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/10x_rna_v1.html
+- slug: 10x_rna_v2
+  name: 10x-RNA-v2
+  assay_id: 10xRNAv2
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3.html
+  canonical_path: assays/10x_rna_v2.spec.yaml
+  sequence_protocol: Illumina
+  date: 16 January 2017
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/10x_rna_v2.html
+- slug: 10x_rna_v3
+  name: 10x-RNA-v3
+  assay_id: 10xRNAv3
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3.html
+  canonical_path: assays/10x_rna_v3.spec.yaml
+  sequence_protocol: Illumina NovaSeq 6000
+  date: ''
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/10x_rna_v3.html
+- slug: 10xcrispr
+  name: 10xCRISPR
+  assay_id: 10xCRISPR
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3fb.html
+  canonical_path: assays/10xcrispr.spec.yaml
+  sequence_protocol: Illumina
+  date: 10 June 2020
+  status: example
+  modalities:
+  - crispr
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/10xcrispr.html
+- slug: 10xfb_3prime
+  name: 10xFB-3prime
+  assay_id: 10xFB protein and RNA assay 3'
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3fb.html
+  canonical_path: assays/10xfb_3prime.spec.yaml
+  sequence_protocol: Illumina
+  date: 12 February 2018
+  status: example
+  modalities:
+  - rna
+  - protein
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/10xfb_3prime.html
+- slug: 10xfb_5prime
+  name: 10xFB protein and RNA assay 5'
+  assay_id: 10xFB protein and RNA assay 5'
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium5vdjfb.html
+  canonical_path: assays/10xfb_5prime.spec.yaml
+  sequence_protocol: Illumina
+  date: ''
+  status: example
+  modalities:
+  - rna
+  - protein
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/10xfb_5prime.html
+- slug: 10xfb_vdj_5prime
+  name: 10xFB-VDJ-5prime
+  assay_id: 10xVDJ and RNA 5'
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium5vdjfb.html
+  canonical_path: assays/10xfb_vdj_5prime.spec.yaml
+  sequence_protocol: Illumina
+  date: 21 October 2016
+  status: example
+  modalities:
+  - rna
+  - vdj
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/10xfb_vdj_5prime.html
+- slug: 10xv3_scrnaseq_element_adept_truseq_dual
+  name: 10xv3 scrnaseq element adept truseq dual
+  assay_id: element-adept-truseq-dual-index
+  assay_link: ''
+  canonical_path: assays/10xv3_scrnaseq_element_adept_truseq_dual.spec.yaml
+  sequence_protocol: Element Aviti
+  date: 21 February 2024
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/10xv3_scrnaseq_element_adept_truseq_dual.html
+- slug: 10xv3_scrnaseq_illumina_truseq_dual
+  name: 10xv3 scrnaseq illumina truseq dual
+  assay_id: Illumina-novaseq-truseq-dual-index
+  assay_link: ''
+  canonical_path: assays/10xv3_scrnaseq_illumina_truseq_dual.spec.yaml
+  sequence_protocol: Illumina NovaSeq 6000
+  date: 21 February 2024
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/10xv3_scrnaseq_illumina_truseq_dual.html
+- slug: bd_rhapsody_eb
+  name: BD-Rhapsody-EB
+  assay_id: BD-Rhapsody-EB
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/BD_Rhapsody.html
+  canonical_path: assays/bd_rhapsody_eb.spec.yaml
+  sequence_protocol: Illumina
+  date: 31 August 2022
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/bd_rhapsody_eb.html
+- slug: bd_rhapsody_v1
+  name: BD-Rhapsody-v1/Illumina
+  assay_id: BD-Rhapsody-v1
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/BD_Rhapsody.html
+  canonical_path: assays/bd_rhapsody_v1.spec.yaml
+  sequence_protocol: Illumina
+  date: 20 December 2018
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/bd_rhapsody_v1.html
+- slug: cel_seq
+  name: CEL-Seq
+  assay_id: CEL-Seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html
+  canonical_path: assays/cel_seq.spec.yaml
+  sequence_protocol: Illumina
+  date: 30 August 2012
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/cel_seq.html
+- slug: cel_seq2
+  name: CEL-Seq2/Illumina
+  assay_id: CEL-Seq2
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html
+  canonical_path: assays/cel_seq2.spec.yaml
+  sequence_protocol: Illumina
+  date: 28 April 2016
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/cel_seq2.html
+- slug: dogmaseq_dig
+  name: DOGMAseq-DIG/Illumina
+  assay_id: DOGMAseq-DIG
+  assay_link: ''
+  canonical_path: assays/dogmaseq_dig.spec.yaml
+  sequence_protocol: Illumina NovaSeq 6000 (S2 Reagent Kit v1.5)
+  date: 23 June 2022
+  status: example
+  modalities:
+  - protein
+  - tag
+  - rna
+  - atac
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/dogmaseq_dig.html
+- slug: dogmaseq_lll
+  name: DOGMAseq-LLL/Illumina
+  assay_id: DOGMAseq-LLL
+  assay_link: ''
+  canonical_path: assays/dogmaseq_lll.spec.yaml
+  sequence_protocol: Illumina NovaSeq 6000 (S2 Reagent Kit v1.5)
+  date: 23 June 2022
+  status: example
+  modalities:
+  - protein
+  - rna
+  - atac
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/dogmaseq_lll.html
+- slug: drop_seq
+  name: Drop-seq/Illumina
+  assay_id: Drop-seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/Drop-seq.html
+  canonical_path: assays/drop_seq.spec.yaml
+  sequence_protocol: Illumina
+  date: 21 May 2015
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/drop_seq.html
+- slug: indropv2
+  name: inDropv2/Illumina
+  assay_id: Indropv2
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/inDrop.html
+  canonical_path: assays/indropv2.spec.yaml
+  sequence_protocol: Illumina
+  date: 08 December 2016
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/indropv2.html
+- slug: issaac_seq
+  name: ISSAAC-seq
+  assay_id: issaac_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/ISSAAC-seq.html
+  canonical_path: assays/issaac_seq.spec.yaml
+  sequence_protocol: ''
+  date: 15 September 2020
+  status: example
+  modalities:
+  - RNA
+  - ATAC
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/issaac_seq.html
+- slug: mars_seq
+  name: MARS-seq
+  assay_id: mars_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/MARS-seq.html
+  canonical_path: assays/mars_seq.spec.yaml
+  sequence_protocol: ''
+  date: 17 May 2019
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/mars_seq.html
+- slug: mcscrb_seq
+  name: mcSCRB-seq
+  assay_id: mcscrb_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/SCRB-seq.html
+  canonical_path: assays/mcscrb_seq.spec.yaml
+  sequence_protocol: ''
+  date: 26 July 2018
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/mcscrb_seq.html
+- slug: microwell_seq
+  name: Microwell-seq
+  assay_id: microwell_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/
+  canonical_path: assays/microwell_seq.spec.yaml
+  sequence_protocol: ''
+  date: 22 February 2018
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/microwell_seq.html
+- slug: parse_wt_v2
+  name: WT Mega v2
+  assay_id: WT-Mega-v2
+  assay_link: ''
+  canonical_path: assays/parse_wt_v2.spec.yaml
+  sequence_protocol: Illumina
+  date: ''
+  status: example
+  modalities:
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/parse_wt_v2.html
+- slug: pi_atac_seq
+  name: Pi-ATAC-seq
+  assay_id: pi_atac_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/Illumina.html
+  canonical_path: assays/pi_atac_seq.spec.yaml
+  sequence_protocol: ''
+  date: 02 November 2018
+  status: example
+  modalities:
+  - ATAC
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/pi_atac_seq.html
+- slug: pipseqv2
+  name: PIPseq V2
+  assay_id: pipseqv2
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/PIP-seq.html
+  canonical_path: assays/pipseqv2.spec.yaml
+  sequence_protocol: ''
+  date: 06 March 2023
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/pipseqv2.html
+- slug: pipseqv3
+  name: PIPseq V3
+  assay_id: pipseqv3
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/PIP-seq.html
+  canonical_path: assays/pipseqv3.spec.yaml
+  sequence_protocol: ''
+  date: 06 March 2023
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/pipseqv3.html
+- slug: quartz_seq
+  name: Quartz-seq
+  assay_id: quartz_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/Quartz-seq_family.html
+  canonical_path: assays/quartz_seq.spec.yaml
+  sequence_protocol: ''
+  date: 17 April 2013
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/quartz_seq.html
+- slug: quartz_seq2
+  name: Quartz-seq2
+  assay_id: quartz_seq2
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/Quartz-seq_family.html
+  canonical_path: assays/quartz_seq2.spec.yaml
+  sequence_protocol: ''
+  date: 09 March 2018
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/quartz_seq2.html
+- slug: sccrispra
+  name: CRISPRa_screening
+  assay_id: sccrispra
+  assay_link: 28/10/10/90
+  canonical_path: assays/sccrispra.spec.yaml
+  sequence_protocol: NextSeq2000 p3 kit
+  date: 28 March 2023
+  status: example
+  modalities:
+  - rna
+  - crispr
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/sccrispra.html
+- slug: sci_rna_seq
+  name: sci-RNA-seq
+  assay_id: sci_rna_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq.html
+  canonical_path: assays/sci_rna_seq.spec.yaml
+  sequence_protocol: ''
+  date: 18 August 2017
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/sci_rna_seq.html
+- slug: sci_rna_seq3
+  name: sci-RNA-seq3
+  assay_id: sci_rna_seq3
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq3.html
+  canonical_path: assays/sci_rna_seq3.spec.yaml
+  sequence_protocol: ''
+  date: 20 February 2019
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/sci_rna_seq3.html
+- slug: scifi_rna_seq
+  name: scifi-RNA-Seq
+  assay_id: scifi_rna_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/scifi-RNA-seq.html
+  canonical_path: assays/scifi_rna_seq.spec.yaml
+  sequence_protocol: ''
+  date: 31 May 2021
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/scifi_rna_seq.html
+- slug: seq_well
+  name: Seq-well
+  assay_id: seq_well
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/Drop-seq.html
+  canonical_path: assays/seq_well.spec.yaml
+  sequence_protocol: ''
+  date: 13 February 2017
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/seq_well.html
+- slug: seq_well_s3
+  name: Seq-Well-S3
+  assay_id: seq_well_s3
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/SeqWell_S3.html
+  canonical_path: assays/seq_well_s3.spec.yaml
+  sequence_protocol: ''
+  date: 02 July 2019
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/seq_well_s3.html
+- slug: share_seq
+  name: SHARE-Seq
+  assay_id: SHARE-Seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/SHARE-seq.html
+  canonical_path: assays/share_seq.spec.yaml
+  sequence_protocol: Illumina
+  date: 23 October 2020
+  status: example
+  modalities:
+  - atac
+  - rna
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/share_seq.html
+- slug: smart_seq2
+  name: Smart-seq2
+  assay_id: smart_seq2
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/SMART-seq_family.html
+  canonical_path: assays/smart_seq2.spec.yaml
+  sequence_protocol: ''
+  date: 02 January 2014
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/smart_seq2.html
+- slug: smart_seq3
+  name: Smart-seq3
+  assay_id: smart_seq3
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/SMART-seq_family.html
+  canonical_path: assays/smart_seq3.spec.yaml
+  sequence_protocol: ''
+  date: 04 May 2020
+  status: example
+  modalities:
+  - RNA_end
+  - RNA_internal
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/smart_seq3.html
+- slug: sn_m3c_seq
+  name: sn-m3C-seq
+  assay_id: sn-m3C-seq
+  assay_link: ''
+  canonical_path: assays/sn_m3c_seq.spec.yaml
+  sequence_protocol: Illumina NextSeq500
+  date: 09 September 2019
+  status: example
+  modalities:
+  - methyl
+  - hic
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/sn_m3c_seq.html
+- slug: snmctseq
+  name: snmCT-seq
+  assay_id: snmCT-seq
+  assay_link: ''
+  canonical_path: assays/snmctseq.spec.yaml
+  sequence_protocol: Illumina NextSeq500
+  date: 09 March 2022
+  status: example
+  modalities:
+  - methyl
+  - rna
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/snmctseq.html
+- slug: split_seq
+  name: SPLiT-seq
+  assay_id: split_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/SPLiT-seq.html
+  canonical_path: assays/split_seq.spec.yaml
+  sequence_protocol: ''
+  date: 15 March 2018
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/split_seq.html
+- slug: strt_seq
+  name: STRT-seq
+  assay_id: strt_seq
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
+  canonical_path: assays/strt_seq.spec.yaml
+  sequence_protocol: ''
+  date: 05 April 2012
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/strt_seq.html
+- slug: strt_seq_2i
+  name: STRT-seq-2i
+  assay_id: strt_seq_2i
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
+  canonical_path: assays/strt_seq_2i.spec.yaml
+  sequence_protocol: ''
+  date: 27 November 2017
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/strt_seq_2i.html
+- slug: strt_seq_c1
+  name: STRT-seq-C1
+  assay_id: strt_seq_c1
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html
+  canonical_path: assays/strt_seq_c1.spec.yaml
+  sequence_protocol: ''
+  date: 27 April 2019
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/strt_seq_c1.html
+- slug: sugarseq
+  name: SugarSeq/Illumina
+  assay_id: SugarSeq
+  assay_link: ''
+  canonical_path: assays/sugarseq.spec.yaml
+  sequence_protocol: Illumina NextSeq
+  date: ''
+  status: example
+  modalities:
+  - rna
+  - tag
+  notes: Current 0.4.0 example that loads and renders but is not fully check-clean.
+  html_path: assays/sugarseq.html
+- slug: surecell
+  name: SureCell
+  assay_id: surecell
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/SureCell.html
+  canonical_path: assays/surecell.spec.yaml
+  sequence_protocol: ''
+  date: 27 April 2019
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/surecell.html
+- slug: tang2009
+  name: 10x Genomics
+  assay_id: tang2009
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.html
+  canonical_path: assays/tang2009.spec.yaml
+  sequence_protocol: ''
+  date: 06 April 2009
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/tang2009.html
+- slug: template
+  name: template
+  assay_id: template
+  assay_link: ''
+  canonical_path: assays/template.spec.yaml
+  sequence_protocol: ''
+  date: ''
+  status: template
+  modalities:
+  - mode
+  notes: Structure template with intentionally incomplete metadata.
+  html_path: assays/template.html
+- slug: vasa_seq_drop
+  name: VASA-seq-drop
+  assay_id: vasa_seq_drop
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/VASA-seq.html
+  canonical_path: assays/vasa_seq_drop.spec.yaml
+  sequence_protocol: ''
+  date: 27 June 2022
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/vasa_seq_drop.html
+- slug: vasa_seq_plate
+  name: VASA-seq
+  assay_id: vasa_seq_plate
+  assay_link: https://teichlab.github.io/scg_lib_structs/methods_html/VASA-seq.html
+  canonical_path: assays/vasa_seq_plate.spec.yaml
+  sequence_protocol: ''
+  date: 27 June 2022
+  status: example
+  modalities:
+  - RNA
+  notes: Current 0.4.0 example with intentionally incomplete local metadata.
+  html_path: assays/vasa_seq_plate.html

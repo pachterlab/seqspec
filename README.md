@@ -47,7 +47,7 @@ Ali Sina Booeshaghi, Xi Chen, Lior Pachter, A machine-readable specification for
 - [Write a `seqspec` from a simple example: `docs/TUTORIAL_SIMPLE.md`](docs/TUTORIAL_SIMPLE.md)
 - [Write a `seqspec` from a template: `docs/TUTORIAL_FROM_TEMPLATE.md`](docs/TUTORIAL_FROM_TEMPLATE.md)
 - [Write a more complex `seqspec`: `docs/TUTORIAL_COMPLEX.md`](docs/TUTORIAL_COMPLEX.md)
-- [View example `seqspec` files: `https://www.sina.bio/seqspec-builder/assays.html`](https://www.sina.bio/seqspec-builder/assays.html)
+- [Browse the generated example site: `docs/examples/site/assays.html`](docs/examples/site/assays.html)
 - [Contribute a `seqspec` : `docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md)
 - [Watch a YouTube video about `seqspec`](https://youtu.be/NSj6Vpzy8tU)
 - [Read the manuscript that describes `seqspec`](https://doi.org/10.1093/bioinformatics/btae168)

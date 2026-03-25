@@ -22,7 +22,7 @@ A `seqspec` file contains information about an dna library and the sequencing re
 **Note**: Developing a `seqspec` file for a published assay can be challenging, as authors often assume readers have prior knowledge of library preparation steps.
 :::
 
-This website documents example assays as well as sequence and library structures: https://www.sina.bio/seqspec-builder/
+The maintained example assays, read templates, and region templates live under `docs/examples/`. The generated HTML catalog is at `docs/examples/site/index.html`.
 
 # Example: SPLiT-Seq Assay
 

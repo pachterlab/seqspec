@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>seqspec examples</title>
+  <style>
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #1a1d21;
+  background: #ffffff;
+}
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+h1, h2 {
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+p {
+  margin: 0 0 14px;
+  line-height: 1.6;
+}
+.nav {
+  display: flex;
+  gap: 18px;
+  margin: 18px 0 26px;
+  font-size: 14px;
+}
+.nav a,
+a {
+  color: #1d4ed8;
+  text-decoration: none;
+}
+.nav a:hover,
+a:hover {
+  text-decoration: underline;
+}
+.note {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #dcdfe3;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+.search {
+  margin: 18px 0 20px;
+}
+.search input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dcdfe3;
+  border-radius: 6px;
+  font: inherit;
+  color: inherit;
+  background: #ffffff;
+}
+.search input:focus {
+  outline: none;
+  border-color: #94a3b8;
+}
+.search-note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #68707a;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th, td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  font-size: 12px;
+  color: #68707a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.mono {
+  font-family: "IBM Plex Mono", Menlo, monospace;
+  font-size: 12px;
+}
+.tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.tag.template { background: #f3f4f6; color: #4b5563; }
+.tag.example { background: #eff6ff; color: #1d4ed8; }
+.tag.validated { background: #f0fdf4; color: #166534; }
+</style>
+</head>
+<body>
+<div class="wrap"><h1>seqspec examples</h1><p>This site is generated from the maintained examples under <span class="mono">docs/examples</span>. It shows the current assay examples, read templates, and region templates.</p><div class="note"><p><strong>Note.</strong> <span class="mono">seqspec</span> files are tightly tied to the data, assay design, sequencer, and library construction they describe. These examples are representative specs derived from <a href="https://teichlab.github.io/scg_lib_structs/">Teichlab library structures</a>. They are useful reference points, but they may be incomplete or incorrect for any one concrete assay or dataset that a user defines.</p></div><div class="nav"><a href="index.html">Overview</a><a href="assays.html">Assays</a><a href="reads.html">Reads</a><a href="regions.html">Regions</a></div><p>The assay pages below are rendered with <span class="mono">seqspec print -f seqspec-html</span>. Use the search box to filter the catalog.</p><div class="search"><input id="assay-search" type="search" placeholder="Search name, assay, sequencer, modality, or date"><div id="assay-search-note" class="search-note">Showing all assays.</div></div><table id="assay-table"><thead><tr><th>Name</th><th>Assay</th><th>Sequencer</th><th>Modalities</th><th>Date</th><th>Report</th><th>seqspec</th></tr></thead><tbody><tr class="assay-row"><td>10x-ATAC</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium_scATAC.html">10xATAC</a></td><td>Illumina</td><td>atac</td><td>19 October 2018</td><td><a href="assays/10x_atac.html">view</a></td><td><a href="../assays/10x_atac.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10x-RNA-5prime</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium5.html">10xRNA5prime</a></td><td>Illumina</td><td>rna</td><td>2016-08-01</td><td><a href="assays/10x_rna_5prime.html">view</a></td><td><a href="../assays/10x_rna_5prime.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10x-ATAC-RNA</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium_multiome.html">10xMultiome</a></td><td>Illumina NovaSeq 6000</td><td>rna, atac</td><td>15 September 2020</td><td><a href="assays/10x_rna_atac.html">view</a></td><td><a href="../assays/10x_rna_atac.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10x-ATAC-RNA-MULTI/Illumina</td><td class="mono"><a href="https://igvf.github.io/seqspec/">10x-ATAC-RNA-MULTI</a></td><td>Illumina NovaSeq 6000</td><td>rna, atac, tag</td><td>17 June 2019</td><td><a href="assays/10x_rna_atac_multi.html">view</a></td><td><a href="../assays/10x_rna_atac_multi.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10x-RNA-v1</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3v1.html">10xRNAv1</a></td><td>Illumina</td><td>rna</td><td>15 April 2016</td><td><a href="assays/10x_rna_v1.html">view</a></td><td><a href="../assays/10x_rna_v1.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10x-RNA-v2</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3.html">10xRNAv2</a></td><td>Illumina</td><td>rna</td><td>16 January 2017</td><td><a href="assays/10x_rna_v2.html">view</a></td><td><a href="../assays/10x_rna_v2.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10x-RNA-v3</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3.html">10xRNAv3</a></td><td>Illumina NovaSeq 6000</td><td>rna</td><td>—</td><td><a href="assays/10x_rna_v3.html">view</a></td><td><a href="../assays/10x_rna_v3.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10xCRISPR</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3fb.html">10xCRISPR</a></td><td>Illumina</td><td>crispr, rna</td><td>10 June 2020</td><td><a href="assays/10xcrispr.html">view</a></td><td><a href="../assays/10xcrispr.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10xFB-3prime</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium3fb.html">10xFB protein and RNA assay 3&#x27;</a></td><td>Illumina</td><td>rna, protein</td><td>12 February 2018</td><td><a href="assays/10xfb_3prime.html">view</a></td><td><a href="../assays/10xfb_3prime.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10xFB protein and RNA assay 5&#x27;</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium5vdjfb.html">10xFB protein and RNA assay 5&#x27;</a></td><td>Illumina</td><td>rna, protein</td><td>—</td><td><a href="assays/10xfb_5prime.html">view</a></td><td><a href="../assays/10xfb_5prime.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10xFB-VDJ-5prime</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/10xChromium5vdjfb.html">10xVDJ and RNA 5&#x27;</a></td><td>Illumina</td><td>rna, vdj</td><td>21 October 2016</td><td><a href="assays/10xfb_vdj_5prime.html">view</a></td><td><a href="../assays/10xfb_vdj_5prime.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10xv3 scrnaseq element adept truseq dual</td><td class="mono">element-adept-truseq-dual-index</td><td>Element Aviti</td><td>rna</td><td>21 February 2024</td><td><a href="assays/10xv3_scrnaseq_element_adept_truseq_dual.html">view</a></td><td><a href="../assays/10xv3_scrnaseq_element_adept_truseq_dual.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10xv3 scrnaseq illumina truseq dual</td><td class="mono">Illumina-novaseq-truseq-dual-index</td><td>Illumina NovaSeq 6000</td><td>rna</td><td>21 February 2024</td><td><a href="assays/10xv3_scrnaseq_illumina_truseq_dual.html">view</a></td><td><a href="../assays/10xv3_scrnaseq_illumina_truseq_dual.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>BD-Rhapsody-EB</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/BD_Rhapsody.html">BD-Rhapsody-EB</a></td><td>Illumina</td><td>rna</td><td>31 August 2022</td><td><a href="assays/bd_rhapsody_eb.html">view</a></td><td><a href="../assays/bd_rhapsody_eb.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>BD-Rhapsody-v1/Illumina</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/BD_Rhapsody.html">BD-Rhapsody-v1</a></td><td>Illumina</td><td>rna</td><td>20 December 2018</td><td><a href="assays/bd_rhapsody_v1.html">view</a></td><td><a href="../assays/bd_rhapsody_v1.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>CEL-Seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html">CEL-Seq</a></td><td>Illumina</td><td>rna</td><td>30 August 2012</td><td><a href="assays/cel_seq.html">view</a></td><td><a href="../assays/cel_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>CEL-Seq2/Illumina</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/CEL-seq_family.html">CEL-Seq2</a></td><td>Illumina</td><td>rna</td><td>28 April 2016</td><td><a href="assays/cel_seq2.html">view</a></td><td><a href="../assays/cel_seq2.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>DOGMAseq-DIG/Illumina</td><td class="mono">DOGMAseq-DIG</td><td>Illumina NovaSeq 6000 (S2 Reagent Kit v1.5)</td><td>protein, tag, rna, atac</td><td>23 June 2022</td><td><a href="assays/dogmaseq_dig.html">view</a></td><td><a href="../assays/dogmaseq_dig.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>DOGMAseq-LLL/Illumina</td><td class="mono">DOGMAseq-LLL</td><td>Illumina NovaSeq 6000 (S2 Reagent Kit v1.5)</td><td>protein, rna, atac</td><td>23 June 2022</td><td><a href="assays/dogmaseq_lll.html">view</a></td><td><a href="../assays/dogmaseq_lll.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>Drop-seq/Illumina</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/Drop-seq.html">Drop-seq</a></td><td>Illumina</td><td>rna</td><td>21 May 2015</td><td><a href="assays/drop_seq.html">view</a></td><td><a href="../assays/drop_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>inDropv2/Illumina</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/inDrop.html">Indropv2</a></td><td>Illumina</td><td>rna</td><td>08 December 2016</td><td><a href="assays/indropv2.html">view</a></td><td><a href="../assays/indropv2.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>ISSAAC-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/ISSAAC-seq.html">issaac_seq</a></td><td>—</td><td>RNA, ATAC</td><td>15 September 2020</td><td><a href="assays/issaac_seq.html">view</a></td><td><a href="../assays/issaac_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>MARS-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/MARS-seq.html">mars_seq</a></td><td>—</td><td>RNA</td><td>17 May 2019</td><td><a href="assays/mars_seq.html">view</a></td><td><a href="../assays/mars_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>mcSCRB-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/SCRB-seq.html">mcscrb_seq</a></td><td>—</td><td>RNA</td><td>26 July 2018</td><td><a href="assays/mcscrb_seq.html">view</a></td><td><a href="../assays/mcscrb_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>Microwell-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/">microwell_seq</a></td><td>—</td><td>RNA</td><td>22 February 2018</td><td><a href="assays/microwell_seq.html">view</a></td><td><a href="../assays/microwell_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>WT Mega v2</td><td class="mono">WT-Mega-v2</td><td>Illumina</td><td>rna</td><td>—</td><td><a href="assays/parse_wt_v2.html">view</a></td><td><a href="../assays/parse_wt_v2.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>Pi-ATAC-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/Illumina.html">pi_atac_seq</a></td><td>—</td><td>ATAC</td><td>02 November 2018</td><td><a href="assays/pi_atac_seq.html">view</a></td><td><a href="../assays/pi_atac_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>PIPseq V2</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/PIP-seq.html">pipseqv2</a></td><td>—</td><td>RNA</td><td>06 March 2023</td><td><a href="assays/pipseqv2.html">view</a></td><td><a href="../assays/pipseqv2.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>PIPseq V3</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/PIP-seq.html">pipseqv3</a></td><td>—</td><td>RNA</td><td>06 March 2023</td><td><a href="assays/pipseqv3.html">view</a></td><td><a href="../assays/pipseqv3.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>Quartz-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/Quartz-seq_family.html">quartz_seq</a></td><td>—</td><td>RNA</td><td>17 April 2013</td><td><a href="assays/quartz_seq.html">view</a></td><td><a href="../assays/quartz_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>Quartz-seq2</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/Quartz-seq_family.html">quartz_seq2</a></td><td>—</td><td>RNA</td><td>09 March 2018</td><td><a href="assays/quartz_seq2.html">view</a></td><td><a href="../assays/quartz_seq2.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>CRISPRa_screening</td><td class="mono">sccrispra</td><td>NextSeq2000 p3 kit</td><td>rna, crispr</td><td>28 March 2023</td><td><a href="assays/sccrispra.html">view</a></td><td><a href="../assays/sccrispra.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>sci-RNA-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq.html">sci_rna_seq</a></td><td>—</td><td>RNA</td><td>18 August 2017</td><td><a href="assays/sci_rna_seq.html">view</a></td><td><a href="../assays/sci_rna_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>sci-RNA-seq3</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/sci-RNA-seq3.html">sci_rna_seq3</a></td><td>—</td><td>RNA</td><td>20 February 2019</td><td><a href="assays/sci_rna_seq3.html">view</a></td><td><a href="../assays/sci_rna_seq3.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>scifi-RNA-Seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/scifi-RNA-seq.html">scifi_rna_seq</a></td><td>—</td><td>RNA</td><td>31 May 2021</td><td><a href="assays/scifi_rna_seq.html">view</a></td><td><a href="../assays/scifi_rna_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>Seq-well</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/Drop-seq.html">seq_well</a></td><td>—</td><td>RNA</td><td>13 February 2017</td><td><a href="assays/seq_well.html">view</a></td><td><a href="../assays/seq_well.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>Seq-Well-S3</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/SeqWell_S3.html">seq_well_s3</a></td><td>—</td><td>RNA</td><td>02 July 2019</td><td><a href="assays/seq_well_s3.html">view</a></td><td><a href="../assays/seq_well_s3.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>SHARE-Seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/SHARE-seq.html">SHARE-Seq</a></td><td>Illumina</td><td>atac, rna</td><td>23 October 2020</td><td><a href="assays/share_seq.html">view</a></td><td><a href="../assays/share_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>Smart-seq2</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/SMART-seq_family.html">smart_seq2</a></td><td>—</td><td>RNA</td><td>02 January 2014</td><td><a href="assays/smart_seq2.html">view</a></td><td><a href="../assays/smart_seq2.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>Smart-seq3</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/SMART-seq_family.html">smart_seq3</a></td><td>—</td><td>RNA_end, RNA_internal</td><td>04 May 2020</td><td><a href="assays/smart_seq3.html">view</a></td><td><a href="../assays/smart_seq3.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>sn-m3C-seq</td><td class="mono">sn-m3C-seq</td><td>Illumina NextSeq500</td><td>methyl, hic</td><td>09 September 2019</td><td><a href="assays/sn_m3c_seq.html">view</a></td><td><a href="../assays/sn_m3c_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>snmCT-seq</td><td class="mono">snmCT-seq</td><td>Illumina NextSeq500</td><td>methyl, rna</td><td>09 March 2022</td><td><a href="assays/snmctseq.html">view</a></td><td><a href="../assays/snmctseq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>SPLiT-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/SPLiT-seq.html">split_seq</a></td><td>—</td><td>RNA</td><td>15 March 2018</td><td><a href="assays/split_seq.html">view</a></td><td><a href="../assays/split_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>STRT-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html">strt_seq</a></td><td>—</td><td>RNA</td><td>05 April 2012</td><td><a href="assays/strt_seq.html">view</a></td><td><a href="../assays/strt_seq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>STRT-seq-2i</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html">strt_seq_2i</a></td><td>—</td><td>RNA</td><td>27 November 2017</td><td><a href="assays/strt_seq_2i.html">view</a></td><td><a href="../assays/strt_seq_2i.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>STRT-seq-C1</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/STRT-seq_family.html">strt_seq_c1</a></td><td>—</td><td>RNA</td><td>27 April 2019</td><td><a href="assays/strt_seq_c1.html">view</a></td><td><a href="../assays/strt_seq_c1.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>SugarSeq/Illumina</td><td class="mono">SugarSeq</td><td>Illumina NextSeq</td><td>rna, tag</td><td>—</td><td><a href="assays/sugarseq.html">view</a></td><td><a href="../assays/sugarseq.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>SureCell</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/SureCell.html">surecell</a></td><td>—</td><td>RNA</td><td>27 April 2019</td><td><a href="assays/surecell.html">view</a></td><td><a href="../assays/surecell.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>10x Genomics</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/tang2009.html">tang2009</a></td><td>—</td><td>RNA</td><td>06 April 2009</td><td><a href="assays/tang2009.html">view</a></td><td><a href="../assays/tang2009.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>template</td><td class="mono">template</td><td>—</td><td>mode</td><td>—</td><td><a href="assays/template.html">view</a></td><td><a href="../assays/template.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>VASA-seq-drop</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/VASA-seq.html">vasa_seq_drop</a></td><td>—</td><td>RNA</td><td>27 June 2022</td><td><a href="assays/vasa_seq_drop.html">view</a></td><td><a href="../assays/vasa_seq_drop.spec.yaml">yaml</a></td></tr><tr class="assay-row"><td>VASA-seq</td><td class="mono"><a href="https://teichlab.github.io/scg_lib_structs/methods_html/VASA-seq.html">vasa_seq_plate</a></td><td>—</td><td>RNA</td><td>27 June 2022</td><td><a href="assays/vasa_seq_plate.html">view</a></td><td><a href="../assays/vasa_seq_plate.spec.yaml">yaml</a></td></tr></tbody></table></div>
+
+<script>
+(function() {
+  const input = document.getElementById('assay-search');
+  const note = document.getElementById('assay-search-note');
+  const rows = Array.from(document.querySelectorAll('#assay-table tbody .assay-row'));
+  if (!input || !note || !rows.length) return;
+
+  function render() {
+    const query = input.value.trim().toLowerCase();
+    let visible = 0;
+    rows.forEach((row) => {
+      const text = row.textContent.toLowerCase();
+      const match = !query || text.includes(query);
+      row.style.display = match ? '' : 'none';
+      if (match) visible += 1;
+    });
+    note.textContent = query
+      ? `Showing ${visible} matching assay${visible === 1 ? '' : 's'}.`
+      : `Showing all ${rows.length} assays.`;
+  }
+
+  input.addEventListener('input', render);
+  render();
+})();
+</script>
+
+</body>
+</html>

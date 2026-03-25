@@ -44,7 +44,11 @@ def build_modality_view(spec: Assay, modality: str) -> dict[str, Any]:
         raise ValueError(f"modality '{modality}' not found in library_spec")
 
     region_nodes, regions, total_bp = region_views(libspec)
-    reads = [project_read(libspec, read) for read in spec.get_seqspec(modality)]
+    reads = []
+    for read in spec.get_seqspec(modality):
+        projected = project_read(libspec, read)
+        if projected is not None:
+            reads.append(projected)
 
     return {
         "modality": modality,
@@ -165,12 +169,17 @@ def region_node(
     }
 
 
-def project_read(libspec: Region, read) -> dict[str, Any]:
+def project_read(libspec: Region, read) -> dict[str, Any] | None:
     """Project one read onto the library coordinate system."""
     leaves = libspec.get_leaves_with_region_id(read.primer_id)
-    primer_index = next(
-        index for index, leaf in enumerate(leaves) if leaf.region_id == read.primer_id
-    )
+    try:
+        primer_index = next(
+            index
+            for index, leaf in enumerate(leaves)
+            if leaf.region_id == read.primer_id
+        )
+    except StopIteration:
+        return None
     cuts = project_regions_to_coordinates(leaves)
     primer = cuts[primer_index]
 

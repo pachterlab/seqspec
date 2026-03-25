@@ -15,6 +15,7 @@ authors:
 - `seqspec print -f seqspec-html`, a self-contained HTML view that shows the library molecule, reads, and nested region metadata.
 - Additional parity tests for Python and Rust command behavior.
 - `seqspec check` now emits warning diagnostics for overlapping read geometry, with guidance to use `seqspec index --no-overlap` when needed.
+- A generated examples site under `docs/examples/site`, with rendered assay reports, read templates, region templates, and a searchable assay catalog.
 
 ### Changed
 
@@ -23,6 +24,8 @@ authors:
 - `seqspec build` is deprecated in both CLIs and remains as a compatibility stub.
 - Older specs are loaded more permissively before upgrade, which makes `0.2.x` and `0.3.x` specs easier to normalize.
 - `seqspec onlist -s region-type` now errors when matches span multiple reads in a modality. Use `-s read` or `-s region` to disambiguate.
+- The maintained examples now live under `docs/examples/assays`, `docs/examples/reads`, and `docs/examples/regions`, with one colocated `docs/examples/build_examples.py` script to normalize YAML, write the manifest, and regenerate the site.
+- GitHub Pages now publishes the generated examples site under `/examples/` alongside the main MyST documentation site.
 
 ### Fixed
 
@@ -167,7 +170,7 @@ TODO:
 - `assay_spec` renamed `library_spec`
 - Reorganize specification document
 - Move contribution guidelines from `SPECIFICATION.md` to `CONTRIBUTION.md`
-- Move example `Region`s from `SPECIFCATION.md` to `seqspec/docs/regions`
+- Move example `Region`s from `SPECIFCATION.md` to `docs/examples/regions`
 - `seqspec index` defaults to indexing reads, `--region` indexes regions
 - Change descriptors of attributes `assay_id`, `doi`
 - `Assay` attribute `assay` changed to `assay_id`

@@ -202,7 +202,7 @@ onlist: !Onlist
 regions: null
 ```
 
-For more information about the various fields, please see the JSON schema specification (`seqspec/schema/seqspec.schema.json`). For consistency across assays I suggest following a standard naming conventions for common regions. I've made a collection of "named" regions available; please see `seqspec/docs/regions` for a list of example regions.
+For more information about the various fields, please see the JSON schema specification (`seqspec/schema/seqspec.schema.json`). For consistency across assays I suggest following a standard naming conventions for common regions. I've made a collection of "named" regions available; please see `docs/examples/regions` for a list of example regions.
 
 ## `Read` Object
 
