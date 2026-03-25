@@ -18,6 +18,7 @@ use seqspec::seqspec_upgrade;
 use seqspec::seqspec_insert;
 use seqspec::seqspec_check;
 use seqspec::seqspec_onlist;
+use seqspec::seqspec_print;
 use seqspec::utils;
 
 use clap::{Parser, Subcommand};
@@ -46,6 +47,7 @@ enum Commands {
     Insert(seqspec_insert::InsertArgs),
     Check(seqspec_check::CheckArgs),
     Onlist(seqspec_onlist::OnlistArgs),
+    Print(seqspec_print::PrintArgs),
     // other subcommands later...
 }
 
@@ -67,5 +69,6 @@ fn main() {
         ,Commands::Insert(args) => seqspec_insert::run_insert(&args)
         ,Commands::Check(args) => { seqspec_check::run_check(&args); }
         ,Commands::Onlist(args) => seqspec_onlist::run_onlist(&args)
+        ,Commands::Print(args) => seqspec_print::run_print(&args)
     }
 }

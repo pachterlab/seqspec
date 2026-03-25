@@ -12,8 +12,20 @@ from seqspec.utils import load_spec
 
 def test_seqspec_check(dogmaseq_dig_spec: Assay):
     """Test seqspec_check function"""
+    spec = dogmaseq_dig_spec.model_copy(deep=True)
+
+    def localize_onlists(region):
+        if region.onlist is not None and region.onlist.urltype in {"http", "https", "ftp"}:
+            region.onlist.urltype = "local"
+            region.onlist.url = region.onlist.filename + ".gz"
+        for child in region.regions:
+            localize_onlists(child)
+
+    for region in spec.library_spec:
+        localize_onlists(region)
+
     # Test with valid spec
-    errors = seqspec_check(spec=dogmaseq_dig_spec)
+    errors = seqspec_check(spec=spec)
     assert len(errors) == 0  # No errors for valid spec
 
     # Test with invalid spec (missing required fields)

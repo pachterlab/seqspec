@@ -20,6 +20,7 @@ pub mod seqspec_upgrade;
 pub mod seqspec_insert;
 pub mod seqspec_check;
 pub mod seqspec_onlist;
+pub mod seqspec_print;
 
 // #[cfg(feature = "python-binding")]
 // mod py_module;  // lives in src/py_module.rs

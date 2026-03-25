@@ -42,11 +42,20 @@ pub fn complement_seq(s: &str) -> String {
 // }
 
 pub fn load_spec(spec: &std::path::PathBuf) -> Assay {
-    // read in the spec file
-    let f: std::fs::File = std::fs::File::open(spec).expect("Could not open file.");
+    let mut f: std::fs::File = std::fs::File::open(spec).expect("Could not open file.");
+    let mut magic = [0_u8; 2];
+    f.read_exact(&mut magic)
+        .expect("Could not read file header.");
+    drop(f);
 
-    // parse through a permissive compatibility layer, then normalize into Assay
-    let spec: AssayCompat = serde_yaml::from_reader(f).expect("Could not read values.");
+    let reader: Box<dyn IoRead> = if magic == [0x1f, 0x8b] {
+        let gz = GzDecoder::new(std::fs::File::open(spec).expect("Could not open file."));
+        Box::new(gz)
+    } else {
+        Box::new(std::fs::File::open(spec).expect("Could not open file."))
+    };
+
+    let spec: AssayCompat = serde_yaml::from_reader(reader).expect("Could not read values.");
 
     spec.into_assay()
 }
@@ -199,6 +208,13 @@ mod tests {
 
     fn dogma_spec() -> Assay {
         load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+    }
+
+    #[test]
+    fn test_load_spec_reads_gzipped_yaml() {
+        let spec = load_spec(&PathBuf::from("tests/fixtures/spec.yaml.gz"));
+        assert_eq!(spec.assay_id, "DOGMAseq-DIG");
+        assert_eq!(spec.seqspec_version, Some("0.4.0".to_string()));
     }
 
     fn leaf(id: &str, len: i64) -> Region {
