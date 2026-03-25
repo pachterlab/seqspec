@@ -255,9 +255,7 @@ def format_sequence_spec(info: Dict, fmt: str = "tab") -> str:
             )
         return "\n".join(lines)
     elif fmt == "json":
-        return json.dumps(
-            [i.model_dump() for i in info["sequence_spec"]], sort_keys=False, indent=4
-        )
+        return json.dumps(info["sequence_spec"], sort_keys=False, indent=4)
     return ""
 
 
@@ -281,9 +279,5 @@ def format_library_spec(info: Dict, fmt: str = "tab") -> str:
                 )
         return "\n".join(lines)
     elif fmt == "json":
-        return json.dumps(
-            {m: [i.model_dump() for i in r] for m, r in info["library_spec"].items()},
-            sort_keys=False,
-            indent=4,
-        )
+        return json.dumps(info["library_spec"], sort_keys=False, indent=4)
     return ""

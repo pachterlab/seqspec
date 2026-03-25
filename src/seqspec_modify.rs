@@ -1,6 +1,5 @@
 use crate::models::assay::Assay;
 use crate::models::file::File;
-use crate::models::read::Read;
 use crate::utils;
 use clap::Args;
 use serde_json::Value;
@@ -103,13 +102,15 @@ fn vi64(v: &Value, key: &str) -> Option<i64> {
 }
 
 fn modify_reads(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
-    let reads: Vec<Read> = spec.get_seqspec(modality);
-    let mut updated: Vec<Read> = reads.clone();
     for patch in keys {
         let Some(read_id) = vstr(patch, "read_id") else {
             continue;
         };
-        if let Some(rd) = updated.iter_mut().find(|r| r.read_id == read_id) {
+        if let Some(rd) = spec
+            .sequence_spec
+            .iter_mut()
+            .find(|r| r.modality == modality && r.read_id == read_id)
+        {
             // files optional
             let files_opt: Option<Vec<File>> = patch.get("files").and_then(|arr| {
                 arr.as_array().map(|items| {
@@ -157,9 +158,6 @@ fn modify_reads(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
             );
         }
     }
-    // replace reads for modality: simplest is to drop existing ones of modality and extend
-    spec.sequence_spec.retain(|r| r.modality != modality);
-    spec.sequence_spec.extend(updated);
 }
 
 fn modify_regions(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
@@ -395,5 +393,23 @@ mod tests {
         let keys = vec![json!({"id": "x"})];
         let modified = seqspec_modify(spec.clone(), "rna", keys, "unknown");
         assert_eq!(modified.assay_id, spec.assay_id);
+    }
+
+    #[test]
+    fn test_modify_read_preserves_global_read_order() {
+        let spec = dogma_spec();
+        let original_ids: Vec<String> = spec
+            .sequence_spec
+            .iter()
+            .map(|read| read.read_id.clone())
+            .collect();
+        let keys = vec![json!({"read_id": "rna_R1", "name": "Updated Name"})];
+        let modified = seqspec_modify(spec, "rna", keys, "read");
+        let modified_ids: Vec<String> = modified
+            .sequence_spec
+            .iter()
+            .map(|read| read.read_id.clone())
+            .collect();
+        assert_eq!(modified_ids, original_ids);
     }
 }
