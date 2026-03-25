@@ -1,6 +1,6 @@
 use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
-use crate::models::region::Region;
+use crate::models::region::{Region, RegionCoordinate};
 use crate::utils;
 use clap::Args;
 use jsonschema;
@@ -71,15 +71,16 @@ fn validate_check_args(args: &CheckArgs) {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ErrorObj {
+    pub severity: String,
     pub error_type: String,
     pub error_message: String,
     pub error_object: String,
 }
 
 fn format_error(e: &ErrorObj, idx: usize) -> String {
-    format!("[error {}] {}", idx, e.error_message)
+    format!("[{} {}] {}", e.severity, idx, e.error_message)
 }
 
 pub fn seqspec_check(spec: &Assay, filter_type: Option<&str>, spec_path: &Path) -> Vec<ErrorObj> {
@@ -120,6 +121,7 @@ const STRUCTURAL_CHECK_TYPES: &[&str] = &[
     "check_region_against_subregion_length",
     "check_region_against_subregion_sequence",
     "check_read_length_against_library",
+    "check_overlapping_read_regions",
 ];
 
 fn filter_errors(errors: Vec<ErrorObj>, filter_type: &str) -> Vec<ErrorObj> {
@@ -189,6 +191,7 @@ pub fn seqspec_check_structural(spec: &Assay) -> Vec<ErrorObj> {
     let errors = run!(check_region_against_subregion_length, errors);
     let errors = run!(check_region_against_subregion_sequence, errors);
     let errors = run!(check_read_length_against_library, errors);
+    let errors = run!(check_overlapping_read_regions, errors);
     errors
 }
 
@@ -219,13 +222,29 @@ fn check(
     Ok(errors)
 }
 
-fn push_error(errors: &mut Vec<ErrorObj>, idx: &mut usize, et: &str, msg: String, obj: &str) {
+fn push_diagnostic(
+    errors: &mut Vec<ErrorObj>,
+    idx: &mut usize,
+    severity: &str,
+    et: &str,
+    msg: String,
+    obj: &str,
+) {
     errors.push(ErrorObj {
+        severity: severity.to_string(),
         error_type: et.to_string(),
         error_message: msg,
         error_object: obj.to_string(),
     });
     *idx += 1;
+}
+
+fn push_error(errors: &mut Vec<ErrorObj>, idx: &mut usize, et: &str, msg: String, obj: &str) {
+    push_diagnostic(errors, idx, "error", et, msg, obj);
+}
+
+fn push_warning(errors: &mut Vec<ErrorObj>, idx: &mut usize, et: &str, msg: String, obj: &str) {
+    push_diagnostic(errors, idx, "warning", et, msg, obj);
 }
 
 fn check_schema(spec: &Assay, mut errors: Vec<ErrorObj>, mut idx: usize) -> (Vec<ErrorObj>, usize) {
@@ -266,6 +285,7 @@ fn check_schema(spec: &Assay, mut errors: Vec<ErrorObj>, mut idx: usize) -> (Vec
                 seg.trim_end_matches(']').trim_matches('"').to_string()
             };
             errors.push(ErrorObj {
+                severity: "error".to_string(),
                 error_type: "check_schema".to_string(),
                 error_message: msg,
                 error_object: last_obj,
@@ -833,6 +853,73 @@ fn check_read_length_against_library(
     (errors, idx)
 }
 
+fn check_overlapping_read_regions(
+    spec: &Assay,
+    mut errors: Vec<ErrorObj>,
+    mut idx: usize,
+) -> (Vec<ErrorObj>, usize) {
+    for modality in &spec.modalities {
+        let reads = spec.get_seqspec(modality);
+        let mut projected_reads: Vec<(String, Vec<RegionCoordinate>)> = Vec::new();
+
+        for read in reads {
+            let Ok((mapped_read, regions)) =
+                utils::map_read_id_to_regions(spec, modality, &read.read_id)
+            else {
+                continue;
+            };
+
+            let region_coordinates = utils::project_regions_to_coordinates(regions);
+            let clipped = utils::itx_read(region_coordinates, 0, mapped_read.max_len);
+            projected_reads.push((mapped_read.read_id, clipped));
+        }
+
+        for left_idx in 0..projected_reads.len() {
+            for right_idx in left_idx + 1..projected_reads.len() {
+                let (left_read_id, left_regions) = &projected_reads[left_idx];
+                let (right_read_id, right_regions) = &projected_reads[right_idx];
+                let right_region_ids: HashSet<String> = right_regions
+                    .iter()
+                    .map(|region| region.region.region_id.clone())
+                    .collect();
+                let mut shared_region_ids: Vec<String> = Vec::new();
+                let mut seen_region_ids: HashSet<String> = HashSet::new();
+
+                for region in left_regions {
+                    let region_id = region.region.region_id.clone();
+                    if right_region_ids.contains(&region_id)
+                        && seen_region_ids.insert(region_id.clone())
+                    {
+                        shared_region_ids.push(region_id);
+                    }
+                }
+
+                if shared_region_ids.is_empty() {
+                    continue;
+                }
+
+                let region_list = shared_region_ids
+                    .iter()
+                    .map(|region_id| format!("'{}'", region_id))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                push_warning(
+                    &mut errors,
+                    &mut idx,
+                    "check_overlapping_read_regions",
+                    format!(
+                        "reads '{}' and '{}' in modality '{}' both cover region(s) {}. Downstream tools may require explicit overlap handling such as `seqspec index --no-overlap`",
+                        left_read_id, right_read_id, modality, region_list
+                    ),
+                    "read",
+                );
+            }
+        }
+    }
+
+    (errors, idx)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -846,22 +933,25 @@ mod tests {
     fn test_check_valid_spec() {
         let spec = dogma_spec();
         let spec_path = PathBuf::from("tests/fixtures/spec.yaml");
-        let errors = seqspec_check(&spec, None, &spec_path);
-        // DOGMAseq-DIG is well-formed; only file-existence errors expected
-        for e in &errors {
+        let diagnostics = seqspec_check(&spec, None, &spec_path);
+        // DOGMAseq-DIG is well-formed; only file-existence errors or overlap warnings are expected
+        for e in &diagnostics {
             assert!(
                 e.error_type == "check_onlist_files_exist"
-                    || e.error_type == "check_read_files_exist",
-                "Unexpected error type: {} - {}",
+                    || e.error_type == "check_read_files_exist"
+                    || (e.severity == "warning"
+                        && e.error_type == "check_overlapping_read_regions"),
+                "Unexpected diagnostic type: {} - {}",
                 e.error_type,
                 e.error_message,
             );
         }
-        // No structural/validation errors
-        let structural_errors: Vec<_> = errors
+        // No structural/validation error diagnostics
+        let structural_errors: Vec<_> = diagnostics
             .iter()
             .filter(|e| {
-                e.error_type != "check_onlist_files_exist"
+                e.severity == "error"
+                    && e.error_type != "check_onlist_files_exist"
                     && e.error_type != "check_read_files_exist"
             })
             .collect();
@@ -871,10 +961,12 @@ mod tests {
     #[test]
     fn test_error_obj_structure() {
         let e = ErrorObj {
+            severity: "error".into(),
             error_type: "test_check".into(),
             error_message: "something went wrong".into(),
             error_object: "region".into(),
         };
+        assert_eq!(e.severity, "error");
         assert_eq!(e.error_type, "test_check");
         assert_eq!(e.error_message, "something went wrong");
         assert_eq!(e.error_object, "region");
@@ -884,11 +976,13 @@ mod tests {
     fn test_filter_errors_igvf() {
         let errors = vec![
             ErrorObj {
+                severity: "error".into(),
                 error_type: "check_schema".into(),
                 error_message: "missing field".into(),
                 error_object: "'lib_struct'".into(),
             },
             ErrorObj {
+                severity: "error".into(),
                 error_type: "check_unique_modalities".into(),
                 error_message: "duplicate".into(),
                 error_object: "modality".into(),
@@ -903,6 +997,7 @@ mod tests {
     #[test]
     fn test_filter_errors_unknown_type() {
         let errors = vec![ErrorObj {
+            severity: "error".into(),
             error_type: "test".into(),
             error_message: "msg".into(),
             error_object: "obj".into(),
@@ -915,16 +1010,19 @@ mod tests {
     fn test_filter_errors_igvf_onlist_skip() {
         let errors = vec![
             ErrorObj {
+                severity: "error".into(),
                 error_type: "check_schema".into(),
                 error_message: "missing field".into(),
                 error_object: "'lib_struct'".into(),
             },
             ErrorObj {
+                severity: "error".into(),
                 error_type: "check_onlist_files_exist".into(),
                 error_message: "file missing".into(),
                 error_object: "onlist".into(),
             },
             ErrorObj {
+                severity: "error".into(),
                 error_type: "check_unique_modalities".into(),
                 error_message: "duplicate".into(),
                 error_object: "modality".into(),
@@ -1007,5 +1105,30 @@ mod tests {
                     .error_message
                     .contains("'index7' sequence_type is 'random' and sequence is not all X's")
         }));
+    }
+
+    #[test]
+    fn test_check_warns_on_overlapping_read_regions() {
+        let spec_path = PathBuf::from("tests/fixtures/check_overlap_warning/spec.yaml");
+        let spec = load_spec(&spec_path);
+        let diagnostics = seqspec_check(&spec, None, &spec_path);
+
+        let errors: Vec<_> = diagnostics
+            .iter()
+            .filter(|diagnostic| diagnostic.severity == "error")
+            .collect();
+        let warnings: Vec<_> = diagnostics
+            .iter()
+            .filter(|diagnostic| diagnostic.severity == "warning")
+            .collect();
+
+        assert!(errors.is_empty());
+        assert_eq!(warnings.len(), 1);
+        assert_eq!(warnings[0].error_type, "check_overlapping_read_regions");
+        assert!(warnings[0]
+            .error_message
+            .contains("seqspec index --no-overlap"));
+        assert!(warnings[0].error_message.contains("'barcode'"));
+        assert!(warnings[0].error_message.contains("'umi'"));
     }
 }

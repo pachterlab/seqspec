@@ -23,6 +23,7 @@ We have multiple tutorials to get you up and running with `seqspec`:
 - `seqspec upgrade` upgrades `0.3.0` specs to `0.4.0` in both implementations.
 - `seqspec` loads gzipped specs directly, so `.yaml.gz` works anywhere a spec path is accepted.
 - `seqspec auth` manages host-matched auth profiles for remote resources, and `seqspec check` / `seqspec onlist` can use them with `--auth-profile`.
+- `seqspec check` now emits warnings for valid but risky geometry, such as reads that cover the same declared regions.
 - `seqspec onlist -s region-type` now errors when the same region type appears across multiple reads, so ambiguous joins are explicit.
 - `seqspec print -f seqspec-html` writes a self-contained HTML view of the library and reads.
 - `seqspec build` is deprecated.

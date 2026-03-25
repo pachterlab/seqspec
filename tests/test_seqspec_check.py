@@ -25,8 +25,10 @@ def test_seqspec_check(dogmaseq_dig_spec: Assay):
         localize_onlists(region)
 
     # Test with valid spec
-    errors = seqspec_check(spec=spec)
-    assert len(errors) == 0  # No errors for valid spec
+    diagnostics = seqspec_check(spec=spec)
+    assert not any(
+        diagnostic["severity"] == "error" for diagnostic in diagnostics
+    ), "Valid spec should not emit error diagnostics"
 
     # Test with invalid spec (missing required fields)
     invalid_spec = Assay(
@@ -46,5 +48,31 @@ def test_seqspec_check(dogmaseq_dig_spec: Assay):
         library_spec=[]
     )
     
-    errors = seqspec_check(spec=invalid_spec)
-    assert len(errors) > 0  # Should have errors for invalid spec
+    diagnostics = seqspec_check(spec=invalid_spec)
+    assert any(
+        diagnostic["severity"] == "error" for diagnostic in diagnostics
+    ), "Invalid spec should emit error diagnostics"
+
+
+def test_seqspec_check_warns_on_overlapping_read_regions():
+    spec = load_spec(Path("tests/fixtures/check_overlap_warning/spec.yaml"))
+
+    diagnostics = seqspec_check(spec=spec)
+
+    errors = [
+        diagnostic for diagnostic in diagnostics if diagnostic["severity"] == "error"
+    ]
+    warnings = [
+        diagnostic
+        for diagnostic in diagnostics
+        if diagnostic["severity"] == "warning"
+    ]
+
+    assert errors == []
+    assert len(warnings) == 1
+    assert warnings[0]["error_type"] == "check_overlapping_read_regions"
+    assert (
+        "seqspec index --no-overlap" in warnings[0]["error_message"]
+    )
+    assert "'barcode'" in warnings[0]["error_message"]
+    assert "'umi'" in warnings[0]["error_message"]

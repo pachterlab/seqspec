@@ -105,7 +105,7 @@ seqspec auth resolve https://api.data.igvf.org/reference-files/IGVFFI5429KKCK/
 Check that the `seqspec` file is correctly formatted and consistent with the [specification](https://github.com/IGVF/seqspec/blob/main/docs/SPECIFICATION.md).
 
 ```bash
-seqspec check [-h] [-o OUT] [--skip {igvf,igvf_onlist_skip}] [--auth-profile PROFILE] yaml
+seqspec check [-h] [-o OUT] [--skip {igvf,igvf_onlist_skip,structural}] [--auth-profile PROFILE] yaml
 ```
 
 ```python
@@ -117,9 +117,16 @@ seqspec_check(spec, filter_type=None, auth_profile=None)
 ```
 
 - optionally, `-o OUT` can be used to write the output to a file.
-- optionally, `--skip {igvf,igvf_onlist_skip}` can filter out known IGVF-specific warnings (see source for list).
+- optionally, `--skip {igvf,igvf_onlist_skip,structural}` can filter out known diagnostic classes (see source for list).
 - optionally, `--auth-profile PROFILE` uses a named auth profile when checking remote files.
 - `yaml` corresponds to the `seqspec` file and may be plain YAML or `.yaml.gz`.
+
+`seqspec check` emits diagnostics with two severities:
+
+- `error`: the spec is invalid and should be fixed.
+- `warning`: the spec is valid, but the declared geometry may still need explicit downstream handling.
+
+Warnings do not mean the spec is malformed. They flag cases that are easy to miss, such as two reads in the same modality covering the same declared regions. In those cases, downstream tools may need explicit overlap handling such as `seqspec index --no-overlap`.
 
 A list of checks performed:
 
@@ -146,6 +153,7 @@ A list of checks performed:
 15. Check that for every region with subregions, the region `min_len`/`max_len` equals the sum of the subregions' `min_len`/`max_len`.
 16. Check that for every region with subregions, the region `sequence` equals the left-to-right concatenation of the subregions' `sequence`s.
 17. Check that each read's `max_len` does not exceed the sequence-able range of library elements after (pos strand) or before (neg strand) the primer.
+18. Warn when two reads in the same modality cover the same declared regions. This often needs explicit overlap handling with `seqspec index --no-overlap`.
 
 Below are a list of example errors one may encounter when checking a spec:
 
@@ -188,6 +196,10 @@ $ seqspec check spec.yaml
 
 # check a spec with protected remote resources
 $ seqspec check --auth-profile igvf spec.yaml
+
+# a valid spec can still emit overlap warnings
+$ seqspec check overlap_spec.yaml
+[warning 1] reads 'rna_R1' and 'rna_R2' in modality 'rna' both cover region(s) 'barcode', 'umi'. Downstream tools may require explicit overlap handling such as `seqspec index --no-overlap`
 ```
 
 ## `seqspec find`: Find objects in seqspec file

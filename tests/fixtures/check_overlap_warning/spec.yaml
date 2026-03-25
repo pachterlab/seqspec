@@ -1,0 +1,102 @@
+seqspec_version: 0.4.0
+assay_id: overlap-warning
+name: Overlap Warning Fixture
+doi: https://doi.org/10.0000/overlap-warning
+date: 25 March 2026
+description: Minimal valid fixture with overlapping read coverage.
+modalities:
+  - rna
+lib_struct: ""
+sequence_protocol:
+  - protocol_id: illumina-protocol
+    name: Illumina
+    modality: rna
+sequence_kit:
+  - kit_id: test-sequencing-kit
+    name: Illumina
+    modality: rna
+library_protocol:
+  - protocol_id: test-library-protocol
+    name: Test library protocol
+    modality: rna
+library_kit:
+  - kit_id: test-library-kit
+    name: Test library kit
+    modality: rna
+sequence_spec:
+  - read_id: rna_R1
+    name: Read 1
+    modality: rna
+    primer_id: primer_r1
+    min_len: 8
+    max_len: 8
+    strand: pos
+    files:
+      - file_id: rna_R1.fastq
+        filename: rna_R1.fastq
+        filetype: fastq
+        filesize: 0
+        url: rna_R1.fastq
+        urltype: local
+        md5: "00000000000000000000000000000000"
+  - read_id: rna_R2
+    name: Read 2
+    modality: rna
+    primer_id: primer_r2
+    min_len: 8
+    max_len: 8
+    strand: neg
+    files:
+      - file_id: rna_R2.fastq
+        filename: rna_R2.fastq
+        filetype: fastq
+        filesize: 0
+        url: rna_R2.fastq
+        urltype: local
+        md5: "11111111111111111111111111111111"
+library_spec:
+  - region_id: rna
+    region_type: rna
+    name: RNA
+    sequence_type: joined
+    sequence: AAAACCCCGGGGTTTT
+    min_len: 16
+    max_len: 16
+    onlist: null
+    regions:
+      - region_id: primer_r1
+        region_type: truseq_read1
+        name: Primer R1
+        sequence_type: fixed
+        sequence: AAAA
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
+      - region_id: barcode
+        region_type: barcode
+        name: Barcode
+        sequence_type: fixed
+        sequence: CCCC
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
+      - region_id: umi
+        region_type: umi
+        name: UMI
+        sequence_type: fixed
+        sequence: GGGG
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
+      - region_id: primer_r2
+        region_type: truseq_read2
+        name: Primer R2
+        sequence_type: fixed
+        sequence: TTTT
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
