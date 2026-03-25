@@ -4,6 +4,7 @@
 #![allow(dead_code)]
 
 use seqspec::seqspec_version;
+use seqspec::seqspec_auth;
 use seqspec::seqspec_format;
 use seqspec::seqspec_find;
 use seqspec::seqspec_index;
@@ -30,6 +31,7 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    Auth(seqspec_auth::AuthArgs),
     Version(seqspec_version::VersionArgs),
     Format(seqspec_format::FormatArgs),
     Find(seqspec_find::FindArgs),
@@ -50,6 +52,7 @@ enum Commands {
 fn main() {
     let args = Args::parse();
     match args.subcmd {
+        Commands::Auth(args) => seqspec_auth::run(&args).unwrap(),
         Commands::Version(args) => seqspec_version::run_version(&args),
         Commands::Format(args) => seqspec_format::run_format(&args),
         Commands::Find(args) => seqspec_find::run_find(&args),

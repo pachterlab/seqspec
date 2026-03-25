@@ -1,3 +1,4 @@
+use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::read::Read;
 use crate::models::onlist::Onlist;
@@ -25,6 +26,9 @@ pub struct OnlistArgs {
     #[clap(short, long, help = "Modality", required = true)]
     modality: String,
 
+    #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
+    auth_profile: Option<String>,
+
     #[clap(help = "Sequencing specification yaml file", required = true)]
     yaml: PathBuf,
 }
@@ -33,16 +37,21 @@ pub fn run_onlist(args: &OnlistArgs) {
     validate_onlist_args(args);
     let base_path = args.yaml.parent().unwrap_or_else(|| Path::new(".")).to_path_buf();
     let spec = utils::load_spec(&args.yaml);
+    let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
 
     let onlists = get_onlists(&spec, &args.modality, &args.selector, args.id.as_deref());
     if onlists.is_empty() { println!("No onlists found"); return; }
 
     if let Some(fmt) = &args.format {
         let save_path = args.output.clone().unwrap_or(base_path.join("joined.txt"));
-        let result_path = join_onlists_and_save(&onlists, fmt, &save_path, &base_path);
+        let result_path =
+            join_onlists_and_save(&onlists, fmt, &save_path, &base_path, &remote_access);
         println!("{}", result_path.display());
     } else if let Some(out) = &args.output {
-        let result_paths = download_onlists_to_path(&onlists, out, &base_path);
+        let result_paths = download_onlists_to_path(&onlists, out, &base_path, &remote_access);
         for p in result_paths { println!("{}", p.url); }
     } else {
         let urls = get_onlist_urls(&onlists, &base_path);
@@ -99,14 +108,19 @@ fn get_onlist_urls(onlists: &Vec<Onlist>, base_path: &Path) -> Vec<UrlInfo> {
 
 struct PathInfo { url: String }
 
-fn download_onlists_to_path(onlists: &Vec<Onlist>, output_path: &Path, base_path: &Path) -> Vec<PathInfo> {
+fn download_onlists_to_path(
+    onlists: &Vec<Onlist>,
+    output_path: &Path,
+    base_path: &Path,
+    remote_access: &RemoteAccess,
+) -> Vec<PathInfo> {
     let mut out = Vec::new();
     for ol in onlists {
         if ol.urltype == "local" {
             let local = base_path.join(&ol.url);
             out.push(PathInfo { url: local.to_string_lossy().to_string() });
         } else {
-            let content = utils::read_remote_list(&ol.url).unwrap_or_default();
+            let content = utils::read_remote_list(&ol.url, remote_access).unwrap_or_default();
             let filename = format!("{}_{}", ol.file_id, output_path.file_name().unwrap_or_default().to_string_lossy());
             let download_path = output_path.parent().unwrap_or_else(|| Path::new(".")).join(filename);
             write_onlist(&content, &download_path);
@@ -116,10 +130,20 @@ fn download_onlists_to_path(onlists: &Vec<Onlist>, output_path: &Path, base_path
     out
 }
 
-fn join_onlists_and_save(onlists: &Vec<Onlist>, format_type: &str, output_path: &Path, base_path: &Path) -> PathBuf {
+fn join_onlists_and_save(
+    onlists: &Vec<Onlist>,
+    format_type: &str,
+    output_path: &Path,
+    base_path: &Path,
+    remote_access: &RemoteAccess,
+) -> PathBuf {
     let mut contents: Vec<Vec<String>> = Vec::new();
     for ol in onlists {
-        let content = if ol.urltype == "local" { utils::read_local_list(&base_path.join(&ol.url)).unwrap_or_default() } else { utils::read_remote_list(&ol.url).unwrap_or_default() };
+        let content = if ol.urltype == "local" {
+            utils::read_local_list(&base_path.join(&ol.url)).unwrap_or_default()
+        } else {
+            utils::read_remote_list(&ol.url, remote_access).unwrap_or_default()
+        };
         contents.push(content);
     }
     let joined = join_onlist_contents(contents, format_type);

@@ -1,11 +1,12 @@
+use crate::auth::RemoteAccess;
 use crate::compat::AssayCompat;
 use crate::models::assay::Assay;
 use crate::models::read::Read;
 use crate::models::region::{Region, RegionCoordinate};
 
 use flate2::read::GzDecoder;
-use reqwest;
 use serde_yaml;
+use std::io::Read as IoRead;
 
 pub fn complement_base(c: char) -> char {
     match c {
@@ -81,23 +82,22 @@ pub fn read_local_list(path: &std::path::Path) -> Result<Vec<String>, String> {
 }
 
 /// Fetch a remote text file (http/https/ftp) and return lines
-pub fn read_remote_list(url: &str) -> Result<Vec<String>, String> {
-    let resp = reqwest::blocking::get(url).map_err(|e| e.to_string())?;
-    if !resp.status().is_success() {
-        return Err(format!("bad status: {}", resp.status()));
-    }
-    let bytes = resp.bytes().map_err(|e| e.to_string())?;
-    let data: Vec<u8> = bytes.to_vec();
-    // Try gunzip if looks like gz
-    let text = if url.ends_with(".gz") {
-        let mut dec = GzDecoder::new(&data[..]);
-        let mut s = String::new();
-        use std::io::Read;
-        dec.read_to_string(&mut s).map_err(|e| e.to_string())?;
-        s
-    } else {
-        String::from_utf8(data).map_err(|e| e.to_string())?
-    };
+pub fn read_remote_list(url: &str, remote_access: &RemoteAccess) -> Result<Vec<String>, String> {
+    let text = remote_access
+        .with_reader(url, |mut reader| {
+            let mut data = Vec::new();
+            reader.read_to_end(&mut data)?;
+            let text = if url.ends_with(".gz") {
+                let mut dec = GzDecoder::new(&data[..]);
+                let mut s = String::new();
+                dec.read_to_string(&mut s)?;
+                s
+            } else {
+                String::from_utf8(data)?
+            };
+            Ok(text)
+        })
+        .map_err(|e| e.to_string())?;
     Ok(text
         .lines()
         .map(|l| l.trim().to_string())

@@ -4,6 +4,7 @@ This module provides functionality to validate seqspec files against the specifi
 """
 
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+import os
 from os import path
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -46,6 +47,13 @@ seqspec check spec.yaml
         default=None,
         choices=["igvf", "igvf_onlist_skip"],
     )
+    subparser.add_argument(
+        "--auth-profile",
+        metavar="PROFILE",
+        help="Authentication profile for remote resource checks",
+        type=str,
+        default=os.environ.get("SEQSPEC_AUTH_PROFILE"),
+    )
 
     subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
 
@@ -65,7 +73,11 @@ def format_error(errobj, idx=0):
     return f"[error {idx}] {errobj['error_message']}"
 
 
-def seqspec_check(spec: Assay, filter_type: Optional[str] = None) -> List[Dict]:
+def seqspec_check(
+    spec: Assay,
+    filter_type: Optional[str] = None,
+    auth_profile: Optional[str] = None,
+) -> List[Dict]:
     """Core functionality to check a seqspec and return filtered errors.
 
     Args:
@@ -75,7 +87,7 @@ def seqspec_check(spec: Assay, filter_type: Optional[str] = None) -> List[Dict]:
     Returns:
         List of error dictionaries
     """
-    errors = check(spec)
+    errors = check(spec, auth_profile=auth_profile)
 
     if filter_type:
         errors = filter_errors(errors, filter_type)
@@ -87,7 +99,7 @@ def run_check(parser: ArgumentParser, args: Namespace):
     validate_check_args(parser, args)
 
     spec = load_spec(args.yaml, strict=False)
-    errors = seqspec_check(spec, args.skip)
+    errors = seqspec_check(spec, args.skip, args.auth_profile)
 
     if args.output:
         with open(args.output, "w") as f:
@@ -137,7 +149,7 @@ def filter_errors(errors, filter_type):
         return errors
 
 
-def check(spec: Assay):
+def check(spec: Assay, auth_profile: Optional[str] = None):
     # Variety of checks against schema
     def check_schema(spec: Assay, errors=[], idx=0):
         schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
@@ -202,7 +214,7 @@ def check(spec: Assay):
 
         for ol in olrgns:
             if ol.urltype == "local":
-                if ol.filename[:-3] == ".gz":
+                if ol.filename.endswith(".gz"):
                     check = ol.url
                     if spec_base and not Path(check).is_absolute():
                         check = str((spec_base / check).resolve())
@@ -233,17 +245,16 @@ def check(spec: Assay):
             elif ol.urltype == "http" or ol.urltype == "https" or ol.urltype == "ftp":
                 # ping the link with a simple http request to check if the file exists at that URI
                 if spec.seqspec_version == "0.3.0":
-                    if not file_exists(ol.url):
+                    if not file_exists(ol.url, auth_profile):
                         errobj = {
                             "error_type": "check_onlist_files_exist",
                             "error_message": f"{ol.filename} does not exist",
                             "error_object": "onlist",
                         }
-
                         errors.append(errobj)
                         idx += 1
                 else:
-                    if not file_exists(ol.url):
+                    if not file_exists(ol.url, auth_profile):
                         errobj = {
                             "error_type": "check_onlist_files_exist",
                             "error_message": f"{ol.filename} does not exist",
@@ -296,7 +307,7 @@ def check(spec: Assay):
                         idx += 1
                 elif f.urltype == "http" or f.urltype == "https" or f.urltype == "ftp":
                     # ping the link with a simple http request to check if the file exists at that URI
-                    if not file_exists(f.url):
+                    if not file_exists(f.url, auth_profile):
                         errobj = {
                             "error_type": "check_read_files_exist",
                             "error_message": f"{f.filename} does not exist",

@@ -3,8 +3,10 @@ mod compat;
 pub mod models;
 
 pub use models::{file, region, read, onlist, assay, coordinate};
+pub mod auth;
 pub mod utils;
 pub mod seqspec_version;
+pub mod seqspec_auth;
 pub mod seqspec_format;
 pub mod seqspec_find;
 pub mod seqspec_index;

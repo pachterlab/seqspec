@@ -87,6 +87,13 @@ seqspec onlist -m rna -s read -i rna_R1 -f product -o joined.txt spec.yaml  # Jo
         default=None,
         required=True,
     )
+    subparser.add_argument(
+        "--auth-profile",
+        metavar="PROFILE",
+        help="Authentication profile for remote onlists",
+        type=str,
+        default=None,
+    )
 
     return subparser
 
@@ -215,7 +222,7 @@ def download_onlists_to_path(
             downloaded_paths.append({"file_id": onlist.file_id, "url": str(local_path)})
         else:
             # Remote file - download it
-            onlist_elements = read_remote_list(onlist)
+            onlist_elements = read_remote_list(onlist, auth_profile=args.auth_profile)
             # Create unique filename for this onlist
             filename = f"{onlist.file_id}_{output_path.name}"
             download_path = output_path.parent / filename
@@ -237,7 +244,7 @@ def join_onlists_and_save(
         if onlist.urltype == "local":
             content = read_local_list(onlist, str(base_path))
         else:
-            content = read_remote_list(onlist)
+            content = read_remote_list(onlist, auth_profile=args.auth_profile)
         onlist_contents.append(content)
 
     # Join the onlists

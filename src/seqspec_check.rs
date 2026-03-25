@@ -1,3 +1,4 @@
+use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::region::Region;
 use crate::utils;
@@ -23,6 +24,9 @@ pub struct CheckArgs {
     )]
     skip: Option<String>,
 
+    #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
+    auth_profile: Option<String>,
+
     #[clap(help = "Sequencing specification yaml file", required = true)]
     yaml: PathBuf,
 }
@@ -30,7 +34,20 @@ pub struct CheckArgs {
 pub fn run_check(args: &CheckArgs) -> Vec<ErrorObj> {
     validate_check_args(args);
     let spec = utils::load_spec(&args.yaml);
-    let errors = seqspec_check(&spec, args.skip.as_deref(), &args.yaml);
+    let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    let errors = seqspec_check_with_remote_access(
+        &spec,
+        args.skip.as_deref(),
+        &args.yaml,
+        &remote_access,
+    )
+    .unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
 
     if let Some(out) = &args.output {
         let mut f = fs::File::create(out).unwrap();
@@ -70,11 +87,25 @@ fn format_error(e: &ErrorObj, idx: usize) -> String {
 }
 
 pub fn seqspec_check(spec: &Assay, filter_type: Option<&str>, spec_path: &Path) -> Vec<ErrorObj> {
-    let mut errors = check(spec, spec_path);
+    let access = RemoteAccess::anonymous();
+    let mut errors = check(spec, spec_path, &access).unwrap();
     if let Some(ft) = filter_type {
         errors = filter_errors(errors, ft);
     }
     errors
+}
+
+pub fn seqspec_check_with_remote_access(
+    spec: &Assay,
+    filter_type: Option<&str>,
+    spec_path: &Path,
+    remote_access: &RemoteAccess,
+) -> anyhow::Result<Vec<ErrorObj>> {
+    let mut errors = check(spec, spec_path, remote_access)?;
+    if let Some(ft) = filter_type {
+        errors = filter_errors(errors, ft);
+    }
+    Ok(errors)
 }
 
 /// All error_type values produced by structural (non-filesystem) checks.
@@ -165,7 +196,7 @@ pub fn seqspec_check_structural(spec: &Assay) -> Vec<ErrorObj> {
     errors
 }
 
-fn check(spec: &Assay, spec_path: &Path) -> Vec<ErrorObj> {
+fn check(spec: &Assay, spec_path: &Path, remote_access: &RemoteAccess) -> anyhow::Result<Vec<ErrorObj>> {
     let errors: Vec<ErrorObj> = Vec::new();
     let idx = 0usize;
 
@@ -178,12 +209,14 @@ fn check(spec: &Assay, spec_path: &Path) -> Vec<ErrorObj> {
 
     // Filesystem checks
     let spec_base = spec_path.parent().map(|p| p.to_path_buf());
-    let (e_on, _i_on) = check_onlist_files_exist(spec, errors, idx, spec_base.as_ref());
+    let (e_on, _i_on) =
+        check_onlist_files_exist(spec, errors, idx, spec_base.as_ref(), remote_access)?;
     errors = e_on;
-    let (e_rf, _i_rf) = check_read_files_exist(spec, errors, idx, spec_base.as_ref());
+    let (e_rf, _i_rf) =
+        check_read_files_exist(spec, errors, idx, spec_base.as_ref(), remote_access)?;
     errors = e_rf;
 
-    errors
+    Ok(errors)
 }
 
 fn push_error(errors: &mut Vec<ErrorObj>, idx: &mut usize, et: &str, msg: String, obj: &str) {
@@ -290,7 +323,8 @@ fn check_onlist_files_exist(
     mut errors: Vec<ErrorObj>,
     mut idx: usize,
     spec_base: Option<&PathBuf>,
-) -> (Vec<ErrorObj>, usize) {
+    remote_access: &RemoteAccess,
+) -> anyhow::Result<(Vec<ErrorObj>, usize)> {
     let mut onlists = Vec::new();
     for m in &spec.modalities {
         if let Some(lib) = spec.get_libspec(m) {
@@ -337,8 +371,7 @@ fn check_onlist_files_exist(
                 }
             }
             "http" | "https" | "ftp" => {
-                // Network existence check skipped in Rust version — assume missing if empty URL
-                if ol.url.is_empty() {
+                if ol.url.is_empty() || !remote_access.url_exists(&ol.url)? {
                     push_error(
                         &mut errors,
                         &mut idx,
@@ -351,7 +384,7 @@ fn check_onlist_files_exist(
             _ => {}
         }
     }
-    (errors, idx)
+    Ok((errors, idx))
 }
 
 fn check_unique_read_ids(
@@ -379,7 +412,8 @@ fn check_read_files_exist(
     mut errors: Vec<ErrorObj>,
     mut idx: usize,
     spec_base: Option<&PathBuf>,
-) -> (Vec<ErrorObj>, usize) {
+    remote_access: &RemoteAccess,
+) -> anyhow::Result<(Vec<ErrorObj>, usize)> {
     for read in &spec.sequence_spec {
         for f in &read.files {
             match f.urltype.as_str() {
@@ -405,7 +439,7 @@ fn check_read_files_exist(
                     }
                 }
                 "http" | "https" | "ftp" => {
-                    if f.url.is_empty() {
+                    if f.url.is_empty() || !remote_access.url_exists(&f.url)? {
                         push_error(
                             &mut errors,
                             &mut idx,
@@ -419,7 +453,7 @@ fn check_read_files_exist(
             }
         }
     }
-    (errors, idx)
+    Ok((errors, idx))
 }
 
 fn check_unique_read_primer_strand_pairs(
