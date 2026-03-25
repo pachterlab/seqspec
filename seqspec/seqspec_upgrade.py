@@ -124,7 +124,7 @@ def upgrade_0_2_0_to_0_4_0(spec: Assay) -> Assay:
                     url="",
                     urltype="",
                     md5=md5,
-                    )
+                )
     spec.seqspec_version = "0.3.0"
     return upgrade_0_3_0_to_0_4_0(spec)
 

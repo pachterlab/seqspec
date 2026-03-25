@@ -58,9 +58,11 @@ class AuthRegistry:
                     "kind": profile.kind,
                     "hosts": profile.hosts,
                     "username_env": profile.username_env,
-                    "username_present": os.environ.get(profile.username_env) is not None,
+                    "username_present": os.environ.get(profile.username_env)
+                    is not None,
                     "password_env": profile.password_env,
-                    "password_present": os.environ.get(profile.password_env) is not None,
+                    "password_present": os.environ.get(profile.password_env)
+                    is not None,
                 }
             )
         return summaries

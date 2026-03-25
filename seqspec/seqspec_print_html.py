@@ -31,7 +31,9 @@ def build_seqspec_view_data(spec: Assay) -> dict[str, Any]:
         "date": spec.date,
         "description": spec.description,
         "lib_struct": spec.lib_struct,
-        "modalities": [build_modality_view(spec, modality) for modality in spec.modalities],
+        "modalities": [
+            build_modality_view(spec, modality) for modality in spec.modalities
+        ],
     }
 
 
@@ -48,9 +50,13 @@ def build_modality_view(spec: Assay, modality: str) -> dict[str, Any]:
         "modality": modality,
         "library_region_id": libspec.region_id,
         "total_bp": total_bp,
-        "sequence_protocols": protocol_rows(spec.sequence_protocol, modality, "protocol_id"),
+        "sequence_protocols": protocol_rows(
+            spec.sequence_protocol, modality, "protocol_id"
+        ),
         "sequence_kits": protocol_rows(spec.sequence_kit, modality, "kit_id"),
-        "library_protocols": protocol_rows(spec.library_protocol, modality, "protocol_id"),
+        "library_protocols": protocol_rows(
+            spec.library_protocol, modality, "protocol_id"
+        ),
         "library_kits": protocol_rows(spec.library_kit, modality, "kit_id"),
         "region_nodes": region_nodes,
         "regions": regions,
@@ -63,7 +69,9 @@ def region_views(
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], int]:
     """Build both the full region tree and the flattened leaf regions."""
 
-    region_nodes, leaf_regions, total_bp = walk_regions(libspec.regions, depth=0, bp_start=0)
+    region_nodes, leaf_regions, total_bp = walk_regions(
+        libspec.regions, depth=0, bp_start=0
+    )
     return region_nodes, leaf_regions, total_bp
 
 
