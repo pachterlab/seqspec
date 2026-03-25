@@ -76,3 +76,18 @@ def test_seqspec_check_warns_on_overlapping_read_regions():
     )
     assert "'barcode'" in warnings[0]["error_message"]
     assert "'umi'" in warnings[0]["error_message"]
+
+
+def test_seqspec_check_prefers_local_onlist_url():
+    spec_path = Path("tests/fixtures/onlist_read_clip/spec.yaml")
+    spec = load_spec(spec_path)
+
+    barcode_region = spec.get_libspec("rna").get_region_by_id("barcode_a")[0]
+    barcode_region.onlist.filename = "display.txt"
+
+    diagnostics = seqspec_check(spec=spec)
+
+    assert not any(
+        diagnostic["error_type"] == "check_onlist_files_exist"
+        for diagnostic in diagnostics
+    )

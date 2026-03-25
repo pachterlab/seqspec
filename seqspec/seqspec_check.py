@@ -15,7 +15,12 @@ from jsonschema import Draft4Validator
 
 from seqspec.Assay import Assay
 from seqspec.Region import itx_read, project_regions_to_coordinates
-from seqspec.utils import file_exists, load_spec, map_read_id_to_regions
+from seqspec.utils import (
+    file_exists,
+    load_spec,
+    local_onlist_locator,
+    map_read_id_to_regions,
+)
 
 
 def setup_check_args(parser):
@@ -264,8 +269,9 @@ def check(spec: Assay, auth_profile: Optional[str] = None):
 
         for ol in olrgns:
             if ol.urltype == "local":
-                if ol.filename.endswith(".gz"):
-                    check = ol.url
+                locator = local_onlist_locator(ol)
+                if locator.endswith(".gz"):
+                    check = locator
                     if spec_base and not Path(check).is_absolute():
                         check = str((spec_base / check).resolve())
                     if not path.exists(check):
@@ -277,8 +283,8 @@ def check(spec: Assay, auth_profile: Optional[str] = None):
                         errors.append(errobj)
                         idx += 1
                 else:
-                    check = ol.url
-                    check_gz = ol.url + ".gz"
+                    check = locator
+                    check_gz = locator + ".gz"
                     if spec_base:
                         if not Path(check).is_absolute():
                             check = str((spec_base / check).resolve())

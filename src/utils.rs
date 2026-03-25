@@ -1,6 +1,7 @@
 use crate::auth::RemoteAccess;
 use crate::compat::AssayCompat;
 use crate::models::assay::Assay;
+use crate::models::onlist::Onlist;
 use crate::models::read::Read;
 use crate::models::region::{Region, RegionCoordinate};
 
@@ -58,6 +59,14 @@ pub fn load_spec(spec: &std::path::PathBuf) -> Assay {
     let spec: AssayCompat = serde_yaml::from_reader(reader).expect("Could not read values.");
 
     spec.into_assay()
+}
+
+pub fn local_onlist_locator(onlist: &Onlist) -> &str {
+    if onlist.url.is_empty() {
+        &onlist.filename
+    } else {
+        &onlist.url
+    }
 }
 
 /// Read a local text file into Vec<String>, handling optional .gz
@@ -460,5 +469,35 @@ mod tests {
         let path = PathBuf::from("tests/fixtures/nonexistent.txt");
         let result = read_local_list(&path);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_local_onlist_locator_prefers_url_when_present() {
+        let onlist = Onlist::new(
+            "ol1".into(),
+            "display.txt".into(),
+            "txt".into(),
+            0,
+            "nested/whitelist.txt".into(),
+            "local".into(),
+            String::new(),
+        );
+
+        assert_eq!(local_onlist_locator(&onlist), "nested/whitelist.txt");
+    }
+
+    #[test]
+    fn test_local_onlist_locator_falls_back_to_filename() {
+        let onlist = Onlist::new(
+            "ol1".into(),
+            "display.txt".into(),
+            "txt".into(),
+            0,
+            String::new(),
+            "local".into(),
+            String::new(),
+        );
+
+        assert_eq!(local_onlist_locator(&onlist), "display.txt");
     }
 }

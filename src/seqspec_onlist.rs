@@ -180,7 +180,10 @@ fn get_onlist_urls(onlists: &Vec<Onlist>, base_path: &Path) -> Vec<UrlInfo> {
     let mut urls = Vec::new();
     for ol in onlists {
         let url = if ol.urltype == "local" {
-            base_path.join(&ol.url).to_string_lossy().to_string()
+            base_path
+                .join(utils::local_onlist_locator(ol))
+                .to_string_lossy()
+                .to_string()
         } else {
             ol.url.clone()
         };
@@ -202,7 +205,7 @@ fn download_onlists_to_path(
     let mut out = Vec::new();
     for ol in onlists {
         if ol.urltype == "local" {
-            let local = base_path.join(&ol.url);
+            let local = base_path.join(utils::local_onlist_locator(ol));
             out.push(PathInfo {
                 url: local.to_string_lossy().to_string(),
             });
@@ -239,7 +242,8 @@ fn join_onlists_and_save(
     let mut contents: Vec<Vec<String>> = Vec::new();
     for ol in onlists {
         let content = if ol.urltype == "local" {
-            utils::read_local_list(&base_path.join(&ol.filename)).unwrap_or_default()
+            utils::read_local_list(&base_path.join(utils::local_onlist_locator(ol)))
+                .unwrap_or_default()
         } else {
             utils::read_remote_list(&ol.url, remote_access).unwrap_or_default()
         };
@@ -301,6 +305,19 @@ fn join_multi_onlist(lsts: Vec<Vec<String>>) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    fn unique_test_dir(prefix: &str) -> PathBuf {
+        std::env::temp_dir().join(format!(
+            "{}-{}-{}",
+            prefix,
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ))
+    }
 
     #[test]
     fn test_join_product() {
@@ -436,5 +453,50 @@ mod tests {
         assert!(err.contains("matches regions in multiple reads"));
         assert!(err.contains("rna_read_1"));
         assert!(err.contains("rna_read_2"));
+    }
+
+    #[test]
+    fn test_get_onlist_urls_prefers_local_url() {
+        let base = PathBuf::from("/tmp/spec-root");
+        let onlists = vec![Onlist::new(
+            "ol1".into(),
+            "display.txt".into(),
+            "txt".into(),
+            0,
+            "nested/whitelist.txt".into(),
+            "local".into(),
+            String::new(),
+        )];
+
+        let urls = get_onlist_urls(&onlists, &base);
+        assert_eq!(urls[0].url, "/tmp/spec-root/nested/whitelist.txt");
+    }
+
+    #[test]
+    fn test_join_onlists_and_save_reads_local_onlists_from_url() {
+        let root = unique_test_dir("seqspec-onlist");
+        let nested = root.join("nested");
+        std::fs::create_dir_all(&nested).unwrap();
+        std::fs::write(nested.join("whitelist.txt"), "AAAA\nCCCC\n").unwrap();
+
+        let onlists = vec![Onlist::new(
+            "ol1".into(),
+            "display.txt".into(),
+            "txt".into(),
+            0,
+            "nested/whitelist.txt".into(),
+            "local".into(),
+            String::new(),
+        )];
+        let output = root.join("joined.txt");
+        let remote_access = RemoteAccess::anonymous();
+
+        let result_path =
+            join_onlists_and_save(&onlists, "product", &output, &root, &remote_access);
+
+        assert_eq!(result_path, output);
+        assert_eq!(std::fs::read_to_string(&output).unwrap(), "AAAA\nCCCC\n");
+
+        std::fs::remove_dir_all(root).unwrap();
     }
 }

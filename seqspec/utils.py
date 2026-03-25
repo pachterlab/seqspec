@@ -503,8 +503,12 @@ def yield_onlist_contents(stream):
         yield line.strip().split()[0]
 
 
+def local_onlist_locator(onlist: Onlist) -> str:
+    return str(onlist.url or onlist.filename)
+
+
 def read_local_list(onlist: Onlist, base_path: str = "") -> List[str]:
-    filename = os.path.join(base_path, onlist.filename)
+    filename = os.path.join(base_path, local_onlist_locator(onlist))
     stream = open(filename, "rb")
     # do we need to decompress?
     if filename.endswith(".gz"):

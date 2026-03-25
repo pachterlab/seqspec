@@ -359,7 +359,8 @@ fn check_onlist_files_exist(
         match ol.urltype.as_str() {
             "local" => {
                 let mut candidates: Vec<PathBuf> = Vec::new();
-                let p = PathBuf::from(&ol.url);
+                let locator = utils::local_onlist_locator(&ol);
+                let p = PathBuf::from(locator);
                 candidates.push(if let Some(base) = spec_base {
                     if p.is_absolute() {
                         p.clone()
@@ -370,7 +371,7 @@ fn check_onlist_files_exist(
                     p.clone()
                 });
                 // also try .gz variant
-                let gz = PathBuf::from(format!("{}.gz", ol.url));
+                let gz = PathBuf::from(format!("{}.gz", locator));
                 candidates.push(if let Some(base) = spec_base {
                     if gz.is_absolute() {
                         gz.clone()
@@ -956,6 +957,40 @@ mod tests {
             })
             .collect();
         assert!(structural_errors.is_empty());
+    }
+
+    #[test]
+    fn test_check_onlist_files_exist_prefers_local_url() {
+        let spec_path = PathBuf::from("tests/fixtures/onlist_read_clip/spec.yaml");
+        let mut spec = load_spec(&spec_path);
+        let library = spec.get_libspec("rna").unwrap();
+        let barcode = library.get_region_by_id("barcode_a").pop().unwrap();
+        let expected_url = barcode.onlist.unwrap().url;
+
+        let barcode_region = spec
+            .library_spec
+            .get_mut(0)
+            .unwrap()
+            .regions
+            .iter_mut()
+            .find(|region| region.region_id == "barcode_a")
+            .unwrap();
+        barcode_region.onlist.as_mut().unwrap().filename = "display.txt".into();
+
+        let diagnostics = seqspec_check(&spec, None, &spec_path);
+        assert!(
+            diagnostics.iter().all(|diagnostic| {
+                diagnostic.error_type != "check_onlist_files_exist"
+                    || !diagnostic.error_message.contains(&expected_url)
+            }),
+            "local onlist existence should resolve through url before filename"
+        );
+        assert!(
+            diagnostics
+                .iter()
+                .all(|diagnostic| diagnostic.error_type != "check_onlist_files_exist"),
+            "changing the display filename should not trigger an onlist existence error"
+        );
     }
 
     #[test]

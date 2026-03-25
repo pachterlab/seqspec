@@ -7,6 +7,7 @@ from seqspec.seqspec_onlist import (
     Onlist,
     download_onlists_to_path,
     get_onlists,
+    get_onlist_urls,
     join_onlist_contents,
     join_onlists_and_save,
 )
@@ -172,3 +173,45 @@ def test_region_type_onlist_errors_when_matches_span_multiple_reads():
 
     with pytest.raises(ValueError, match="matches regions in multiple reads"):
         get_onlists(spec, "rna", "region-type", "barcode")
+
+
+def test_get_onlist_urls_prefers_local_url(tmp_path):
+    onlist = Onlist(
+        file_id="local_list",
+        filename="display.txt",
+        filetype="txt",
+        filesize=0,
+        url="nested/whitelist.txt",
+        urltype="local",
+        md5="",
+    )
+
+    urls = get_onlist_urls([onlist], tmp_path)
+    assert urls == [
+        {
+            "file_id": "local_list",
+            "url": str(tmp_path / "nested" / "whitelist.txt"),
+        }
+    ]
+
+
+def test_join_onlists_and_save_reads_local_onlists_from_url(tmp_path):
+    nested = tmp_path / "nested"
+    nested.mkdir()
+    (nested / "whitelist.txt").write_text("AAAA\nCCCC\n")
+
+    onlist = Onlist(
+        file_id="local_list",
+        filename="display.txt",
+        filetype="txt",
+        filesize=0,
+        url="nested/whitelist.txt",
+        urltype="local",
+        md5="",
+    )
+    output = tmp_path / "joined.txt"
+
+    result_path = join_onlists_and_save([onlist], "product", output, tmp_path)
+
+    assert result_path == str(output)
+    assert output.read_text().splitlines() == ["AAAA", "CCCC"]

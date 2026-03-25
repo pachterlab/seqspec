@@ -14,6 +14,7 @@ from seqspec.Region import Onlist, itx_read, project_regions_to_coordinates
 from seqspec.seqspec_find import find_by_region_id, find_by_region_type
 from seqspec.utils import (
     load_spec,
+    local_onlist_locator,
     map_read_id_to_regions,
     read_local_list,
     read_remote_list,
@@ -222,7 +223,7 @@ def get_onlist_urls(onlists: List[Onlist], base_path: Path) -> List[Dict[str, st
     urls = []
     for onlist in onlists:
         if onlist.urltype == "local":
-            url = str(base_path / Path(onlist.url))
+            url = str(base_path / Path(local_onlist_locator(onlist)))
         else:
             url = onlist.url
         urls.append({"file_id": onlist.file_id, "url": url})
@@ -241,7 +242,7 @@ def download_onlists_to_path(
     for onlist in onlists:
         if onlist.urltype == "local":
             # Local file - just return the path
-            local_path = base_path / Path(onlist.url)
+            local_path = base_path / Path(local_onlist_locator(onlist))
             downloaded_paths.append({"file_id": onlist.file_id, "url": str(local_path)})
         else:
             # Remote file - download it

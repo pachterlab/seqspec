@@ -12,6 +12,7 @@ from seqspec.utils import (
     read_local_list,
     read_remote_list,
     get_remote_auth_token,
+    local_onlist_locator,
     map_read_id_to_regions,
     write_read,
     yield_onlist_contents,
@@ -268,4 +269,36 @@ def test_map_read_id_to_regions_invalid_read_id():
         library_spec=[],
     )
     with pytest.raises(IndexError):
-        map_read_id_to_regions(spec, "RNA", "read2") 
+        map_read_id_to_regions(spec, "RNA", "read2")
+
+
+def test_local_onlist_locator_prefers_url_when_present():
+    onlist = Onlist(
+        file_id="ol1",
+        filename="display.txt",
+        filetype="txt",
+        filesize=0,
+        url="nested/whitelist.txt",
+        urltype="local",
+        md5="",
+    )
+
+    assert local_onlist_locator(onlist) == "nested/whitelist.txt"
+
+
+def test_read_local_list_prefers_url_when_present(tmp_path):
+    nested = tmp_path / "nested"
+    nested.mkdir()
+    (nested / "whitelist.txt").write_text("AAAA\nCCCC\n")
+
+    onlist = Onlist(
+        file_id="ol1",
+        filename="display.txt",
+        filetype="txt",
+        filesize=0,
+        url="nested/whitelist.txt",
+        urltype="local",
+        md5="",
+    )
+
+    assert read_local_list(onlist, str(tmp_path)) == ["AAAA", "CCCC"]
