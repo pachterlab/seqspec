@@ -533,7 +533,7 @@
         true,
       ],
     ];
-    return `<div class="section"><div class="section-head">Assay</div><div class="section-body"><div class="description">${esc(
+    return `<div class="meta-section"><div class="meta-section-head">Assay</div><div class="meta-section-body"><div class="description">${esc(
       data.description || "",
     )}</div>${kvList(rows)}</div></div>`;
   }
@@ -552,11 +552,11 @@
     html += assaySummary();
 
     modalities.forEach((modality) => {
-      html += `<div class="modality-section"><div class="modality-head"><div class="modality-title">${esc(
-        modality.modality,
-      )}</div><div class="modality-meta">${esc(
+      html += `<div class="mol-section"><div class="mol-section-head">Library Structure \u2014 ${esc(
+        data.assay_name,
+      )} (${esc(modality.modality)})</div><div class="mol-section-meta">${esc(
         `${modality.region_nodes.length} regions · ${modality.reads.length} reads · ${modality.total_bp} bp`,
-      )}</div></div><div class="mol-body">${buildMolSvg(
+      )}</div><div class="mol-body">${buildMolSvg(
         modality,
       )}</div><div class="mol-legend"><span><span class="leg-swatch" style="background:var(--reg-fixed)"></span>fixed</span><span><span class="leg-swatch" style="background:var(--reg-onlist)"></span>onlist</span><span><span class="leg-swatch" style="background:var(--reg-random)"></span>random</span><span><span class="leg-swatch outline"></span>nested region span</span></div><div class="detail-layout">${selectorHtml(
         modality,
