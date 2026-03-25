@@ -4,29 +4,61 @@ This module provides the main entry point for the seqspec command-line interface
 It handles argument parsing, command routing, and execution of subcommands.
 """
 
+import importlib
 import logging
 import sys
 import warnings
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Tuple
 
 from . import __version__
-from .seqspec_build import run_build, setup_build_args
-from .seqspec_check import run_check, setup_check_args
-from .seqspec_file import run_file, setup_file_args
-from .seqspec_find import run_find, setup_find_args
-from .seqspec_format import run_format, setup_format_args
-from .seqspec_index import run_index, setup_index_args
-from .seqspec_info import run_info, setup_info_args
-from .seqspec_init import run_init, setup_init_args
-from .seqspec_insert import run_insert, setup_insert_args
-from .seqspec_methods import run_methods, setup_methods_args
-from .seqspec_modify import run_modify, setup_modify_args
-from .seqspec_onlist import run_onlist, setup_onlist_args
-from .seqspec_print import run_print, setup_print_args
-from .seqspec_split import run_split, setup_split_args
-from .seqspec_upgrade import run_upgrade, setup_upgrade_args
-from .seqspec_version import run_version, setup_version_args
+
+COMMAND_MODULES: Dict[str, Tuple[str, str, str]] = {
+    "auth": ("seqspec_auth", "setup_auth_args", "run_auth"),
+    "check": ("seqspec_check", "setup_check_args", "run_check"),
+    "file": ("seqspec_file", "setup_file_args", "run_file"),
+    "find": ("seqspec_find", "setup_find_args", "run_find"),
+    "format": ("seqspec_format", "setup_format_args", "run_format"),
+    "index": ("seqspec_index", "setup_index_args", "run_index"),
+    "info": ("seqspec_info", "setup_info_args", "run_info"),
+    "init": ("seqspec_init", "setup_init_args", "run_init"),
+    "insert": ("seqspec_insert", "setup_insert_args", "run_insert"),
+    "methods": ("seqspec_methods", "setup_methods_args", "run_methods"),
+    "modify": ("seqspec_modify", "setup_modify_args", "run_modify"),
+    "onlist": ("seqspec_onlist", "setup_onlist_args", "run_onlist"),
+    "print": ("seqspec_print", "setup_print_args", "run_print"),
+    "split": ("seqspec_split", "setup_split_args", "run_split"),
+    "upgrade": ("seqspec_upgrade", "setup_upgrade_args", "run_upgrade"),
+    "version": ("seqspec_version", "setup_version_args", "run_version"),
+}
+
+
+def load_command(command: str) -> Tuple[Callable, Callable]:
+    if command == "build":
+        return setup_build_args, run_build
+
+    module_name, setup_name, run_name = COMMAND_MODULES[command]
+    module = importlib.import_module(f".{module_name}", __package__)
+    return getattr(module, setup_name), getattr(module, run_name)
+
+
+def setup_build_args(parser) -> ArgumentParser:
+    subparser = parser.add_parser(
+        "build",
+        description="""
+The LLM-backed build command is deprecated and will be removed.
+---
+""",
+        help="Deprecated. This command will be removed.",
+        formatter_class=RawTextHelpFormatter,
+    )
+    return subparser
+
+
+def run_build(_: ArgumentParser, __: Namespace) -> None:
+    raise RuntimeError(
+        "seqspec build is deprecated. Use seqspec init/insert/modify or construct the spec directly."
+    )
 
 
 def setup_parser():
@@ -44,6 +76,7 @@ Documentation: https://pachterlab.github.io/seqspec/
 """,
         formatter_class=RawTextHelpFormatter,
     )
+    parser.add_argument("--version", action="version", version=f"seqspec {__version__}")
 
     subparsers = parser.add_subparsers(
         dest="command",
@@ -51,25 +84,12 @@ Documentation: https://pachterlab.github.io/seqspec/
     )
 
     # Setup the arguments for all subcommands
-    command_to_parser = {
-        "build": setup_build_args(subparsers),
-        "check": setup_check_args(subparsers),
-        "find": setup_find_args(subparsers),
-        "file": setup_file_args(subparsers),
-        "format": setup_format_args(subparsers),
-        # "convert": setup_convert_args(subparsers),
-        "index": setup_index_args(subparsers),
-        "info": setup_info_args(subparsers),
-        "init": setup_init_args(subparsers),
-        "insert": setup_insert_args(subparsers),
-        "methods": setup_methods_args(subparsers),
-        "modify": setup_modify_args(subparsers),
-        "onlist": setup_onlist_args(subparsers),
-        "print": setup_print_args(subparsers),
-        "split": setup_split_args(subparsers),
-        "upgrade": setup_upgrade_args(subparsers),
-        "version": setup_version_args(subparsers),
-    }
+    command_to_parser = {}
+    for command in ["auth", "build", *COMMAND_MODULES.keys()]:
+        if command in command_to_parser:
+            continue
+        setup_func, _ = load_command(command)
+        command_to_parser[command] = setup_func(subparsers)
 
     return parser, command_to_parser
 
@@ -89,8 +109,6 @@ def handle_no_args(
     if len(sys.argv) == 2:
         if sys.argv[1] in command_to_parser:
             command_to_parser[sys.argv[1]].print_help(sys.stderr)
-        elif sys.argv[1] == "--version":
-            print(f"seqspec {__version__}")
         else:
             parser.print_help(sys.stderr)
         sys.exit(1)
@@ -99,6 +117,16 @@ def handle_no_args(
 def main() -> None:
     """Main entry point for the seqspec CLI."""
     warnings.simplefilter("default", DeprecationWarning)
+
+    if len(sys.argv) == 2 and sys.argv[1] == "--version":
+        print(f"seqspec {__version__}")
+        sys.exit(0)
+    if len(sys.argv) >= 2 and sys.argv[1] == "build":
+        print(
+            "seqspec build is deprecated. Use seqspec init/insert/modify or construct the spec directly.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     logging.basicConfig(
         stream=sys.stderr,
@@ -111,25 +139,10 @@ def main() -> None:
     args = parser.parse_args()
 
     # Setup validator and runner for all subcommands
-    command_to_function: Dict[str, Callable[[ArgumentParser, Namespace], Any]] = {
-        "format": run_format,
-        "print": run_print,
-        "build": run_build,
-        "check": run_check,
-        "find": run_find,
-        "index": run_index,
-        "info": run_info,
-        "init": run_init,
-        "methods": run_methods,
-        "modify": run_modify,
-        "onlist": run_onlist,
-        "split": run_split,
-        "version": run_version,
-        "file": run_file,
-        "upgrade": run_upgrade,
-        # "convert": run_convert,
-        "insert": run_insert,
-    }
+    command_to_function: Dict[str, Callable[[ArgumentParser, Namespace], Any]] = {}
+    for command in command_to_parser:
+        _, run_func = load_command(command)
+        command_to_function[command] = run_func
 
     try:
         command_to_function[sys.argv[1]](parser, args)

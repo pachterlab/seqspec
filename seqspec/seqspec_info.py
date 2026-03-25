@@ -152,7 +152,7 @@ def seqspec_info_meta(spec: Assay) -> Dict:
     Returns:
         Dictionary containing meta information
     """
-    sd = spec.to_dict()
+    sd = spec.model_dump()
     del sd["library_spec"]
     del sd["sequence_spec"]
     del sd["modalities"]
@@ -173,7 +173,8 @@ def seqspec_info_library_spec(spec: Assay) -> Dict:
     for m in modalities:
         libspec = spec.get_libspec(m)
         leaves = libspec.get_leaves()
-        result[m] = leaves if leaves else []
+        r = leaves if leaves else []
+        result[m] = [i.model_dump() for i in r]
     return {"library_spec": result}
 
 
@@ -254,9 +255,7 @@ def format_sequence_spec(info: Dict, fmt: str = "tab") -> str:
             )
         return "\n".join(lines)
     elif fmt == "json":
-        return json.dumps(
-            [i.model_dump() for i in info["sequence_spec"]], sort_keys=False, indent=4
-        )
+        return json.dumps(info["sequence_spec"], sort_keys=False, indent=4)
     return ""
 
 
@@ -280,9 +279,5 @@ def format_library_spec(info: Dict, fmt: str = "tab") -> str:
                 )
         return "\n".join(lines)
     elif fmt == "json":
-        return json.dumps(
-            {m: [i.model_dump() for i in r] for m, r in info["library_spec"].items()},
-            sort_keys=False,
-            indent=4,
-        )
+        return json.dumps(info["library_spec"], sort_keys=False, indent=4)
     return ""

@@ -1,7 +1,9 @@
-from seqspec.seqspec_index import seqspec_index, format_index
+from seqspec.seqspec_index import seqspec_index, format_index, filter_index_no_overlap
 from seqspec.Assay import Assay
 from seqspec.Region import RegionCoordinate
 import json
+from pathlib import Path
+from seqspec.utils import load_spec
 
 
 def test_seqspec_index(dogmaseq_dig_spec: Assay):
@@ -374,3 +376,32 @@ def test_format_index():
     split = format_index(indices, "splitcode")
     assert "@extract" in split
     assert "groups\tids\ttags\tdistances\tlocations" in split
+
+
+def test_filter_index_no_overlap_is_noop_when_reads_do_not_overlap(
+    dogmaseq_dig_spec: Assay,
+):
+    indices = seqspec_index(
+        spec=dogmaseq_dig_spec, modality="rna", ids=["rna_R1", "rna_R2"], idtype="read"
+    )
+
+    filtered = filter_index_no_overlap(indices)
+
+    assert len(filtered) == 2
+    assert len(filtered[0].rcv) == 2
+    assert len(filtered[1].rcv) == 1
+
+
+def test_filter_index_no_overlap_removes_regions_seen_in_earlier_reads():
+    spec = load_spec(Path("tests/fixtures/check_overlap_warning/spec.yaml"))
+    indices = seqspec_index(
+        spec=spec, modality="rna", ids=["rna_R1", "rna_R2"], idtype="read"
+    )
+
+    filtered = filter_index_no_overlap(indices)
+
+    assert len(filtered) == 2
+    assert filtered[0].query_id == "rna_R1"
+    assert [region.region_id for region in filtered[0].rcv] == ["barcode", "umi"]
+    assert filtered[1].query_id == "rna_R2"
+    assert filtered[1].rcv == []

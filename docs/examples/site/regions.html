@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>seqspec region templates</title>
+  <style>
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #1a1d21;
+  background: #ffffff;
+}
+.wrap {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+h1, h2 {
+  margin: 0 0 12px;
+  font-weight: 600;
+}
+p {
+  margin: 0 0 14px;
+  line-height: 1.6;
+}
+.nav {
+  display: flex;
+  gap: 18px;
+  margin: 18px 0 26px;
+  font-size: 14px;
+}
+.nav a,
+a {
+  color: #1d4ed8;
+  text-decoration: none;
+}
+.nav a:hover,
+a:hover {
+  text-decoration: underline;
+}
+.note {
+  margin: 0 0 18px;
+  padding: 12px 14px;
+  border: 1px solid #dcdfe3;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+.search {
+  margin: 18px 0 20px;
+}
+.search input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dcdfe3;
+  border-radius: 6px;
+  font: inherit;
+  color: inherit;
+  background: #ffffff;
+}
+.search input:focus {
+  outline: none;
+  border-color: #94a3b8;
+}
+.search-note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #68707a;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+th, td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+th {
+  font-size: 12px;
+  color: #68707a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.mono {
+  font-family: "IBM Plex Mono", Menlo, monospace;
+  font-size: 12px;
+}
+.tag {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.tag.template { background: #f3f4f6; color: #4b5563; }
+.tag.example { background: #eff6ff; color: #1d4ed8; }
+.tag.validated { background: #f0fdf4; color: #166534; }
+</style>
+</head>
+<body>
+<div class="wrap"><h1>Regions</h1><p>This catalog lists the maintained region templates used by the assay examples.</p><div class="nav"><a href="index.html">Overview</a><a href="assays.html">Assays</a><a href="reads.html">Reads</a><a href="regions.html">Regions</a></div><table><thead><tr><th>Template</th><th>Regions</th><th>Region ids</th><th>Link</th></tr></thead><tbody><tr><td><strong>10x5pv2.rgn.yaml</strong></td><td>4</td><td class="mono">barcode, umi, 10x5pTSO, cDNA</td><td><a href="../regions/10x5pv2.rgn.yaml">yaml</a></td></tr><tr><td><strong>10x5pv3.rgn.yaml</strong></td><td>4</td><td class="mono">barcode, umi, 10x5pTSO, cDNA</td><td><a href="../regions/10x5pv3.rgn.yaml">yaml</a></td></tr><tr><td><strong>10xv2.rgn.yaml</strong></td><td>3</td><td class="mono">barcode, umi, cDNA</td><td><a href="../regions/10xv2.rgn.yaml">yaml</a></td></tr><tr><td><strong>10xv3-CRISPR.rgn.yaml</strong></td><td>7</td><td class="mono">barcode, umi, linker, sgRNA-scaffold, antibody_barcode, linker-2, tso</td><td><a href="../regions/10xv3-CRISPR.rgn.yaml">yaml</a></td></tr><tr><td><strong>10xv3-FB.rgn.yaml</strong></td><td>6</td><td class="mono">barcode, umi, linker, random-1, antibody_barcode, random-2</td><td><a href="../regions/10xv3-FB.rgn.yaml">yaml</a></td></tr><tr><td><strong>10xv3.rgn.yaml</strong></td><td>3</td><td class="mono">barcode, umi, cDNA</td><td><a href="../regions/10xv3.rgn.yaml">yaml</a></td></tr><tr><td><strong>10xv4.rgn.yaml</strong></td><td>3</td><td class="mono">barcode, umi, cDNA</td><td><a href="../regions/10xv4.rgn.yaml">yaml</a></td></tr><tr><td><strong>barcode.rgn.yaml</strong></td><td>1</td><td class="mono">barcode</td><td><a href="../regions/barcode.rgn.yaml">yaml</a></td></tr><tr><td><strong>bd_rhapsody_eb.rgn.yaml</strong></td><td>8</td><td class="mono">bd_eb_vb, bd_cls1, bd_eb_cls_linker1, bd_cls2, bd_eb_cls_linker2, bd_cls3, umi, cDNA</td><td><a href="../regions/bd_rhapsody_eb.rgn.yaml">yaml</a></td></tr><tr><td><strong>bd_rhapsody_v1.rgn.yaml</strong></td><td>7</td><td class="mono">bd_cls1, bd_cls_linker1, bd_cls2, bd_cls_linker2, bd_cls3, umi, cDNA</td><td><a href="../regions/bd_rhapsody_v1.rgn.yaml">yaml</a></td></tr><tr><td><strong>cdna.rgn.yaml</strong></td><td>1</td><td class="mono">cDNA</td><td><a href="../regions/cdna.rgn.yaml">yaml</a></td></tr><tr><td><strong>celseq.rgn.yaml</strong></td><td>2</td><td class="mono">barcode, cDNA</td><td><a href="../regions/celseq.rgn.yaml">yaml</a></td></tr><tr><td><strong>celseq2.rgn.yaml</strong></td><td>3</td><td class="mono">umi, barcode, cDNA</td><td><a href="../regions/celseq2.rgn.yaml">yaml</a></td></tr><tr><td><strong>citeseq.yaml</strong></td><td>3</td><td class="mono">protein_cell_bc, protein_umi, protein_seq</td><td><a href="../regions/citeseq.yaml">yaml</a></td></tr><tr><td><strong>dropseq.rgn.yaml</strong></td><td>3</td><td class="mono">dropseq_barcode, umi, cDNA</td><td><a href="../regions/dropseq.rgn.yaml">yaml</a></td></tr><tr><td><strong>dropseq_seqa_r1.rgn.yaml</strong></td><td>1</td><td class="mono">dropseq_seqA_read1</td><td><a href="../regions/dropseq_seqa_r1.rgn.yaml">yaml</a></td></tr><tr><td><strong>dropseq_seqb_r1.rgn.yaml</strong></td><td>1</td><td class="mono">dropseq_seqB_read1</td><td><a href="../regions/dropseq_seqb_r1.rgn.yaml">yaml</a></td></tr><tr><td><strong>fipresci.rgn.yaml</strong></td><td>6</td><td class="mono">barcode, umi, 10x5pTSO, cDNA, ME2, tn5_barcode</td><td><a href="../regions/fipresci.rgn.yaml">yaml</a></td></tr><tr><td><strong>flashseq.rgn.yaml</strong></td><td>4</td><td class="mono">linker-1, umi, linker-2, cDNA</td><td><a href="../regions/flashseq.rgn.yaml">yaml</a></td></tr><tr><td><strong>gdna.rgn.yaml</strong></td><td>1</td><td class="mono">gDNA</td><td><a href="../regions/gdna.rgn.yaml">yaml</a></td></tr><tr><td><strong>hydroprna.rgn.yaml</strong></td><td>7</td><td class="mono">cDNA, umi, hydroprna_bc3, hydroprna_linker2, hydroprna_bc2, hydroprna_linker1, hydroprna_bc1</td><td><a href="../regions/hydroprna.rgn.yaml">yaml</a></td></tr><tr><td><strong>illumina_index.rgn.yaml</strong></td><td>1</td><td class="mono">index</td><td><a href="../regions/illumina_index.rgn.yaml">yaml</a></td></tr><tr><td><strong>illumina_p5.rgn.yaml</strong></td><td>1</td><td class="mono">illumina_p5</td><td><a href="../regions/illumina_p5.rgn.yaml">yaml</a></td></tr><tr><td><strong>illumina_p7.rgn.yaml</strong></td><td>1</td><td class="mono">illumina_p7</td><td><a href="../regions/illumina_p7.rgn.yaml">yaml</a></td></tr><tr><td><strong>marsseq2.rgn.yaml</strong></td><td>5</td><td class="mono">marsseq2_platebarcode_linker, marsseq2_platebarcode, cDNA, umi, marsseq2_rt1_barcode</td><td><a href="../regions/marsseq2.rgn.yaml">yaml</a></td></tr><tr><td><strong>mcscrbseq.rgn.yaml</strong></td><td>3</td><td class="mono">mcscrb_barcode, umi, cDNA</td><td><a href="../regions/mcscrbseq.rgn.yaml">yaml</a></td></tr><tr><td><strong>microwellseq.rgn.yaml</strong></td><td>7</td><td class="mono">microwellseq_bc1, microwellseq_linker1, microwellseq_bc2, microwellseq_linker2, microwellseq_bc3, umi, cDNA</td><td><a href="../regions/microwellseq.rgn.yaml">yaml</a></td></tr><tr><td><strong>nextera_r1.rgn.yaml</strong></td><td>1</td><td class="mono">nextera_read1</td><td><a href="../regions/nextera_r1.rgn.yaml">yaml</a></td></tr><tr><td><strong>nextera_r1_joined.rgn.yaml</strong></td><td>1</td><td class="mono">nextera_read1</td><td><a href="../regions/nextera_r1_joined.rgn.yaml">yaml</a></td></tr><tr><td><strong>nextera_r2.rgn.yaml</strong></td><td>1</td><td class="mono">nextera_read2</td><td><a href="../regions/nextera_r2.rgn.yaml">yaml</a></td></tr><tr><td><strong>nextera_r2_joined.rgn.yaml</strong></td><td>1</td><td class="mono">nextera_read2</td><td><a href="../regions/nextera_r2_joined.rgn.yaml">yaml</a></td></tr><tr><td><strong>petriseq.rgn.yaml</strong></td><td>7</td><td class="mono">umi, petriseq_bc3, petriseq_linker3, petriseq_bc2, petriseq_linker2, petriseq_bc1, cDNA</td><td><a href="../regions/petriseq.rgn.yaml">yaml</a></td></tr><tr><td><strong>pipseqv2.rgn.yaml</strong></td><td>7</td><td class="mono">pipseq_v2_bc1, pipseq_v2_linker1, pipseq_v2_bc2, pipseq_v2_linker2, pipseq_v2_bc3, umi, cDNA</td><td><a href="../regions/pipseqv2.rgn.yaml">yaml</a></td></tr><tr><td><strong>pipseqv3.rgn.yaml</strong></td><td>9</td><td class="mono">pipseq_v3_bc1, pipseq_v3_linker1, pipseq_v3_bc2, pipseq_v3_linker2, pipseq_v3_bc3, pipseq_v3_linker3, pipseq_v3_bc4, umi, cDNA</td><td><a href="../regions/pipseqv3.rgn.yaml">yaml</a></td></tr><tr><td><strong>pipseqv4.rgn.yaml</strong></td><td>10</td><td class="mono">pipseq_v4_vb, pipseq_v3_bc1, pipseq_v3_linker1, pipseq_v3_bc2, pipseq_v3_linker2, pipseq_v3_bc3, pipseq_v3_linker3, pipseq_v3_bc4, umi, cDNA</td><td><a href="../regions/pipseqv4.rgn.yaml">yaml</a></td></tr><tr><td><strong>quartzseq.rgn.yaml</strong></td><td>3</td><td class="mono">barcode, umi, cDNA</td><td><a href="../regions/quartzseq.rgn.yaml">yaml</a></td></tr><tr><td><strong>scirnaseq.rgn.yaml</strong></td><td>10</td><td class="mono">i5_barcode, truseq_adapter, hairpin_barcode, linker, umi, rt_barcode, cdna, me, s7, i7_barcode</td><td><a href="../regions/scirnaseq.rgn.yaml">yaml</a></td></tr><tr><td><strong>smartseq2.rgn.yaml</strong></td><td>1</td><td class="mono">cDNA</td><td><a href="../regions/smartseq2.rgn.yaml">yaml</a></td></tr><tr><td><strong>smartseq3-express.rgn.yaml</strong></td><td>4</td><td class="mono">linker-1, umi, linker-2, cDNA</td><td><a href="../regions/smartseq3-express.rgn.yaml">yaml</a></td></tr><tr><td><strong>smartseq3.rgn.yaml</strong></td><td>4</td><td class="mono">linker-1, umi, linker-2, cDNA</td><td><a href="../regions/smartseq3.rgn.yaml">yaml</a></td></tr><tr><td><strong>strtseq.rgn.yaml</strong></td><td>8</td><td class="mono">well-barcode, linker-1, umi, linker-2, cDNA, ME, linker-3, subarray-barcode</td><td><a href="../regions/strtseq.rgn.yaml">yaml</a></td></tr><tr><td><strong>surecell_3p_wta.yaml</strong></td><td>9</td><td class="mono">surecell_3p_wta_bc1, surecell_3p_wta_linker1, surecell_3p_wta_bc2, surecell_3p_wta_linker2, surecell_3p_wta_bc3, surecell_3p_wta_linker3, umi, surecell_3p_wta_linker4, cDNA</td><td><a href="../regions/surecell_3p_wta.yaml">yaml</a></td></tr><tr><td><strong>truseq_r1.rgn.yaml</strong></td><td>1</td><td class="mono">truseq_read1</td><td><a href="../regions/truseq_r1.rgn.yaml">yaml</a></td></tr><tr><td><strong>truseq_r2.rgn.yaml</strong></td><td>1</td><td class="mono">truseq_read2</td><td><a href="../regions/truseq_r2.rgn.yaml">yaml</a></td></tr><tr><td><strong>umi.rgn.yaml</strong></td><td>1</td><td class="mono">umi</td><td><a href="../regions/umi.rgn.yaml">yaml</a></td></tr></tbody></table></div>
+
+</body>
+</html>

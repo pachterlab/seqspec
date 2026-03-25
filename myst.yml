@@ -31,14 +31,13 @@ project:
 site:
   template: book-theme
   title: seqspec
-  logo_text: Machine readable specification for genomics assays
   actions:
     - title: GitHub
       url: https://github.com/pachterlab/seqspec
-  nav: []
-    # https://mystmd.org/guide/website-templates
-    # - title: Examples
-    #   url: ./builder.html
-  # options:
-  #   favicon: favicon.ico
-  #   logo: site_logo.png
+  nav:
+    - title: Examples
+      url: https://pachterlab.github.io/seqspec/examples/
+  options:
+    logo_text: Machine readable specification for genomics assays
+    # favicon: favicon.ico
+    # logo: site_logo.png

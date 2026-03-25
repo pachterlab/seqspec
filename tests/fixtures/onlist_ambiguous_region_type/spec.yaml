@@ -1,0 +1,104 @@
+seqspec_version: 0.4.0
+assay_id: ambiguous_onlist_region_type
+name: Ambiguous region-type onlist fixture
+doi: https://doi.org/10.1101/ambiguous-onlist
+date: 25 March 2026
+description: Minimal fixture where the same region type appears in two reads.
+modalities:
+  - rna
+lib_struct: ''
+sequence_protocol: Illumina
+sequence_kit: test-sequencing-kit
+library_protocol: test-library-protocol
+library_kit: test-library-kit
+sequence_spec:
+  - read_id: rna_read_1
+    name: Read 1
+    modality: rna
+    primer_id: primer_r1
+    min_len: 2
+    max_len: 2
+    strand: neg
+    files:
+      - file_id: rna_read_1.fastq.gz
+        filename: rna_read_1.fastq.gz
+        filetype: fastq
+        filesize: 0
+        url: rna_read_1.fastq.gz
+        urltype: local
+        md5: "00000000000000000000000000000001"
+  - read_id: rna_read_2
+    name: Read 2
+    modality: rna
+    primer_id: primer_r2
+    min_len: 2
+    max_len: 2
+    strand: neg
+    files:
+      - file_id: rna_read_2.fastq.gz
+        filename: rna_read_2.fastq.gz
+        filetype: fastq
+        filesize: 0
+        url: rna_read_2.fastq.gz
+        urltype: local
+        md5: "00000000000000000000000000000002"
+library_spec:
+  - region_id: rna
+    region_type: rna
+    name: RNA
+    sequence_type: joined
+    sequence: NNAANNGG
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+      - region_id: barcode_r1
+        region_type: barcode
+        name: Barcode R1
+        sequence_type: onlist
+        sequence: NN
+        min_len: 2
+        max_len: 2
+        onlist:
+          file_id: barcode_r1.txt
+          filename: barcode_r1.txt
+          filetype: txt
+          filesize: 0
+          url: barcode_r1.txt
+          urltype: local
+          md5: "11111111111111111111111111111111"
+        regions: []
+      - region_id: primer_r1
+        region_type: truseq_read1
+        name: Primer R1
+        sequence_type: fixed
+        sequence: AA
+        min_len: 2
+        max_len: 2
+        onlist: null
+        regions: []
+      - region_id: barcode_r2
+        region_type: barcode
+        name: Barcode R2
+        sequence_type: onlist
+        sequence: NN
+        min_len: 2
+        max_len: 2
+        onlist:
+          file_id: barcode_r2.txt
+          filename: barcode_r2.txt
+          filetype: txt
+          filesize: 0
+          url: barcode_r2.txt
+          urltype: local
+          md5: "22222222222222222222222222222222"
+        regions: []
+      - region_id: primer_r2
+        region_type: truseq_read2
+        name: Primer R2
+        sequence_type: fixed
+        sequence: GG
+        min_len: 2
+        max_len: 2
+        onlist: null
+        regions: []

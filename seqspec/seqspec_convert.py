@@ -179,7 +179,7 @@ def seqspec_to_token(spec):
     specs_regions = {}
     modalities = spec.list_modalities()
     for modality in modalities:
-        regions = [i.to_dict() for i in spec.get_libspec(modality).get_leaves()]
+        regions = [i.model_dump() for i in spec.get_libspec(modality).get_leaves()]
         specs_regions[modality] = regions
 
     # Convert to tokenized matrix

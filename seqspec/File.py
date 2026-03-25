@@ -3,6 +3,10 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+# from ._core import File as _RustFile
+
+__all__ = ["File"]
+
 
 class File(BaseModel):
     file_id: str
@@ -13,15 +17,10 @@ class File(BaseModel):
     urltype: str
     md5: str
 
+    # add an updatae_spec attr that computes the md5 for the object
+
     def __repr__(self) -> str:
-        s = f"""{self.file_id}"""
-        return s
-
-    def to_dict(self):
-        return self.model_dump()
-
-    def update_file_id(self, file_id: str):
-        self.file_id = file_id
+        return self.file_id
 
 
 class FileInput(BaseModel):
@@ -82,13 +81,61 @@ class FileInput(BaseModel):
     )
 
     def to_file(self) -> File:
+        # derive defaults from filename when needed
+        fname = self.filename or ""
         return File(
-            file_id=self.file_id or (Path(self.filename).name if self.filename else ""),
-            filename=self.filename or "",
-            filetype=self.filetype
-            or (Path(self.filename).suffix.lstrip(".") if self.filename else ""),
+            file_id=self.file_id or (Path(fname).name if fname else ""),
+            filename=fname,
+            filetype=self.filetype or (Path(fname).suffix.lstrip(".") if fname else ""),
             filesize=self.filesize or 0,
             url=self.url or "",
             urltype=self.urltype or "local",
             md5=self.md5 or "",
         )
+
+
+# class RustFile:
+#     __slots__ = ("_inner",)
+
+#     def __init__(self, inner: _RustFile) -> None:
+#         self._inner = inner
+
+#     @classmethod
+#     def new(
+#         cls,
+#         *,
+#         file_id: str,
+#         filename: str,
+#         filetype: str,
+#         filesize: int,
+#         url: str,
+#         urltype: str,
+#         md5: str,
+#     ) -> "RustFile":
+#         return cls(
+#             _RustFile(file_id, filename, filetype, int(filesize), url, urltype, md5)
+#         )
+
+#     def __getattr__(self, name):
+#         # called only if attribute not found on Rust object itself
+#         return getattr(self._inner, name)
+
+#     def __setattr__(self, name, value):
+#         if name == "_inner":
+#             object.__setattr__(self, name, value)
+#         else:
+#             setattr(self._inner, name, value)
+
+#     @classmethod
+#     def from_model(cls, m: File) -> "RustFile":
+#         return cls(_RustFile.from_json(m.model_dump_json()))
+
+#     @classmethod
+#     def from_input(cls, i: FileInput) -> "RustFile":
+#         return cls.from_model(i.to_file())
+
+#     def snapshot(self) -> File:
+#         return File.model_validate_json(self._inner.to_json())
+
+#     def __repr__(self) -> str:
+#         return f"RustFile(file_id={self.file_id!r}, filename={self.filename!r}, size={self.filesize})"

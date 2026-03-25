@@ -27,6 +27,7 @@ from seqspec.Assay import (
     SeqKitInput,
     SeqProtocolInput,
 )
+from seqspec.auth import AuthRegistry
 from seqspec.File import File, FileInput
 from seqspec.Read import Read, ReadInput
 from seqspec.Region import Onlist, Region, RegionInput
@@ -444,13 +445,26 @@ def load_spec_stream(spec_stream: IO) -> Assay:
     return assay
 
 
+# def yaml_safe_dump(obj):
+#     if isinstance(obj, list):
+#         return [o.model_dump() if hasattr(o, "model_dump") else o for o in obj]
+#     elif hasattr(obj, "model_dump"):
+#         return obj.model_dump()
+#     else:
+#         return obj
+
+
+# # rust compatible via snapshot
 def yaml_safe_dump(obj):
     if isinstance(obj, list):
-        return [o.model_dump() if hasattr(o, "model_dump") else o for o in obj]
-    elif hasattr(obj, "model_dump"):
+        return [yaml_safe_dump(o) for o in obj]
+    if hasattr(obj, "model_dump"):
         return obj.model_dump()
-    else:
-        return obj
+    # allow engines/proxies to serialize via snapshot()
+    snap = getattr(obj, "snapshot", None)
+    if callable(snap):
+        return yaml_safe_dump(snap())
+    return obj
 
 
 def load_genbank(gbk_fn: str):
@@ -489,8 +503,18 @@ def yield_onlist_contents(stream):
         yield line.strip().split()[0]
 
 
+def local_resource_url(url: str, filename: str, resource: str) -> str:
+    if not url:
+        raise ValueError(f"local {resource} '{filename}' has empty url")
+    return str(url)
+
+
+def local_onlist_locator(onlist: Onlist) -> str:
+    return local_resource_url(onlist.url, onlist.filename, "onlist")
+
+
 def read_local_list(onlist: Onlist, base_path: str = "") -> List[str]:
-    filename = os.path.join(base_path, onlist.filename)
+    filename = os.path.join(base_path, local_onlist_locator(onlist))
     stream = open(filename, "rb")
     # do we need to decompress?
     if filename.endswith(".gz"):
@@ -506,7 +530,9 @@ def read_local_list(onlist: Onlist, base_path: str = "") -> List[str]:
     return results
 
 
-def read_remote_list(onlist: Onlist, base_path: str = "") -> List[str]:
+def read_remote_list(
+    onlist: Onlist, base_path: str = "", auth_profile: Optional[str] = None
+) -> List[str]:
     """Given an onlist object read the local or remote data"""
     filename = str(onlist.filename)
     if onlist.url:
@@ -515,7 +541,7 @@ def read_remote_list(onlist: Onlist, base_path: str = "") -> List[str]:
     stream = None
     try:
         # open stream
-        auth = get_remote_auth_token()
+        auth = get_remote_auth_token(filename, auth_profile)
         response = requests.get(filename, stream=True, auth=auth)
         response.raise_for_status()
         # Read into an in-memory bytes buffer to satisfy type expectations
@@ -546,16 +572,21 @@ def read_remote_list(onlist: Onlist, base_path: str = "") -> List[str]:
     return results
 
 
-def get_remote_auth_token():
-    """Look for authentication tokens for accessing remote resources"""
+def get_remote_auth_token(
+    uri: Optional[str] = None, auth_profile: Optional[str] = None
+) -> Optional[Tuple[str, str]]:
+    """Look for authentication tokens for accessing remote resources."""
+    if uri is not None:
+        registry = AuthRegistry.load()
+        auth = registry.resolve_requests_auth(uri, auth_profile)
+        if auth is not None:
+            return auth
+
     username = os.environ.get("IGVF_API_KEY")
     password = os.environ.get("IGVF_SECRET_KEY")
-    if not (username is None or password is None):
-        auth = (username, password)
-    else:
-        auth = None
-
-    return auth
+    if username is None or password is None:
+        return None
+    return (username, password)
 
 
 def region_ids_in_spec(seqspec, modality, region_ids):
@@ -567,23 +598,17 @@ def region_ids_in_spec(seqspec, modality, region_ids):
     return found
 
 
-def file_exists(uri):
+def file_exists(uri: str, auth_profile: Optional[str] = None) -> bool:
     try:
-        if uri.startswith("https://api.data.igvf.org"):
-            auth = get_remote_auth_token()
-            if auth is None:
-                print("Warning: IGVF_API_KEY and IGVF_SECRET_KEY not set")
-            r = requests.head(uri, auth=auth)
-            if r.status_code == 307:
-                # igvf download link will redirect to a presigned amazon s3 url, HEAD request will not work.
-                r = requests.get(r.headers["Location"], headers={"Range": "bytes=0-0"})
-                return r.status_code == 206
-            return r.status_code == 200
-        r = requests.head(uri)
-        if r.status_code == 302:
-            return file_exists(r.headers["Location"])
-        return r.status_code == 200
-    except requests.ConnectionError:
+        auth = get_remote_auth_token(uri, auth_profile)
+        r = requests.get(
+            uri,
+            headers={"Range": "bytes=0-0"},
+            auth=auth,
+            allow_redirects=True,
+        )
+        return r.status_code in (200, 206)
+    except requests.RequestException:
         return False
 
 

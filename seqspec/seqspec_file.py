@@ -270,7 +270,7 @@ def format_json_files(
     for items in zip(*files.values()):
         if k == "all":
             for key, item in zip(files.keys(), items):
-                d = item.to_dict()
+                d = item.model_dump()
                 if item.urltype == "local" and fp:
                     d["url"] = str(spec_fn.parent / d["url"])
                 x.append(d)

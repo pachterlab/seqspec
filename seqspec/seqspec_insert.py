@@ -11,11 +11,14 @@ from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
 from typing import List, Optional
 
+import yaml
+
 from seqspec.Assay import Assay
 from seqspec.Read import ReadInput
 from seqspec.Region import RegionInput
 from seqspec.utils import (
     load_reads,
+    load_regions,
     load_spec,
     write_pydantic_to_file_or_stdout,
 )
@@ -113,6 +116,20 @@ def validate_insert_args(args: Namespace):
         raise FileNotFoundError(f"Spec file not found: {args.yaml}")
 
 
+def load_resource_payload(resource: str):
+    """Load inline JSON/YAML or a JSON/YAML file into a Python object."""
+    resource_path = Path(resource)
+    if resource_path.exists():
+        content = resource_path.read_text()
+    else:
+        content = resource
+
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError:
+        return yaml.safe_load(content)
+
+
 def run_insert(_: ArgumentParser, args: Namespace) -> None:
     """Execute the ``insert`` command.
 
@@ -133,14 +150,13 @@ def run_insert(_: ArgumentParser, args: Namespace) -> None:
     validate_insert_args(args)
     spec: Assay = load_spec(args.yaml)
 
-    # TODO validate the resource you are loading against the object, i guess this does it already
-    resource_data = json.loads(args.resource)
-    if args.selector == "reads":
+    resource_data = load_resource_payload(args.resource)
+    if args.selector == "read":
         resource_data = load_reads(resource_data)
         spec = seqspec_insert_reads(spec, args.modality, resource_data, args.after)
     else:
-        resource_data = load_reads(resource_data)
-        spec = seqspec_insert_reads(spec, args.modality, resource_data, args.after)
+        resource_data = load_regions(resource_data)
+        spec = seqspec_insert_regions(spec, args.modality, resource_data, args.after)
 
     spec.update_spec()
     write_pydantic_to_file_or_stdout(spec, args.output)

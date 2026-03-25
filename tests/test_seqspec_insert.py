@@ -1,4 +1,5 @@
 from seqspec.seqspec_insert import (
+    load_resource_payload,
     seqspec_insert_reads,
     seqspec_insert_regions,
 )
@@ -264,3 +265,77 @@ def test_seqspec_insert_general_read(temp_spec: Assay):
     assert len(updated_spec.get_seqspec("rna")) == original_rna_read_count + 1
     read_ids = [r.read_id for r in updated_spec.get_seqspec("rna")]
     assert "general_R1" in read_ids
+
+
+def test_load_resource_payload_accepts_yaml_file(tmp_path):
+    resource_path = tmp_path / "regions.yaml"
+    resource_path.write_text(
+        "- region_id: inserted_region\n"
+        "  region_type: linker\n"
+        "  name: Inserted Region\n"
+        "  sequence_type: fixed\n"
+        "  sequence: ACGT\n"
+        "  min_len: 4\n"
+        "  max_len: 4\n"
+    )
+
+    payload = load_resource_payload(str(resource_path))
+
+    assert isinstance(payload, list)
+    assert payload[0]["region_id"] == "inserted_region"
+
+
+def test_load_resource_payload_accepts_reads_mapping():
+    payload = load_resource_payload(
+        '{"reads":[{"read_id":"wrapped_R1","name":"Wrapped Read","primer_id":"rna_polyT","min_len":10,"max_len":10,"strand":"pos"}]}'
+    )
+
+    assert isinstance(payload, dict)
+    assert payload["reads"][0]["read_id"] == "wrapped_R1"
+
+
+def test_load_resource_payload_accepts_regions_mapping():
+    payload = load_resource_payload(
+        '{"regions":[{"region_id":"wrapped_bc","region_type":"barcode","name":"Wrapped Barcode","sequence_type":"fixed","sequence":"ACGT","min_len":4,"max_len":4}]}'
+    )
+
+    assert isinstance(payload, dict)
+    assert payload["regions"][0]["region_id"] == "wrapped_bc"
+
+
+def test_seqspec_insert_reads_invalid_modality_raises(temp_spec):
+    new_read = ReadInput(
+        read_id="bad_read",
+        name="Bad Read",
+        modality="rna",
+        primer_id="test_primer",
+        min_len=10,
+        max_len=10,
+        strand="pos",
+    )
+
+    try:
+        seqspec_insert_reads(temp_spec, "missing", [new_read])
+    except ValueError as exc:
+        assert "Modality 'missing' not found." in str(exc)
+    else:
+        raise AssertionError("Expected ValueError for invalid modality")
+
+
+def test_seqspec_insert_regions_missing_after_raises(temp_spec):
+    new_region = RegionInput(
+        region_id="bad_region",
+        region_type="barcode",
+        name="Bad Region",
+        sequence_type="fixed",
+        sequence="ACGT",
+        min_len=4,
+        max_len=4,
+    )
+
+    try:
+        seqspec_insert_regions(temp_spec, "rna", [new_region], after="missing")
+    except ValueError as exc:
+        assert "No region with id 'missing' found under modality 'rna'" in str(exc)
+    else:
+        raise AssertionError("Expected ValueError for missing insertion target")

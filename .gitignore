@@ -1,5 +1,7 @@
 .vscode/
 docs/_build/
+_build/
+.mplconfig/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

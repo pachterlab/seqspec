@@ -14,6 +14,7 @@ from seqspec.Region import Onlist, itx_read, project_regions_to_coordinates
 from seqspec.seqspec_find import find_by_region_id, find_by_region_type
 from seqspec.utils import (
     load_spec,
+    local_onlist_locator,
     map_read_id_to_regions,
     read_local_list,
     read_remote_list,
@@ -87,6 +88,13 @@ seqspec onlist -m rna -s read -i rna_R1 -f product -o joined.txt spec.yaml  # Jo
         default=None,
         required=True,
     )
+    subparser.add_argument(
+        "--auth-profile",
+        metavar="PROFILE",
+        help="Authentication profile for remote onlists",
+        type=str,
+        default=None,
+    )
 
     return subparser
 
@@ -118,11 +126,22 @@ def run_onlist(parser: ArgumentParser, args: Namespace) -> None:
     if args.format:
         # Join operation - requires download and output path
         save_path = args.output or Path(args.yaml).resolve().parent
-        result_path = join_onlists_and_save(onlists, args.format, save_path, base_path)
+        result_path = join_onlists_and_save(
+            onlists,
+            args.format,
+            save_path,
+            base_path,
+            auth_profile=args.auth_profile,
+        )
         print(result_path)
     elif args.output:
         # Download operation - download remote files to output location
-        result_paths = download_onlists_to_path(onlists, args.output, base_path)
+        result_paths = download_onlists_to_path(
+            onlists,
+            args.output,
+            base_path,
+            auth_profile=args.auth_profile,
+        )
         for path_info in result_paths:
             print(f"{path_info['url']}")
     else:
@@ -137,6 +156,7 @@ def get_onlists(spec: Assay, modality: str, selector: str, id: str) -> List[Onli
     if selector == "region-type":
         # Prefer ordering by read orientation when possible to ensure
         # consistency with the `read` selector behavior.
+        matches_by_read: List[tuple[str, List[Onlist]]] = []
         reads: List[Read] = spec.get_seqspec(modality)
         for rd in reads:
             try:
@@ -150,7 +170,15 @@ def get_onlists(spec: Assay, modality: str, selector: str, id: str) -> List[Onli
                     if ol:
                         ordered_onlists.append(ol)
             if ordered_onlists:
-                return ordered_onlists
+                matches_by_read.append((rd.read_id, ordered_onlists))
+
+        if len(matches_by_read) == 1:
+            return matches_by_read[0][1]
+        if len(matches_by_read) > 1:
+            read_ids = ", ".join(read_id for read_id, _ in matches_by_read)
+            raise ValueError(
+                f"region-type '{id}' matches regions in multiple reads for modality '{modality}': {read_ids}. Use -s read or -s region to disambiguate."
+            )
 
         # Fallback: original region-type traversal order
         regions = find_by_region_type(spec, modality, id)
@@ -195,7 +223,7 @@ def get_onlist_urls(onlists: List[Onlist], base_path: Path) -> List[Dict[str, st
     urls = []
     for onlist in onlists:
         if onlist.urltype == "local":
-            url = str(base_path / Path(onlist.url))
+            url = str(base_path / Path(local_onlist_locator(onlist)))
         else:
             url = onlist.url
         urls.append({"file_id": onlist.file_id, "url": url})
@@ -203,7 +231,10 @@ def get_onlist_urls(onlists: List[Onlist], base_path: Path) -> List[Dict[str, st
 
 
 def download_onlists_to_path(
-    onlists: List[Onlist], output_path: Path, base_path: Path
+    onlists: List[Onlist],
+    output_path: Path,
+    base_path: Path,
+    auth_profile: str | None = None,
 ) -> List[Dict[str, str]]:
     """Download remote onlists and return local paths."""
     downloaded_paths = []
@@ -211,11 +242,11 @@ def download_onlists_to_path(
     for onlist in onlists:
         if onlist.urltype == "local":
             # Local file - just return the path
-            local_path = base_path / Path(onlist.url)
+            local_path = base_path / Path(local_onlist_locator(onlist))
             downloaded_paths.append({"file_id": onlist.file_id, "url": str(local_path)})
         else:
             # Remote file - download it
-            onlist_elements = read_remote_list(onlist)
+            onlist_elements = read_remote_list(onlist, auth_profile=auth_profile)
             # Create unique filename for this onlist
             filename = f"{onlist.file_id}_{output_path.name}"
             download_path = output_path.parent / filename
@@ -228,7 +259,11 @@ def download_onlists_to_path(
 
 
 def join_onlists_and_save(
-    onlists: List[Onlist], format_type: str, output_path: Path, base_path: Path
+    onlists: List[Onlist],
+    format_type: str,
+    output_path: Path,
+    base_path: Path,
+    auth_profile: str | None = None,
 ) -> str:
     """Download onlists, join them, and save to output path."""
     # Download all onlists first
@@ -237,7 +272,7 @@ def join_onlists_and_save(
         if onlist.urltype == "local":
             content = read_local_list(onlist, str(base_path))
         else:
-            content = read_remote_list(onlist)
+            content = read_remote_list(onlist, auth_profile=auth_profile)
         onlist_contents.append(content)
 
     # Join the onlists

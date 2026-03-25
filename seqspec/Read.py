@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 from seqspec.File import File, FileInput
 from seqspec.Region import RegionCoordinate
 
+# from ._core import Read as _RustRead
+
 
 class Read(BaseModel):
     read_id: str
@@ -22,11 +24,7 @@ class Read(BaseModel):
     def __repr__(self) -> str:
         strand = "+" if self.strand == "pos" else "-"
         s = f"""{strand}({self.min_len}, {self.max_len}){self.read_id}:{self.primer_id}"""
-        # return str(self.model_dump())
         return s
-
-    def to_dict(self):
-        return self.model_dump()
 
     def update_read_by_id(
         self,
@@ -39,21 +37,21 @@ class Read(BaseModel):
         strand=None,
         files=None,
     ):
-        if read_id:
+        if read_id is not None:
             self.read_id = read_id
-        if name:
+        if name is not None:
             self.name = name
-        if modality:
+        if modality is not None:
             self.modality = modality
-        if primer_id:
+        if primer_id is not None:
             self.primer_id = primer_id
-        if min_len:
+        if min_len is not None:
             self.min_len = min_len
-        if max_len:
+        if max_len is not None:
             self.max_len = max_len
-        if strand:
+        if strand is not None:
             self.strand = strand
-        if files:
+        if files is not None:
             self.files = files
 
     def get_read_by_file_id(self, file_id: str):
@@ -62,7 +60,63 @@ class Read(BaseModel):
                 return self
         return None
 
-    # update_from removed per new approach
+
+# class RustRead:
+#     __slots__ = ("_inner",)
+
+#     def __init__(self, inner: _RustRead) -> None:
+#         object.__setattr__(self, "_inner", inner)
+
+#     # Generic forwarding
+
+#     def __getattr__(self, name):
+#         # called only if attribute not found on Rust object itself
+#         return getattr(self._inner, name)
+
+#     def __setattr__(self, name, value):
+#         if name == "_inner":
+#             object.__setattr__(self, name, value)
+#         else:
+#             setattr(self._inner, name, value)
+
+#     @classmethod
+#     def new(
+#         cls,
+#         *,
+#         read_id: str,
+#         name: str,
+#         modality: str,
+#         primer_id: str,
+#         min_len: int,
+#         max_len: int,
+#         strand: str,
+#         files: List[RustFile] | None = None,
+#     ) -> "RustRead":
+#         rust_files = [f._inner for f in (files or [])]  # pass raw RustFile inners
+#         inner = _RustRead(
+#             read_id,
+#             name,
+#             modality,
+#             primer_id,
+#             int(min_len),
+#             int(max_len),
+#             strand,
+#             rust_files,
+#         )
+#         return cls(inner)
+
+#     # convenience constructor: accept a Pydantic Read DTO
+#     @classmethod
+#     def from_model(cls, m: Read) -> "RustRead":
+#         # serde in Rust will build Vec<File> from the nested DTOs
+#         return cls(_RustRead.from_json(m.model_dump_json()))
+
+#     def snapshot(self) -> "Read":
+#         # Convert back into your Pydantic DTO
+#         return Read.model_validate_json(self._inner.to_json())
+
+#     def __repr__(self) -> str:
+#         return self._inner.__repr__()  # uses Rust __repr__
 
 
 class ReadCoordinate(BaseModel):

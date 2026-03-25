@@ -1,0 +1,31 @@
+[package]
+name = "seqspec"
+version = "0.4.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/pachterlab/seqspec"
+description = "Sequencing specification tools (Rust core + PyO3 bindings)"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "seqspec"
+crate-type = ["rlib", "cdylib"]
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4.5.46", features = ["derive", "env"] }
+jsonschema = "0.33.0"
+pyo3 = { version = "0.25", optional = true, features = ["extension-module", "abi3-py312"] }
+# pythonize = "0.25.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+thiserror = "1"
+reqwest = { version = "0.12", features = ["blocking", "rustls-tls"] }
+flate2 = "1"
+toml = "0.8"
+
+
+[features]
+default = []
+python-binding = ["pyo3"]          # enable PyO3 only when building Python wheels

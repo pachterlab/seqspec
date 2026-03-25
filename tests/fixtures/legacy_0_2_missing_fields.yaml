@@ -1,0 +1,51 @@
+!Assay
+seqspec_version: 0.2.0
+assay_id: legacy-02
+name: legacy-02
+doi: ""
+date: "2024-01-01"
+description: legacy missing files and short onlist
+modalities:
+  - rna
+lib_struct: ""
+sequence_spec:
+  - !Read
+    read_id: rna_R1
+    name: rna_R1
+    modality: rna
+    primer_id: truseq_read1
+    min_len: 16
+    max_len: 16
+    strand: pos
+library_spec:
+  - !Region
+    region_id: rna
+    region_type: rna
+    name: rna
+    sequence_type: joined
+    sequence: ""
+    min_len: 0
+    max_len: 0
+    onlist: null
+    regions:
+      - !Region
+        region_id: truseq_read1
+        region_type: truseq_read1
+        name: truseq_read1
+        sequence_type: fixed
+        sequence: ACGTACGT
+        min_len: 8
+        max_len: 8
+        onlist: null
+        regions: []
+      - !Region
+        region_id: barcode
+        region_type: barcode
+        name: barcode
+        sequence_type: onlist
+        min_len: 8
+        max_len: 8
+        onlist:
+          filename: whitelist.txt.gz
+          md5: abc123
+        regions: []

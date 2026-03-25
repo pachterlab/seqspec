@@ -353,9 +353,11 @@ def get_coordinate_by_read_id(spec: Assay, modality: str, read_id: str) -> Coord
 
     return coord
 
+
 FEATURE_REGION_TYPES = {"CDNA", "GDNA", "PROTEIN", "TAG", "SGRNA_TARGET"}
 
-def format_kallisto_bus(indices: List[Coordinate], subregion_type=None):
+
+def format_kallisto_bus(indices: List[Coordinate], subregion_type=None) -> str:
     bcs = []
     umi = []
     feature = []
@@ -376,7 +378,9 @@ def format_kallisto_bus(indices: List[Coordinate], subregion_type=None):
     return x
 
 
-def format_kallisto_bus_force_single(indices: List[Coordinate], subregion_type=None):
+def format_kallisto_bus_force_single(
+    indices: List[Coordinate], subregion_type=None
+) -> str:
     bcs = []
     umi = []
     feature = []
@@ -408,7 +412,7 @@ def format_kallisto_bus_force_single(indices: List[Coordinate], subregion_type=N
 
 # this one should only return one string
 # TODO: return to this
-def format_seqkit_subseq(indices: List[Coordinate], subregion_type=None):
+def format_seqkit_subseq(indices: List[Coordinate], subregion_type=None) -> str:
     # The x string format is start:stop (1-indexed)
     # x = ""
     # region = indices[0]
@@ -422,7 +426,7 @@ def format_seqkit_subseq(indices: List[Coordinate], subregion_type=None):
     return x
 
 
-def format_tab(indices: List[Coordinate], subregion_type=None):
+def format_tab(indices: List[Coordinate], subregion_type=None) -> str:
     x = ""
     for idx, coord in enumerate(indices):
         rcv = coord.rcv
@@ -433,14 +437,16 @@ def format_tab(indices: List[Coordinate], subregion_type=None):
     return x[:-1]
 
 
-def format_starsolo(indices: List[Coordinate], subregion_type=None):
+def format_starsolo(indices: List[Coordinate], subregion_type=None) -> str:
     bcs = []
     umi = []
     cdna = []
     for idx, coord in enumerate(indices):
         for cut in coord.rcv:
             if cut.region_type.upper() == "BARCODE":
-                bcs.append(f"--soloCBstart {cut.start + 1} --soloCBlen {cut.stop}")
+                bcs.append(
+                    f"--soloCBstart {cut.start + 1} --soloCBlen {cut.stop - cut.start}"
+                )
             elif cut.region_type.upper() == "UMI":
                 umi.append(
                     f"--soloUMIstart {cut.start + 1} --soloUMIlen {cut.stop - cut.start}"
@@ -451,7 +457,7 @@ def format_starsolo(indices: List[Coordinate], subregion_type=None):
     return x
 
 
-def format_simpleaf(indices: List[Coordinate], subregion_type=None):
+def format_simpleaf(indices: List[Coordinate], subregion_type=None) -> str:
     x = ""
     xl = []
     for idx, coord in enumerate(indices):
@@ -469,7 +475,7 @@ def format_simpleaf(indices: List[Coordinate], subregion_type=None):
     return "".join(xl)
 
 
-def format_zumis(indices: List[Coordinate], subregion_type=None):
+def format_zumis(indices: List[Coordinate], subregion_type=None) -> str:
     xl = []
     for idx, coord in enumerate(indices):
         x = ""
@@ -486,7 +492,7 @@ def format_zumis(indices: List[Coordinate], subregion_type=None):
 
 
 def stable_deduplicate_fqs(fqs):
-    # stably deduplicate gdna_fqs
+    # stably deduplicate fqs
     seen_fqs = set()
     deduplicated_fqs = []
     for r in fqs:
@@ -496,7 +502,7 @@ def stable_deduplicate_fqs(fqs):
     return deduplicated_fqs
 
 
-def format_chromap(indices: List[Coordinate], subregion_type=None):
+def format_chromap(indices: List[Coordinate], subregion_type=None) -> str:
     bc_fqs = []
     bc_str = []
     gdna_fqs = []
@@ -563,7 +569,7 @@ def filter_groupby_region_type(g, keep=["umi", "barcode", "cdna"]):
     return g
 
 
-def format_relative(indices: List[Coordinate], subregion_type=None):
+def format_relative(indices: List[Coordinate], subregion_type=None) -> str:
     x = ""
     for idx, coord in enumerate(indices):
         rg_strand = coord.strand  # noqa
@@ -620,9 +626,6 @@ def groupby_region_type(rgns):
             d[rgn.obj.region_type] = {"obj": rgn.obj, "rgncdiffs": []}
         d[rgn.obj.region_type]["rgncdiffs"].append(rgn)
     return d
-
-
-# def group_regions_by_region_type(rgns):
 
 
 def format_splitcode_row(obj, rgncdiffs, idx=0, rev=False, complement=False):
@@ -689,7 +692,7 @@ def format_splitcode_row(obj, rgncdiffs, idx=0, rev=False, complement=False):
     return {"region_type": obj.region_type, "fmt": e}
 
 
-def format_splitcode(indices: List[Coordinate], subregion_type=None):
+def format_splitcode(indices: List[Coordinate], subregion_type=None) -> str:
     # extraction based on fixed sequences
     # extraction based on onlist sequences
     # umi - bc3 - link2 - bc2 - link1 - bc1 - read

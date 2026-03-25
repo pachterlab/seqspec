@@ -3,7 +3,9 @@
 This module provides functionality to validate seqspec files against the specification schema.
 """
 
+import os
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
+from itertools import combinations
 from os import path
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -12,7 +14,14 @@ import yaml
 from jsonschema import Draft4Validator
 
 from seqspec.Assay import Assay
-from seqspec.utils import file_exists, load_spec
+from seqspec.Region import itx_read, project_regions_to_coordinates
+from seqspec.utils import (
+    file_exists,
+    load_spec,
+    local_onlist_locator,
+    local_resource_url,
+    map_read_id_to_regions,
+)
 
 
 def setup_check_args(parser):
@@ -44,7 +53,14 @@ seqspec check spec.yaml
         help="Skip checks",
         type=str,
         default=None,
-        choices=["igvf", "igvf_onlist_skip"],
+        choices=["igvf", "igvf_onlist_skip", "structural"],
+    )
+    subparser.add_argument(
+        "--auth-profile",
+        metavar="PROFILE",
+        help="Authentication profile for remote resource checks",
+        type=str,
+        default=os.environ.get("SEQSPEC_AUTH_PROFILE"),
     )
 
     subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
@@ -61,21 +77,49 @@ def validate_check_args(parser: ArgumentParser, args: Namespace) -> None:
         parser.error(f"Output path exists but is not a file: {args.output}")
 
 
+def make_diagnostic(
+    severity: str, error_type: str, error_message: str, error_object: str
+):
+    return {
+        "severity": severity,
+        "error_type": error_type,
+        "error_message": error_message,
+        "error_object": error_object,
+    }
+
+
+def normalize_diagnostics(diagnostics: List[Dict]) -> List[Dict]:
+    return [
+        make_diagnostic(
+            severity=diagnostic.get("severity", "error"),
+            error_type=diagnostic["error_type"],
+            error_message=diagnostic["error_message"],
+            error_object=diagnostic["error_object"],
+        )
+        for diagnostic in diagnostics
+    ]
+
+
 def format_error(errobj, idx=0):
-    return f"[error {idx}] {errobj['error_message']}"
+    severity = errobj.get("severity", "error")
+    return f"[{severity} {idx}] {errobj['error_message']}"
 
 
-def seqspec_check(spec: Assay, filter_type: Optional[str] = None) -> List[Dict]:
-    """Core functionality to check a seqspec and return filtered errors.
+def seqspec_check(
+    spec: Assay,
+    filter_type: Optional[str] = None,
+    auth_profile: Optional[str] = None,
+) -> List[Dict]:
+    """Core functionality to check a seqspec and return filtered diagnostics.
 
     Args:
         spec: The Assay object to check
-        filter_type: Optional filter type to apply to errors (e.g. "igvf", "igvf_onlist_skip")
+        filter_type: Optional filter type to apply to diagnostics (e.g. "igvf", "igvf_onlist_skip")
 
     Returns:
-        List of error dictionaries
+        List of diagnostic dictionaries
     """
-    errors = check(spec)
+    errors = check(spec, auth_profile=auth_profile)
 
     if filter_type:
         errors = filter_errors(errors, filter_type)
@@ -87,7 +131,7 @@ def run_check(parser: ArgumentParser, args: Namespace):
     validate_check_args(parser, args)
 
     spec = load_spec(args.yaml, strict=False)
-    errors = seqspec_check(spec, args.skip)
+    errors = seqspec_check(spec, args.skip, args.auth_profile)
 
     if args.output:
         with open(args.output, "w") as f:
@@ -110,9 +154,33 @@ IGVF_FILTERS = [
 IGVF_ONLIST_SKIP_FILTERS = IGVF_FILTERS + [
     {"error_type": "check_onlist_files_exist", "error_object": "onlist"}
 ]
+STRUCTURAL_CHECK_TYPES = [
+    "check_unique_modalities",
+    "check_region_ids_modalities",
+    "check_unique_read_ids",
+    "check_unique_read_primer_strand_pairs",
+    "check_unique_region_ids",
+    "check_read_modalities",
+    "check_primer_ids_in_region_ids",
+    "check_sequence_types",
+    "check_region_lengths",
+    "check_sequence_lengths",
+    "check_read_file_count",
+    "check_region_against_subregion_length",
+    "check_region_against_subregion_sequence",
+    "check_read_length_against_library",
+    "check_overlapping_read_regions",
+]
 
 
 def filter_errors(errors, filter_type):
+    if filter_type == "structural":
+        return [
+            error
+            for error in errors
+            if error["error_type"] not in STRUCTURAL_CHECK_TYPES
+        ]
+
     filters = None
     if filter_type == "igvf":
         filters = IGVF_FILTERS
@@ -137,14 +205,14 @@ def filter_errors(errors, filter_type):
         return errors
 
 
-def check(spec: Assay):
+def check(spec: Assay, auth_profile: Optional[str] = None):
     # Variety of checks against schema
     def check_schema(spec: Assay, errors=[], idx=0):
         schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
         with open(schema_fn, "r") as stream:
             schema = yaml.load(stream, Loader=yaml.Loader)
         validator = Draft4Validator(schema)
-        for idx, error in enumerate(validator.iter_errors(spec.to_dict()), 1):
+        for idx, error in enumerate(validator.iter_errors(spec.model_dump()), 1):
             err_elements = [repr(index) for index in error.path]
             err_path = f"spec[{']['.join(err_elements)}]"
             errobj = {
@@ -202,8 +270,19 @@ def check(spec: Assay):
 
         for ol in olrgns:
             if ol.urltype == "local":
-                if ol.filename[:-3] == ".gz":
-                    check = ol.url
+                try:
+                    locator = local_onlist_locator(ol)
+                except ValueError as err:
+                    errobj = {
+                        "error_type": "check_onlist_files_exist",
+                        "error_message": str(err),
+                        "error_object": "onlist",
+                    }
+                    errors.append(errobj)
+                    idx += 1
+                    continue
+                if locator.endswith(".gz"):
+                    check = locator
                     if spec_base and not Path(check).is_absolute():
                         check = str((spec_base / check).resolve())
                     if not path.exists(check):
@@ -215,8 +294,8 @@ def check(spec: Assay):
                         errors.append(errobj)
                         idx += 1
                 else:
-                    check = ol.url
-                    check_gz = ol.url + ".gz"
+                    check = locator
+                    check_gz = locator + ".gz"
                     if spec_base:
                         if not Path(check).is_absolute():
                             check = str((spec_base / check).resolve())
@@ -233,17 +312,16 @@ def check(spec: Assay):
             elif ol.urltype == "http" or ol.urltype == "https" or ol.urltype == "ftp":
                 # ping the link with a simple http request to check if the file exists at that URI
                 if spec.seqspec_version == "0.3.0":
-                    if not file_exists(ol.url):
+                    if not file_exists(ol.url, auth_profile):
                         errobj = {
                             "error_type": "check_onlist_files_exist",
                             "error_message": f"{ol.filename} does not exist",
                             "error_object": "onlist",
                         }
-
                         errors.append(errobj)
                         idx += 1
                 else:
-                    if not file_exists(ol.url):
+                    if not file_exists(ol.url, auth_profile):
                         errobj = {
                             "error_type": "check_onlist_files_exist",
                             "error_message": f"{ol.filename} does not exist",
@@ -283,7 +361,17 @@ def check(spec: Assay):
         for read in spec.sequence_spec:
             for f in read.files:
                 if f.urltype == "local":
-                    check = f.url
+                    try:
+                        check = local_resource_url(f.url, f.filename, "file")
+                    except ValueError as err:
+                        errobj = {
+                            "error_type": "check_read_files_exist",
+                            "error_message": str(err),
+                            "error_object": "file",
+                        }
+                        errors.append(errobj)
+                        idx += 1
+                        continue
                     if spec_base and not Path(check).is_absolute():
                         check = str((spec_base / check).resolve())
                     if not path.exists(check):
@@ -296,7 +384,7 @@ def check(spec: Assay):
                         idx += 1
                 elif f.urltype == "http" or f.urltype == "https" or f.urltype == "ftp":
                     # ping the link with a simple http request to check if the file exists at that URI
-                    if not file_exists(f.url):
+                    if not file_exists(f.url, auth_profile):
                         errobj = {
                             "error_type": "check_read_files_exist",
                             "error_message": f"{f.filename} does not exist",
@@ -442,6 +530,62 @@ def check(spec: Assay):
                     "error_object": "read",
                 }
                 errors.append(errobj)
+                idx += 1
+
+        return (errors, idx)
+
+    def check_overlapping_read_regions(spec: Assay, errors, idx):
+        for modality in spec.modalities:
+            reads = spec.get_seqspec(modality)
+            projected_reads = []
+
+            for read in reads:
+                try:
+                    mapped_read, regions = map_read_id_to_regions(
+                        spec, modality, read.read_id
+                    )
+                except IndexError:
+                    continue
+
+                region_coordinates = project_regions_to_coordinates(regions)
+                projected_reads.append(
+                    (mapped_read, itx_read(region_coordinates, 0, mapped_read.max_len))
+                )
+
+            for (left_read, left_regions), (right_read, right_regions) in combinations(
+                projected_reads, 2
+            ):
+                right_region_ids = {region.region_id for region in right_regions}
+                shared_region_ids = []
+                seen_region_ids = set()
+
+                for region in left_regions:
+                    if (
+                        region.region_id in right_region_ids
+                        and region.region_id not in seen_region_ids
+                    ):
+                        shared_region_ids.append(region.region_id)
+                        seen_region_ids.add(region.region_id)
+
+                if not shared_region_ids:
+                    continue
+
+                region_list = ", ".join(
+                    f"'{region_id}'" for region_id in shared_region_ids
+                )
+                errors.append(
+                    make_diagnostic(
+                        severity="warning",
+                        error_type="check_overlapping_read_regions",
+                        error_message=(
+                            f"reads '{left_read.read_id}' and '{right_read.read_id}' in modality "
+                            f"'{modality}' both cover region(s) {region_list}. Downstream tools "
+                            "may require explicit overlap handling such as "
+                            "`seqspec index --no-overlap`"
+                        ),
+                        error_object="read",
+                    )
+                )
                 idx += 1
 
         return (errors, idx)
@@ -651,9 +795,10 @@ def check(spec: Assay):
         "check_region_against_subregion_length": check_region_against_subregion_length,
         "check_region_against_subregion_sequence": check_region_against_subregion_sequence,
         "check_read_length_against_library": check_read_length_against_library,
+        "check_overlapping_read_regions": check_overlapping_read_regions,
     }
     for k, v in checks.items():
         # print(k)
         errors, idx = v(spec, errors, idx)
 
-    return errors
+    return normalize_diagnostics(errors)
