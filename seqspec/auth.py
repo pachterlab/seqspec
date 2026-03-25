@@ -1,10 +1,9 @@
 import json
 import os
+import tomllib
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
-
-import tomllib
 
 AUTH_CONFIG_ENV = "SEQSPEC_AUTH_CONFIG"
 

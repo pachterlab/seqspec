@@ -3,8 +3,8 @@
 This module provides functionality to validate seqspec files against the specification schema.
 """
 
-from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 import os
+from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from os import path
 from pathlib import Path
 from typing import Dict, List, Optional

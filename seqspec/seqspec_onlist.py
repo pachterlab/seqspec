@@ -125,11 +125,22 @@ def run_onlist(parser: ArgumentParser, args: Namespace) -> None:
     if args.format:
         # Join operation - requires download and output path
         save_path = args.output or Path(args.yaml).resolve().parent
-        result_path = join_onlists_and_save(onlists, args.format, save_path, base_path)
+        result_path = join_onlists_and_save(
+            onlists,
+            args.format,
+            save_path,
+            base_path,
+            auth_profile=args.auth_profile,
+        )
         print(result_path)
     elif args.output:
         # Download operation - download remote files to output location
-        result_paths = download_onlists_to_path(onlists, args.output, base_path)
+        result_paths = download_onlists_to_path(
+            onlists,
+            args.output,
+            base_path,
+            auth_profile=args.auth_profile,
+        )
         for path_info in result_paths:
             print(f"{path_info['url']}")
     else:
@@ -210,7 +221,10 @@ def get_onlist_urls(onlists: List[Onlist], base_path: Path) -> List[Dict[str, st
 
 
 def download_onlists_to_path(
-    onlists: List[Onlist], output_path: Path, base_path: Path
+    onlists: List[Onlist],
+    output_path: Path,
+    base_path: Path,
+    auth_profile: str | None = None,
 ) -> List[Dict[str, str]]:
     """Download remote onlists and return local paths."""
     downloaded_paths = []
@@ -222,7 +236,7 @@ def download_onlists_to_path(
             downloaded_paths.append({"file_id": onlist.file_id, "url": str(local_path)})
         else:
             # Remote file - download it
-            onlist_elements = read_remote_list(onlist, auth_profile=args.auth_profile)
+            onlist_elements = read_remote_list(onlist, auth_profile=auth_profile)
             # Create unique filename for this onlist
             filename = f"{onlist.file_id}_{output_path.name}"
             download_path = output_path.parent / filename
@@ -235,7 +249,11 @@ def download_onlists_to_path(
 
 
 def join_onlists_and_save(
-    onlists: List[Onlist], format_type: str, output_path: Path, base_path: Path
+    onlists: List[Onlist],
+    format_type: str,
+    output_path: Path,
+    base_path: Path,
+    auth_profile: str | None = None,
 ) -> str:
     """Download onlists, join them, and save to output path."""
     # Download all onlists first
@@ -244,7 +262,7 @@ def join_onlists_and_save(
         if onlist.urltype == "local":
             content = read_local_list(onlist, str(base_path))
         else:
-            content = read_remote_list(onlist, auth_profile=args.auth_profile)
+            content = read_remote_list(onlist, auth_profile=auth_profile)
         onlist_contents.append(content)
 
     # Join the onlists

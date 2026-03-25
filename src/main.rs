@@ -23,6 +23,9 @@ use seqspec::utils;
 
 use clap::{Parser, Subcommand};
 
+const BUILD_DEPRECATED_MESSAGE: &str =
+    "seqspec build is deprecated. Use seqspec init/insert/modify or construct the spec directly.";
+
 #[derive(Parser, Debug)]
 #[command(name = "seqspec", version)]
 struct Args {
@@ -30,9 +33,13 @@ struct Args {
     subcmd: Commands,
 }
 
+#[derive(clap::Args, Debug)]
+struct BuildArgs {}
+
 #[derive(Subcommand, Debug)]
 enum Commands {
     Auth(seqspec_auth::AuthArgs),
+    Build(BuildArgs),
     Version(seqspec_version::VersionArgs),
     Format(seqspec_format::FormatArgs),
     Find(seqspec_find::FindArgs),
@@ -55,6 +62,7 @@ fn main() {
     let args = Args::parse();
     match args.subcmd {
         Commands::Auth(args) => seqspec_auth::run(&args).unwrap(),
+        Commands::Build(_) => run_build_deprecated(),
         Commands::Version(args) => seqspec_version::run_version(&args),
         Commands::Format(args) => seqspec_format::run_format(&args),
         Commands::Find(args) => seqspec_find::run_find(&args),
@@ -72,5 +80,29 @@ fn main() {
         }
         Commands::Onlist(args) => seqspec_onlist::run_onlist(&args),
         Commands::Print(args) => seqspec_print::run_print(&args),
+    }
+}
+
+fn run_build_deprecated() {
+    eprintln!("{}", BUILD_DEPRECATED_MESSAGE);
+    std::process::exit(1);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_build_subcommand_is_recognized() {
+        let args = Args::try_parse_from(["seqspec", "build"]).unwrap();
+        assert!(matches!(args.subcmd, Commands::Build(_)));
+    }
+
+    #[test]
+    fn test_build_deprecated_message_matches_python_cli() {
+        assert_eq!(
+            BUILD_DEPRECATED_MESSAGE,
+            "seqspec build is deprecated. Use seqspec init/insert/modify or construct the spec directly."
+        );
     }
 }
