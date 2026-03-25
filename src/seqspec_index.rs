@@ -255,8 +255,8 @@ fn get_coordinate_by_read_id(spec: &Assay, modality: &String, read_id: &str) -> 
     }
 }
 fn filter_index_no_overlap(mut indices: Vec<Coordinate>) -> Vec<Coordinate> {
+    let mut seen: HashSet<String> = HashSet::new();
     for idx in &mut indices {
-        let mut seen: HashSet<String> = HashSet::new();
         let mut new_rcv: Vec<RegionCoordinate> = Vec::new();
         for rgn in idx.rcv.iter() {
             let rid = rgn.region.region_id.clone();
@@ -984,9 +984,33 @@ mod tests {
         let indices = get_index_by_reads(&spec, &modality);
         let orig_count: usize = indices.iter().map(|i| i.rcv.len()).sum();
         let filtered = filter_index_no_overlap(indices);
-        // Filtered should have same or fewer total region coordinates
+        // Non-overlapping DOGMA RNA reads should be unchanged.
         let filt_count: usize = filtered.iter().map(|i| i.rcv.len()).sum();
-        assert!(filt_count <= orig_count);
+        assert_eq!(filt_count, orig_count);
+    }
+
+    #[test]
+    fn test_filter_index_no_overlap_removes_regions_seen_in_earlier_reads() {
+        let spec = load_spec(&PathBuf::from(
+            "tests/fixtures/check_overlap_warning/spec.yaml",
+        ));
+        let modality = "rna".to_string();
+        let indices = get_index_by_reads(&spec, &modality);
+        let filtered = filter_index_no_overlap(indices);
+
+        assert_eq!(filtered.len(), 2);
+        assert_eq!(filtered[0].query_id, "rna_R1");
+        assert_eq!(filtered[0].rcv.len(), 2);
+        assert_eq!(
+            filtered[0]
+                .rcv
+                .iter()
+                .map(|region| region.region.region_id.clone())
+                .collect::<Vec<_>>(),
+            vec!["barcode".to_string(), "umi".to_string()]
+        );
+        assert_eq!(filtered[1].query_id, "rna_R2");
+        assert_eq!(filtered[1].rcv.len(), 0);
     }
 
     #[test]
