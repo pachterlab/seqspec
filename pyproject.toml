@@ -64,7 +64,7 @@ license-files = ["LICENSE"]
 include = ["seqspec", "seqspec.*"]
 
 [tool.setuptools.package-data]
-"seqspec" = ["schema/*", "py.typed", "_core.pyi"]
+"seqspec" = ["schema/*", "py.typed", "_core.pyi", "report_assets/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

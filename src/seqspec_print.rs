@@ -1,5 +1,6 @@
 use crate::models::assay::Assay;
 use crate::models::region::{Region, RegionCoordinate};
+use crate::seqspec_html;
 use crate::utils;
 use clap::Args;
 use std::fs;
@@ -59,7 +60,7 @@ pub fn seqspec_print(spec: &Assay, fmt: &str) -> Result<String, String> {
     match fmt {
         "library-ascii" => Ok(print_library_ascii(spec)),
         "seqspec-ascii" => print_seqspec_ascii(spec),
-        "seqspec-html" => Err("seqspec-html is not implemented in the Rust CLI yet".to_string()),
+        "seqspec-html" => seqspec_html::render_seqspec_html(spec),
         "seqspec-png" => Err("seqspec-png is not implemented in the Rust CLI yet".to_string()),
         _ => Err(format!("Unsupported format: {}", fmt)),
     }
@@ -84,17 +85,15 @@ fn format_libseq(
         .get_libspec(modality)
         .ok_or_else(|| format!("modality '{}' not found", modality))?;
 
-    Ok(
-        [
-            modality.to_string(),
-            "---".to_string(),
-            positive.join("\n"),
-            libspec.sequence.clone(),
-            utils::complement_seq(&libspec.sequence),
-            negative.join("\n"),
-        ]
-        .join("\n"),
-    )
+    Ok([
+        modality.to_string(),
+        "---".to_string(),
+        positive.join("\n"),
+        libspec.sequence.clone(),
+        utils::complement_seq(&libspec.sequence),
+        negative.join("\n"),
+    ]
+    .join("\n"))
 }
 
 fn libseq(spec: &Assay, modality: &str) -> Result<(Vec<String>, Vec<String>), String> {
@@ -204,8 +203,9 @@ mod tests {
     }
 
     #[test]
-    fn test_print_reports_unimplemented_html() {
-        let err = seqspec_print(&dogma_spec(), "seqspec-html").unwrap_err();
-        assert!(err.contains("not implemented"));
+    fn test_print_seqspec_html_contains_payload() {
+        let html = seqspec_print(&dogma_spec(), "seqspec-html").unwrap();
+        assert!(html.contains("seqspec-view-data"));
+        assert!(html.contains("DOGMAseq-DIG"));
     }
 }

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>seqspec view</title>
+  <style>
+__STYLE__
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app"></div>
+  <div class="mol-tip" id="mol-tip"></div>
+  <script>
+    window.SEQSPEC_REPOSITORY = __REPOSITORY__;
+    window.SEQSPEC_TOOL_VERSION = __TOOL_VERSION__;
+  </script>
+  <script type="application/json" id="seqspec-view-data">__DATA__</script>
+  <script>
+__APP__
+  </script>
+</body>
+</html>
+
