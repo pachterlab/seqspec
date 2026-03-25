@@ -19,6 +19,7 @@ from seqspec.utils import (
     file_exists,
     load_spec,
     local_onlist_locator,
+    local_resource_url,
     map_read_id_to_regions,
 )
 
@@ -269,7 +270,17 @@ def check(spec: Assay, auth_profile: Optional[str] = None):
 
         for ol in olrgns:
             if ol.urltype == "local":
-                locator = local_onlist_locator(ol)
+                try:
+                    locator = local_onlist_locator(ol)
+                except ValueError as err:
+                    errobj = {
+                        "error_type": "check_onlist_files_exist",
+                        "error_message": str(err),
+                        "error_object": "onlist",
+                    }
+                    errors.append(errobj)
+                    idx += 1
+                    continue
                 if locator.endswith(".gz"):
                     check = locator
                     if spec_base and not Path(check).is_absolute():
@@ -350,7 +361,17 @@ def check(spec: Assay, auth_profile: Optional[str] = None):
         for read in spec.sequence_spec:
             for f in read.files:
                 if f.urltype == "local":
-                    check = f.url
+                    try:
+                        check = local_resource_url(f.url, f.filename, "file")
+                    except ValueError as err:
+                        errobj = {
+                            "error_type": "check_read_files_exist",
+                            "error_message": str(err),
+                            "error_object": "file",
+                        }
+                        errors.append(errobj)
+                        idx += 1
+                        continue
                     if spec_base and not Path(check).is_absolute():
                         check = str((spec_base / check).resolve())
                     if not path.exists(check):

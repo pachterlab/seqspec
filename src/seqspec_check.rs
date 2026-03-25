@@ -359,7 +359,19 @@ fn check_onlist_files_exist(
         match ol.urltype.as_str() {
             "local" => {
                 let mut candidates: Vec<PathBuf> = Vec::new();
-                let locator = utils::local_onlist_locator(&ol);
+                let locator = match utils::local_onlist_locator(&ol) {
+                    Ok(locator) => locator,
+                    Err(err) => {
+                        push_error(
+                            &mut errors,
+                            &mut idx,
+                            "check_onlist_files_exist",
+                            err,
+                            "onlist",
+                        );
+                        continue;
+                    }
+                };
                 let p = PathBuf::from(locator);
                 candidates.push(if let Some(base) = spec_base {
                     if p.is_absolute() {
@@ -439,7 +451,20 @@ fn check_read_files_exist(
         for f in &read.files {
             match f.urltype.as_str() {
                 "local" => {
-                    let p = PathBuf::from(&f.url);
+                    let locator = match utils::local_resource_url(&f.url, &f.filename, "file") {
+                        Ok(locator) => locator,
+                        Err(err) => {
+                            push_error(
+                                &mut errors,
+                                &mut idx,
+                                "check_read_files_exist",
+                                err,
+                                "file",
+                            );
+                            continue;
+                        }
+                    };
+                    let p = PathBuf::from(locator);
                     let full = if let Some(base) = spec_base {
                         if p.is_absolute() {
                             p.clone()
@@ -991,6 +1016,40 @@ mod tests {
                 .all(|diagnostic| diagnostic.error_type != "check_onlist_files_exist"),
             "changing the display filename should not trigger an onlist existence error"
         );
+    }
+
+    #[test]
+    fn test_check_onlist_files_exist_errors_when_local_url_is_empty() {
+        let spec_path = PathBuf::from("tests/fixtures/onlist_read_clip/spec.yaml");
+        let mut spec = load_spec(&spec_path);
+        let barcode_region = spec
+            .library_spec
+            .get_mut(0)
+            .unwrap()
+            .regions
+            .iter_mut()
+            .find(|region| region.region_id == "barcode_a")
+            .unwrap();
+        barcode_region.onlist.as_mut().unwrap().url.clear();
+
+        let diagnostics = seqspec_check(&spec, None, &spec_path);
+        assert!(diagnostics.iter().any(|diagnostic| {
+            diagnostic.error_type == "check_onlist_files_exist"
+                && diagnostic.error_message == "local onlist 'barcode_a.txt' has empty url"
+        }));
+    }
+
+    #[test]
+    fn test_check_read_files_exist_errors_when_local_url_is_empty() {
+        let spec_path = PathBuf::from("tests/fixtures/onlist_read_clip/spec.yaml");
+        let mut spec = load_spec(&spec_path);
+        spec.sequence_spec[0].files[0].url.clear();
+
+        let diagnostics = seqspec_check(&spec, None, &spec_path);
+        assert!(diagnostics.iter().any(|diagnostic| {
+            diagnostic.error_type == "check_read_files_exist"
+                && diagnostic.error_message == "local file 'rna_read.fastq.gz' has empty url"
+        }));
     }
 
     #[test]

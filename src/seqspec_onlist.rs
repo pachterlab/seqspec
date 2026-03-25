@@ -181,7 +181,10 @@ fn get_onlist_urls(onlists: &Vec<Onlist>, base_path: &Path) -> Vec<UrlInfo> {
     for ol in onlists {
         let url = if ol.urltype == "local" {
             base_path
-                .join(utils::local_onlist_locator(ol))
+                .join(utils::local_onlist_locator(ol).unwrap_or_else(|err| {
+                    eprintln!("{}", err);
+                    std::process::exit(1);
+                }))
                 .to_string_lossy()
                 .to_string()
         } else {
@@ -205,7 +208,10 @@ fn download_onlists_to_path(
     let mut out = Vec::new();
     for ol in onlists {
         if ol.urltype == "local" {
-            let local = base_path.join(utils::local_onlist_locator(ol));
+            let local = base_path.join(utils::local_onlist_locator(ol).unwrap_or_else(|err| {
+                eprintln!("{}", err);
+                std::process::exit(1);
+            }));
             out.push(PathInfo {
                 url: local.to_string_lossy().to_string(),
             });
@@ -242,8 +248,11 @@ fn join_onlists_and_save(
     let mut contents: Vec<Vec<String>> = Vec::new();
     for ol in onlists {
         let content = if ol.urltype == "local" {
-            utils::read_local_list(&base_path.join(utils::local_onlist_locator(ol)))
-                .unwrap_or_default()
+            let locator = utils::local_onlist_locator(ol).unwrap_or_else(|err| {
+                eprintln!("{}", err);
+                std::process::exit(1);
+            });
+            utils::read_local_list(&base_path.join(locator)).unwrap_or_default()
         } else {
             utils::read_remote_list(&ol.url, remote_access).unwrap_or_default()
         };

@@ -503,8 +503,14 @@ def yield_onlist_contents(stream):
         yield line.strip().split()[0]
 
 
+def local_resource_url(url: str, filename: str, resource: str) -> str:
+    if not url:
+        raise ValueError(f"local {resource} '{filename}' has empty url")
+    return str(url)
+
+
 def local_onlist_locator(onlist: Onlist) -> str:
-    return str(onlist.url or onlist.filename)
+    return local_resource_url(onlist.url, onlist.filename, "onlist")
 
 
 def read_local_list(onlist: Onlist, base_path: str = "") -> List[str]:

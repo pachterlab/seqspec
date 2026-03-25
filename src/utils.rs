@@ -61,12 +61,20 @@ pub fn load_spec(spec: &std::path::PathBuf) -> Assay {
     spec.into_assay()
 }
 
-pub fn local_onlist_locator(onlist: &Onlist) -> &str {
-    if onlist.url.is_empty() {
-        &onlist.filename
+pub fn local_resource_url<'a>(
+    url: &'a str,
+    filename: &str,
+    resource: &str,
+) -> Result<&'a str, String> {
+    if url.is_empty() {
+        Err(format!("local {} '{}' has empty url", resource, filename))
     } else {
-        &onlist.url
+        Ok(url)
     }
+}
+
+pub fn local_onlist_locator(onlist: &Onlist) -> Result<&str, String> {
+    local_resource_url(&onlist.url, &onlist.filename, "onlist")
 }
 
 /// Read a local text file into Vec<String>, handling optional .gz
@@ -483,11 +491,14 @@ mod tests {
             String::new(),
         );
 
-        assert_eq!(local_onlist_locator(&onlist), "nested/whitelist.txt");
+        assert_eq!(
+            local_onlist_locator(&onlist).unwrap(),
+            "nested/whitelist.txt"
+        );
     }
 
     #[test]
-    fn test_local_onlist_locator_falls_back_to_filename() {
+    fn test_local_onlist_locator_errors_when_url_is_empty() {
         let onlist = Onlist::new(
             "ol1".into(),
             "display.txt".into(),
@@ -498,6 +509,17 @@ mod tests {
             String::new(),
         );
 
-        assert_eq!(local_onlist_locator(&onlist), "display.txt");
+        assert_eq!(
+            local_onlist_locator(&onlist).unwrap_err(),
+            "local onlist 'display.txt' has empty url"
+        );
+    }
+
+    #[test]
+    fn test_local_resource_url_errors_when_url_is_empty() {
+        assert_eq!(
+            local_resource_url("", "display.fastq.gz", "file").unwrap_err(),
+            "local file 'display.fastq.gz' has empty url"
+        );
     }
 }
