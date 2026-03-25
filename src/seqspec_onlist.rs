@@ -51,7 +51,11 @@ pub fn run_onlist(args: &OnlistArgs) {
         std::process::exit(1);
     });
 
-    let onlists = get_onlists(&spec, &args.modality, &args.selector, args.id.as_deref());
+    let onlists = get_onlists(&spec, &args.modality, &args.selector, args.id.as_deref())
+        .unwrap_or_else(|err| {
+            eprintln!("{}", err);
+            std::process::exit(1);
+        });
     if onlists.is_empty() {
         println!("No onlists found");
         return;
@@ -88,10 +92,16 @@ fn validate_onlist_args(args: &OnlistArgs) {
     }
 }
 
-fn get_onlists(spec: &Assay, modality: &str, selector: &str, id: Option<&str>) -> Vec<Onlist> {
+fn get_onlists(
+    spec: &Assay,
+    modality: &str,
+    selector: &str,
+    id: Option<&str>,
+) -> Result<Vec<Onlist>, String> {
     match selector {
         "region-type" => {
             let mut out: Vec<Onlist> = Vec::new();
+            let mut matches_by_read: Vec<(String, Vec<Onlist>)> = Vec::new();
             for rd in spec.get_seqspec(modality) {
                 if let Ok((_read, rgns)) =
                     utils::map_read_id_to_regions(spec, modality, &rd.read_id)
@@ -105,9 +115,25 @@ fn get_onlists(spec: &Assay, modality: &str, selector: &str, id: Option<&str>) -
                         }
                     }
                     if !ordered.is_empty() {
-                        return ordered;
+                        matches_by_read.push((rd.read_id.clone(), ordered));
                     }
                 }
+            }
+            if matches_by_read.len() == 1 {
+                return Ok(matches_by_read.remove(0).1);
+            }
+            if matches_by_read.len() > 1 {
+                let read_ids = matches_by_read
+                    .iter()
+                    .map(|(read_id, _)| read_id.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                return Err(format!(
+                    "region-type '{}' matches regions in multiple reads for modality '{}': {}. Use -s read or -s region to disambiguate.",
+                    id.unwrap_or(""),
+                    modality,
+                    read_ids
+                ));
             }
             let regions = find_by_region_type(spec, modality, id.unwrap_or(""));
             for r in regions {
@@ -115,7 +141,7 @@ fn get_onlists(spec: &Assay, modality: &str, selector: &str, id: Option<&str>) -
                     out.push(ol);
                 }
             }
-            out
+            Ok(out)
         }
         "region" => {
             let mut out: Vec<Onlist> = Vec::new();
@@ -125,7 +151,7 @@ fn get_onlists(spec: &Assay, modality: &str, selector: &str, id: Option<&str>) -
                     out.push(ol);
                 }
             }
-            out
+            Ok(out)
         }
         "read" => {
             let (_read, rgns) = utils::map_read_id_to_regions(spec, modality, id.unwrap_or(""))
@@ -150,9 +176,9 @@ fn get_onlists(spec: &Assay, modality: &str, selector: &str, id: Option<&str>) -
                     out.push(ol);
                 }
             }
-            out
+            Ok(out)
         }
-        _ => Vec::new(),
+        _ => Ok(Vec::new()),
     }
 }
 
@@ -351,17 +377,18 @@ mod tests {
     }
 
     #[test]
-    fn test_get_onlists_by_region_type() {
+    fn test_get_onlists_by_region_type_errors_when_matches_span_reads() {
         let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
-        let onlists = get_onlists(&spec, "rna", "region-type", Some("barcode"));
-        assert_eq!(onlists.len(), 1);
-        assert_eq!(onlists[0].filename, "RNA-737K-arc-v1.txt");
+        let err = get_onlists(&spec, "rna", "region-type", Some("barcode")).unwrap_err();
+        assert!(err.contains("matches regions in multiple reads"));
+        assert!(err.contains("rna_R1"));
+        assert!(err.contains("rna_R2"));
     }
 
     #[test]
     fn test_get_onlists_by_region() {
         let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
-        let onlists = get_onlists(&spec, "rna", "region", Some("rna_cell_bc"));
+        let onlists = get_onlists(&spec, "rna", "region", Some("rna_cell_bc")).unwrap();
         assert_eq!(onlists.len(), 1);
         assert_eq!(onlists[0].filename, "RNA-737K-arc-v1.txt");
     }
@@ -372,7 +399,7 @@ mod tests {
         let rna_reads = spec.get_seqspec("rna");
         assert_eq!(rna_reads.len(), 2);
         // rna_R1 maps to regions including rna_cell_bc which has an onlist
-        let onlists = get_onlists(&spec, "rna", "read", Some(&rna_reads[0].read_id));
+        let onlists = get_onlists(&spec, "rna", "read", Some(&rna_reads[0].read_id)).unwrap();
         assert_eq!(onlists.len(), 1);
         assert_eq!(onlists[0].filename, "RNA-737K-arc-v1.txt");
     }
@@ -380,7 +407,31 @@ mod tests {
     #[test]
     fn test_get_onlists_empty_modality() {
         let spec = crate::utils::load_spec(&std::path::PathBuf::from("tests/fixtures/spec.yaml"));
-        let onlists = get_onlists(&spec, "rna", "region-type", Some("nonexistent_type"));
+        let onlists = get_onlists(&spec, "rna", "region-type", Some("nonexistent_type")).unwrap();
         assert!(onlists.is_empty());
+    }
+
+    #[test]
+    fn test_get_onlists_region_type_uses_read_order_when_unique() {
+        let spec = crate::utils::load_spec(&std::path::PathBuf::from(
+            "tests/fixtures/onlist_issue_68/spec.yaml",
+        ));
+        let onlists = get_onlists(&spec, "rna", "region-type", Some("barcode")).unwrap();
+        let file_ids = onlists
+            .iter()
+            .map(|onlist| onlist.file_id.as_str())
+            .collect::<Vec<_>>();
+        assert_eq!(file_ids, vec!["barcode_b.txt", "barcode_a.txt"]);
+    }
+
+    #[test]
+    fn test_get_onlists_region_type_errors_when_matches_span_multiple_reads() {
+        let spec = crate::utils::load_spec(&std::path::PathBuf::from(
+            "tests/fixtures/onlist_ambiguous_region_type/spec.yaml",
+        ));
+        let err = get_onlists(&spec, "rna", "region-type", Some("barcode")).unwrap_err();
+        assert!(err.contains("matches regions in multiple reads"));
+        assert!(err.contains("rna_read_1"));
+        assert!(err.contains("rna_read_2"));
     }
 }

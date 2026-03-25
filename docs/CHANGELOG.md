@@ -7,23 +7,27 @@ authors:
 
 # Changelog
 
-## [0.X.X] - XXXX-XX-XX
+## [0.4.1] - Unreleased
 
 ### Added
 
-- Implemented core data objects in Rust using PyO3 for improved performance and safety.
-- Added extensive tests to ensure full parity between Python and Rust implementations.
+- `seqspec auth` in Python and Rust with `init`, `path`, `list`, and `resolve` subcommands.
+- `seqspec print -f seqspec-html`, a self-contained HTML view that shows the library molecule, reads, and nested region metadata.
+- Additional parity tests for Python and Rust command behavior.
 
 ### Changed
 
-- Switched build system in `pyproject.toml` to use `maturin` for Rust extension integration.
-- Updated packaging and development workflow to support Rust-backed modules.
+- `seqspec upgrade` now upgrades `0.3.0` specs to `0.4.0` in both implementations.
+- Python and Rust now share the same core command surface for `auth`, `check`, `find`, `file`, `format`, `index`, `info`, `init`, `insert`, `methods`, `modify`, `onlist`, `print`, `split`, `upgrade`, and `version`.
+- `seqspec build` is deprecated in both CLIs and remains as a compatibility stub.
+- Older specs are loaded more permissively before upgrade, which makes `0.2.x` and `0.3.x` specs easier to normalize.
+- `seqspec onlist -s region-type` now errors when matches span multiple reads in a modality. Use `-s read` or `-s region` to disambiguate.
 
-### Removed
+### Fixed
 
-- Removed `to_dict` and `update_from` attributes from all objects; refactored related tests and class structures.
-
-#### Breaking changes
+- Rust `load_spec` now reads gzipped seqspec YAML.
+- Python `seqspec check` and `seqspec onlist` can use auth profiles for remote resources.
+- Python local gzipped onlist validation now detects `.gz` files correctly.
 
 ## [0.4.0] - 2025-08-24
 

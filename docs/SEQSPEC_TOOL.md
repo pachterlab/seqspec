@@ -22,14 +22,15 @@ The `seqspec` specification is detailed in [here](SEQSPEC_FILE.md). Please revie
 ```
 usage: seqspec [-h] <CMD> ...
 
-seqspec 0.3.0: A machine-readable file format for genomic library sequence and structure.
+seqspec 0.4.0: A machine-readable file format for genomic library sequence and structure.
 
 GitHub: https://github.com/pachterlab/seqspec
 Documentation: https://pachterlab.github.io/seqspec/
 
 positional arguments:
   <CMD>
-    build     Generate a complete seqspec with natural language (LLM-assisted)
+    auth      Manage remote authentication profiles
+    build     Deprecated. This command will be removed.
     check     Validate seqspec file against specification
     find      Find objects in seqspec file
     file      List files present in seqspec file
@@ -52,27 +53,73 @@ optional arguments:
 
 `seqspec` operates on `seqspec` compatible YAML files that follow the specification. All of the following examples will use the `seqspec` specification for the [DOGMAseq-DIG](https://doi.org/10.1186/s13059-022-02698-8) assay which can be found here: `seqspec/examples/specs/dogmaseq-dig/spec.yaml`.
 
+Any command that takes `yaml` also accepts gzipped specs such as `spec.yaml.gz`.
+
+The `build` command is deprecated. Use `seqspec init`, `seqspec insert`, and `seqspec modify` instead.
+
 :::{attention}
 **IMPORTANT**: Many `seqspec` commands require that the specification be properly formatted and error-corrected. Errors in the spec can be found with `seqspec check` (see below for instructions). The spec can be properly formatted (or "filled in") with `seqspec format`. It is recommended to run `seqspec format` followed by `seqspec check` after writing a new `seqspec` (or correcting errors in an existing one).
 :::
+
+## `seqspec auth`: Manage remote authentication profiles
+
+Use auth profiles when a spec points to protected remote files such as IGVF-hosted onlists or FASTQs.
+
+```bash
+seqspec auth <AUTH_CMD> ...
+```
+
+`seqspec auth` has four subcommands:
+
+- `init`: create or update a profile that maps one or more hosts to credential environment variables
+- `path`: show where the auth config file lives
+- `list`: list configured profiles
+- `resolve`: show which profile would be used for a given URL
+
+The auth config is host-based. The profile stores environment variable names, not secrets.
+
+### Examples
+
+```bash
+# create an IGVF profile
+seqspec auth init \
+  --profile igvf \
+  --host api.data.igvf.org \
+  --host data.igvf.org \
+  --kind basic \
+  --username-env IGVF_ACCESS_KEY_ID \
+  --password-env IGVF_ACCESS_KEY_SECRET
+
+# inspect the config path
+seqspec auth path
+
+# list configured profiles
+seqspec auth list
+
+# resolve a URL to a profile
+seqspec auth resolve https://api.data.igvf.org/reference-files/IGVFFI5429KKCK/
+```
 
 ## `seqspec check`: Validate seqspec file against specification
 
 Check that the `seqspec` file is correctly formatted and consistent with the [specification](https://github.com/IGVF/seqspec/blob/main/docs/SPECIFICATION.md).
 
 ```bash
-seqspec check [-h] [-o OUT] [--skip {igvf,igvf_onlist_skip}] yaml
+seqspec check [-h] [-o OUT] [--skip {igvf,igvf_onlist_skip}] [--auth-profile PROFILE] yaml
 ```
 
 ```python
-from seqspec.seqspec_check import run_check
+from seqspec.seqspec_check import seqspec_check
+from seqspec.utils import load_spec
 
-run_check(schema_fn: str, spec_fn: str, o: str)
+spec = load_spec("spec.yaml", strict=False)
+seqspec_check(spec, filter_type=None, auth_profile=None)
 ```
 
 - optionally, `-o OUT` can be used to write the output to a file.
 - optionally, `--skip {igvf,igvf_onlist_skip}` can filter out known IGVF-specific warnings (see source for list).
-- `yaml` corresponds to the `seqspec` file.
+- optionally, `--auth-profile PROFILE` uses a named auth profile when checking remote files.
+- `yaml` corresponds to the `seqspec` file and may be plain YAML or `.yaml.gz`.
 
 A list of checks performed:
 
@@ -138,6 +185,9 @@ Below are a list of example errors one may encounter when checking a spec:
 $ seqspec check spec.yaml
 [error 1] None is not of type 'string' in spec['assay']
 [error 2] 'Ribonucleic acid' is not one of ['rna', 'tag', 'protein', 'atac', 'crispr'] in spec['modalities'][0]
+
+# check a spec with protected remote resources
+$ seqspec check --auth-profile igvf spec.yaml
 ```
 
 ## `seqspec find`: Find objects in seqspec file
@@ -556,13 +606,15 @@ $ seqspec modify -m atac -o mod_spec.yaml -i atac_R1 --files "R1_1.fastq.gz,fast
 ## `seqspec onlist`: Get onlist file(s) for elements in seqspec file
 
 ```bash
-seqspec onlist [-h] [-o OUT] [-s SELECTOR] [-f {product,multi}] -m MODALITY [-i ID] yaml
+seqspec onlist [-h] [-o OUT] [-s SELECTOR] [-f {product,multi}] [--auth-profile PROFILE] -m MODALITY [-i ID] yaml
 ```
 
 ```python
-from seqspec.seqspec_onlist import run_onlist
+from seqspec.seqspec_onlist import get_onlists
+from seqspec.utils import load_spec
 
-run_onlist(spec_fn, modality, ids, idtype, fmt, o)
+spec = load_spec("spec.yaml")
+get_onlists(spec, modality="rna", selector="region-type", id="barcode")
 ```
 
 - optionally, `-o OUT` when set with `-f`, writes the joined onlist to this file; when set without `-f`, downloads remote onlists locally and prints paths.
@@ -575,9 +627,10 @@ run_onlist(spec_fn, modality, ids, idtype, fmt, o)
 - `-f` selects how to combine multiple onlists:
   - `product` (cartesian product)
   - `multi` (row-aligned, zip with padding)
-- `yaml` corresponds to the `seqspec` file.
+- optionally, `--auth-profile PROFILE` uses a named auth profile for protected remote onlists.
+- `yaml` corresponds to the `seqspec` file and may be plain YAML or `.yaml.gz`.
 
-_Note_: If, for example, there are multiple regions with the specified `region_type` in the modality (e.g. multiple barcodes), then `seqspec onlist` will return a path to an onlist that it generates where the entries in that onlist are the cartesian product of the onlists for all of the regions found.
+_Note_: `-s region-type` is only valid when the matching regions come from one read geometry. If the same `region_type` appears across multiple reads in the modality, `seqspec onlist` errors and asks you to use `-s read` or `-s region` instead.
 
 ### Examples
 
@@ -589,6 +642,14 @@ $ seqspec onlist -m rna -s read -i rna_R1 spec.yaml
 # Get onlist for barcode region type
 $ seqspec onlist -m rna -s region-type -i barcode spec.yaml
 /path/to/spec/folder/RNA-737K-arc-v1.txt
+
+# Ambiguous region-type matches across reads are rejected
+$ seqspec onlist -m rna -s region-type -i barcode ambiguous_spec.yaml
+region-type 'barcode' matches regions in multiple reads for modality 'rna': rna_R1, rna_R2. Use -s read or -s region to disambiguate.
+
+# Get an onlist from a protected remote source
+$ seqspec onlist --auth-profile igvf -m crispr -s region-type -i barcode spec.yaml
+/path/to/spec/folder/IGVFFI5429KKCK.txt.gz
 ```
 
 ## `seqspec print`: Display the sequence and/or library structure from seqspec file
@@ -600,17 +661,21 @@ seqspec print [-h] [-o OUT] [-f FORMAT] yaml
 ```
 
 ```python
-from seqspec.seqspec_print import run_seqspec_print
-run_seqspec_print(spec_fn, fmt, o)
+from seqspec.seqspec_print import seqspec_print
+from seqspec.utils import load_spec
+
+seqspec_print(load_spec("spec.yaml"), "seqspec-html")
 ```
 
 - optionally, `-o OUT` to set the path of printed file.
 - optionally, `-f FORMAT` is the format of the printed file. Can be one of:
   - `library-ascii`: prints an ascii tree of the library_spec
-  - `seqspec-html`: prints an html of both the library_spec and sequence_spec (TODO this is incomplete)
+  - `seqspec-html`: prints a self-contained interactive HTML view of the library structure, reads, and metadata
   - `seqspec-png`: prints a png summary of modality structures
   - `seqspec-ascii`: prints an ascii representation of both the library_spec and sequence_spec
-- `yaml` corresponds to the `seqspec` file.
+- `yaml` corresponds to the `seqspec` file and may be plain YAML or `.yaml.gz`.
+
+The Python CLI supports all four formats. The standalone Rust CLI supports `library-ascii`, `seqspec-ascii`, and `seqspec-html`.
 
 ### Examples
 
@@ -670,17 +735,7 @@ TGTGAGAAAGGGATGTGCTGCGAGAAGGCTAGAXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
 # Print the sequence and library structure as html
-$ seqspec print -f seqspec-html spec.yaml
-  <!DOCTYPE html>
-  <html>
-    <head>
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style>
-      highlight {
-      color: green;
-      }
-      ...
-      # long output omitted
+$ seqspec print -f seqspec-html -o spec.html spec.yaml
 
 # Print the library structure as a png
 $ seqspec print -o spec.png -f seqspec-png spec.yaml
@@ -720,38 +775,43 @@ seqspec version [-h] [-o OUT] yaml
 ```
 
 ```python
-from seqspec.seqspec_version import run_version
-run_version(spec_fn, o)
+from seqspec.seqspec_version import seqspec_version
+from seqspec.utils import load_spec
+
+seqspec_version(load_spec("spec.yaml"))
 ```
 
 - optionally, `-o OUT` path to file to write output.
-- `yaml` corresponds to the `seqspec` file.
+- `yaml` corresponds to the `seqspec` file and may be plain YAML or `.yaml.gz`.
 
 ### Examples
 
 ```bash
 # Get versions of tool and file
 $ seqspec version spec.yaml
-seqspec version: 0.3.0
-seqspec file version: 0.3.0
+seqspec version: 0.4.0
+seqspec file version: 0.4.0
 ```
 
 ## (HIDDEN) `seqspec upgrade`: Upgrade seqspec file from older versions to the current version
 
-This is a hidden subcommand that upgrades an old version of the spec to the current one. It is not intended to be used in a production environment.
+This is a hidden subcommand that upgrades an old version of the spec to the current one. It upgrades `0.0.x`, `0.1.x`, `0.2.0`, and `0.3.0` specs to `0.4.0`.
 
 ```bash
 seqspec upgrade [-h] [-o OUT] yaml
 ```
 
 ```python
-from seqspec.seqspec_upgrade import run_upgrade
-run_upgrade(spec_fn, o)
+from seqspec.seqspec_upgrade import seqspec_upgrade
+from seqspec.utils import load_spec
+
+spec = load_spec("spec.v0_3_0.yaml", strict=False)
+seqspec_upgrade(spec, spec.seqspec_version or "0.0.0")
 ```
 
 ### Examples
 
 ```bash
-# upgrade spec
-$ seqspec upgrade -o spec.yaml spec.yaml
+# upgrade a 0.3.0 spec to 0.4.0
+$ seqspec upgrade -o spec.v0_4_0.yaml spec.v0_3_0.yaml
 ```

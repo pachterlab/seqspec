@@ -1,5 +1,3 @@
-import os
-from argparse import ArgumentParser, Namespace
 from pathlib import Path
 from unittest.mock import patch
 
@@ -11,8 +9,8 @@ from seqspec.seqspec_onlist import (
     get_onlists,
     join_onlist_contents,
     join_onlists_and_save,
-    run_onlist,
 )
+from seqspec.utils import load_spec
 
 
 def test_get_onlists_region(dogmaseq_dig_spec):
@@ -22,12 +20,10 @@ def test_get_onlists_region(dogmaseq_dig_spec):
     assert onlists[0].file_id == "RNA-737K-arc-v1.txt"
 
 
-def test_get_onlists_region_type(dogmaseq_dig_spec):
-    """Test get_onlists with region-type selector"""
-    onlists = get_onlists(dogmaseq_dig_spec, "rna", "region-type", "barcode")
-    assert len(onlists) > 0
-    for onlist in onlists:
-        assert onlist is not None
+def test_get_onlists_region_type_raises_for_ambiguous_reads(dogmaseq_dig_spec):
+    """Test get_onlists with region-type selector when matches span reads."""
+    with pytest.raises(ValueError, match="matches regions in multiple reads"):
+        get_onlists(dogmaseq_dig_spec, "rna", "region-type", "barcode")
 
 
 def test_get_onlists_read(dogmaseq_dig_spec):
@@ -129,3 +125,43 @@ def test_join_onlists_and_save_threads_auth_profile(tmp_path):
     ]
     assert result_path == str(output_path)
     assert output_path.read_text().splitlines() == ["AAA", "CCC"]
+
+
+def test_product_onlist_matches_between_read_and_region_type_for_issue_68(tmp_path):
+    fixture_dir = Path("tests/fixtures/onlist_issue_68")
+    spec = load_spec(fixture_dir / "spec.yaml")
+
+    read_output = tmp_path / "read_product.txt"
+    region_type_output = tmp_path / "region_type_product.txt"
+
+    join_onlists_and_save(
+        get_onlists(spec, "rna", "read", "rna_read"),
+        "product",
+        read_output,
+        fixture_dir,
+    )
+    join_onlists_and_save(
+        get_onlists(spec, "rna", "region-type", "barcode"),
+        "product",
+        region_type_output,
+        fixture_dir,
+    )
+
+    read_lines = read_output.read_text().splitlines()
+    region_type_lines = region_type_output.read_text().splitlines()
+
+    assert read_lines == ["TTAA", "TTAC", "TGAA", "TGAC"]
+    assert region_type_lines == read_lines
+
+
+def test_get_onlists_region_type_uses_read_order_when_unique():
+    spec = load_spec("tests/fixtures/onlist_issue_68/spec.yaml")
+    onlists = get_onlists(spec, "rna", "region-type", "barcode")
+    assert [onlist.file_id for onlist in onlists] == ["barcode_b.txt", "barcode_a.txt"]
+
+
+def test_region_type_onlist_errors_when_matches_span_multiple_reads():
+    spec = load_spec("tests/fixtures/onlist_ambiguous_region_type/spec.yaml")
+
+    with pytest.raises(ValueError, match="matches regions in multiple reads"):
+        get_onlists(spec, "rna", "region-type", "barcode")

@@ -155,6 +155,7 @@ def get_onlists(spec: Assay, modality: str, selector: str, id: str) -> List[Onli
     if selector == "region-type":
         # Prefer ordering by read orientation when possible to ensure
         # consistency with the `read` selector behavior.
+        matches_by_read: List[tuple[str, List[Onlist]]] = []
         reads: List[Read] = spec.get_seqspec(modality)
         for rd in reads:
             try:
@@ -168,7 +169,15 @@ def get_onlists(spec: Assay, modality: str, selector: str, id: str) -> List[Onli
                     if ol:
                         ordered_onlists.append(ol)
             if ordered_onlists:
-                return ordered_onlists
+                matches_by_read.append((rd.read_id, ordered_onlists))
+
+        if len(matches_by_read) == 1:
+            return matches_by_read[0][1]
+        if len(matches_by_read) > 1:
+            read_ids = ", ".join(read_id for read_id, _ in matches_by_read)
+            raise ValueError(
+                f"region-type '{id}' matches regions in multiple reads for modality '{modality}': {read_ids}. Use -s read or -s region to disambiguate."
+            )
 
         # Fallback: original region-type traversal order
         regions = find_by_region_type(spec, modality, id)
