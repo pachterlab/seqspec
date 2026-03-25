@@ -22,7 +22,7 @@ use seqspec::utils;
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
-#[clap(name = "seqspec", version = "0.X.0", author = "Your Name")]
+#[command(name = "seqspec", version)]
 struct Args {
     #[command(subcommand)]
     subcmd: Commands,

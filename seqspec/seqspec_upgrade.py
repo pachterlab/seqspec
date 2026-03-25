@@ -52,8 +52,8 @@ def run_upgrade(parser: ArgumentParser, args: Namespace) -> None:
     """Run the upgrade command."""
     validate_upgrade_args(parser, args)
 
-    spec = load_spec(args.yaml)
-    version = spec.seqspec_version
+    spec = load_spec(args.yaml, strict=False)
+    version = spec.seqspec_version or "0.0.0"
     upgraded_spec = seqspec_upgrade(spec, version)
 
     if args.output:
@@ -65,11 +65,12 @@ def run_upgrade(parser: ArgumentParser, args: Namespace) -> None:
 def seqspec_upgrade(spec: Assay, version: str) -> Assay:
     """Upgrade spec to current version."""
     UPGRADE = {
-        "0.0.0": upgrade_0_0_0_to_0_3_0,
-        "0.1.0": upgrade_0_1_0_to_0_3_0,
-        "0.1.1": upgrade_0_1_1_to_0_3_0,
-        "0.2.0": upgrade_0_2_0_to_0_3_0,
-        "0.3.0": upgrade_0_3_0_to_0_3_0,
+        "0.0.0": upgrade_0_0_0_to_0_4_0,
+        "0.1.0": upgrade_0_1_0_to_0_4_0,
+        "0.1.1": upgrade_0_1_1_to_0_4_0,
+        "0.2.0": upgrade_0_2_0_to_0_4_0,
+        "0.3.0": upgrade_0_3_0_to_0_4_0,
+        "0.4.0": upgrade_0_4_0_to_0_4_0,
     }
 
     if version not in UPGRADE:
@@ -80,13 +81,19 @@ def seqspec_upgrade(spec: Assay, version: str) -> Assay:
     return UPGRADE[version](spec)
 
 
-def upgrade_0_3_0_to_0_3_0(spec: Assay) -> Assay:
+def upgrade_0_4_0_to_0_4_0(spec: Assay) -> Assay:
     """No upgrade needed for current version."""
     return spec
 
 
-def upgrade_0_2_0_to_0_3_0(spec: Assay) -> Assay:
-    """Upgrade spec from version 0.2.0 to 0.3.0."""
+def upgrade_0_3_0_to_0_4_0(spec: Assay) -> Assay:
+    """Upgrade spec from version 0.3.0 to 0.4.0."""
+    spec.seqspec_version = "0.4.0"
+    return spec
+
+
+def upgrade_0_2_0_to_0_4_0(spec: Assay) -> Assay:
+    """Upgrade spec from version 0.2.0 to 0.4.0."""
     # Set files to empty for specs < v0.3.0
     for r in spec.sequence_spec:
         r.set_files(
@@ -117,21 +124,21 @@ def upgrade_0_2_0_to_0_3_0(spec: Assay) -> Assay:
                     url="",
                     urltype="",
                     md5=md5,
-                )
+                    )
     spec.seqspec_version = "0.3.0"
-    return spec
+    return upgrade_0_3_0_to_0_4_0(spec)
 
 
-def upgrade_0_1_1_to_0_3_0(spec: Assay) -> Assay:
-    """Upgrade spec from version 0.1.1 to 0.3.0."""
-    return upgrade_0_2_0_to_0_3_0(spec)
+def upgrade_0_1_1_to_0_4_0(spec: Assay) -> Assay:
+    """Upgrade spec from version 0.1.1 to 0.4.0."""
+    return upgrade_0_2_0_to_0_4_0(spec)
 
 
-def upgrade_0_1_0_to_0_3_0(spec: Assay) -> Assay:
-    """Upgrade spec from version 0.1.0 to 0.3.0."""
-    return upgrade_0_2_0_to_0_3_0(spec)
+def upgrade_0_1_0_to_0_4_0(spec: Assay) -> Assay:
+    """Upgrade spec from version 0.1.0 to 0.4.0."""
+    return upgrade_0_2_0_to_0_4_0(spec)
 
 
-def upgrade_0_0_0_to_0_3_0(spec: Assay) -> Assay:
-    """Upgrade spec from version 0.0.0 to 0.3.0."""
-    return upgrade_0_2_0_to_0_3_0(spec)
+def upgrade_0_0_0_to_0_4_0(spec: Assay) -> Assay:
+    """Upgrade spec from version 0.0.0 to 0.4.0."""
+    return upgrade_0_2_0_to_0_4_0(spec)
