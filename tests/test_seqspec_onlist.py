@@ -32,6 +32,13 @@ def test_get_onlists_read(dogmaseq_dig_spec):
     assert len(onlists) == 1
 
 
+def test_get_onlists_read_respects_read_window():
+    spec = load_spec("tests/fixtures/onlist_read_clip/spec.yaml")
+    onlists = get_onlists(spec, "rna", "read", "rna_read")
+
+    assert [onlist.file_id for onlist in onlists] == ["barcode_a.txt"]
+
+
 def test_join_onlist_contents_product():
     """Test joining onlists with product format"""
     contents = [["A", "B"], ["1", "2"]]

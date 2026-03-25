@@ -143,6 +143,24 @@ def test_read_update_read_by_id_partial():
     assert read.max_len == 150  # Unchanged
     assert read.strand == "pos"  # Unchanged
 
+
+def test_read_update_read_by_id_accepts_zero_and_empty_values():
+    read = Read(
+        read_id="test_read",
+        name="Test Read",
+        modality="RNA",
+        primer_id="test_primer",
+        min_len=100,
+        max_len=150,
+        strand="pos",
+    )
+
+    read.update_read_by_id(name="", min_len=0, max_len=0)
+
+    assert read.name == ""
+    assert read.min_len == 0
+    assert read.max_len == 0
+
 def test_read_get_read_by_file_id():
     """Test getting read by file ID."""
     file1 = File(

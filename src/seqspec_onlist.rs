@@ -1,7 +1,6 @@
 use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::onlist::Onlist;
-use crate::models::read::Read;
 use crate::seqspec_find::{find_by_region_id, find_by_region_type};
 use crate::utils;
 use clap::Args;
@@ -151,28 +150,19 @@ fn get_onlists(
                     out.push(ol);
                 }
             }
+            if out.is_empty() {
+                return Err(format!("No onlist found for region {}", id.unwrap_or("")));
+            }
             Ok(out)
         }
         "read" => {
-            let (_read, rgns) = utils::map_read_id_to_regions(spec, modality, id.unwrap_or(""))
-                .unwrap_or_else(|_| {
-                    (
-                        Read {
-                            read_id: String::new(),
-                            name: String::new(),
-                            modality: String::new(),
-                            primer_id: String::new(),
-                            min_len: 0,
-                            max_len: 0,
-                            strand: "pos".to_string(),
-                            files: vec![],
-                        },
-                        vec![],
-                    )
-                });
+            let (read, rgns) = utils::map_read_id_to_regions(spec, modality, id.unwrap_or(""))
+                .map_err(|err| err.to_string())?;
+            let region_coordinates = utils::project_regions_to_coordinates(rgns);
+            let clipped = utils::itx_read(region_coordinates, 0, read.max_len);
             let mut out: Vec<Onlist> = Vec::new();
-            for r in rgns {
-                if let Some(ol) = r.get_onlist() {
+            for rc in clipped {
+                if let Some(ol) = rc.region.get_onlist() {
                     out.push(ol);
                 }
             }
@@ -249,7 +239,7 @@ fn join_onlists_and_save(
     let mut contents: Vec<Vec<String>> = Vec::new();
     for ol in onlists {
         let content = if ol.urltype == "local" {
-            utils::read_local_list(&base_path.join(&ol.url)).unwrap_or_default()
+            utils::read_local_list(&base_path.join(&ol.filename)).unwrap_or_default()
         } else {
             utils::read_remote_list(&ol.url, remote_access).unwrap_or_default()
         };
@@ -402,6 +392,19 @@ mod tests {
         let onlists = get_onlists(&spec, "rna", "read", Some(&rna_reads[0].read_id)).unwrap();
         assert_eq!(onlists.len(), 1);
         assert_eq!(onlists[0].filename, "RNA-737K-arc-v1.txt");
+    }
+
+    #[test]
+    fn test_get_onlists_by_read_respects_read_window() {
+        let spec = crate::utils::load_spec(&std::path::PathBuf::from(
+            "tests/fixtures/onlist_read_clip/spec.yaml",
+        ));
+        let onlists = get_onlists(&spec, "rna", "read", Some("rna_read")).unwrap();
+        let file_ids = onlists
+            .iter()
+            .map(|onlist| onlist.file_id.as_str())
+            .collect::<Vec<_>>();
+        assert_eq!(file_ids, vec!["barcode_a.txt"]);
     }
 
     #[test]

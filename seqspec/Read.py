@@ -37,21 +37,21 @@ class Read(BaseModel):
         strand=None,
         files=None,
     ):
-        if read_id:
+        if read_id is not None:
             self.read_id = read_id
-        if name:
+        if name is not None:
             self.name = name
-        if modality:
+        if modality is not None:
             self.modality = modality
-        if primer_id:
+        if primer_id is not None:
             self.primer_id = primer_id
-        if min_len:
+        if min_len is not None:
             self.min_len = min_len
-        if max_len:
+        if max_len is not None:
             self.max_len = max_len
-        if strand:
+        if strand is not None:
             self.strand = strand
-        if files:
+        if files is not None:
             self.files = files
 
     def get_read_by_file_id(self, file_id: str):

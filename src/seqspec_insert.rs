@@ -63,11 +63,19 @@ pub fn run_insert(args: &InsertArgs) {
     match args.selector.as_str() {
         "read" => {
             let reads = load_reads_from_value(&payload, &args.modality);
-            spec = seqspec_insert_reads(spec, &args.modality, reads, args.after.as_deref());
+            spec = seqspec_insert_reads(spec, &args.modality, reads, args.after.as_deref())
+                .unwrap_or_else(|err| {
+                    eprintln!("{err}");
+                    std::process::exit(1);
+                });
         }
         "region" => {
             let regions = load_regions_from_value(&payload);
-            spec = seqspec_insert_regions(spec, &args.modality, regions, args.after.as_deref());
+            spec = seqspec_insert_regions(spec, &args.modality, regions, args.after.as_deref())
+                .unwrap_or_else(|err| {
+                    eprintln!("{err}");
+                    std::process::exit(1);
+                });
         }
         _ => {}
     }
@@ -94,8 +102,14 @@ fn validate_insert_args(args: &InsertArgs) {
 }
 
 fn parse_resource(resource: &str) -> Value {
-    // For simplicity, treat resource as inline JSON string (Python parity currently)
-    serde_json::from_str(resource).expect("--resource must be a JSON array or object")
+    let payload = match PathBuf::from(resource) {
+        path if path.exists() => fs::read_to_string(path).expect("failed to read --resource file"),
+        _ => resource.to_string(),
+    };
+
+    serde_json::from_str(&payload)
+        .or_else(|_| serde_yaml::from_str(&payload))
+        .expect("--resource must be inline JSON/YAML or a JSON/YAML file")
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -197,9 +211,14 @@ impl RegionInput {
 }
 
 fn load_reads_from_value(val: &Value, modality: &str) -> Vec<Read> {
-    let arr = val
-        .as_array()
-        .expect("--resource JSON must be an array of reads");
+    let arr = match val {
+        Value::Array(items) => items,
+        Value::Object(map) => map
+            .get("reads")
+            .and_then(Value::as_array)
+            .expect("--resource must be an array of reads or a mapping with key 'reads'"),
+        _ => panic!("--resource must be an array of reads or a mapping with key 'reads'"),
+    };
     let mut out: Vec<Read> = Vec::new();
     for item in arr {
         let ri: ReadInput = serde_json::from_value(item.clone()).expect("Invalid read object");
@@ -211,9 +230,16 @@ fn load_reads_from_value(val: &Value, modality: &str) -> Vec<Read> {
 }
 
 fn load_regions_from_value(val: &Value) -> Vec<Region> {
-    let arr = val
-        .as_array()
-        .expect("--resource JSON must be an array of regions");
+    let arr = match val {
+        Value::Array(items) => items,
+        Value::Object(map) => map
+            .get("regions")
+            .and_then(Value::as_array)
+            .expect("--resource must be an array of regions or a mapping with key 'regions'"),
+        _ => {
+            panic!("--resource must be an array of regions or a mapping with key 'regions'")
+        }
+    };
     let mut out: Vec<Region> = Vec::new();
     for item in arr {
         let ri: RegionInput = serde_json::from_value(item.clone()).expect("Invalid region object");
@@ -229,9 +255,9 @@ pub fn seqspec_insert_reads(
     modality: &str,
     reads: Vec<Read>,
     after: Option<&str>,
-) -> Assay {
-    let _ = spec.insert_reads(reads, modality, after);
-    spec
+) -> Result<Assay, String> {
+    spec.insert_reads(reads, modality, after)?;
+    Ok(spec)
 }
 
 pub fn seqspec_insert_regions(
@@ -239,9 +265,9 @@ pub fn seqspec_insert_regions(
     modality: &str,
     regions: Vec<Region>,
     after: Option<&str>,
-) -> Assay {
-    let _ = spec.insert_regions(regions, modality, after);
-    spec
+) -> Result<Assay, String> {
+    spec.insert_regions(regions, modality, after)?;
+    Ok(spec)
 }
 
 #[cfg(test)]
@@ -268,7 +294,7 @@ mod tests {
             "pos".into(),
             vec![],
         );
-        let spec = seqspec_insert_reads(spec, "rna", vec![new_read], None);
+        let spec = seqspec_insert_reads(spec, "rna", vec![new_read], None).unwrap();
         let reads = spec.get_seqspec("rna");
         assert_eq!(reads.len(), orig_count + 1);
         assert_eq!(reads[0].read_id, "test_read"); // inserted at beginning
@@ -287,7 +313,7 @@ mod tests {
             "pos".into(),
             vec![],
         );
-        let spec = seqspec_insert_reads(spec, "rna", vec![new_read], Some("rna_R1"));
+        let spec = seqspec_insert_reads(spec, "rna", vec![new_read], Some("rna_R1")).unwrap();
         let reads = spec.get_seqspec("rna");
         assert_eq!(reads.len(), 3);
         assert_eq!(reads[0].read_id, "rna_R1");
@@ -308,7 +334,7 @@ mod tests {
             "pos".into(),
             vec![],
         );
-        let spec = seqspec_insert_reads(spec, "rna", vec![new_read], None);
+        let spec = seqspec_insert_reads(spec, "rna", vec![new_read], None).unwrap();
         let reads = spec.get_seqspec("rna");
         assert_eq!(reads[0].modality, "rna"); // modality was corrected
     }
@@ -329,7 +355,7 @@ mod tests {
             None,
             vec![],
         );
-        let spec = seqspec_insert_regions(spec, "rna", vec![new_region], None);
+        let spec = seqspec_insert_regions(spec, "rna", vec![new_region], None).unwrap();
         let rna_lib = spec.get_libspec("rna").unwrap();
         assert_eq!(rna_lib.regions.len(), orig_child_count + 1);
         assert_eq!(rna_lib.regions[0].region_id, "test_region"); // at beginning
@@ -351,7 +377,8 @@ mod tests {
             None,
             vec![],
         );
-        let spec = seqspec_insert_regions(spec, "rna", vec![new_region], Some(&first_child_id));
+        let spec =
+            seqspec_insert_regions(spec, "rna", vec![new_region], Some(&first_child_id)).unwrap();
         let rna_lib = spec.get_libspec("rna").unwrap();
         assert_eq!(rna_lib.regions[0].region_id, first_child_id);
         assert_eq!(rna_lib.regions[1].region_id, "test_region");
@@ -369,6 +396,16 @@ mod tests {
     }
 
     #[test]
+    fn test_parse_resource_reads_mapping() {
+        let json = r#"{"reads":[{"read_id":"r1","name":"Read 1","min_len":50,"max_len":50,"strand":"pos"}]}"#;
+        let val = parse_resource(json);
+        let reads = load_reads_from_value(&val, "rna");
+        assert_eq!(reads.len(), 1);
+        assert_eq!(reads[0].read_id, "r1");
+        assert_eq!(reads[0].modality, "rna");
+    }
+
+    #[test]
     fn test_parse_resource_regions_json() {
         let json = r#"[{"region_id":"r1","region_type":"barcode","name":"BC","sequence_type":"onlist","sequence":"NNNN","min_len":4,"max_len":4}]"#;
         let val = parse_resource(json);
@@ -377,6 +414,34 @@ mod tests {
         assert_eq!(regions[0].region_id, "r1");
         assert_eq!(regions[0].region_type, "barcode");
         assert_eq!(regions[0].sequence, "NNNN");
+    }
+
+    #[test]
+    fn test_parse_resource_regions_mapping() {
+        let json = r#"{"regions":[{"region_id":"r1","region_type":"barcode","name":"BC","sequence_type":"onlist","sequence":"NNNN","min_len":4,"max_len":4}]}"#;
+        let val = parse_resource(json);
+        let regions = load_regions_from_value(&val);
+        assert_eq!(regions.len(), 1);
+        assert_eq!(regions[0].region_id, "r1");
+    }
+
+    #[test]
+    fn test_parse_resource_accepts_yaml_file() {
+        let tmp_path = std::env::temp_dir().join(format!(
+            "seqspec_insert_{}_resource.yaml",
+            std::process::id()
+        ));
+        fs::write(
+            &tmp_path,
+            "- region_id: inserted_region\n  region_type: linker\n  name: Inserted Region\n  sequence_type: fixed\n  sequence: ACGT\n  min_len: 4\n  max_len: 4\n",
+        )
+        .unwrap();
+
+        let parsed = parse_resource(tmp_path.to_str().unwrap());
+        assert!(parsed.is_array());
+        assert_eq!(parsed[0]["region_id"], "inserted_region");
+
+        let _ = fs::remove_file(tmp_path);
     }
 
     #[test]
@@ -395,10 +460,45 @@ mod tests {
             None,
             vec![],
         );
-        let spec = seqspec_insert_regions(spec, "rna", vec![new_region], None);
+        let spec = seqspec_insert_regions(spec, "rna", vec![new_region], None).unwrap();
         let rna_lib = spec.get_libspec("rna").unwrap();
         // update_attr is called inside insert_regions, so lengths should be updated
         assert_eq!(rna_lib.min_len, orig_min + 8);
         assert_eq!(rna_lib.max_len, orig_max + 8);
+    }
+
+    #[test]
+    fn test_insert_reads_invalid_modality_returns_error() {
+        let spec = dogma_spec();
+        let new_read = Read::new(
+            "bad_read".into(),
+            "Bad Read".into(),
+            "".into(),
+            "primer1".into(),
+            10,
+            10,
+            "pos".into(),
+            vec![],
+        );
+        let result = seqspec_insert_reads(spec, "missing", vec![new_read], None);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_insert_regions_missing_after_returns_error() {
+        let spec = dogma_spec();
+        let new_region = Region::new(
+            "bad_region".into(),
+            "custom".into(),
+            "Bad Region".into(),
+            "fixed".into(),
+            "ACGT".into(),
+            4,
+            4,
+            None,
+            vec![],
+        );
+        let result = seqspec_insert_regions(spec, "rna", vec![new_region], Some("missing"));
+        assert!(result.is_err());
     }
 }

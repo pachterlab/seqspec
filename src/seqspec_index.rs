@@ -25,10 +25,8 @@ pub struct IndexArgs {
         long,
         help = "Tool",
         value_name = "TOOL",
-        required = true,
         value_parser = ["chromap", "kb", "kb-single", "relative", "seqkit", "simpleaf", "starsolo", "splitcode", "tab", "zumis"],
         default_value = "tab",
-        required = false
     )]
     tool: String,
 
@@ -37,9 +35,8 @@ pub struct IndexArgs {
         long,
         help = "Selector",
         value_name = "SELECTOR",
-        value_parser = ["read", "region", "file", "region-type"],
+        value_parser = ["read", "region", "file"],
         default_value = "read",
-        required = false
     )]
     selector: String,
 
@@ -57,34 +54,19 @@ pub struct IndexArgs {
         long,
         help = "IDs (comma-separated)",
         value_name = "IDS",
-        required = false,
         value_delimiter = ','
     )]
     ids: Option<Vec<String>>,
 
-    #[clap(
-        short,
-        long,
-        help = "Rev",
-        value_name = "REV",
-        required = false,
-        default_value = "false"
-    )]
+    #[clap(long, help = "Returns 3'->5' region order", default_value = "false")]
     rev: bool,
 
-    #[clap(
-        long,
-        help = "Subregion Type",
-        value_name = "SUBREGIONTYPE",
-        required = false
-    )]
+    #[clap(long, hide = true, value_name = "SUBREGIONTYPE")]
     subregion_type: Option<String>,
 
     #[clap(
         long,
-        help = "No Overlap",
-        value_name = "NOOVERLAP",
-        required = false,
+        help = "Disable overlap (default: False)",
         default_value = "false"
     )]
     no_overlap: bool,

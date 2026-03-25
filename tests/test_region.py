@@ -1276,6 +1276,41 @@ def test_update_region_by_id_partial_none():
     assert updated.min_len == 2 and updated.max_len == 2
 
 
+def test_update_region_by_id_accepts_zero_and_empty_values():
+    leaf = Region(
+        region_id="L",
+        region_type="named",
+        name="L",
+        sequence_type="fixed",
+        sequence="GG",
+        min_len=2,
+        max_len=2,
+        regions=[],
+    )
+    root = Region(
+        region_id="root",
+        region_type="named",
+        name="root",
+        sequence_type="joined",
+        regions=[leaf],
+    )
+    root.update_region_by_id(
+        target_region_id="L",
+        region_id=None,
+        region_type=None,
+        name="",
+        sequence_type=None,
+        sequence="",
+        min_len=0,
+        max_len=0,
+    )
+    updated = root.get_region_by_id("L")[0]
+    assert updated.name == ""
+    assert updated.sequence == ""
+    assert updated.min_len == 0
+    assert updated.max_len == 0
+
+
 def test_region_repr_contains_type_and_lengths():
     r = Region(
         region_id="x",

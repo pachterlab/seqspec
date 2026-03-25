@@ -1,13 +1,7 @@
 use crate::auth::{init_profile, AuthKind, AuthProfile, AuthRegistry, RemoteAccess};
 use anyhow::Result;
-use clap::{Args, Subcommand, ValueEnum};
+use clap::{Args, Subcommand};
 use serde::Serialize;
-
-#[derive(Debug, Clone, Copy, ValueEnum)]
-pub enum OutputFormat {
-    Text,
-    Json,
-}
 
 #[derive(Debug, Args)]
 pub struct AuthArgs {
@@ -39,22 +33,13 @@ pub struct AuthInitArgs {
 
     #[arg(long, value_name = "ENV", required = true)]
     pub password_env: String,
-
-    #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
-    pub format: OutputFormat,
 }
 
 #[derive(Debug, Args)]
-pub struct AuthPathArgs {
-    #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
-    pub format: OutputFormat,
-}
+pub struct AuthPathArgs {}
 
 #[derive(Debug, Args)]
-pub struct AuthListArgs {
-    #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
-    pub format: OutputFormat,
-}
+pub struct AuthListArgs {}
 
 #[derive(Debug, Args)]
 pub struct AuthResolveArgs {
@@ -63,9 +48,6 @@ pub struct AuthResolveArgs {
 
     #[arg(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
     pub auth_profile: Option<String>,
-
-    #[arg(long, value_enum, default_value_t = OutputFormat::Text)]
-    pub format: OutputFormat,
 }
 
 #[derive(Debug, Serialize)]
@@ -95,7 +77,7 @@ fn run_init(args: &AuthInitArgs) -> Result<()> {
             password_env: args.password_env.clone(),
         },
     )?;
-    print_value(args.format, &output)
+    print_value(&output)
 }
 
 fn run_path(args: &AuthPathArgs) -> Result<()> {
@@ -110,13 +92,15 @@ fn run_path(args: &AuthPathArgs) -> Result<()> {
             .map(|path| path.display().to_string()),
         exists: location.exists,
     };
-    print_value(args.format, &output)
+    let _ = args;
+    print_value(&output)
 }
 
 fn run_list(args: &AuthListArgs) -> Result<()> {
     let registry = AuthRegistry::load()?;
     let profiles = registry.profile_summaries();
-    print_value(args.format, &profiles)
+    let _ = args;
+    print_value(&profiles)
 }
 
 fn run_resolve(args: &AuthResolveArgs) -> Result<()> {
@@ -125,17 +109,10 @@ fn run_resolve(args: &AuthResolveArgs) -> Result<()> {
     if let Some(profile_name) = args.auth_profile.as_deref() {
         let _ = RemoteAccess::load(Some(profile_name))?;
     }
-    print_value(args.format, &resolved)
+    print_value(&resolved)
 }
 
-fn print_value<T: Serialize>(format: OutputFormat, value: &T) -> Result<()> {
-    match format {
-        OutputFormat::Json => {
-            println!("{}", serde_json::to_string_pretty(value)?);
-        }
-        OutputFormat::Text => {
-            println!("{}", serde_json::to_string_pretty(value)?);
-        }
-    }
+fn print_value<T: Serialize>(value: &T) -> Result<()> {
+    println!("{}", serde_json::to_string_pretty(value)?);
     Ok(())
 }

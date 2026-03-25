@@ -132,7 +132,8 @@ impl Assay {
         self.modalities
             .iter()
             .position(|m| m == modality)
-            .map(|idx| self.library_spec[idx].clone())
+            .and_then(|idx| self.library_spec.get(idx).cloned())
+            .filter(|region| region.region_id == modality)
     }
 
     pub fn get_seqspec(&self, modality: &str) -> Vec<Read> {
@@ -194,6 +195,10 @@ impl Assay {
         modality: &str,
         after: Option<&str>,
     ) -> Result<(), String> {
+        if !self.modalities.iter().any(|m| m == modality) {
+            return Err(format!("Modality '{modality}' not found"));
+        }
+
         // set modality on incoming reads (reuses allocation)
         let modality_owned = modality.to_owned();
         for r in &mut reads {
@@ -392,6 +397,13 @@ mod tests {
     }
 
     #[test]
+    fn test_assay_get_libspec_rejects_top_level_region_id_mismatch() {
+        let mut a = sample_assay();
+        a.library_spec[0].region_id = "wrong".into();
+        assert!(a.get_libspec("rna").is_none());
+    }
+
+    #[test]
     fn test_assay_get_seqspec() {
         let a = sample_assay();
         let reads = a.get_seqspec("rna");
@@ -518,6 +530,23 @@ mod tests {
             .position(|r| r.read_id == "I1")
             .unwrap();
         assert_eq!(i1_pos, r1_pos + 1);
+    }
+
+    #[test]
+    fn test_assay_insert_reads_invalid_modality() {
+        let mut a = sample_assay();
+        let new_read = Read::new(
+            "I1".into(),
+            "Index 1".into(),
+            "".into(),
+            "p".into(),
+            8,
+            8,
+            "pos".into(),
+            vec![],
+        );
+        let result = a.insert_reads(vec![new_read], "atac", None);
+        assert!(result.is_err());
     }
 
     #[test]

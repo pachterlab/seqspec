@@ -1,3 +1,4 @@
+use crate::seqspec_file::seqspec_file as seqspec_file_lookup;
 use crate::utils;
 use std::fs;
 use std::io::Write;
@@ -13,20 +14,23 @@ use std::path::PathBuf;
 #[derive(Debug, Args)]
 pub struct FindArgs {
     #[clap(short, long, help = "Output file path", value_name = "OUT")]
-    output: Option<PathBuf>,
+    pub output: Option<PathBuf>,
 
     #[clap(help = "Sequencing specification yaml file", required = true)]
-    yaml: PathBuf,
+    pub yaml: PathBuf,
 
     #[clap(
         short,
         long,
         help = "Selector",
         value_name = "SELECTOR",
-        required = true,
+        default_value = "region",
         value_parser = ["read", "region", "file", "region-type"]
     )]
-    selector: String,
+    pub selector: String,
+
+    #[clap(long, hide = true)]
+    pub rtype: bool,
 
     #[clap(
         short,
@@ -35,10 +39,10 @@ pub struct FindArgs {
         value_name = "MODALITY",
         required = true
     )]
-    modality: String,
+    pub modality: String,
 
-    #[clap(short, long, help = "ID", value_name = "ID", required = true)]
-    id: String,
+    #[clap(short, long, help = "ID", value_name = "ID")]
+    pub id: Option<String>,
 }
 
 pub fn validate_find_args(args: &FindArgs) -> () {
@@ -56,7 +60,7 @@ pub fn run_find(args: &FindArgs) {
     validate_find_args(args);
     let spec = utils::load_spec(&args.yaml);
 
-    let found = seqspec_find(&spec, &args.selector, &args.modality, &args.id);
+    let found = seqspec_find(&spec, &args.selector, &args.modality, args.id.as_deref());
     let yaml_str = match found {
         FindResult::Reads(v) => serde_yaml::to_string(&v).unwrap(),
         FindResult::Regions(v) => serde_yaml::to_string(&v).unwrap(),
@@ -85,11 +89,11 @@ pub fn find_by_region_id(spec: &Assay, modality: &str, region_id: &str) -> Vec<R
 }
 
 pub fn find_by_file_id(spec: &Assay, modality: &str, file_id: &str) -> Vec<File> {
-    let m = spec.get_seqspec(modality);
-    m.iter()
-        .flat_map(|r| r.files.iter())
+    let selector = "file".to_string();
+    seqspec_file_lookup(spec, &modality.to_string(), None, &selector)
+        .into_values()
+        .flatten()
         .filter(|f| f.file_id == file_id)
-        .cloned()
         .collect()
 }
 
@@ -105,7 +109,15 @@ pub enum FindResult {
     Files(Vec<File>),
 }
 
-pub fn seqspec_find(spec: &Assay, selector: &str, modality: &str, id: &str) -> FindResult {
+pub fn seqspec_find(spec: &Assay, selector: &str, modality: &str, id: Option<&str>) -> FindResult {
+    let Some(id) = id else {
+        return match selector {
+            "read" => FindResult::Reads(Vec::new()),
+            "region" | "region-type" => FindResult::Regions(Vec::new()),
+            "file" => FindResult::Files(Vec::new()),
+            _ => panic!("Invalid selector: {}", selector),
+        };
+    };
     match selector {
         "read" => FindResult::Reads(find_by_read_id(spec, modality, id)),
         "region" => FindResult::Regions(find_by_region_id(spec, modality, id)),
@@ -164,6 +176,14 @@ mod tests {
     }
 
     #[test]
+    fn test_find_by_file_id_includes_region_onlists() {
+        let spec = dogma_spec();
+        let found = find_by_file_id(&spec, "rna", "RNA-737K-arc-v1.txt");
+        assert_eq!(found.len(), 1);
+        assert_eq!(found[0].filename, "RNA-737K-arc-v1.txt");
+    }
+
+    #[test]
     fn test_find_no_results() {
         let spec = dogma_spec();
         let found = find_by_region_id(&spec, "rna", "nonexistent_region_id");
@@ -176,7 +196,7 @@ mod tests {
     #[test]
     fn test_seqspec_find_dispatches() {
         let spec = dogma_spec();
-        let result = seqspec_find(&spec, "region-type", "rna", "barcode");
+        let result = seqspec_find(&spec, "region-type", "rna", Some("barcode"));
         match result {
             FindResult::Regions(v) => {
                 assert_eq!(v.len(), 1);
@@ -185,13 +205,23 @@ mod tests {
             _ => panic!("Expected Regions variant"),
         }
 
-        let result = seqspec_find(&spec, "read", "rna", "rna_R1");
+        let result = seqspec_find(&spec, "read", "rna", Some("rna_R1"));
         match result {
             FindResult::Reads(v) => {
                 assert_eq!(v.len(), 1);
                 assert_eq!(v[0].read_id, "rna_R1");
             }
             _ => panic!("Expected Reads variant"),
+        }
+    }
+
+    #[test]
+    fn test_seqspec_find_returns_empty_without_id() {
+        let spec = dogma_spec();
+        let result = seqspec_find(&spec, "region", "rna", None);
+        match result {
+            FindResult::Regions(v) => assert!(v.is_empty()),
+            _ => panic!("Expected Regions variant"),
         }
     }
 }

@@ -105,4 +105,30 @@ mod tests {
             "seqspec build is deprecated. Use seqspec init/insert/modify or construct the spec directly."
         );
     }
+
+    #[test]
+    fn test_find_defaults_match_python_cli() {
+        let args = Args::try_parse_from(["seqspec", "find", "-m", "rna", "spec.yaml"]).unwrap();
+        match args.subcmd {
+            Commands::Find(find_args) => {
+                assert_eq!(find_args.selector, "region");
+                assert!(find_args.id.is_none());
+            }
+            _ => panic!("expected find subcommand"),
+        }
+    }
+
+    #[test]
+    fn test_index_region_type_selector_is_rejected() {
+        let result = Args::try_parse_from([
+            "seqspec",
+            "index",
+            "-m",
+            "rna",
+            "-s",
+            "region-type",
+            "spec.yaml",
+        ]);
+        assert!(result.is_err());
+    }
 }

@@ -200,31 +200,29 @@ fn list_region_files(spec: &Assay, modality: &String) -> HashMap<String, Vec<Fil
 fn format_list_files_metadata(
     files: &HashMap<String, Vec<File>>,
     k: &String,
-    spec_fn: &PathBuf,
-    fp: bool,
+    _spec_fn: &PathBuf,
+    _fp: bool,
 ) -> String {
     let mut x: Vec<String> = Vec::new();
-    if k == "all" {
-        for (_key, items) in files {
-            for item in items {
+    for row in iter_file_rows(files) {
+        if k == "all" {
+            for (key, item) in row {
                 x.push(format!(
                     "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
-                    _key,
+                    key,
                     item.file_id,
                     item.filename,
                     item.filetype,
                     item.filesize,
-                    maybe_full(&item.url, &item.urltype, spec_fn, fp),
+                    item.url,
                     item.urltype,
                     item.md5
                 ));
             }
-        }
-    } else {
-        for (_key, items) in files {
-            for item in items {
+        } else {
+            for (key, item) in row {
                 let attr = match k.as_str() {
-                    "url" => maybe_full(&item.url, &item.urltype, spec_fn, fp),
+                    "url" => item.url.clone(),
                     "file_id" => item.file_id.clone(),
                     "filename" => item.filename.clone(),
                     "filetype" => item.filetype.clone(),
@@ -233,7 +231,7 @@ fn format_list_files_metadata(
                     "md5" => item.md5.clone(),
                     _ => String::new(),
                 };
-                x.push(format!("{}\t{}\t{}", _key, item.file_id, attr));
+                x.push(format!("{}\t{}\t{}", key, item.file_id, attr));
             }
         }
     }
@@ -248,8 +246,8 @@ fn format_json_files(
 ) -> String {
     use serde_json::json;
     let mut x: Vec<serde_json::Value> = Vec::new();
-    for (_key, items) in files {
-        for item in items {
+    for row in iter_file_rows(files) {
+        for (_key, item) in row {
             if k == "all" {
                 let mut d = serde_json::to_value(item).unwrap();
                 if item.urltype == "local" && fp {
@@ -290,9 +288,9 @@ fn format_list_files(
 ) -> String {
     let mut out: Vec<String> = Vec::new();
     if fmt == "paired" {
-        for (_key, items) in files {
+        for row in iter_file_rows(files) {
             let mut t: Vec<String> = Vec::new();
-            for i in items {
+            for (_key, i) in row {
                 let val = if let Some(key) = k {
                     let mut attr = match key.as_str() {
                         "url" => maybe_full(&i.url, &i.urltype, spec_fn, fp),
@@ -318,8 +316,8 @@ fn format_list_files(
             out.push(t.join("\t"));
         }
     } else if fmt == "interleaved" || fmt == "list" {
-        for (_key, items) in files {
-            for i in items {
+        for row in iter_file_rows(files) {
+            for (_key, i) in row {
                 let id = if let Some(key) = k {
                     let mut attr = match key.as_str() {
                         "url" => maybe_full(&i.url, &i.urltype, spec_fn, fp),
@@ -345,8 +343,8 @@ fn format_list_files(
         }
     } else if fmt == "index" {
         let mut t: Vec<String> = Vec::new();
-        for (_key, items) in files {
-            for i in items {
+        for row in iter_file_rows(files) {
+            for (_key, i) in row {
                 let id = if let Some(key) = k {
                     let mut attr = match key.as_str() {
                         "url" => maybe_full(&i.url, &i.urltype, spec_fn, fp),
@@ -373,6 +371,32 @@ fn format_list_files(
         out.push(t.join(","));
     }
     out.join("\n")
+}
+
+fn ordered_file_columns<'a>(
+    files: &'a HashMap<String, Vec<File>>,
+) -> Vec<(&'a String, &'a Vec<File>)> {
+    let mut columns: Vec<(&String, &Vec<File>)> = files.iter().collect();
+    columns.sort_by(|(left, _), (right, _)| left.cmp(right));
+    columns
+}
+
+fn iter_file_rows<'a>(files: &'a HashMap<String, Vec<File>>) -> Vec<Vec<(&'a String, &'a File)>> {
+    let columns = ordered_file_columns(files);
+    let row_count = columns
+        .iter()
+        .map(|(_, items)| items.len())
+        .min()
+        .unwrap_or(0);
+    let mut rows = Vec::new();
+    for row_idx in 0..row_count {
+        let mut row = Vec::new();
+        for (key, items) in &columns {
+            row.push((*key, &items[row_idx]));
+        }
+        rows.push(row);
+    }
+    rows
 }
 
 fn list_files_by_read_id(
@@ -530,5 +554,93 @@ mod tests {
         let url = "http://example.com/file.txt".to_string();
         let result = maybe_full(&url, &"http".to_string(), &spec_fn, true);
         assert_eq!(result, "http://example.com/file.txt");
+    }
+
+    #[test]
+    fn test_format_list_files_paired_uses_row_major_order() {
+        let mut files = HashMap::new();
+        files.insert(
+            "rna_R1".to_string(),
+            vec![
+                File::new(
+                    "r1_a".into(),
+                    "r1_a.fastq.gz".into(),
+                    "fastq".into(),
+                    0,
+                    "r1_a.fastq.gz".into(),
+                    "local".into(),
+                    "".into(),
+                ),
+                File::new(
+                    "r1_b".into(),
+                    "r1_b.fastq.gz".into(),
+                    "fastq".into(),
+                    0,
+                    "r1_b.fastq.gz".into(),
+                    "local".into(),
+                    "".into(),
+                ),
+            ],
+        );
+        files.insert(
+            "rna_R2".to_string(),
+            vec![
+                File::new(
+                    "r2_a".into(),
+                    "r2_a.fastq.gz".into(),
+                    "fastq".into(),
+                    0,
+                    "r2_a.fastq.gz".into(),
+                    "local".into(),
+                    "".into(),
+                ),
+                File::new(
+                    "r2_b".into(),
+                    "r2_b.fastq.gz".into(),
+                    "fastq".into(),
+                    0,
+                    "r2_b.fastq.gz".into(),
+                    "local".into(),
+                    "".into(),
+                ),
+            ],
+        );
+
+        let rendered = format_list_files(
+            &files,
+            &"paired".to_string(),
+            Some(&"filename".to_string()),
+            &PathBuf::from("spec.yaml"),
+            false,
+        );
+        assert_eq!(
+            rendered,
+            "r1_a.fastq.gz\tr2_a.fastq.gz\nr1_b.fastq.gz\tr2_b.fastq.gz"
+        );
+    }
+
+    #[test]
+    fn test_format_list_files_metadata_keeps_raw_local_url() {
+        let mut files = HashMap::new();
+        files.insert(
+            "rna_R1".to_string(),
+            vec![File::new(
+                "r1".into(),
+                "r1.fastq.gz".into(),
+                "fastq".into(),
+                0,
+                "relative/r1.fastq.gz".into(),
+                "local".into(),
+                "".into(),
+            )],
+        );
+
+        let rendered = format_list_files_metadata(
+            &files,
+            &"url".to_string(),
+            &PathBuf::from("/tmp/spec.yaml"),
+            true,
+        );
+        assert_eq!(rendered, "rna_R1\tr1\trelative/r1.fastq.gz");
     }
 }

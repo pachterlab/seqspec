@@ -31,6 +31,9 @@ pub struct ModifyArgs {
     )]
     keys: String,
 
+    #[clap(short = 'i', hide = true, value_name = "IDs")]
+    legacy_ids: Option<String>,
+
     #[clap(
         short,
         long,

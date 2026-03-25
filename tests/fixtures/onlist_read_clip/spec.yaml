@@ -1,0 +1,80 @@
+seqspec_version: 0.4.0
+assay_id: onlist_read_clip
+name: Onlist read clip fixture
+doi: https://doi.org/10.1101/onlist-read-clip
+date: 25 March 2026
+description: Minimal fixture to ensure read onlists respect the read window.
+modalities:
+  - rna
+lib_struct: ''
+sequence_protocol: Illumina
+sequence_kit: test-sequencing-kit
+library_protocol: test-library-protocol
+library_kit: test-library-kit
+sequence_spec:
+  - read_id: rna_read
+    name: Read 1
+    modality: rna
+    primer_id: primer
+    min_len: 2
+    max_len: 2
+    strand: pos
+    files:
+      - file_id: rna_read.fastq.gz
+        filename: rna_read.fastq.gz
+        filetype: fastq
+        filesize: 0
+        url: rna_read.fastq.gz
+        urltype: local
+        md5: "00000000000000000000000000000000"
+library_spec:
+  - region_id: rna
+    region_type: rna
+    name: RNA
+    sequence_type: joined
+    sequence: GGNNNN
+    min_len: 6
+    max_len: 6
+    onlist: null
+    regions:
+      - region_id: primer
+        region_type: truseq_read1
+        name: Primer
+        sequence_type: fixed
+        sequence: GG
+        min_len: 2
+        max_len: 2
+        onlist: null
+        regions: []
+      - region_id: barcode_a
+        region_type: barcode
+        name: Barcode A
+        sequence_type: onlist
+        sequence: NN
+        min_len: 2
+        max_len: 2
+        onlist:
+          file_id: barcode_a.txt
+          filename: barcode_a.txt
+          filetype: txt
+          filesize: 0
+          url: barcode_a.txt
+          urltype: local
+          md5: "11111111111111111111111111111111"
+        regions: []
+      - region_id: barcode_b
+        region_type: barcode
+        name: Barcode B
+        sequence_type: onlist
+        sequence: NN
+        min_len: 2
+        max_len: 2
+        onlist:
+          file_id: barcode_b.txt
+          filename: barcode_b.txt
+          filetype: txt
+          filesize: 0
+          url: barcode_b.txt
+          urltype: local
+          md5: "22222222222222222222222222222222"
+        regions: []

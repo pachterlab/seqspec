@@ -312,13 +312,20 @@ class Region(BaseModel):
         target = self.get_region_by_id(target_region_id)
         if target:
             r = target[0]
-            r.region_id = region_id or r.region_id
-            r.region_type = region_type or r.region_type
-            r.name = name or r.name
-            r.sequence_type = sequence_type or r.sequence_type
-            r.sequence = sequence or r.sequence
-            r.min_len = min_len or r.min_len
-            r.max_len = max_len or r.max_len
+            if region_id is not None:
+                r.region_id = region_id
+            if region_type is not None:
+                r.region_type = region_type
+            if name is not None:
+                r.name = name
+            if sequence_type is not None:
+                r.sequence_type = sequence_type
+            if sequence is not None:
+                r.sequence = sequence
+            if min_len is not None:
+                r.min_len = min_len
+            if max_len is not None:
+                r.max_len = max_len
 
     def reverse(self):
         if self.regions:
