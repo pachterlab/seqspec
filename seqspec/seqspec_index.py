@@ -70,6 +70,7 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
 
     choices = [
         "chromap",
+        "fgbio",
         "kb",
         "kb-single",
         "relative",
@@ -194,6 +195,7 @@ def format_index(
     """
     FORMAT = {
         "chromap": format_chromap,
+        "fgbio": format_fgbio,
         "kb": format_kallisto_bus,
         "kb-single": format_kallisto_bus_force_single,
         "relative": format_relative,
@@ -355,6 +357,97 @@ def get_coordinate_by_read_id(spec: Assay, modality: str, read_id: str) -> Coord
 
 
 FEATURE_REGION_TYPES = {"CDNA", "GDNA", "PROTEIN", "TAG", "SGRNA_TARGET"}
+FGBIO_TEMPLATE_REGION_TYPES = {
+    "ATAC",
+    "CDNA",
+    "CRISPR",
+    "GDNA",
+    "HIC",
+    "METHYL",
+    "PROTEIN",
+    "RNA",
+    "SGRNA_TARGET",
+    "TAG",
+}
+FGBIO_SKIP_REGION_TYPES = {
+    "ILLUMINA_P5",
+    "ILLUMINA_P7",
+    "LINKER",
+    "ME1",
+    "ME2",
+    "NEXTERA_READ1",
+    "NEXTERA_READ2",
+    "POLY_A",
+    "POLY_C",
+    "POLY_G",
+    "POLY_T",
+    "S5",
+    "S7",
+    "TRUSEQ_READ1",
+    "TRUSEQ_READ2",
+}
+
+
+def fgbio_operator(region_type: str) -> str:
+    region_type = region_type.upper()
+    if region_type == "BARCODE":
+        return "C"
+    if region_type == "UMI":
+        return "M"
+    if region_type in {"INDEX5", "INDEX7"}:
+        return "B"
+    if region_type in FGBIO_TEMPLATE_REGION_TYPES:
+        return "T"
+    if region_type in FGBIO_SKIP_REGION_TYPES:
+        return "S"
+    raise Exception(f"fgbio does not support region_type '{region_type.lower()}'")
+
+
+def format_fgbio_read_structure(coord: Coordinate) -> str:
+    if coord.query_type not in {"Read", "File"}:
+        raise Exception("fgbio only supports read or file selectors")
+    if not coord.rcv:
+        raise Exception(f"fgbio requires at least one region for {coord.query_id}")
+
+    segments = []
+    cuts = sorted(coord.rcv, key=lambda cut: cut.start)
+    expected_start = 0
+
+    for idx, cut in enumerate(cuts):
+        if cut.start != expected_start:
+            raise Exception(
+                f"fgbio requires contiguous read-local coordinates for {coord.query_id}"
+            )
+        length = cut.stop - cut.start
+        if length <= 0:
+            raise Exception(
+                f"fgbio requires positive segment lengths for {coord.query_id}"
+            )
+
+        operator = fgbio_operator(cut.region_type)
+        is_variable_terminal = idx + 1 == len(cuts) and cut.min_len != cut.max_len
+        seg_length = None if is_variable_terminal else length
+
+        if segments and segments[-1]["operator"] == operator:
+            if segments[-1]["length"] is None or seg_length is None:
+                segments[-1]["length"] = None
+            else:
+                segments[-1]["length"] += seg_length
+        else:
+            segments.append({"operator": operator, "length": seg_length})
+
+        expected_start = cut.stop
+
+    return "".join(
+        f"+{segment['operator']}"
+        if segment["length"] is None
+        else f"{segment['length']}{segment['operator']}"
+        for segment in segments
+    )
+
+
+def format_fgbio(indices: List[Coordinate], subregion_type=None) -> str:
+    return " ".join(format_fgbio_read_structure(coord) for coord in indices)
 
 
 def format_kallisto_bus(indices: List[Coordinate], subregion_type=None) -> str:

@@ -389,6 +389,7 @@ run_index(spec_fn: str, modality: str, ids: List[str], idtype: str, fmt: str, re
 - optionally, `--rev` can be set to return the 3'->5' index.
 - optionally, `-t TOOL` returns the indices in the format specified by the tool. One of:
   - `chromap`: emit barcode and genomic ranges in chromap `--read-format` syntax
+  - `fgbio`: emit per-read fgbio-style read structure strings for tools that take one read structure per FASTQ or BAM read. This export is defined for `read` and `file` selectors and maps `barcode -> C`, `umi -> M`, `index5/index7 -> B`, biological payload regions such as `cdna`, `rna`, `protein`, `tag`, `atac`, `gdna`, and `crispr` to `T`, and technical regions such as primers, linkers, and adapters to `S`. This is a per-read export, not the single run-level `READ_STRUCTURE` string used by Picard BCL tools such as `IlluminaBasecallsToSam`.
   - `kb`: `kallisto`/`kb count` `-x TECHNOLOGY` ([format](https://pachterlab.github.io/kallisto/manual#:~:text=will%20accept%20a-,string,-specifying%20a%20new)) requires a barcode, UMI, and sequence. The following `region_type` are used during indexing:
     - `barcode` for the barcode
     - `umi` for the umi
@@ -436,6 +437,10 @@ $ seqspec index -m atac -t kb -s file -i atac_R1_SRR18677642.fastq.gz,atac_R2_SR
 # If the files are specified in the spec then -i can be omitted
 $ seqspec index -m atac -t kb -s file spec.yaml
 1,8,24:-1,-1,-1:0,0,53,2,0,53
+
+# export physical read structures in fgbio syntax
+$ seqspec index -m atac -t fgbio -s read -i atac_R1,atac_R2,atac_R3 spec.yaml
+53T 8S16C 53T
 ```
 
 ## `seqspec info`: get info about seqspec file

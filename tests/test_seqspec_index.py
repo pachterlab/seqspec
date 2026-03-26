@@ -1,8 +1,15 @@
-from seqspec.seqspec_index import seqspec_index, format_index, filter_index_no_overlap
+from pathlib import Path
+
+import pytest
+
 from seqspec.Assay import Assay
 from seqspec.Region import RegionCoordinate
-import json
-from pathlib import Path
+from seqspec.seqspec_index import (
+    Coordinate,
+    filter_index_no_overlap,
+    format_index,
+    seqspec_index,
+)
 from seqspec.utils import load_spec
 
 
@@ -76,17 +83,17 @@ def test_seqspec_index(dogmaseq_dig_spec: Assay):
     )
     assert len(indices) == 1
 
-from seqspec.seqspec_index import Coordinate
+
 def test_seqspec_index_without_ids(dogmaseq_dig_spec: Assay):
     """Test seqspec_index without providing ids (uses get_index_by_files)"""
     # Test file indexing without specific IDs
     indices = seqspec_index(
         spec=dogmaseq_dig_spec, modality="rna", ids=[], idtype="file"
     )
-    
+
     # Should return indices for all files in the modality
     assert len(indices) > 0
-    
+
     # Check structure of returned indices
     for coord in indices:
         assert isinstance(coord, Coordinate)
@@ -100,21 +107,21 @@ def test_seqspec_index_multiple_read_ids(dogmaseq_dig_spec: Assay):
     """Test seqspec_index with multiple read IDs"""
     # Test multiple read IDs for RNA modality
     indices = seqspec_index(
-        spec=dogmaseq_dig_spec, 
-        modality="rna", 
-        ids=["rna_R1", "rna_R2"], 
+        spec=dogmaseq_dig_spec,
+        modality="rna",
+        ids=["rna_R1", "rna_R2"],
         idtype="read"
     )
-    
+
     assert len(indices) == 2
-    
+
     # Check first read (rna_R1)
     rna_r1_index = indices[0]
     assert "rna_R1" in rna_r1_index.query_id
     assert rna_r1_index.strand == "pos"
     rna_r1_regions = rna_r1_index.rcv
     assert len(rna_r1_regions) == 2  # cell_bc + umi
-    
+
     # Check second read (rna_R2) - this has negative strand
     rna_r2_index = indices[1]
     assert "rna_R2" in rna_r2_index.query_id
@@ -132,9 +139,9 @@ def test_seqspec_index_multiple_file_ids(dogmaseq_dig_spec: Assay):
         ids=["rna_R1_SRR18677638.fastq.gz", "rna_R2_SRR18677638.fastq.gz"],
         idtype="file"
     )
-    
+
     assert len(indices) == 2
-    
+
     # Validate returned file IDs and structure
     file_ids = {"rna_R1_SRR18677638.fastq.gz", "rna_R2_SRR18677638.fastq.gz"}
     returned_ids = {coord.query_id for coord in indices}
@@ -160,9 +167,9 @@ def test_seqspec_index_multiple_region_ids(dogmaseq_dig_spec: Assay):
         ids=["rna_cell_bc", "cdna"],  # Use region IDs
         idtype="region"
     )
-    
+
     assert len(indices) == 2
-    
+
     # Check that each index has the expected structure
     for coord in indices:
         assert isinstance(coord, Coordinate)
@@ -180,21 +187,21 @@ def test_seqspec_index_different_modalities(dogmaseq_dig_spec: Assay):
     )
     assert len(rna_indices) == 1
     assert "rna_R1" == rna_indices[0].query_id
-    
+
     # Test ATAC modality
     atac_indices = seqspec_index(
         spec=dogmaseq_dig_spec, modality="atac", ids=["atac_R1"], idtype="read"
     )
     assert len(atac_indices) == 1
     assert "atac_R1" == atac_indices[0].query_id
-    
+
     # Test protein modality
     protein_indices = seqspec_index(
         spec=dogmaseq_dig_spec, modality="protein", ids=["protein_R1"], idtype="read"
     )
     assert len(protein_indices) == 1
     assert "protein_R1" == protein_indices[0].query_id
-    
+
     # Test tag modality
     tag_indices = seqspec_index(
         spec=dogmaseq_dig_spec, modality="tag", ids=["tag_R1"], idtype="read"
@@ -207,17 +214,17 @@ def test_seqspec_index_reverse_strand(dogmaseq_dig_spec: Assay):
     """Test seqspec_index with reverse strand ordering"""
     # Test with rev=True
     indices = seqspec_index(
-        spec=dogmaseq_dig_spec, 
-        modality="rna", 
-        ids=["rna_R1"], 
+        spec=dogmaseq_dig_spec,
+        modality="rna",
+        ids=["rna_R1"],
         idtype="read",
         rev=True
     )
-    
+
     assert len(indices) == 1
     assert "rna_R1"  == indices[0].query_id
     assert indices[0].strand == "pos"  # Strand should still be pos for this read
-    
+
     # Check that regions are still RegionCoordinate objects
     regions = indices[0].rcv
     assert all(isinstance(region, RegionCoordinate) for region in regions)
@@ -232,7 +239,7 @@ def test_seqspec_index_edge_cases(dogmaseq_dig_spec: Assay):
     # This should return indices for all files in the modality
     assert isinstance(indices, list)
     assert len(indices) > 0
-    
+
     # Test with empty ids list for read type (should raise KeyError)
     try:
         indices = seqspec_index(
@@ -243,7 +250,7 @@ def test_seqspec_index_edge_cases(dogmaseq_dig_spec: Assay):
     except KeyError:
         # This is expected behavior - read type requires IDs
         pass
-    
+
     # Test with empty ids list for region type (should raise KeyError)
     try:
         indices = seqspec_index(
@@ -260,7 +267,7 @@ def test_seqspec_index_structure_validation(dogmaseq_dig_spec: Assay):
     """Test that seqspec_index returns properly structured data"""
     # Test all idtypes to ensure consistent structure
     idtypes = ["read", "region", "file"]
-    
+
     for idtype in idtypes:
         if idtype == "read":
             ids = ["rna_R1"]
@@ -268,15 +275,15 @@ def test_seqspec_index_structure_validation(dogmaseq_dig_spec: Assay):
             ids = ["rna_cell_bc"]
         else:  # file
             ids = ["rna_R1_SRR18677638.fastq.gz"]
-        
+
         indices = seqspec_index(
             spec=dogmaseq_dig_spec, modality="rna", ids=ids, idtype=idtype
         )
-        
+
         # Validate structure
         assert isinstance(indices, list)
         assert len(indices) > 0
-        
+
         for coord in indices:
             assert isinstance(coord, Coordinate)
             assert hasattr(coord, "strand")
@@ -289,10 +296,10 @@ def test_seqspec_index_structure_validation(dogmaseq_dig_spec: Assay):
 def test_format_index():
     """Test format_index with various formats"""
     from seqspec.utils import load_spec
-    
+
     # Load fresh spec to avoid state interference
     dogmaseq_dig_spec = load_spec("tests/fixtures/spec.yaml")
-    
+
     # Test tab format for RNA
     indices = seqspec_index(
         spec=dogmaseq_dig_spec, modality="rna", ids=["rna_R1"], idtype="read"
@@ -325,6 +332,10 @@ def test_format_index():
     expected_chromap = "-1 atac_R1 -2 atac_R3 --barcode atac_R2 --read-format bc:8:23,r1:0:52,r2:0:52"
     assert formatted_index == expected_chromap
 
+    # Test fgbio read-structure export for ATAC
+    formatted_index = format_index(indices, "fgbio")
+    assert formatted_index == "53T 8S16C 53T"
+
     # Test simpleaf format for protein
     indices = seqspec_index(
         spec=dogmaseq_dig_spec, modality="protein", ids=["protein_R1", "protein_R2"], idtype="read"
@@ -348,6 +359,10 @@ def test_format_index():
     formatted_index = format_index(indices, "zumis")
     expected_zumis = "- BCS(1-16)\n- UMI(17-28)\n\n- cDNA(1-102)"
     assert formatted_index == expected_zumis
+
+    # Test fgbio read-structure export for RNA
+    formatted_fgbio = format_index(indices, "fgbio")
+    assert formatted_fgbio == "16C12M 102T"
 
     # Additional pragmatic coverage: kb-single, seqkit, relative, splitcode formats
     # kb-single chooses the longest feature among feature regions
@@ -376,6 +391,20 @@ def test_format_index():
     split = format_index(indices, "splitcode")
     assert "@extract" in split
     assert "groups\tids\ttags\tdistances\tlocations" in split
+
+
+def test_format_fgbio_index7_fixture():
+    spec = load_spec("tests/fixtures/fgbio_index7/spec.yaml")
+    indices = seqspec_index(spec=spec, modality="rna", ids=["I1"], idtype="read")
+    assert format_index(indices, "fgbio") == "4B"
+
+
+def test_format_fgbio_rejects_region_selector(dogmaseq_dig_spec: Assay):
+    indices = seqspec_index(
+        spec=dogmaseq_dig_spec, modality="rna", ids=["rna"], idtype="region"
+    )
+    with pytest.raises(Exception, match="fgbio only supports read or file selectors"):
+        format_index(indices, "fgbio")
 
 
 def test_filter_index_no_overlap_is_noop_when_reads_do_not_overlap(

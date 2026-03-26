@@ -25,7 +25,7 @@ pub struct IndexArgs {
         long,
         help = "Tool",
         value_name = "TOOL",
-        value_parser = ["chromap", "kb", "kb-single", "relative", "seqkit", "simpleaf", "starsolo", "splitcode", "tab", "zumis"],
+        value_parser = ["chromap", "fgbio", "kb", "kb-single", "relative", "seqkit", "simpleaf", "starsolo", "splitcode", "tab", "zumis"],
         default_value = "tab",
     )]
     tool: String,
@@ -132,6 +132,7 @@ pub fn format_index(
 ) -> String {
     match tool.as_str() {
         "chromap" => format_chromap(index),
+        "fgbio" => format_fgbio(index),
         "kb" => format_kallisto_bus(index),
         "kb-single" => format_kallisto_bus_force_single(index),
         "relative" => format_relative(index),
@@ -251,6 +252,95 @@ fn filter_index_no_overlap(mut indices: Vec<Coordinate>) -> Vec<Coordinate> {
     }
     indices
 }
+fn fgbio_operator(region_type: &str) -> Result<char, String> {
+    match region_type.to_uppercase().as_str() {
+        "BARCODE" => Ok('C'),
+        "UMI" => Ok('M'),
+        "INDEX5" | "INDEX7" => Ok('B'),
+        "ATAC" | "CDNA" | "CRISPR" | "GDNA" | "HIC" | "METHYL" | "PROTEIN" | "RNA"
+        | "SGRNA_TARGET" | "TAG" => Ok('T'),
+        "ILLUMINA_P5" | "ILLUMINA_P7" | "LINKER" | "ME1" | "ME2" | "NEXTERA_READ1"
+        | "NEXTERA_READ2" | "POLY_A" | "POLY_C" | "POLY_G" | "POLY_T" | "S5" | "S7"
+        | "TRUSEQ_READ1" | "TRUSEQ_READ2" => Ok('S'),
+        other => Err(format!("fgbio does not support region_type '{other}'")),
+    }
+}
+
+fn format_fgbio_read_structure(coord: &Coordinate) -> Result<String, String> {
+    if coord.query_type != "Read" && coord.query_type != "File" {
+        return Err("fgbio only supports read or file selectors".to_string());
+    }
+    if coord.rcv.is_empty() {
+        return Err(format!(
+            "fgbio requires at least one region for {}",
+            coord.query_id
+        ));
+    }
+
+    let mut cuts = coord.rcv.iter().collect::<Vec<_>>();
+    cuts.sort_by_key(|cut| cut.start);
+
+    let mut expected_start = 0_i64;
+    let mut segments: Vec<(char, Option<i64>)> = Vec::new();
+
+    for (idx, cut) in cuts.iter().enumerate() {
+        if cut.start != expected_start {
+            return Err(format!(
+                "fgbio requires contiguous read-local coordinates for {}",
+                coord.query_id
+            ));
+        }
+        let length = cut.stop - cut.start;
+        if length <= 0 {
+            return Err(format!(
+                "fgbio requires positive segment lengths for {}",
+                coord.query_id
+            ));
+        }
+
+        let operator = fgbio_operator(&cut.region.region_type)?;
+        let is_variable_terminal =
+            idx + 1 == cuts.len() && cut.region.min_len != cut.region.max_len;
+        let seg_length = if is_variable_terminal {
+            None
+        } else {
+            Some(length)
+        };
+
+        if let Some((last_operator, last_length)) = segments.last_mut() {
+            if *last_operator == operator {
+                *last_length = match (*last_length, seg_length) {
+                    (None, _) | (_, None) => None,
+                    (Some(left), Some(right)) => Some(left + right),
+                };
+            } else {
+                segments.push((operator, seg_length));
+            }
+        } else {
+            segments.push((operator, seg_length));
+        }
+
+        expected_start = cut.stop;
+    }
+
+    Ok(segments
+        .into_iter()
+        .map(|(operator, length)| match length {
+            Some(length) => format!("{length}{operator}"),
+            None => format!("+{operator}"),
+        })
+        .collect())
+}
+
+fn format_fgbio(indices: &Vec<Coordinate>) -> String {
+    indices
+        .iter()
+        .map(format_fgbio_read_structure)
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap()
+        .join(" ")
+}
+
 fn format_kallisto_bus(indices: &Vec<Coordinate>) -> String {
     let mut bcs: Vec<String> = Vec::new();
     let mut umi: Vec<String> = Vec::new();
@@ -924,6 +1014,34 @@ mod tests {
     }
 
     #[test]
+    fn test_format_fgbio() {
+        let indices = rna_indices();
+        let result = format_index(&indices, &"fgbio".to_string(), &None);
+        assert_eq!(result, "16C12M 102T");
+
+        let spec = dogma_spec();
+        let atac_indices = get_index_by_read_ids(
+            &spec,
+            &"atac".to_string(),
+            &vec![
+                "atac_R1".to_string(),
+                "atac_R2".to_string(),
+                "atac_R3".to_string(),
+            ],
+        );
+        let atac_result = format_index(&atac_indices, &"fgbio".to_string(), &None);
+        assert_eq!(atac_result, "53T 8S16C 53T");
+    }
+
+    #[test]
+    fn test_format_fgbio_index7_fixture() {
+        let spec = load_spec(&PathBuf::from("tests/fixtures/fgbio_index7/spec.yaml"));
+        let indices = get_index_by_read_ids(&spec, &"rna".to_string(), &vec!["I1".to_string()]);
+        let result = format_index(&indices, &"fgbio".to_string(), &None);
+        assert_eq!(result, "4B");
+    }
+
+    #[test]
     fn test_index_by_files() {
         let spec = dogma_spec();
         let modality = "rna".to_string();
@@ -1016,5 +1134,15 @@ mod tests {
         let rev = false;
         let indices = seqspec_index(&spec, &modality, &ids, &idtype, &rev);
         assert_eq!(indices.len(), 1);
+    }
+
+    #[test]
+    #[should_panic(expected = "fgbio only supports read or file selectors")]
+    fn test_format_fgbio_rejects_region_selector() {
+        let spec = dogma_spec();
+        let modality = "rna".to_string();
+        let lib = spec.get_libspec("rna").unwrap();
+        let indices = get_index_by_region_ids(&spec, &modality, &vec![lib.region_id.clone()]);
+        let _ = format_index(&indices, &"fgbio".to_string(), &None);
     }
 }
