@@ -1,3 +1,4 @@
+use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::file::File;
 use crate::models::onlist::Onlist;
@@ -9,16 +10,26 @@ use std::path::PathBuf;
 
 #[derive(Debug, Args)]
 pub struct UpgradeArgs {
-    #[clap(help = "Sequencing specification yaml file", required = true)]
-    yaml: PathBuf,
+    #[clap(help = "Path or URL to sequencing specification YAML", required = true)]
+    yaml: String,
 
     #[clap(short, long, help = "Path to output file", value_name = "OUT")]
     output: Option<PathBuf>,
+
+    #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
+    auth_profile: Option<String>,
 }
 
 pub fn run_upgrade(args: &UpgradeArgs) {
-    validate_upgrade_args(args);
-    let spec = utils::load_spec(&args.yaml);
+    let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    validate_upgrade_args(args, &remote_access);
+    let spec = utils::load_spec_source(&args.yaml, &remote_access).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
     let version = spec
         .seqspec_version
         .clone()
@@ -34,9 +45,9 @@ pub fn run_upgrade(args: &UpgradeArgs) {
     }
 }
 
-fn validate_upgrade_args(args: &UpgradeArgs) {
-    if !args.yaml.exists() {
-        eprintln!("Please use `seqspec upgrade -h` for help.");
+fn validate_upgrade_args(args: &UpgradeArgs, remote_access: &RemoteAccess) {
+    if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
+        eprintln!("{}", err);
         std::process::exit(1);
     }
     if let Some(out) = &args.output {
@@ -222,5 +233,26 @@ mod tests {
         assert_eq!(onlist.file_id, "whitelist.txt.gz");
         assert_eq!(onlist.filename, "whitelist.txt.gz");
         assert_eq!(onlist.md5, "abc123");
+    }
+
+    #[test]
+    fn test_upgrade_loaded_legacy_0_3_tagged_protocol_spec() {
+        let spec = load_spec(&PathBuf::from(
+            "tests/fixtures/legacy_0_3_tagged_protocol_objects.yaml",
+        ));
+
+        let upgraded = seqspec_upgrade(spec, "0.3.0");
+        assert_eq!(upgraded.seqspec_version, Some("0.4.0".to_string()));
+
+        let sequence_kit = upgraded.sequence_kit.expect("sequence kit");
+        assert_eq!(sequence_kit.len(), 1);
+        assert_eq!(sequence_kit[0].kit_id, "NovaSeq X Series 10B Reagent Kit");
+
+        let library_protocol = upgraded.library_protocol.expect("library protocol");
+        assert_eq!(library_protocol.len(), 1);
+        assert_eq!(
+            library_protocol[0].protocol_id,
+            "single-cell RNA sequencing assay (OBI:0002631)"
+        );
     }
 }

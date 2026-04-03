@@ -1,3 +1,4 @@
+use crate::auth::RemoteAccess;
 use crate::seqspec_file::seqspec_file as seqspec_file_lookup;
 use crate::utils;
 use std::fs;
@@ -16,8 +17,8 @@ pub struct FindArgs {
     #[clap(short, long, help = "Output file path", value_name = "OUT")]
     pub output: Option<PathBuf>,
 
-    #[clap(help = "Sequencing specification yaml file", required = true)]
-    pub yaml: PathBuf,
+    #[clap(help = "Path or URL to sequencing specification YAML", required = true)]
+    pub yaml: String,
 
     #[clap(
         short,
@@ -43,11 +44,14 @@ pub struct FindArgs {
 
     #[clap(short, long, help = "ID", value_name = "ID")]
     pub id: Option<String>,
+
+    #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
+    pub auth_profile: Option<String>,
 }
 
-pub fn validate_find_args(args: &FindArgs) -> () {
-    if !args.yaml.exists() {
-        eprintln!("Please use `seqspec find -h` for help.");
+pub fn validate_find_args(args: &FindArgs, remote_access: &RemoteAccess) -> () {
+    if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
+        eprintln!("{}", err);
         std::process::exit(1);
     }
     if args.selector.is_empty() {
@@ -57,8 +61,15 @@ pub fn validate_find_args(args: &FindArgs) -> () {
 }
 
 pub fn run_find(args: &FindArgs) {
-    validate_find_args(args);
-    let spec = utils::load_spec(&args.yaml);
+    let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    validate_find_args(args, &remote_access);
+    let spec = utils::load_spec_source(&args.yaml, &remote_access).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
 
     let found = seqspec_find(&spec, &args.selector, &args.modality, args.id.as_deref());
     let yaml_str = match found {

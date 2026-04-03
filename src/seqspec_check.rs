@@ -27,23 +27,32 @@ pub struct CheckArgs {
     #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
     auth_profile: Option<String>,
 
-    #[clap(help = "Sequencing specification yaml file", required = true)]
-    yaml: PathBuf,
+    #[clap(help = "Path or URL to sequencing specification YAML", required = true)]
+    yaml: String,
 }
 
 pub fn run_check(args: &CheckArgs) -> Vec<ErrorObj> {
-    validate_check_args(args);
-    let spec = utils::load_spec(&args.yaml);
     let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
         eprintln!("{}", err);
         std::process::exit(1);
     });
+    validate_check_args(args, &remote_access);
+    let spec = utils::load_spec_source(&args.yaml, &remote_access).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    let spec_base = utils::spec_base_from_source(&args.yaml);
     let errors =
-        seqspec_check_with_remote_access(&spec, args.skip.as_deref(), &args.yaml, &remote_access)
-            .unwrap_or_else(|err| {
-                eprintln!("{}", err);
-                std::process::exit(1);
-            });
+        seqspec_check_with_remote_access_from_base(
+            &spec,
+            args.skip.as_deref(),
+            spec_base.as_deref(),
+            &remote_access,
+        )
+        .unwrap_or_else(|err| {
+            eprintln!("{}", err);
+            std::process::exit(1);
+        });
 
     if let Some(out) = &args.output {
         let mut f = fs::File::create(out).unwrap();
@@ -58,9 +67,9 @@ pub fn run_check(args: &CheckArgs) -> Vec<ErrorObj> {
     errors
 }
 
-fn validate_check_args(args: &CheckArgs) {
-    if !args.yaml.exists() {
-        eprintln!("Input file does not exist: {}", args.yaml.display());
+fn validate_check_args(args: &CheckArgs, remote_access: &RemoteAccess) {
+    if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
+        eprintln!("{}", err);
         std::process::exit(1);
     }
     if let Some(out) = &args.output {
@@ -85,7 +94,8 @@ fn format_error(e: &ErrorObj, idx: usize) -> String {
 
 pub fn seqspec_check(spec: &Assay, filter_type: Option<&str>, spec_path: &Path) -> Vec<ErrorObj> {
     let access = RemoteAccess::anonymous();
-    let mut errors = check(spec, spec_path, &access).unwrap();
+    let spec_base = spec_path.parent();
+    let mut errors = check(spec, spec_base, &access).unwrap();
     if let Some(ft) = filter_type {
         errors = filter_errors(errors, ft);
     }
@@ -98,7 +108,17 @@ pub fn seqspec_check_with_remote_access(
     spec_path: &Path,
     remote_access: &RemoteAccess,
 ) -> anyhow::Result<Vec<ErrorObj>> {
-    let mut errors = check(spec, spec_path, remote_access)?;
+    let spec_base = spec_path.parent();
+    seqspec_check_with_remote_access_from_base(spec, filter_type, spec_base, remote_access)
+}
+
+pub fn seqspec_check_with_remote_access_from_base(
+    spec: &Assay,
+    filter_type: Option<&str>,
+    spec_base: Option<&Path>,
+    remote_access: &RemoteAccess,
+) -> anyhow::Result<Vec<ErrorObj>> {
+    let mut errors = check(spec, spec_base, remote_access)?;
     if let Some(ft) = filter_type {
         errors = filter_errors(errors, ft);
     }
@@ -197,7 +217,7 @@ pub fn seqspec_check_structural(spec: &Assay) -> Vec<ErrorObj> {
 
 fn check(
     spec: &Assay,
-    spec_path: &Path,
+    spec_base: Option<&Path>,
     remote_access: &RemoteAccess,
 ) -> anyhow::Result<Vec<ErrorObj>> {
     let errors: Vec<ErrorObj> = Vec::new();
@@ -211,12 +231,11 @@ fn check(
     errors.extend(seqspec_check_structural(spec));
 
     // Filesystem checks
-    let spec_base = spec_path.parent().map(|p| p.to_path_buf());
     let (e_on, _i_on) =
-        check_onlist_files_exist(spec, errors, idx, spec_base.as_ref(), remote_access)?;
+        check_onlist_files_exist(spec, errors, idx, spec_base, remote_access)?;
     errors = e_on;
     let (e_rf, _i_rf) =
-        check_read_files_exist(spec, errors, idx, spec_base.as_ref(), remote_access)?;
+        check_read_files_exist(spec, errors, idx, spec_base, remote_access)?;
     errors = e_rf;
 
     Ok(errors)
@@ -342,7 +361,7 @@ fn check_onlist_files_exist(
     spec: &Assay,
     mut errors: Vec<ErrorObj>,
     mut idx: usize,
-    spec_base: Option<&PathBuf>,
+    spec_base: Option<&Path>,
     remote_access: &RemoteAccess,
 ) -> anyhow::Result<(Vec<ErrorObj>, usize)> {
     let mut onlists = Vec::new();
@@ -373,6 +392,19 @@ fn check_onlist_files_exist(
                     }
                 };
                 let p = PathBuf::from(locator);
+                if spec_base.is_none() && !p.is_absolute() {
+                    push_error(
+                        &mut errors,
+                        &mut idx,
+                        "check_onlist_files_exist",
+                        format!(
+                            "cannot resolve local onlist '{}' without a local seqspec source",
+                            ol.filename
+                        ),
+                        "onlist",
+                    );
+                    continue;
+                }
                 candidates.push(if let Some(base) = spec_base {
                     if p.is_absolute() {
                         p.clone()
@@ -444,7 +476,7 @@ fn check_read_files_exist(
     spec: &Assay,
     mut errors: Vec<ErrorObj>,
     mut idx: usize,
-    spec_base: Option<&PathBuf>,
+    spec_base: Option<&Path>,
     remote_access: &RemoteAccess,
 ) -> anyhow::Result<(Vec<ErrorObj>, usize)> {
     for read in &spec.sequence_spec {
@@ -465,6 +497,19 @@ fn check_read_files_exist(
                         }
                     };
                     let p = PathBuf::from(locator);
+                    if spec_base.is_none() && !p.is_absolute() {
+                        push_error(
+                            &mut errors,
+                            &mut idx,
+                            "check_read_files_exist",
+                            format!(
+                                "cannot resolve local file '{}' without a local seqspec source",
+                                f.filename
+                            ),
+                            "file",
+                        );
+                        continue;
+                    }
                     let full = if let Some(base) = spec_base {
                         if p.is_absolute() {
                             p.clone()

@@ -1,3 +1,4 @@
+use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::read::Read;
 use crate::models::region::Region;
@@ -11,8 +12,8 @@ use std::path::PathBuf;
 
 #[derive(Debug, Args)]
 pub struct InfoArgs {
-    #[clap(help = "Sequencing specification yaml file", required = true)]
-    yaml: PathBuf,
+    #[clap(help = "Path or URL to sequencing specification YAML", required = true)]
+    yaml: String,
 
     #[clap(
         short,
@@ -36,11 +37,21 @@ pub struct InfoArgs {
 
     #[clap(short, long, help = "Path to output file", value_name = "OUT")]
     output: Option<PathBuf>,
+
+    #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
+    auth_profile: Option<String>,
 }
 
 pub fn run_info(args: &InfoArgs) {
-    validate_info_args(args);
-    let spec = utils::load_spec(&args.yaml);
+    let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    validate_info_args(args, &remote_access);
+    let spec = utils::load_spec_source(&args.yaml, &remote_access).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
 
     let info = seqspec_info(&spec, &args.key);
     let result = format_info(&spec, info, &args.key, &args.format);
@@ -53,9 +64,9 @@ pub fn run_info(args: &InfoArgs) {
     }
 }
 
-fn validate_info_args(args: &InfoArgs) {
-    if !args.yaml.exists() {
-        eprintln!("Please use `seqspec info -h` for help.");
+fn validate_info_args(args: &InfoArgs, remote_access: &RemoteAccess) {
+    if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
+        eprintln!("{}", err);
         std::process::exit(1);
     }
     if let Some(out) = &args.output {

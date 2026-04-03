@@ -3,13 +3,14 @@
 This module provides functionality to upgrade seqspec files from older versions to the current version.
 """
 
+import os
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
 
 from seqspec.Assay import Assay
 from seqspec.File import File
 from seqspec.Region import Onlist
-from seqspec.utils import load_spec
+from seqspec.utils import is_remote_source, load_spec
 
 
 def setup_upgrade_args(parser) -> ArgumentParser:
@@ -27,7 +28,9 @@ seqspec upgrade spec.yaml                   # Upgrade and print to stdout
         help="Upgrade seqspec file to current version",
         formatter_class=RawTextHelpFormatter,
     )
-    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
+    subparser.add_argument(
+        "yaml", help="Path or URL to sequencing specification YAML", type=str
+    )
     subparser.add_argument(
         "-o",
         "--output",
@@ -36,12 +39,19 @@ seqspec upgrade spec.yaml                   # Upgrade and print to stdout
         type=Path,
         default=None,
     )
+    subparser.add_argument(
+        "--auth-profile",
+        metavar="PROFILE",
+        help="Authentication profile for remote spec access",
+        type=str,
+        default=os.environ.get("SEQSPEC_AUTH_PROFILE"),
+    )
     return subparser
 
 
 def validate_upgrade_args(parser: ArgumentParser, args: Namespace) -> None:
     """Validate the upgrade command arguments."""
-    if not Path(args.yaml).exists():
+    if not is_remote_source(args.yaml) and not Path(args.yaml).exists():
         parser.error(f"Input file does not exist: {args.yaml}")
 
     if args.output and Path(args.output).exists() and not Path(args.output).is_file():
@@ -52,7 +62,7 @@ def run_upgrade(parser: ArgumentParser, args: Namespace) -> None:
     """Run the upgrade command."""
     validate_upgrade_args(parser, args)
 
-    spec = load_spec(args.yaml, strict=False)
+    spec = load_spec(args.yaml, strict=False, auth_profile=args.auth_profile)
     version = spec.seqspec_version or "0.0.0"
     upgraded_spec = seqspec_upgrade(spec, version)
 

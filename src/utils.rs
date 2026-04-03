@@ -5,9 +5,12 @@ use crate::models::onlist::Onlist;
 use crate::models::read::Read;
 use crate::models::region::{Region, RegionCoordinate};
 
+use anyhow::{Context, Result};
 use flate2::read::GzDecoder;
 use serde_yaml;
-use std::io::Read as IoRead;
+use serde_yaml::Value;
+use std::io::{Cursor, Read as IoRead};
+use std::path::{Path, PathBuf};
 
 pub fn complement_base(c: char) -> char {
     match c {
@@ -42,23 +45,114 @@ pub fn complement_seq(s: &str) -> String {
 //     Ok(obj.into())
 // }
 
-pub fn load_spec(spec: &std::path::PathBuf) -> Assay {
-    let mut f: std::fs::File = std::fs::File::open(spec).expect("Could not open file.");
+pub fn is_remote_source(source: &str) -> bool {
+    matches!(
+        source.split_once("://").map(|(scheme, _)| scheme),
+        Some("http" | "https" | "ftp")
+    )
+}
+
+pub fn local_source_path(source: &str) -> Option<PathBuf> {
+    if is_remote_source(source) {
+        None
+    } else {
+        Some(PathBuf::from(source))
+    }
+}
+
+pub fn spec_base_from_source(source: &str) -> Option<PathBuf> {
+    local_source_path(source).and_then(|path| path.parent().map(|parent| parent.to_path_buf()))
+}
+
+pub fn load_spec(spec: &PathBuf) -> Assay {
+    load_spec_path(spec).expect("Could not read values.")
+}
+
+pub fn load_spec_path(spec: &Path) -> Result<Assay> {
+    let mut f = std::fs::File::open(spec)
+        .with_context(|| format!("Could not open file '{}'.", spec.display()))?;
     let mut magic = [0_u8; 2];
     f.read_exact(&mut magic)
-        .expect("Could not read file header.");
+        .with_context(|| format!("Could not read file header for '{}'.", spec.display()))?;
     drop(f);
 
     let reader: Box<dyn IoRead> = if magic == [0x1f, 0x8b] {
-        let gz = GzDecoder::new(std::fs::File::open(spec).expect("Could not open file."));
+        let gz = GzDecoder::new(
+            std::fs::File::open(spec)
+                .with_context(|| format!("Could not open file '{}'.", spec.display()))?,
+        );
         Box::new(gz)
     } else {
-        Box::new(std::fs::File::open(spec).expect("Could not open file."))
+        Box::new(
+            std::fs::File::open(spec)
+                .with_context(|| format!("Could not open file '{}'.", spec.display()))?,
+        )
     };
 
-    let spec: AssayCompat = serde_yaml::from_reader(reader).expect("Could not read values.");
+    load_spec_reader(reader)
+}
 
-    spec.into_assay()
+pub fn load_spec_bytes(bytes: &[u8]) -> Result<Assay> {
+    let reader: Box<dyn IoRead> = if bytes.starts_with(&[0x1f, 0x8b]) {
+        Box::new(GzDecoder::new(Cursor::new(bytes.to_vec())))
+    } else {
+        Box::new(Cursor::new(bytes.to_vec()))
+    };
+
+    load_spec_reader(reader)
+}
+
+pub fn load_spec_reader<R: IoRead>(reader: R) -> Result<Assay> {
+    let raw: Value = serde_yaml::from_reader(reader).context("Could not read values.")?;
+    let spec: AssayCompat =
+        serde_yaml::from_value(strip_yaml_tags(raw)).context("Could not read values.")?;
+
+    Ok(spec.into_assay())
+}
+
+pub fn load_spec_source(source: &str, remote_access: &RemoteAccess) -> Result<Assay> {
+    if is_remote_source(source) {
+        remote_access.with_reader(source, |mut reader| {
+            let mut data = Vec::new();
+            reader.read_to_end(&mut data)?;
+            load_spec_bytes(&data)
+        })
+    } else {
+        load_spec_path(Path::new(source))
+    }
+}
+
+pub fn validate_source_exists(source: &str, remote_access: &RemoteAccess) -> Result<()> {
+    if is_remote_source(source) {
+        remote_access
+            .with_reader(source, |mut reader| {
+                let mut data = Vec::new();
+                reader.read_to_end(&mut data)?;
+                Ok(())
+            })
+            .map_err(|_| anyhow::anyhow!("Input source does not exist: {}", source))
+    } else if Path::new(source).exists() {
+        Ok(())
+    } else {
+        Err(anyhow::anyhow!("Input source does not exist: {}", source))
+    }
+}
+
+fn strip_yaml_tags(value: Value) -> Value {
+    match value {
+        Value::Tagged(tagged) => strip_yaml_tags(tagged.value),
+        Value::Sequence(sequence) => {
+            Value::Sequence(sequence.into_iter().map(strip_yaml_tags).collect())
+        }
+        Value::Mapping(mapping) => {
+            let mut normalized = serde_yaml::Mapping::new();
+            for (key, value) in mapping {
+                normalized.insert(strip_yaml_tags(key), strip_yaml_tags(value));
+            }
+            Value::Mapping(normalized)
+        }
+        other => other,
+    }
 }
 
 pub fn local_resource_url<'a>(
@@ -221,7 +315,12 @@ pub fn itx_read(
 mod tests {
     use super::*;
     use crate::models::region::Region;
+    use flate2::write::GzEncoder;
+    use flate2::Compression;
+    use std::io::{Read as IoReadTrait, Write};
+    use std::net::TcpListener;
     use std::path::PathBuf;
+    use std::thread;
 
     fn dogma_spec() -> Assay {
         load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
@@ -232,6 +331,81 @@ mod tests {
         let spec = load_spec(&PathBuf::from("tests/fixtures/spec.yaml.gz"));
         assert_eq!(spec.assay_id, "DOGMAseq-DIG");
         assert_eq!(spec.seqspec_version, Some("0.4.0".to_string()));
+    }
+
+    #[test]
+    fn test_load_spec_source_reads_remote_yaml() {
+        let body = std::fs::read("tests/fixtures/spec.yaml").unwrap();
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut buffer = [0_u8; 4096];
+            let _ = stream.read(&mut buffer);
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            );
+            stream.write_all(response.as_bytes()).unwrap();
+            stream.write_all(&body).unwrap();
+        });
+
+        let access = RemoteAccess::anonymous();
+        let spec = load_spec_source(&format!("http://{}/spec.yaml", addr), &access).unwrap();
+        server.join().unwrap();
+
+        assert_eq!(spec.assay_id, "DOGMAseq-DIG");
+    }
+
+    #[test]
+    fn test_load_spec_source_reads_remote_gzipped_yaml() {
+        let body = std::fs::read("tests/fixtures/spec.yaml").unwrap();
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+        encoder.write_all(&body).unwrap();
+        let body = encoder.finish().unwrap();
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut buffer = [0_u8; 4096];
+            let _ = stream.read(&mut buffer);
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            );
+            stream.write_all(response.as_bytes()).unwrap();
+            stream.write_all(&body).unwrap();
+        });
+
+        let access = RemoteAccess::anonymous();
+        let spec = load_spec_source(&format!("http://{}/spec.yaml.gz", addr), &access).unwrap();
+        server.join().unwrap();
+
+        assert_eq!(spec.assay_id, "DOGMAseq-DIG");
+    }
+
+    #[test]
+    fn test_validate_source_exists_accepts_remote_spec_source() {
+        let body = std::fs::read("tests/fixtures/spec.yaml").unwrap();
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut buffer = [0_u8; 4096];
+            let _ = stream.read(&mut buffer);
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            );
+            stream.write_all(response.as_bytes()).unwrap();
+            stream.write_all(&body).unwrap();
+        });
+
+        let access = RemoteAccess::anonymous();
+        let result = validate_source_exists(&format!("http://{}/spec.yaml", addr), &access);
+        server.join().unwrap();
+
+        assert!(result.is_ok());
     }
 
     fn leaf(id: &str, len: i64) -> Region {
@@ -324,6 +498,34 @@ mod tests {
         assert_eq!(library_kit[0].kit_id, "LegacyKit");
         assert_eq!(library_kit[0].name.as_deref(), Some("LegacyKit"));
         assert_eq!(library_kit[0].modality, "rna");
+    }
+
+    #[test]
+    fn test_load_spec_accepts_legacy_tagged_protocol_objects() {
+        let spec = load_spec(&PathBuf::from(
+            "tests/fixtures/legacy_0_3_tagged_protocol_objects.yaml",
+        ));
+
+        assert_eq!(spec.seqspec_version, Some("0.3.0".to_string()));
+        assert_eq!(spec.modalities, vec!["rna".to_string()]);
+
+        let sequence_kit = spec.sequence_kit.expect("sequence kit");
+        assert_eq!(sequence_kit.len(), 1);
+        assert_eq!(sequence_kit[0].kit_id, "NovaSeq X Series 10B Reagent Kit");
+        assert_eq!(
+            sequence_kit[0].name.as_deref(),
+            Some("NovaSeq X Series 10B Reagent Kit")
+        );
+        assert_eq!(sequence_kit[0].modality, "rna");
+
+        let library_protocol = spec.library_protocol.expect("library protocol");
+        assert_eq!(library_protocol.len(), 1);
+        assert_eq!(
+            library_protocol[0].protocol_id,
+            "single-cell RNA sequencing assay (OBI:0002631)"
+        );
+        assert_eq!(library_protocol[0].name, "scRNA-seq (Multiome)");
+        assert_eq!(library_protocol[0].modality, "rna");
     }
 
     #[test]

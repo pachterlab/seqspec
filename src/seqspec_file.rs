@@ -1,3 +1,4 @@
+use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::file::File;
 use crate::models::onlist::Onlist;
@@ -6,15 +7,15 @@ use clap::Args;
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Args)]
 pub struct FileArgs {
     #[clap(short, long, help = "Output file path", value_name = "OUT")]
     output: Option<PathBuf>,
 
-    #[clap(help = "Sequencing specification yaml file", required = true)]
-    yaml: PathBuf,
+    #[clap(help = "Path or URL to sequencing specification YAML", required = true)]
+    yaml: String,
 
     #[clap(
         short,
@@ -67,26 +68,37 @@ pub struct FileArgs {
 
     #[clap(long, help = "Use full path for local urls", default_value = "false")]
     fullpath: bool,
+
+    #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
+    auth_profile: Option<String>,
 }
 
 pub fn run_file(args: &FileArgs) {
-    validate_file_args(args);
-    let spec = utils::load_spec(&args.yaml);
+    let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    validate_file_args(args, &remote_access);
+    let spec = utils::load_spec_source(&args.yaml, &remote_access).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    let spec_base = utils::spec_base_from_source(&args.yaml);
 
     let ids = args.ids.clone();
     let files = seqspec_file(&spec, &args.modality, ids.as_ref(), &args.selector);
 
     if !files.is_empty() {
         let result = match args.format.as_str() {
-            "list" => format_list_files_metadata(&files, &args.key, &args.yaml, args.fullpath),
+            "list" => format_list_files_metadata(&files, &args.key, spec_base.as_deref(), args.fullpath),
             "paired" | "interleaved" | "index" => format_list_files(
                 &files,
                 &args.format,
                 Some(&args.key),
-                &args.yaml,
+                spec_base.as_deref(),
                 args.fullpath,
             ),
-            "json" => format_json_files(&files, &args.key, &args.yaml, args.fullpath),
+            "json" => format_json_files(&files, &args.key, spec_base.as_deref(), args.fullpath),
             _ => String::new(),
         };
 
@@ -99,9 +111,9 @@ pub fn run_file(args: &FileArgs) {
     }
 }
 
-fn validate_file_args(args: &FileArgs) {
-    if !args.yaml.exists() {
-        eprintln!("Please use `seqspec file -h` for help.");
+fn validate_file_args(args: &FileArgs, remote_access: &RemoteAccess) {
+    if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
+        eprintln!("{}", err);
         std::process::exit(1);
     }
     if ["filesize", "filetype", "urltype", "md5"].contains(&args.key.as_str())
@@ -200,7 +212,7 @@ fn list_region_files(spec: &Assay, modality: &String) -> HashMap<String, Vec<Fil
 fn format_list_files_metadata(
     files: &HashMap<String, Vec<File>>,
     k: &String,
-    _spec_fn: &PathBuf,
+    _spec_base: Option<&Path>,
     _fp: bool,
 ) -> String {
     let mut x: Vec<String> = Vec::new();
@@ -241,7 +253,7 @@ fn format_list_files_metadata(
 fn format_json_files(
     files: &HashMap<String, Vec<File>>,
     k: &String,
-    spec_fn: &PathBuf,
+    spec_base: Option<&Path>,
     fp: bool,
 ) -> String {
     use serde_json::json;
@@ -252,13 +264,13 @@ fn format_json_files(
                 let mut d = serde_json::to_value(item).unwrap();
                 if item.urltype == "local" && fp {
                     if let Some(obj) = d.as_object_mut() {
-                        obj.insert("url".to_string(), json!(full_path(spec_fn, &item.url)));
+                        obj.insert("url".to_string(), json!(full_path(spec_base, &item.url)));
                     }
                 }
                 x.push(d);
             } else {
                 let mut attr = match k.as_str() {
-                    "url" => maybe_full(&item.url, &item.urltype, spec_fn, fp),
+                    "url" => maybe_full(&item.url, &item.urltype, spec_base, fp),
                     _ => String::new(),
                 };
                 if k != "url" {
@@ -283,7 +295,7 @@ fn format_list_files(
     files: &HashMap<String, Vec<File>>,
     fmt: &String,
     k: Option<&String>,
-    spec_fn: &PathBuf,
+    spec_base: Option<&Path>,
     fp: bool,
 ) -> String {
     let mut out: Vec<String> = Vec::new();
@@ -293,7 +305,7 @@ fn format_list_files(
             for (_key, i) in row {
                 let val = if let Some(key) = k {
                     let mut attr = match key.as_str() {
-                        "url" => maybe_full(&i.url, &i.urltype, spec_fn, fp),
+                        "url" => maybe_full(&i.url, &i.urltype, spec_base, fp),
                         _ => String::new(),
                     };
                     if key != &"url".to_string() {
@@ -320,7 +332,7 @@ fn format_list_files(
             for (_key, i) in row {
                 let id = if let Some(key) = k {
                     let mut attr = match key.as_str() {
-                        "url" => maybe_full(&i.url, &i.urltype, spec_fn, fp),
+                        "url" => maybe_full(&i.url, &i.urltype, spec_base, fp),
                         _ => String::new(),
                     };
                     if key != &"url".to_string() {
@@ -347,7 +359,7 @@ fn format_list_files(
             for (_key, i) in row {
                 let id = if let Some(key) = k {
                     let mut attr = match key.as_str() {
-                        "url" => maybe_full(&i.url, &i.urltype, spec_fn, fp),
+                        "url" => maybe_full(&i.url, &i.urltype, spec_base, fp),
                         _ => String::new(),
                     };
                     if key != &"url".to_string() {
@@ -466,20 +478,18 @@ fn list_files_by_region_type(
     new_files
 }
 
-fn maybe_full(url: &String, urltype: &String, spec_fn: &PathBuf, fp: bool) -> String {
+fn maybe_full(url: &String, urltype: &String, spec_base: Option<&Path>, fp: bool) -> String {
     if urltype == "local" && fp {
-        full_path(spec_fn, url)
+        full_path(spec_base, url)
     } else {
         url.clone()
     }
 }
 
-fn full_path(spec_fn: &PathBuf, url: &String) -> String {
-    let parent: PathBuf = spec_fn
-        .parent()
-        .map(|p| p.to_path_buf())
-        .unwrap_or_else(|| PathBuf::from("."));
-    parent.join(url).to_string_lossy().to_string()
+fn full_path(spec_base: Option<&Path>, url: &String) -> String {
+    spec_base
+        .map(|base| base.join(url).to_string_lossy().to_string())
+        .unwrap_or_else(|| url.clone())
 }
 
 #[cfg(test)]
@@ -536,7 +546,7 @@ mod tests {
     fn test_full_path() {
         let spec_fn = PathBuf::from("/data/specs/spec.yaml");
         let url = "barcodes.txt".to_string();
-        let result = full_path(&spec_fn, &url);
+        let result = full_path(spec_fn.parent(), &url);
         assert_eq!(result, "/data/specs/barcodes.txt");
     }
 
@@ -544,7 +554,7 @@ mod tests {
     fn test_maybe_full_local() {
         let spec_fn = PathBuf::from("/data/specs/spec.yaml");
         let url = "file.txt".to_string();
-        let result = maybe_full(&url, &"local".to_string(), &spec_fn, true);
+        let result = maybe_full(&url, &"local".to_string(), spec_fn.parent(), true);
         assert_eq!(result, "/data/specs/file.txt");
     }
 
@@ -552,7 +562,7 @@ mod tests {
     fn test_maybe_full_remote() {
         let spec_fn = PathBuf::from("/data/specs/spec.yaml");
         let url = "http://example.com/file.txt".to_string();
-        let result = maybe_full(&url, &"http".to_string(), &spec_fn, true);
+        let result = maybe_full(&url, &"http".to_string(), spec_fn.parent(), true);
         assert_eq!(result, "http://example.com/file.txt");
     }
 
@@ -610,7 +620,7 @@ mod tests {
             &files,
             &"paired".to_string(),
             Some(&"filename".to_string()),
-            &PathBuf::from("spec.yaml"),
+            Some(Path::new(".")),
             false,
         );
         assert_eq!(
@@ -638,7 +648,7 @@ mod tests {
         let rendered = format_list_files_metadata(
             &files,
             &"url".to_string(),
-            &PathBuf::from("/tmp/spec.yaml"),
+            Some(Path::new("/tmp")),
             true,
         );
         assert_eq!(rendered, "rna_R1\tr1\trelative/r1.fastq.gz");

@@ -1,3 +1,4 @@
+use crate::auth::RemoteAccess;
 use crate::utils;
 use std::fs;
 use std::io::Write;
@@ -17,8 +18,8 @@ pub struct IndexArgs {
     #[clap(short, long, help = "Output file path", value_name = "OUT")]
     output: Option<PathBuf>,
 
-    #[clap(help = "Sequencing specification yaml file", required = true)]
-    yaml: PathBuf,
+    #[clap(help = "Path or URL to sequencing specification YAML", required = true)]
+    yaml: String,
 
     #[clap(
         short,
@@ -70,11 +71,14 @@ pub struct IndexArgs {
         default_value = "false"
     )]
     no_overlap: bool,
+
+    #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
+    auth_profile: Option<String>,
 }
 
-pub fn validate_index_args(args: &IndexArgs) -> () {
-    if !args.yaml.exists() {
-        eprintln!("Please use `seqspec index -h` for help.");
+pub fn validate_index_args(args: &IndexArgs, remote_access: &RemoteAccess) -> () {
+    if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
+        eprintln!("{}", err);
         std::process::exit(1);
     }
     if args.modality.is_empty() {
@@ -88,8 +92,15 @@ pub fn validate_index_args(args: &IndexArgs) -> () {
 }
 
 pub fn run_index(args: &IndexArgs) {
-    validate_index_args(args);
-    let spec = utils::load_spec(&args.yaml);
+    let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    validate_index_args(args, &remote_access);
+    let spec = utils::load_spec_source(&args.yaml, &remote_access).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
 
     let ids = args.ids.as_ref().unwrap_or(&Vec::new()).clone();
 

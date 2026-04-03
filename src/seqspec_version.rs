@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use clap::Args;
 
+use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::utils;
 
@@ -14,22 +15,31 @@ pub struct VersionArgs {
     #[clap(short, long, value_name = "OUT")]
     output: Option<PathBuf>,
 
-    /// Sequencing specification YAML file
+    /// Path or URL to sequencing specification YAML
     #[clap(value_name = "YAML")]
-    yaml: PathBuf,
+    yaml: String,
+
+    #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
+    auth_profile: Option<String>,
 }
 
-pub fn validate_version_args(args: &VersionArgs) {
-    // just call the runner and print any error nicely
-    if !args.yaml.exists() {
-        eprintln!("Please use `seqspec version -h` for help.");
+pub fn validate_version_args(args: &VersionArgs, remote_access: &RemoteAccess) {
+    if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
+        eprintln!("{}", err);
         std::process::exit(1);
     }
 }
 
 pub fn run_version(args: &VersionArgs) {
-    validate_version_args(args);
-    let spec = utils::load_spec(&args.yaml);
+    let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    validate_version_args(args, &remote_access);
+    let spec = utils::load_spec_source(&args.yaml, &remote_access).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
     let vinfo = seqspec_version(&spec);
     let out = format_version(&vinfo);
 

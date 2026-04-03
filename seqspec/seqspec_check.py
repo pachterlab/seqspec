@@ -17,6 +17,7 @@ from seqspec.Assay import Assay
 from seqspec.Region import itx_read, project_regions_to_coordinates
 from seqspec.utils import (
     file_exists,
+    is_remote_source,
     load_spec,
     local_onlist_locator,
     local_resource_url,
@@ -63,14 +64,16 @@ seqspec check spec.yaml
         default=os.environ.get("SEQSPEC_AUTH_PROFILE"),
     )
 
-    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
+    subparser.add_argument(
+        "yaml", help="Path or URL to sequencing specification YAML", type=str
+    )
 
     return subparser
 
 
 def validate_check_args(parser: ArgumentParser, args: Namespace) -> None:
     """Validate the check command arguments."""
-    if not Path(args.yaml).exists():
+    if not is_remote_source(args.yaml) and not Path(args.yaml).exists():
         parser.error(f"Input file does not exist: {args.yaml}")
 
     if args.output and Path(args.output).exists() and not Path(args.output).is_file():
@@ -130,7 +133,7 @@ def run_check(parser: ArgumentParser, args: Namespace):
     """Run the check command."""
     validate_check_args(parser, args)
 
-    spec = load_spec(args.yaml, strict=False)
+    spec = load_spec(args.yaml, strict=False, auth_profile=args.auth_profile)
     errors = seqspec_check(spec, args.skip, args.auth_profile)
 
     if args.output:
@@ -283,6 +286,15 @@ def check(spec: Assay, auth_profile: Optional[str] = None):
                     continue
                 if locator.endswith(".gz"):
                     check = locator
+                    if spec_base is None and not Path(check).is_absolute():
+                        errobj = {
+                            "error_type": "check_onlist_files_exist",
+                            "error_message": f"cannot resolve local onlist '{ol.filename}' without a local seqspec source",
+                            "error_object": "onlist",
+                        }
+                        errors.append(errobj)
+                        idx += 1
+                        continue
                     if spec_base and not Path(check).is_absolute():
                         check = str((spec_base / check).resolve())
                     if not path.exists(check):
@@ -296,6 +308,15 @@ def check(spec: Assay, auth_profile: Optional[str] = None):
                 else:
                     check = locator
                     check_gz = locator + ".gz"
+                    if spec_base is None and not Path(check).is_absolute():
+                        errobj = {
+                            "error_type": "check_onlist_files_exist",
+                            "error_message": f"cannot resolve local onlist '{ol.filename}' without a local seqspec source",
+                            "error_object": "onlist",
+                        }
+                        errors.append(errobj)
+                        idx += 1
+                        continue
                     if spec_base:
                         if not Path(check).is_absolute():
                             check = str((spec_base / check).resolve())
@@ -367,6 +388,15 @@ def check(spec: Assay, auth_profile: Optional[str] = None):
                         errobj = {
                             "error_type": "check_read_files_exist",
                             "error_message": str(err),
+                            "error_object": "file",
+                        }
+                        errors.append(errobj)
+                        idx += 1
+                        continue
+                    if spec_base is None and not Path(check).is_absolute():
+                        errobj = {
+                            "error_type": "check_read_files_exist",
+                            "error_message": f"cannot resolve local file '{f.filename}' without a local seqspec source",
                             "error_object": "file",
                         }
                         errors.append(errobj)

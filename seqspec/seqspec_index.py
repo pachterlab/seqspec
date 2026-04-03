@@ -3,6 +3,7 @@
 This module provides functionality to identify the position of elements in a spec for use in downstream tools.
 """
 
+import os
 import warnings
 from argparse import SUPPRESS, ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
@@ -20,7 +21,7 @@ from seqspec.Region import (
 )
 from seqspec.seqspec_file import list_files_by_file_id
 from seqspec.seqspec_find import find_by_region_id
-from seqspec.utils import load_spec, map_read_id_to_regions
+from seqspec.utils import is_remote_source, load_spec, map_read_id_to_regions
 
 
 class Coordinate(BaseModel):
@@ -50,7 +51,9 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
         formatter_class=RawTextHelpFormatter,
     )
     subparser_required = subparser.add_argument_group("required arguments")
-    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
+    subparser.add_argument(
+        "yaml", help="Path or URL to sequencing specification YAML", type=str
+    )
     subparser.add_argument(
         "-o",
         "--output",
@@ -130,6 +133,13 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
         dest="overlap",
         default=False,
     )
+    subparser.add_argument(
+        "--auth-profile",
+        metavar="PROFILE",
+        help="Authentication profile for remote spec access",
+        type=str,
+        default=os.environ.get("SEQSPEC_AUTH_PROFILE"),
+    )
 
     return subparser
 
@@ -137,7 +147,7 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
 def validate_index_args(parser: ArgumentParser, args: Namespace) -> None:
     """Validate the index command arguments."""
 
-    if not Path(args.yaml).exists():
+    if not is_remote_source(args.yaml) and not Path(args.yaml).exists():
         parser.error(f"Input file does not exist: {args.yaml}")
 
     if args.output and Path(args.output).exists() and not Path(args.output).is_file():
@@ -220,7 +230,7 @@ def run_index(parser: ArgumentParser, args: Namespace) -> None:
     """Run the index command."""
     validate_index_args(parser, args)
 
-    spec = load_spec(args.yaml)
+    spec = load_spec(args.yaml, auth_profile=args.auth_profile)
     ids = args.ids.split(",") if args.ids else []
 
     indices = seqspec_index(

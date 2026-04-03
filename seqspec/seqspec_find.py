@@ -3,6 +3,7 @@
 This module provides functionality to search for objects within seqspec files.
 """
 
+import os
 import warnings
 from argparse import SUPPRESS, ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
@@ -13,7 +14,11 @@ from seqspec.File import File
 from seqspec.Read import Read
 from seqspec.Region import Region
 from seqspec.seqspec_file import list_all_files
-from seqspec.utils import load_spec, write_pydantic_to_file_or_stdout
+from seqspec.utils import (
+    is_remote_source,
+    load_spec,
+    write_pydantic_to_file_or_stdout,
+)
 
 
 def setup_find_args(parser) -> ArgumentParser:
@@ -34,7 +39,9 @@ seqspec find -m rna -s file -i r1.fastq.gz spec.yaml    # Find files with id r1.
     )
     subparser_required = subparser.add_argument_group("required arguments")
 
-    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
+    subparser.add_argument(
+        "yaml", help="Path or URL to sequencing specification YAML", type=str
+    )
     subparser.add_argument(
         "-o",
         "--output",
@@ -73,13 +80,20 @@ seqspec find -m rna -s file -i r1.fastq.gz spec.yaml    # Find files with id r1.
         default=None,
         required=False,
     )
+    subparser.add_argument(
+        "--auth-profile",
+        metavar="PROFILE",
+        help="Authentication profile for remote spec access",
+        type=str,
+        default=os.environ.get("SEQSPEC_AUTH_PROFILE"),
+    )
 
     return subparser
 
 
 def validate_find_args(parser: ArgumentParser, args: Namespace) -> None:
     """Validate the find command arguments."""
-    if not Path(args.yaml).exists():
+    if not is_remote_source(args.yaml) and not Path(args.yaml).exists():
         parser.error(f"Input file does not exist: {args.yaml}")
 
     if args.output and Path(args.output).exists() and not Path(args.output).is_file():
@@ -125,7 +139,7 @@ def run_find(parser: ArgumentParser, args: Namespace) -> None:
     """Run the find command."""
     validate_find_args(parser, args)
 
-    spec = load_spec(args.yaml)
+    spec = load_spec(args.yaml, auth_profile=args.auth_profile)
 
     found = seqspec_find(spec, args.selector, args.modality, args.id)
 

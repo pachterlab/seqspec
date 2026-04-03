@@ -3,12 +3,14 @@ import tempfile
 import gzip
 from unittest.mock import patch, mock_open, MagicMock
 from io import StringIO
-import io
+from pathlib import Path
 
 import pytest
 
 from seqspec.utils import (
+    is_remote_source,
     load_spec_stream,
+    load_spec,
     local_resource_url,
     read_local_list,
     read_remote_list,
@@ -42,6 +44,46 @@ library_spec: []
 
     assert isinstance(spec, Assay)
     assert spec.assay_id == "MyAssay"
+
+
+def test_is_remote_source():
+    assert is_remote_source("https://example.org/spec.yaml")
+    assert is_remote_source("ftp://example.org/spec.yaml")
+    assert not is_remote_source("tests/fixtures/spec.yaml")
+
+
+def test_load_spec_reads_remote_yaml():
+    payload = Path("tests/fixtures/spec.yaml").read_bytes()
+    response = MagicMock()
+    response.content = payload
+    response.raise_for_status.return_value = None
+
+    with patch("seqspec.utils.get_remote_auth_token", return_value=None), patch(
+        "seqspec.utils.requests.get", return_value=response
+    ) as mock_get:
+        spec = load_spec("https://example.org/spec.yaml")
+
+    assert spec.assay_id == "DOGMAseq-DIG"
+    assert spec._spec_path is None
+    assert spec._spec_source == "https://example.org/spec.yaml"
+    mock_get.assert_called_once_with("https://example.org/spec.yaml", auth=None)
+
+
+def test_load_spec_reads_remote_gzipped_yaml():
+    payload = gzip.compress(Path("tests/fixtures/spec.yaml").read_bytes())
+    response = MagicMock()
+    response.content = payload
+    response.raise_for_status.return_value = None
+
+    with patch("seqspec.utils.get_remote_auth_token", return_value=None), patch(
+        "seqspec.utils.requests.get", return_value=response
+    ) as mock_get:
+        spec = load_spec("https://example.org/spec.yaml.gz")
+
+    assert spec.assay_id == "DOGMAseq-DIG"
+    assert spec._spec_path is None
+    assert spec._spec_source == "https://example.org/spec.yaml.gz"
+    mock_get.assert_called_once_with("https://example.org/spec.yaml.gz", auth=None)
 
 def test_write_read():
     # Create a dummy Read object

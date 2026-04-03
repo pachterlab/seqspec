@@ -105,40 +105,55 @@ def format_pydantic_validation_object(error_path: str) -> str:
     return result
 
 
-def load_spec(spec_fn: Union[str, Path], strict=True) -> Assay:
-    """
-    Loads a YAML or gzipped YAML spec file, strips tags, and constructs an Assay object.
-    If strict=True and validation fails, prints all errors and raises an exception.
-    """
-    # Check if the file is gzip by reading the magic number
-    with open(spec_fn, "rb") as f:
-        magic = f.read(2)
+def is_remote_source(source: Union[str, Path]) -> bool:
+    source_str = str(source)
+    return source_str.startswith(("http://", "https://", "ftp://"))
 
-    if magic == b"\x1f\x8b":
-        with gzip.open(spec_fn, "rt") as stream:
+
+def local_spec_base(source: Union[str, Path]) -> Optional[Path]:
+    if is_remote_source(source):
+        return None
+    return Path(source).resolve().parent
+
+
+def _read_spec_bytes(
+    spec_source: Union[str, Path], auth_profile: Optional[str] = None
+) -> Tuple[bytes, Optional[Path], str]:
+    source_str = str(spec_source)
+    if is_remote_source(source_str):
+        auth = get_remote_auth_token(source_str, auth_profile)
+        response = requests.get(source_str, auth=auth)
+        response.raise_for_status()
+        return response.content, None, source_str
+
+    path = Path(spec_source)
+    resolved = path.resolve()
+    with open(resolved, "rb") as stream:
+        return stream.read(), resolved, str(resolved)
+
+
+def _load_spec_from_bytes(
+    payload: bytes,
+    strict: bool = True,
+    spec_path: Optional[Path] = None,
+    spec_source: Optional[str] = None,
+) -> Assay:
+    if payload.startswith(b"\x1f\x8b"):
+        with gzip.open(io.BytesIO(payload), "rt") as stream:
             data_dict = safe_load_strip_tags(stream)
     else:
-        with open(spec_fn, "r") as stream:
-            data_dict = safe_load_strip_tags(stream)
+        data_dict = yaml.safe_load(strip_yaml_tags(payload.decode("utf-8")))
 
     if strict:
         try:
             assay = Assay(**data_dict)
-            # record the absolute path of the spec on the created object
-            try:
-                assay._spec_path = str(Path(spec_fn).resolve())
-            except Exception:
-                assay._spec_path = None
-            return assay
         except ValidationError as e:
             verrors = e.errors()
             errors = []
             for idx, err in enumerate(verrors, 1):
-                # err['loc'] is a tuple of the error path, join with dots for readability
                 err_path = ".".join(str(x) for x in err.get("loc", []))
                 err_type = err.get("type", "unknown")
                 err_msg = err.get("msg", "")
-                # Compose a descriptive error message
                 errors.append(
                     {
                         "error_type": err_type,
@@ -156,14 +171,26 @@ def load_spec(spec_fn: Union[str, Path], strict=True) -> Assay:
                 "Invalid spec. Correct errors then verify spec with `seqspec format` and `seqspec check`."
             )
     else:
-        from seqspec.Assay import AssayInput
-
         assay = AssayInput(**data_dict).to_assay()
-        try:
-            assay._spec_path = str(Path(spec_fn).resolve())
-        except Exception:
-            assay._spec_path = None
-        return assay
+
+    assay._spec_path = str(spec_path) if spec_path is not None else None
+    assay._spec_source = spec_source
+    return assay
+
+
+def load_spec(
+    spec_fn: Union[str, Path], strict: bool = True, auth_profile: Optional[str] = None
+) -> Assay:
+    """
+    Loads a YAML or gzipped YAML spec file, strips tags, and constructs an Assay object.
+    If strict=True and validation fails, prints all errors and raises an exception.
+    """
+    payload, spec_path, spec_source = _read_spec_bytes(
+        spec_fn, auth_profile=auth_profile
+    )
+    return _load_spec_from_bytes(
+        payload, strict=strict, spec_path=spec_path, spec_source=spec_source
+    )
 
 
 def load_regions(

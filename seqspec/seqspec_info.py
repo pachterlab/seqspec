@@ -1,10 +1,11 @@
 import json
+import os
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from pathlib import Path
 from typing import Dict
 
 from seqspec.Assay import Assay
-from seqspec.utils import load_spec
+from seqspec.utils import is_remote_source, load_spec
 
 
 def setup_info_args(parser) -> ArgumentParser:
@@ -25,7 +26,9 @@ seqspec info -f json -k sequence_spec spec.yaml # Get sequence spec in json form
         formatter_class=RawTextHelpFormatter,
     )
 
-    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
+    subparser.add_argument(
+        "yaml", help="Path or URL to sequencing specification YAML", type=str
+    )
     choices = ["modalities", "meta", "sequence_spec", "library_spec"]
     subparser.add_argument(
         "-k",
@@ -56,12 +59,19 @@ seqspec info -f json -k sequence_spec spec.yaml # Get sequence spec in json form
         default=None,
         required=False,
     )
+    subparser.add_argument(
+        "--auth-profile",
+        metavar="PROFILE",
+        help="Authentication profile for remote spec access",
+        type=str,
+        default=os.environ.get("SEQSPEC_AUTH_PROFILE"),
+    )
     return subparser
 
 
 def validate_info_args(parser: ArgumentParser, args: Namespace) -> None:
     """Validate the info command arguments."""
-    if not Path(args.yaml).exists():
+    if not is_remote_source(args.yaml) and not Path(args.yaml).exists():
         parser.error(f"Input file does not exist: {args.yaml}")
 
     if args.output and Path(args.output).exists() and not Path(args.output).is_file():
@@ -72,7 +82,7 @@ def run_info(parser: ArgumentParser, args: Namespace) -> None:
     """Run the info command."""
     validate_info_args(parser, args)
 
-    spec = load_spec(args.yaml)
+    spec = load_spec(args.yaml, auth_profile=args.auth_profile)
 
     if args.key:
         # Extract data

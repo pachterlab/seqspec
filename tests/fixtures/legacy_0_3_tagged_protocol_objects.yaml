@@ -1,0 +1,89 @@
+!Assay
+seqspec_version: 0.3.0
+assay_id: legacy-tagged-03
+name: legacy-tagged-03
+doi: ""
+date: "2025-03-17"
+description: legacy tagged protocol objects
+modalities:
+  - rna
+lib_struct: ""
+library_protocol:
+  - !LibProtocol
+    protocol_id: single-cell RNA sequencing assay (OBI:0002631)
+    name: scRNA-seq (Multiome)
+    modality: rna
+library_kit: Illumina Truseq Dual Index
+sequence_protocol: Illumina NovaSeq X (NTR:0000765)
+sequence_kit:
+  - !SeqKit
+    kit_id: NovaSeq X Series 10B Reagent Kit
+    name: NovaSeq X Series 10B Reagent Kit
+    modality: rna
+sequence_spec:
+  - !Read
+    read_id: RNA Read 1
+    name: Read 1
+    modality: rna
+    primer_id: rna-truseq_read1
+    min_len: 28
+    max_len: 28
+    strand: pos
+    files:
+      - !File
+        file_id: IGVFFI3413KTVY
+        filename: hPBMC_2303522004_Multiome_GEX_907_S5_L006_R1_001.fastq.gz
+        filetype: .fastq.gz
+        filesize: 0
+        url: https://api.data.igvf.org/sequence-files/IGVFFI3413KTVY/@@download/IGVFFI3413KTVY.fastq.gz
+        urltype: https
+        md5: 94e772c759a0a524e4f96c1f4ad9442d
+library_spec:
+  - !Region
+    region_id: rna
+    region_type: rna
+    name: 10x Multiome RNA
+    sequence_type: joined
+    sequence: TCTTTCCCTACACGACGCTCTTCCGATCTNNNNNNNNNNNNNNNNXXXXXXXXXXXX
+    min_len: 57
+    max_len: 57
+    onlist: null
+    regions:
+      - !Region
+        region_id: rna-truseq_read1
+        region_type: truseq_read1
+        name: RNA Truseq Read 1
+        sequence_type: fixed
+        sequence: TCTTTCCCTACACGACGCTCTTCCGATCT
+        min_len: 29
+        max_len: 29
+        onlist: null
+        regions: []
+      - !Region
+        region_id: rna-cell_barcode
+        region_type: barcode
+        name: Cell Barcode
+        sequence_type: onlist
+        sequence: NNNNNNNNNNNNNNNN
+        min_len: 16
+        max_len: 16
+        onlist: !Onlist
+          file_id: IGVFFI8751YQRY
+          filename: IGVFFI8751YQRY.tsv.gz
+          filetype: .txt.gz
+          filesize: 2142553
+          url: https://api.data.igvf.org/tabular-files/IGVFFI8751YQRY/@@download/IGVFFI8751YQRY.tsv.gz
+          urltype: https
+          md5: 95ca0127739965ae57d09c6c1cfb20b4
+          location: remote
+        regions: []
+      - !Region
+        region_id: rna-umi
+        region_type: umi
+        name: GEX UMI
+        sequence_type: random
+        sequence: XXXXXXXXXXXX
+        min_len: 12
+        max_len: 12
+        onlist: null
+        regions: []

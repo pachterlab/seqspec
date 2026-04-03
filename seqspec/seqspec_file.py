@@ -4,6 +4,7 @@ This module provides functionality to list and format files present in seqspec f
 """
 
 import json
+import os
 from argparse import ArgumentParser, Namespace, RawTextHelpFormatter
 from collections import defaultdict
 from pathlib import Path
@@ -11,7 +12,7 @@ from typing import Dict, List, Optional
 
 from seqspec.Assay import Assay
 from seqspec.File import File
-from seqspec.utils import load_spec
+from seqspec.utils import is_remote_source, load_spec, local_spec_base
 
 
 def setup_file_args(parser) -> ArgumentParser:
@@ -34,7 +35,9 @@ seqspec file -m rna -f json -s region-type -k all -i barcode spec.yaml # List fi
     )
     subparser_required = subparser.add_argument_group("required arguments")
 
-    subparser.add_argument("yaml", help="Sequencing specification yaml file", type=Path)
+    subparser.add_argument(
+        "yaml", help="Path or URL to sequencing specification YAML", type=str
+    )
     subparser.add_argument(
         "-o",
         "--output",
@@ -106,13 +109,20 @@ seqspec file -m rna -f json -s region-type -k all -i barcode spec.yaml # List fi
         action="store_true",
         default=False,
     )
+    subparser.add_argument(
+        "--auth-profile",
+        metavar="PROFILE",
+        help="Authentication profile for remote spec access",
+        type=str,
+        default=os.environ.get("SEQSPEC_AUTH_PROFILE"),
+    )
 
     return subparser
 
 
 def validate_file_args(parser: ArgumentParser, args: Namespace) -> None:
     """Validate the file command arguments."""
-    if not Path(args.yaml).exists():
+    if not is_remote_source(args.yaml) and not Path(args.yaml).exists():
         parser.error(f"Input file does not exist: {args.yaml}")
 
     if args.output and Path(args.output).exists() and not Path(args.output).is_file():
@@ -174,8 +184,9 @@ def run_file(parser: ArgumentParser, args: Namespace) -> None:
     """Run the file command."""
     validate_file_args(parser, args)
 
-    spec = load_spec(args.yaml)
+    spec = load_spec(args.yaml, auth_profile=args.auth_profile)
     ids = args.ids.split(",") if args.ids else []
+    spec_base = local_spec_base(args.yaml)
 
     files = seqspec_file(
         spec=spec,
@@ -194,7 +205,7 @@ def run_file(parser: ArgumentParser, args: Namespace) -> None:
         }
 
         result = FORMAT[args.format](
-            files, args.format, args.key, Path(args.yaml), args.fullpath
+            files, args.format, args.key, spec_base, args.fullpath
         )
 
         if args.output:
@@ -238,7 +249,7 @@ def format_list_files_metadata(
     files: Dict[str, List[File]],
     fmt: str,
     k: str,
-    spec_fn: Path = Path(""),
+    spec_fn: Optional[Path] = None,
     fp: bool = False,
 ) -> str:
     """Format file metadata as a tab-separated list."""
@@ -272,13 +283,15 @@ def format_json_files(
             for key, item in zip(files.keys(), items):
                 d = item.model_dump()
                 if item.urltype == "local" and fp:
-                    d["url"] = str(spec_fn.parent / d["url"])
+                    d["url"] = str(
+                        (spec_fn / d["url"]) if spec_fn is not None else d["url"]
+                    )
                 x.append(d)
         else:
             for key, item in zip(files.keys(), items):
                 attr = getattr(item, k)
                 if k == "url" and item.urltype == "local" and fp:
-                    attr = str(spec_fn.parent / attr)
+                    attr = str((spec_fn / attr) if spec_fn is not None else attr)
                 x.append({"file_id": item.file_id, k: attr})
     return json.dumps(x, indent=4)
 
@@ -287,7 +300,7 @@ def format_list_files(
     files: Dict[str, List[File]],
     fmt: str,
     k: Optional[str] = None,
-    spec_fn: Path = Path(""),
+    spec_fn: Optional[Path] = None,
     fp: bool = False,
 ) -> str:
     """Format files as a list based on the format type."""
@@ -300,7 +313,7 @@ def format_list_files(
                 if k:
                     attr = str(getattr(i, k))
                     if k == "url" and i.urltype == "local" and fp:
-                        attr = str(spec_fn.parent / attr)
+                        attr = str((spec_fn / attr) if spec_fn is not None else attr)
                     t.append(attr)
                 else:
                     t.append(i.filename)
@@ -313,7 +326,7 @@ def format_list_files(
                 if k:
                     id = str(getattr(item, k))
                     if k == "url" and item.urltype == "local" and fp:
-                        id = str(spec_fn.parent / id)
+                        id = str((spec_fn / id) if spec_fn is not None else id)
                 x.append(id)
 
     elif fmt == "index":
@@ -324,7 +337,7 @@ def format_list_files(
                 if k:
                     id = str(getattr(item, k))
                     if k == "url" and item.urltype == "local" and fp:
-                        id = str(spec_fn.parent / id)
+                        id = str((spec_fn / id) if spec_fn is not None else id)
                 t.append(id)
         x.append(",".join(t))
 

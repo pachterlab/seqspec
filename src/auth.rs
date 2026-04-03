@@ -1,14 +1,15 @@
 use anyhow::{anyhow, bail, Context, Result};
 use clap::ValueEnum;
+use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::env;
 use std::fs;
 use std::io::Read as IoRead;
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
 
 const AUTH_CONFIG_ENV: &str = "SEQSPEC_AUTH_CONFIG";
+const REMOTE_USER_AGENT: &str = "seqspec/0.4";
 
 #[derive(Debug, Clone, Serialize)]
 pub struct ConfigLocation {
@@ -148,18 +149,34 @@ impl AuthRegistry {
             return Ok(None);
         };
 
-        let username = env::var(&profile.username_env).with_context(|| {
-            format!(
-                "auth profile '{}' requires env var '{}' for host '{}'",
-                profile_name, profile.username_env, host
-            )
-        })?;
-        let password = env::var(&profile.password_env).with_context(|| {
-            format!(
-                "auth profile '{}' requires env var '{}' for host '{}'",
-                profile_name, profile.password_env, host
-            )
-        })?;
+        let username = match env::var(&profile.username_env) {
+            Ok(value) => value,
+            Err(err) => {
+                if selected_profile.is_none() {
+                    return Ok(None);
+                }
+                return Err(err).with_context(|| {
+                    format!(
+                        "auth profile '{}' requires env var '{}' for host '{}'",
+                        profile_name, profile.username_env, host
+                    )
+                });
+            }
+        };
+        let password = match env::var(&profile.password_env) {
+            Ok(value) => value,
+            Err(err) => {
+                if selected_profile.is_none() {
+                    return Ok(None);
+                }
+                return Err(err).with_context(|| {
+                    format!(
+                        "auth profile '{}' requires env var '{}' for host '{}'",
+                        profile_name, profile.password_env, host
+                    )
+                });
+            }
+        };
 
         Ok(Some(ResolvedCredentials { username, password }))
     }
@@ -257,71 +274,35 @@ impl RemoteAccess {
             .registry
             .resolve_credentials(url, self.selected_profile.as_deref())?;
 
-        let mut command = Command::new("curl");
-        command.arg("-fsSL");
+        let client = Client::builder()
+            .user_agent(REMOTE_USER_AGENT)
+            .build()
+            .with_context(|| format!("failed to build HTTP client for '{}'", url))?;
+
+        let mut request = client.get(url);
         if let Some(credentials) = credentials {
-            command
-                .arg("--user")
-                .arg(format!("{}:{}", credentials.username, credentials.password));
+            request = request.basic_auth(credentials.username, Some(credentials.password));
         }
-        command
-            .arg(url)
-            .stdout(Stdio::piped())
-            .stderr(Stdio::piped());
+        let response = request
+            .send()
+            .with_context(|| format!("failed to send HTTP request for '{}'", url))?;
 
-        let mut child = command
-            .spawn()
-            .with_context(|| format!("failed to spawn curl for '{}'", url))?;
-
-        let mut stderr = child
-            .stderr
-            .take()
-            .ok_or_else(|| anyhow!("curl did not provide stderr for '{}'", url))?;
-
-        let read_result = {
-            let stdout = child
-                .stdout
-                .take()
-                .ok_or_else(|| anyhow!("curl did not provide stdout for '{}'", url))?;
-            read_fn(Box::new(stdout))
-        };
-
-        let status = child
-            .wait()
-            .with_context(|| format!("failed to wait for curl while reading '{}'", url))?;
-
-        let mut stderr_text = String::new();
-        let _ = stderr.read_to_string(&mut stderr_text);
-        let stderr_text = stderr_text.trim();
-
-        match (read_result, status.success()) {
-            (Ok(value), true) => Ok(value),
-            (Ok(_), false) => {
-                if stderr_text.is_empty() {
-                    bail!("curl exited with status {} while reading '{}'", status, url);
-                }
-                bail!(
-                    "curl exited with status {} while reading '{}': {}",
-                    status,
-                    url,
-                    stderr_text
-                );
+        let status = response.status();
+        if !status.is_success() {
+            let body = response.text().unwrap_or_default();
+            let body = body.trim();
+            if body.is_empty() {
+                bail!("HTTP {} while reading '{}'", status, url);
             }
-            (Err(err), true) => Err(err),
-            (Err(err), false) => {
-                if stderr_text.is_empty() {
-                    Err(err.context(format!(
-                        "curl exited with status {} while reading '{}'",
-                        status, url
-                    )))
-                } else {
-                    Err(err.context(format!(
-                        "curl exited with status {} while reading '{}': {}",
-                        status, url, stderr_text
-                    )))
-                }
-            }
+            bail!(
+                "HTTP {} while reading '{}': {}",
+                status,
+                url,
+                summarize_http_body(body)
+            );
         }
+
+        read_fn(Box::new(response)).with_context(|| format!("failed to read '{}'", url))
     }
 
     pub fn url_exists(&self, url: &str) -> Result<bool> {
@@ -329,31 +310,30 @@ impl RemoteAccess {
             .registry
             .resolve_credentials(url, self.selected_profile.as_deref())?;
 
-        let mut command = Command::new("curl");
-        command.arg("-fsSL");
-        command.arg("-r").arg("0-0");
-        command.arg("-o").arg("/dev/null");
+        let client = Client::builder()
+            .user_agent(REMOTE_USER_AGENT)
+            .build()
+            .with_context(|| format!("failed to build HTTP client for '{}'", url))?;
+
+        let mut request = client.get(url).header(reqwest::header::RANGE, "bytes=0-0");
         if let Some(credentials) = credentials {
-            command
-                .arg("--user")
-                .arg(format!("{}:{}", credentials.username, credentials.password));
+            request = request.basic_auth(credentials.username, Some(credentials.password));
         }
-        command.arg(url).stderr(Stdio::piped());
+        let response = request
+            .send()
+            .with_context(|| format!("failed to send HTTP request for '{}'", url))?;
 
-        let output = command
-            .output()
-            .with_context(|| format!("failed to spawn curl for '{}'", url))?;
+        Ok(response.status().is_success())
+    }
+}
 
-        if output.status.success() {
-            return Ok(true);
-        }
-
-        let stderr_text = String::from_utf8_lossy(&output.stderr);
-        let stderr_text = stderr_text.trim();
-        if stderr_text.contains("404") || stderr_text.contains("403") {
-            return Ok(false);
-        }
-        Ok(false)
+fn summarize_http_body(body: &str) -> String {
+    let compact = body.split_whitespace().collect::<Vec<_>>().join(" ");
+    let limit = 200;
+    if compact.len() <= limit {
+        compact
+    } else {
+        format!("{}...", &compact[..limit])
     }
 }
 
@@ -518,7 +498,7 @@ mod tests {
 
     #[test]
     fn test_registry_loads_profiles_from_env_path() {
-        let _guard = env_lock().lock().unwrap();
+        let _guard = env_lock().lock().unwrap_or_else(|err| err.into_inner());
         let root = env::temp_dir().join(format!(
             "seqspec-auth-{}-{}",
             std::process::id(),
@@ -551,7 +531,7 @@ password_env = "IGVF_ACCESS_KEY_SECRET"
 
     #[test]
     fn test_resolve_summary_matches_host() {
-        let _guard = env_lock().lock().unwrap();
+        let _guard = env_lock().lock().unwrap_or_else(|err| err.into_inner());
         let root = env::temp_dir().join(format!(
             "seqspec-auth-{}-{}",
             std::process::id(),
@@ -587,7 +567,7 @@ password_env = "IGVF_ACCESS_KEY_SECRET"
 
     #[test]
     fn test_remote_access_sends_basic_auth() {
-        let _guard = env_lock().lock().unwrap();
+        let _guard = env_lock().lock().unwrap_or_else(|err| err.into_inner());
         let root = env::temp_dir().join(format!(
             "seqspec-auth-{}-{}",
             std::process::id(),
@@ -617,8 +597,8 @@ password_env = "SEQSPEC_TEST_PASS"
             let (mut stream, _) = listener.accept().unwrap();
             let mut buffer = [0_u8; 4096];
             let size = stream.read(&mut buffer).unwrap();
-            let request = String::from_utf8_lossy(&buffer[..size]);
-            let authorized = request.contains("Authorization: Basic YWxpY2U6c2VjcmV0");
+            let request = String::from_utf8_lossy(&buffer[..size]).to_ascii_lowercase();
+            let authorized = request.contains("authorization: basic ywxpy2u6c2vjcmv0");
             let (status, body) = if authorized {
                 ("200 OK", "AAAA\nCCCC\n")
             } else {
@@ -650,5 +630,74 @@ password_env = "SEQSPEC_TEST_PASS"
 
         assert_eq!(text, "AAAA\nCCCC\n");
         fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn test_remote_access_auto_profile_falls_back_to_anonymous_when_env_missing() {
+        let _guard = env_lock().lock().unwrap_or_else(|err| err.into_inner());
+        let root = env::temp_dir().join(format!(
+            "seqspec-auth-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&root).unwrap();
+        let path = write_config(
+            &root,
+            r#"
+[profiles.local]
+hosts = ["127.0.0.1"]
+kind = "basic"
+username_env = "SEQSPEC_TEST_USER"
+password_env = "SEQSPEC_TEST_PASS"
+"#,
+        );
+        env::set_var(AUTH_CONFIG_ENV, &path);
+        env::remove_var("SEQSPEC_TEST_USER");
+        env::remove_var("SEQSPEC_TEST_PASS");
+
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut buffer = [0_u8; 4096];
+            let size = stream.read(&mut buffer).unwrap();
+            let request = String::from_utf8_lossy(&buffer[..size]).to_ascii_lowercase();
+            let authorized = request.contains("authorization: basic ");
+            let body = "AAAA\nCCCC\n";
+            let response = format!(
+                "HTTP/1.1 200 OK\r\nX-Authorized: {}\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                authorized,
+                body.len(),
+                body
+            );
+            stream.write_all(response.as_bytes()).unwrap();
+        });
+
+        let access = RemoteAccess::load(None).unwrap();
+        let text = access
+            .with_reader(&format!("http://{}/barcodes.txt", addr), |mut reader| {
+                let mut text = String::new();
+                reader.read_to_string(&mut text)?;
+                Ok(text)
+            })
+            .unwrap();
+
+        env::remove_var(AUTH_CONFIG_ENV);
+        server.join().unwrap();
+
+        assert_eq!(text, "AAAA\nCCCC\n");
+        fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn test_summarize_http_body_compacts_and_truncates() {
+        let summary = summarize_http_body("one   two\nthree ".repeat(80).as_str());
+
+        assert!(summary.starts_with("one two three"));
+        assert!(summary.ends_with("..."));
+        assert!(summary.len() <= 203);
     }
 }

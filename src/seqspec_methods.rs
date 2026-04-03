@@ -1,3 +1,4 @@
+use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::file::File as ReadFile;
 use crate::models::read::Read;
@@ -10,8 +11,8 @@ use std::path::PathBuf;
 
 #[derive(Debug, Args)]
 pub struct MethodsArgs {
-    #[clap(help = "Sequencing specification yaml file", required = true)]
-    yaml: PathBuf,
+    #[clap(help = "Path or URL to sequencing specification YAML", required = true)]
+    yaml: String,
 
     #[clap(
         short,
@@ -24,11 +25,21 @@ pub struct MethodsArgs {
 
     #[clap(short, long, help = "Path to output file", value_name = "OUT")]
     output: Option<PathBuf>,
+
+    #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
+    auth_profile: Option<String>,
 }
 
 pub fn run_methods(args: &MethodsArgs) {
-    validate_methods_args(args);
-    let spec = utils::load_spec(&args.yaml);
+    let remote_access = RemoteAccess::load(args.auth_profile.as_deref()).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
+    validate_methods_args(args, &remote_access);
+    let spec = utils::load_spec_source(&args.yaml, &remote_access).unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
 
     let text = seqspec_methods(&spec, &args.modality);
     if let Some(out) = &args.output {
@@ -39,9 +50,9 @@ pub fn run_methods(args: &MethodsArgs) {
     }
 }
 
-fn validate_methods_args(args: &MethodsArgs) {
-    if !args.yaml.exists() {
-        eprintln!("Please use `seqspec methods -h` for help.");
+fn validate_methods_args(args: &MethodsArgs, remote_access: &RemoteAccess) {
+    if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
+        eprintln!("{}", err);
         std::process::exit(1);
     }
     if let Some(out) = &args.output {

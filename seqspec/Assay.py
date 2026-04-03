@@ -237,6 +237,7 @@ class Assay(BaseModel):
 
     # Not part of the public schema; populated when loading from disk.
     _spec_path: Optional[str] = PrivateAttr(default=None)
+    _spec_source: Optional[str] = PrivateAttr(default=None)
 
     def model_post_init(self, __context) -> None:
         self.normalize_protocols_kits()
