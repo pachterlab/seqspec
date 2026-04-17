@@ -6,7 +6,7 @@ This module provides functionality to identify the position of elements in a spe
 from pathlib import Path
 from argparse import ArgumentParser, RawTextHelpFormatter, Namespace, SUPPRESS
 import warnings
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Set
 
 from seqspec.utils import load_spec, map_read_id_to_regions
 from seqspec.seqspec_find import find_by_region_id
@@ -99,6 +99,14 @@ seqspec index -m rna -s file -i rna_R1.fastq.gz,rna_R2.fastq.gz spec.yaml # Inde
         "--region",
         action="store_true",
         help=SUPPRESS,
+    )
+
+    subparser.add_argument(
+        "--no-overlap",
+        help="Disable overlap (default: False)",
+        action="store_true",
+        dest="overlap",
+        default=False,
     )
 
     subparser_required.add_argument(
@@ -240,6 +248,10 @@ def run_index(parser: ArgumentParser, args: Namespace) -> None:
         args.rev,
     )
 
+    # filter index for no overlap if requested
+    if args.overlap:
+        indices = filter_index_no_overlap(indices)
+
     result = format_index(indices, args.tool, args.subregion_type)
 
     if args.output:
@@ -247,6 +259,28 @@ def run_index(parser: ArgumentParser, args: Namespace) -> None:
             print(result, file=f)
     else:
         print(result)
+
+
+def filter_index_no_overlap(indices: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Drop duplicate region_id entries across index dicts, keeping the first occurrence.
+
+    Each element matches ``seqspec_index`` output: a ``strand`` key and one key whose
+    value is a list of ``RegionCoordinate`` objects.
+    """
+    seen_region_ids: Set[str] = set()
+    for idx in indices:
+        for key, cuts in list(idx.items()):
+            if key == "strand":
+                continue
+            if not isinstance(cuts, list):
+                continue
+            filtered = []
+            for rgn in cuts:
+                if rgn.region_id not in seen_region_ids:
+                    filtered.append(rgn)
+                    seen_region_ids.add(rgn.region_id)
+            idx[key] = filtered
+    return indices
 
 
 def get_index_by_files(spec, modality):
