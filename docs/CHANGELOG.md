@@ -14,6 +14,7 @@ authors:
 - `seqspec auth` in Python and Rust with `init`, `path`, `list`, and `resolve` subcommands.
 - `seqspec index -t fgbio` in Python and Rust to export per-read fgbio-style read structure strings from `seqspec`.
 - `seqspec print -f seqspec-html`, a self-contained HTML view that shows the library molecule, reads, and nested region metadata.
+- `seqspec print -f seqspec-png` and `seqspec print -f seqspec-pdf` now use the HTML coordinate model, support `--label` modes, and draw callouts for labels that do not fit inside short regions.
 - Additional parity tests for Python and Rust command behavior.
 - `seqspec check` now emits warning diagnostics for overlapping read geometry, with guidance to use `seqspec index --no-overlap` when needed.
 - A generated examples site under `docs/examples/site`, with rendered assay reports, read templates, region templates, and a searchable assay catalog.

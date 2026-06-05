@@ -5,7 +5,7 @@ from matplotlib.figure import Figure
 from seqspec.Assay import Assay
 from seqspec.Read import Read
 from seqspec.Region import Region
-from seqspec.seqspec_print import print_library_ascii, print_seqspec_png
+from seqspec.seqspec_print import print_library_ascii, print_seqspec_png, seqspec_print
 from seqspec.seqspec_print_html import build_seqspec_view_data, print_seqspec_html
 from seqspec.utils import load_spec
 
@@ -112,6 +112,26 @@ def test_print_seqspec_png_returns_figure():
     spec = load_spec(FIXTURE)
     figure = print_seqspec_png(spec)
     assert isinstance(figure, Figure)
+
+
+def test_print_seqspec_pdf_returns_figure():
+    spec = load_spec(FIXTURE)
+    figure = seqspec_print(spec, "seqspec-pdf", label="region_id")
+    assert isinstance(figure, Figure)
+
+
+def test_print_seqspec_png_supports_label_modes():
+    figure = print_seqspec_png(nested_spec(), label="name+length")
+    rendered_text = {text.get_text() for ax in figure.axes for text in ax.texts}
+    assert "fixed a 3" in rendered_text
+    assert "fixed t 1" in rendered_text
+
+
+def test_print_seqspec_png_can_hide_region_labels():
+    figure = print_seqspec_png(nested_spec(), label="none")
+    rendered_text = {text.get_text() for ax in figure.axes for text in ax.texts}
+    assert "fixed a" not in rendered_text
+    assert "fixed t" not in rendered_text
 
 
 def test_build_seqspec_view_data_contains_modalities():

@@ -12,28 +12,28 @@ const APP_JS: &str = include_str!("../seqspec/report_assets/app.js");
 
 #[derive(Debug, Serialize)]
 pub struct SeqspecViewData {
-    assay_id: String,
-    assay_name: String,
-    seqspec_version: Option<String>,
-    doi: String,
-    date: String,
-    description: String,
-    lib_struct: String,
-    modalities: Vec<ModalityView>,
+    pub(crate) assay_id: String,
+    pub(crate) assay_name: String,
+    pub(crate) seqspec_version: Option<String>,
+    pub(crate) doi: String,
+    pub(crate) date: String,
+    pub(crate) description: String,
+    pub(crate) lib_struct: String,
+    pub(crate) modalities: Vec<ModalityView>,
 }
 
 #[derive(Debug, Serialize)]
 pub struct ModalityView {
-    modality: String,
-    library_region_id: String,
-    total_bp: i64,
-    sequence_protocols: Vec<MetadataRow>,
-    sequence_kits: Vec<MetadataRow>,
-    library_protocols: Vec<MetadataRow>,
-    library_kits: Vec<MetadataRow>,
-    region_nodes: Vec<RegionView>,
-    regions: Vec<RegionView>,
-    reads: Vec<ReadView>,
+    pub(crate) modality: String,
+    pub(crate) library_region_id: String,
+    pub(crate) total_bp: i64,
+    pub(crate) sequence_protocols: Vec<MetadataRow>,
+    pub(crate) sequence_kits: Vec<MetadataRow>,
+    pub(crate) library_protocols: Vec<MetadataRow>,
+    pub(crate) library_kits: Vec<MetadataRow>,
+    pub(crate) region_nodes: Vec<RegionView>,
+    pub(crate) regions: Vec<RegionView>,
+    pub(crate) reads: Vec<ReadView>,
 }
 
 #[derive(Debug, Serialize)]
@@ -48,23 +48,23 @@ pub struct MetadataRow {
 
 #[derive(Clone, Debug, Serialize)]
 pub struct RegionView {
-    region_id: String,
-    region_type: String,
-    name: String,
-    sequence_type: String,
-    sequence: String,
-    min_len: i64,
-    max_len: i64,
-    len: i64,
-    bp_start: i64,
-    bp_end: i64,
-    depth: usize,
-    parent_region_id: Option<String>,
-    path_region_ids: Vec<String>,
-    path_names: Vec<String>,
-    is_leaf: bool,
-    child_region_ids: Vec<String>,
-    onlist: Option<OnlistView>,
+    pub(crate) region_id: String,
+    pub(crate) region_type: String,
+    pub(crate) name: String,
+    pub(crate) sequence_type: String,
+    pub(crate) sequence: String,
+    pub(crate) min_len: i64,
+    pub(crate) max_len: i64,
+    pub(crate) len: i64,
+    pub(crate) bp_start: i64,
+    pub(crate) bp_end: i64,
+    pub(crate) depth: usize,
+    pub(crate) parent_region_id: Option<String>,
+    pub(crate) path_region_ids: Vec<String>,
+    pub(crate) path_names: Vec<String>,
+    pub(crate) is_leaf: bool,
+    pub(crate) child_region_ids: Vec<String>,
+    pub(crate) onlist: Option<OnlistView>,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -80,16 +80,16 @@ pub struct OnlistView {
 
 #[derive(Debug, Serialize)]
 pub struct ReadView {
-    read_id: String,
-    name: String,
-    label: String,
-    primer_id: String,
-    min_len: i64,
-    max_len: i64,
-    strand: String,
-    start: i64,
-    end: i64,
-    files: Vec<FileView>,
+    pub(crate) read_id: String,
+    pub(crate) name: String,
+    pub(crate) label: String,
+    pub(crate) primer_id: String,
+    pub(crate) min_len: i64,
+    pub(crate) max_len: i64,
+    pub(crate) strand: String,
+    pub(crate) start: i64,
+    pub(crate) end: i64,
+    pub(crate) files: Vec<FileView>,
 }
 
 #[derive(Debug, Serialize)]

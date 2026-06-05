@@ -24,6 +24,8 @@ thiserror = "1"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }
 flate2 = "1"
 toml = "0.8"
+resvg = "0.47.0"
+svg2pdf = "0.13.0"
 
 
 [features]

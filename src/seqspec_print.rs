@@ -2,10 +2,11 @@ use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::region::{Region, RegionCoordinate};
 use crate::seqspec_html;
+use crate::seqspec_static_render;
 use crate::utils;
 use clap::Args;
 use std::fs;
-use std::io::Write;
+use std::io::{self, Write};
 use std::path::PathBuf;
 
 #[derive(Debug, Args)]
@@ -22,9 +23,18 @@ pub struct PrintArgs {
         help = "Format",
         value_name = "FORMAT",
         default_value = "library-ascii",
-        value_parser = ["library-ascii", "seqspec-ascii", "seqspec-html", "seqspec-png"],
+        value_parser = ["library-ascii", "seqspec-ascii", "seqspec-html", "seqspec-png", "seqspec-pdf"],
     )]
     format: String,
+
+    #[clap(
+        long,
+        help = "Region labels for PNG/PDF output",
+        value_name = "LABEL",
+        default_value = "name",
+        value_parser = ["name", "region_id", "length", "name+length", "none"],
+    )]
+    label: String,
 
     #[clap(long, env = "SEQSPEC_AUTH_PROFILE", value_name = "PROFILE")]
     auth_profile: Option<String>,
@@ -41,16 +51,29 @@ pub fn run_print(args: &PrintArgs) {
         eprintln!("{}", err);
         std::process::exit(1);
     });
-    let result = seqspec_print(&spec, &args.format).unwrap_or_else(|err| {
-        eprintln!("{}", err);
-        std::process::exit(1);
-    });
-
-    if let Some(out) = &args.output {
-        let mut fh = fs::File::create(out).unwrap();
-        writeln!(fh, "{result}").unwrap();
+    if is_static_format(&args.format) {
+        let result = seqspec_static_render::render_static(&spec, &args.format, &args.label)
+            .unwrap_or_else(|err| {
+                eprintln!("{}", err);
+                std::process::exit(1);
+            });
+        if let Some(out) = &args.output {
+            fs::write(out, result).unwrap();
+        } else {
+            io::stdout().write_all(&result).unwrap();
+        }
     } else {
-        println!("{result}");
+        let result = seqspec_print(&spec, &args.format).unwrap_or_else(|err| {
+            eprintln!("{}", err);
+            std::process::exit(1);
+        });
+
+        if let Some(out) = &args.output {
+            let mut fh = fs::File::create(out).unwrap();
+            writeln!(fh, "{result}").unwrap();
+        } else {
+            println!("{result}");
+        }
     }
 }
 
@@ -65,6 +88,10 @@ fn validate_print_args(args: &PrintArgs, remote_access: &RemoteAccess) {
             std::process::exit(1);
         }
     }
+    if args.label != "name" && !is_static_format(&args.format) {
+        eprintln!("--label is only supported with seqspec-png and seqspec-pdf");
+        std::process::exit(1);
+    }
 }
 
 pub fn seqspec_print(spec: &Assay, fmt: &str) -> Result<String, String> {
@@ -72,9 +99,15 @@ pub fn seqspec_print(spec: &Assay, fmt: &str) -> Result<String, String> {
         "library-ascii" => Ok(print_library_ascii(spec)),
         "seqspec-ascii" => print_seqspec_ascii(spec),
         "seqspec-html" => seqspec_html::render_seqspec_html(spec),
-        "seqspec-png" => Err("seqspec-png is not implemented in the Rust CLI yet".to_string()),
+        "seqspec-png" | "seqspec-pdf" => {
+            Err(format!("{} is a binary format; use render_static", fmt))
+        }
         _ => Err(format!("Unsupported format: {}", fmt)),
     }
+}
+
+fn is_static_format(fmt: &str) -> bool {
+    fmt == "seqspec-png" || fmt == "seqspec-pdf"
 }
 
 fn print_seqspec_ascii(spec: &Assay) -> Result<String, String> {

@@ -19,6 +19,7 @@ pub mod seqspec_modify;
 pub mod seqspec_onlist;
 pub mod seqspec_print;
 pub mod seqspec_split;
+pub mod seqspec_static_render;
 pub mod seqspec_upgrade;
 pub mod seqspec_version;
 pub mod utils;
