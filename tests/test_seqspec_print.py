@@ -123,8 +123,9 @@ def test_print_seqspec_pdf_returns_figure():
 def test_print_seqspec_png_supports_label_modes():
     figure = print_seqspec_png(nested_spec(), label="name+length")
     rendered_text = {text.get_text() for ax in figure.axes for text in ax.texts}
-    assert "fixed a 3" in rendered_text
-    assert "fixed t 1" in rendered_text
+    assert "fixed a (3)" in rendered_text
+    assert "fixed t (1)" in rendered_text
+    assert "Read 1 (2)" in rendered_text
 
 
 def test_print_seqspec_png_can_hide_region_labels():

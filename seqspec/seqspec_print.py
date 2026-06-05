@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import newick
 import numpy as np
 from matplotlib.patches import FancyArrowPatch, Rectangle
+from matplotlib.ticker import MultipleLocator
 
 from seqspec.Assay import Assay
 from seqspec.Region import complement_sequence
@@ -23,6 +24,7 @@ from seqspec.utils import is_remote_source, load_spec
 
 STATIC_RENDER_FORMATS = {"seqspec-png", "seqspec-pdf"}
 LABEL_MODES = ("name", "region_id", "length", "name+length", "none")
+REGION_BAR_HEIGHT = 0.38
 SEQUENCE_TYPE_COLORS = {
     "fixed": "#e2e5e9",
     "onlist": "#bbf7d0",
@@ -282,7 +284,7 @@ def region_label(region: dict[str, Any], label: str) -> str:
     if label == "length":
         return str(region["len"])
     if label == "name+length":
-        return f"{region['name']} {region['len']}"
+        return f"{region['name']} ({region['len']})"
     raise ValueError(f"Unsupported label: {label}")
 
 
@@ -304,15 +306,15 @@ def sequence_type_stroke(sequence_type: str) -> str:
 
 def estimate_label_width_bp(text: str) -> float:
     """Estimate static label width in nucleotide coordinates."""
-    return max(4.0, len(text) * 2.6)
+    return max(6.0, len(text) * 4.1)
 
 
 def choose_callout_lane(
     center: float, text: str, lane_ends: list[float]
 ) -> tuple[int, float]:
-    text_x = center + 2.6
+    text_x = center + 4.0
     label_end = text_x + estimate_label_width_bp(text)
-    gap = 2.0
+    gap = 4.0
 
     for lane, lane_end in enumerate(lane_ends):
         if text_x >= lane_end + gap:
@@ -325,11 +327,56 @@ def choose_callout_lane(
     return lane, text_x
 
 
+def read_label(read: dict[str, Any]) -> str:
+    label = read["label"] or read["read_id"]
+    length = abs(int(read["end"]) - int(read["start"]))
+    return f"{label} ({length})"
+
+
+def short_region_label_count(regions, label_mode) -> int:
+    return sum(
+        1
+        for region in regions
+        if (text := region_label(region, label_mode)) and is_short_region(region, text)
+    )
+
+
+def callout_lane_capacity(regions, label_mode) -> int:
+    count = short_region_label_count(regions, label_mode)
+    return min(6, max(3, (count + 1) // 2))
+
+
+def estimate_callout_lane_counts(regions, label_mode) -> tuple[int, int]:
+    capacity = callout_lane_capacity(regions, label_mode)
+    lane_ends = {
+        "above": [-float("inf")] * capacity,
+        "below": [-float("inf")] * capacity,
+    }
+    used = {"above": 0, "below": 0}
+    callout_count = 0
+
+    for region in regions:
+        text = region_label(region, label_mode)
+        if not text or not is_short_region(region, text):
+            continue
+
+        start = float(region["bp_start"])
+        end = float(region["bp_end"])
+        center = start + (end - start) / 2.0
+        side = "below" if callout_count % 2 == 0 else "above"
+        lane, _ = choose_callout_lane(center, text, lane_ends[side])
+        used[side] = max(used[side], lane + 1)
+        callout_count += 1
+
+    return used["above"], used["below"]
+
+
 def draw_region_labels(ax, regions, label_mode, bar_y, bar_h, fontsize):
     callout_count = 0
+    capacity = callout_lane_capacity(regions, label_mode)
     callout_lanes = {
-        "above": [-float("inf"), -float("inf"), -float("inf")],
-        "below": [-float("inf"), -float("inf"), -float("inf")],
+        "above": [-float("inf")] * capacity,
+        "below": [-float("inf")] * capacity,
     }
     for region in regions:
         text = region_label(region, label_mode)
@@ -345,24 +392,24 @@ def draw_region_labels(ax, regions, label_mode, bar_y, bar_h, fontsize):
             lane, text_x = choose_callout_lane(center, text, callout_lanes[side])
             if side == "above":
                 anchor_y = bar_y + bar_h
-                text_y = bar_y + bar_h + 0.34 + 0.30 * lane
+                text_y = bar_y + bar_h + 0.42 + 0.48 * lane
             else:
                 anchor_y = bar_y
-                text_y = bar_y - 0.48 - 0.34 * lane
+                text_y = bar_y - 0.56 - 0.48 * lane
             label_left = text_x - 0.65
             ax.plot(
                 [center, center],
                 [anchor_y, text_y],
-                color="#848a92",
-                linewidth=0.7,
+                color="#c5cbd3",
+                linewidth=0.65,
                 zorder=7,
                 clip_on=False,
             )
             ax.plot(
                 [center, label_left],
                 [text_y, text_y],
-                color="#848a92",
-                linewidth=0.7,
+                color="#c5cbd3",
+                linewidth=0.65,
                 zorder=7,
                 clip_on=False,
             )
@@ -382,14 +429,13 @@ def draw_region_labels(ax, regions, label_mode, bar_y, bar_h, fontsize):
         else:
             ax.text(
                 center,
-                bar_y + bar_h + 0.16,
+                bar_y + bar_h / 2.0,
                 text,
-                rotation=40,
-                ha="left",
-                va="bottom",
-                fontsize=fontsize,
+                ha="center",
+                va="center",
+                fontsize=max(fontsize - 1, 8),
                 fontfamily="monospace",
-                color="#4a5058",
+                color="#2f343b",
                 clip_on=False,
                 zorder=8,
             )
@@ -399,7 +445,7 @@ def draw_regions(
     ax, modality: dict[str, Any], label_mode: str, fontsize: int
 ) -> set[str]:
     bar_y = 0.0
-    bar_h = 0.22
+    bar_h = REGION_BAR_HEIGHT
     group_gap = 0.16
     group_h = 0.08
     region_types = set()
@@ -455,10 +501,17 @@ def draw_regions(
     return region_types
 
 
-def draw_reads(ax, modality: dict[str, Any], fontsize: int) -> tuple[float, float]:
+def draw_reads(
+    ax,
+    modality: dict[str, Any],
+    fontsize: int,
+    above_callout_lanes: int,
+    below_callout_lanes: int,
+) -> tuple[float, float, float, float]:
     pos_reads = [read for read in modality["reads"] if read["strand"] == "pos"]
     neg_reads = [read for read in modality["reads"] if read["strand"] == "neg"]
     x_min, x_max = 0.0, float(modality["total_bp"])
+    y_min, y_max = -2.35, 2.05
 
     def draw_read(read, y, color_index, above):
         nonlocal x_min, x_max
@@ -469,6 +522,22 @@ def draw_reads(ax, modality: dict[str, Any], fontsize: int) -> tuple[float, floa
         color = READ_COLORS[color_index % len(READ_COLORS)]
         arrow_start = start if above else end
         arrow_end = end if above else start
+        molecule_y = REGION_BAR_HEIGHT if above else 0.0
+        span_start = min(start, end)
+        span_width = max(abs(end - start), 0.001)
+        highlight_y = molecule_y if above else y
+        highlight_h = abs(y - molecule_y)
+        ax.add_patch(
+            Rectangle(
+                (span_start, highlight_y),
+                span_width,
+                highlight_h,
+                facecolor=color,
+                edgecolor="none",
+                alpha=0.07,
+                zorder=2,
+            )
+        )
         arrow = FancyArrowPatch(
             (arrow_start, y),
             (arrow_end, y),
@@ -477,25 +546,24 @@ def draw_reads(ax, modality: dict[str, Any], fontsize: int) -> tuple[float, floa
             linewidth=1.6,
             color=color,
             clip_on=False,
-            zorder=6,
+            zorder=7,
         )
         ax.add_patch(arrow)
-        anchor_x = start if above else end
-        anchor_y = 0.0 if above else 0.22
-        ax.plot(
-            [anchor_x, anchor_x],
-            [anchor_y, y],
-            color=color,
-            linewidth=0.8,
-            linestyle=(0, (2, 2)),
-            alpha=0.45,
-            zorder=5,
-        )
+        for guide_x, alpha, width in ((arrow_start, 0.45, 0.8), (arrow_end, 0.32, 0.7)):
+            ax.plot(
+                [guide_x, guide_x],
+                [molecule_y, y],
+                color=color,
+                linewidth=width,
+                linestyle=(0, (2, 2)),
+                alpha=alpha,
+                zorder=6,
+            )
         if above:
             ax.text(
                 start + 1,
                 y + 0.06,
-                read["label"] or read["read_id"],
+                read_label(read),
                 ha="left",
                 va="bottom",
                 fontsize=fontsize - 1,
@@ -508,7 +576,7 @@ def draw_reads(ax, modality: dict[str, Any], fontsize: int) -> tuple[float, floa
             ax.text(
                 end - 1,
                 y - 0.06,
-                read["label"] or read["read_id"],
+                read_label(read),
                 ha="right",
                 va="top",
                 fontsize=fontsize - 1,
@@ -518,17 +586,19 @@ def draw_reads(ax, modality: dict[str, Any], fontsize: int) -> tuple[float, floa
                 zorder=7,
             )
 
-    y = 1.38
+    y = max(1.38, 1.05 + 0.52 * above_callout_lanes)
     for index, read in enumerate(pos_reads):
         draw_read(read, y, index, True)
+        y_max = max(y_max, y + 0.45)
         y += 0.36
 
-    y = -1.62
+    y = min(-1.62, -1.02 - 0.52 * below_callout_lanes)
     for index, read in enumerate(neg_reads):
         draw_read(read, y, len(pos_reads) + index, False)
+        y_min = min(y_min, y - 0.40)
         y -= 0.36
 
-    return x_min, x_max
+    return x_min, x_max, y_min, y_max
 
 
 def plot_png(payload: dict[str, Any], label: str = "name"):
@@ -543,9 +613,12 @@ def plot_png(payload: dict[str, Any], label: str = "name"):
     """
     modalities = payload["modalities"]
     nmodes = len(modalities)
-    fig_h = max(1.8 * nmodes, 2.4)
+    max_short_regions = max(
+        (short_region_label_count(m["regions"], label) for m in modalities), default=0
+    )
+    fig_h = max(1.8 * nmodes, 2.4, 2.2 * nmodes + 0.18 * max_short_regions)
 
-    base_fs = 13 if nmodes <= 2 else 12
+    base_fs = 10 if nmodes <= 2 else 9
     plt.rcParams.update({"font.size": base_fs})
 
     fig, axes = plt.subplots(
@@ -561,11 +634,16 @@ def plot_png(payload: dict[str, Any], label: str = "name"):
 
     for modality, ax in zip(modalities, axes):
         all_sequence_types.update(draw_regions(ax, modality, label, base_fs))
-        xmin, xmax = draw_reads(ax, modality, base_fs)
+        above_lanes, below_lanes = estimate_callout_lane_counts(
+            modality["regions"], label
+        )
+        xmin, xmax, y_min, y_max = draw_reads(
+            ax, modality, base_fs, above_lanes, below_lanes
+        )
         global_xmin = min(global_xmin, xmin)
         global_xmax = max(global_xmax, xmax)
 
-        ax.set_ylim(-2.35, 2.05)
+        ax.set_ylim(y_min, y_max)
         for spine in ("right", "top", "left", "bottom"):
             ax.spines[spine].set_visible(False)
         ax.set_yticks([])
@@ -584,6 +662,8 @@ def plot_png(payload: dict[str, Any], label: str = "name"):
     axes[-1].set_xlim(global_xmin - pad, global_xmax + pad)
     axes[-1].xaxis.set_visible(True)
     axes[-1].spines["bottom"].set_visible(True)
+    axes[-1].xaxis.set_major_locator(MultipleLocator(25))
+    axes[-1].xaxis.set_minor_locator(MultipleLocator(12.5))
     axes[-1].minorticks_on()
     axes[-1].set_xlabel("# nucleotides")
 
@@ -597,7 +677,12 @@ def plot_png(payload: dict[str, Any], label: str = "name"):
     ]
     if handles:
         fig.legend(
-            handles=handles, loc="center left", bbox_to_anchor=(1.01, 0.5), frameon=True
+            handles=handles,
+            title="Region type",
+            loc="upper right",
+            bbox_to_anchor=(0.985, 0.965),
+            frameon=True,
+            borderaxespad=0.0,
         )
 
     return fig

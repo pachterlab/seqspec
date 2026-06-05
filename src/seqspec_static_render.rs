@@ -62,7 +62,7 @@ pub fn render_static(spec: &Assay, fmt: &str, label: &str) -> Result<Vec<u8>, St
 
 pub fn render_svg(spec: &Assay, label: LabelMode) -> Result<String, String> {
     let payload = seqspec_html::build_seqspec_view_data(spec)?;
-    let canvas = canvas_for_payload(&payload);
+    let canvas = canvas_for_payload(&payload, label);
     let mut out = String::new();
     let mut sequence_types = BTreeSet::new();
 
@@ -108,7 +108,7 @@ pub fn render_svg(spec: &Assay, label: LabelMode) -> Result<String, String> {
     Ok(out)
 }
 
-fn canvas_for_payload(payload: &seqspec_html::SeqspecViewData) -> Canvas {
+fn canvas_for_payload(payload: &seqspec_html::SeqspecViewData, label: LabelMode) -> Canvas {
     let mut global_xmin = 0.0_f64;
     let mut global_xmax = payload
         .modalities
@@ -127,9 +127,15 @@ fn canvas_for_payload(payload: &seqspec_html::SeqspecViewData) -> Canvas {
     global_xmin -= pad;
     global_xmax += pad;
 
-    let row_h = 310.0;
-    let top = 80.0;
-    let bottom = 120.0;
+    let max_lane_capacity = payload
+        .modalities
+        .iter()
+        .map(|modality| callout_lane_capacity(&modality.regions, label))
+        .max()
+        .unwrap_or(3);
+    let row_h = (310.0_f64).max(235.0 + 60.0 * max_lane_capacity as f64);
+    let top = (80.0_f64).max(70.0 + 50.0 * max_lane_capacity as f64);
+    let bottom = 90.0;
     Canvas {
         width: 2400.0,
         height: top + bottom + row_h * payload.modalities.len().max(1) as f64,
@@ -153,12 +159,12 @@ fn draw_modality(
 ) {
     let row_y = canvas.top + row_idx as f64 * canvas.row_h;
     let bar_y = row_y + 110.0;
-    let bar_h = 18.0;
+    let bar_h = 30.0;
 
     text(
         out,
         canvas.left - 65.0,
-        bar_y + 11.0,
+        bar_y + bar_h / 2.0 + 11.0,
         &modality.modality,
         42.0,
         "#000000",
@@ -230,8 +236,9 @@ fn draw_region_labels(
     bar_h: f64,
 ) {
     let mut callout_count = 0_usize;
-    let mut above_lanes = vec![f64::NEG_INFINITY; 3];
-    let mut below_lanes = vec![f64::NEG_INFINITY; 3];
+    let capacity = callout_lane_capacity(regions, label_mode);
+    let mut above_lanes = vec![f64::NEG_INFINITY; capacity];
+    let mut below_lanes = vec![f64::NEG_INFINITY; capacity];
 
     for region in regions {
         let label = region_label(region, label_mode);
@@ -252,14 +259,16 @@ fn draw_region_labels(
             };
             let (lane, text_x) = choose_callout_lane(center, &label, lanes);
             let (anchor_y, text_y) = if above {
-                (bar_y, bar_y - 32.0 - 30.0 * lane as f64)
+                (bar_y, bar_y - 38.0 - 44.0 * lane as f64)
             } else {
-                (bar_y + bar_h, bar_y + 55.0 + 34.0 * lane as f64)
+                (bar_y + bar_h, bar_y + 64.0 + 46.0 * lane as f64)
             };
             let label_left = text_x - 8.0;
-            line(out, center, anchor_y, center, text_y, "#848a92", 1.0, None);
             line(
-                out, center, text_y, label_left, text_y, "#848a92", 1.0, None,
+                out, center, anchor_y, center, text_y, "#c5cbd3", 0.9, None, 1.0,
+            );
+            line(
+                out, center, text_y, label_left, text_y, "#c5cbd3", 0.9, None, 1.0,
             );
             text(
                 out,
@@ -276,12 +285,12 @@ fn draw_region_labels(
             text(
                 out,
                 center,
-                bar_y - 18.0,
+                bar_y + bar_h / 2.0 + 8.0,
                 &label,
-                24.0,
-                "#4a5058",
-                TextAnchor::Start,
-                Some(format!("rotate(-40 {:.3} {:.3})", center, bar_y - 18.0)),
+                22.0,
+                "#2f343b",
+                TextAnchor::Middle,
+                None,
             );
         }
     }
@@ -299,18 +308,34 @@ fn draw_reads(out: &mut String, canvas: &Canvas, modality: &ModalityView, bar_y:
         .filter(|read| read.strand == "neg")
         .collect();
 
+    let (above_callout_lanes, below_callout_lanes) =
+        estimate_callout_lane_counts(&modality.regions, LabelMode::NameLength, canvas);
+    let pos_base_y = bar_y - (80.0_f64).max(70.0 + 50.0 * above_callout_lanes as f64);
+    let neg_base_y = bar_y + (130.0_f64).max(112.0 + 52.0 * below_callout_lanes as f64);
+
     for (idx, read) in pos_reads.iter().enumerate() {
         let color = READ_COLORS[idx % READ_COLORS.len()];
-        let y = bar_y - 80.0 - 45.0 * idx as f64;
+        let y = pos_base_y - 45.0 * idx as f64;
         let start = canvas.x(read.start as f64);
         let end = canvas.x(read.end as f64);
-        line(out, start, bar_y, start, y, color, 1.3, Some("4 4"));
+        rect_alpha(
+            out,
+            start.min(end),
+            y,
+            (end - start).abs().max(0.5),
+            (bar_y - y).max(0.5),
+            color,
+            0.07,
+        );
+        line(out, start, bar_y, start, y, color, 1.3, Some("4 4"), 0.45);
+        line(out, end, bar_y, end, y, color, 1.1, Some("4 4"), 0.32);
         arrow(out, start, y, end, y, color, idx);
+        let label = read_label(&read.label, &read.read_id, read.start, read.end);
         text(
             out,
             start + 6.0,
             y - 10.0,
-            read_label(&read.label, &read.read_id),
+            &label,
             24.0,
             color,
             TextAnchor::Start,
@@ -321,16 +346,47 @@ fn draw_reads(out: &mut String, canvas: &Canvas, modality: &ModalityView, bar_y:
     for (idx, read) in neg_reads.iter().enumerate() {
         let color_idx = pos_reads.len() + idx;
         let color = READ_COLORS[color_idx % READ_COLORS.len()];
-        let y = bar_y + 130.0 + 45.0 * idx as f64;
+        let y = neg_base_y + 45.0 * idx as f64;
         let start = canvas.x(read.start as f64);
         let end = canvas.x(read.end as f64);
-        line(out, end, bar_y + bar_h, end, y, color, 1.3, Some("4 4"));
+        rect_alpha(
+            out,
+            start.min(end),
+            bar_y + bar_h,
+            (end - start).abs().max(0.5),
+            (y - (bar_y + bar_h)).max(0.5),
+            color,
+            0.07,
+        );
+        line(
+            out,
+            end,
+            bar_y + bar_h,
+            end,
+            y,
+            color,
+            1.3,
+            Some("4 4"),
+            0.45,
+        );
+        line(
+            out,
+            start,
+            bar_y + bar_h,
+            start,
+            y,
+            color,
+            1.1,
+            Some("4 4"),
+            0.32,
+        );
         arrow(out, end, y, start, y, color, color_idx);
+        let label = read_label(&read.label, &read.read_id, read.start, read.end);
         text(
             out,
             end - 6.0,
             y + 26.0,
-            read_label(&read.label, &read.read_id),
+            &label,
             24.0,
             color,
             TextAnchor::End,
@@ -340,16 +396,16 @@ fn draw_reads(out: &mut String, canvas: &Canvas, modality: &ModalityView, bar_y:
 }
 
 fn draw_axis(out: &mut String, canvas: &Canvas) {
-    let y = canvas.height - canvas.bottom + 35.0;
+    let y = canvas.height - canvas.bottom + 12.0;
     let x0 = canvas.left;
     let x1 = canvas.width - canvas.right;
-    line(out, x0, y, x1, y, "#222222", 1.8, None);
+    line(out, x0, y, x1, y, "#222222", 1.8, None, 1.0);
 
     let first = ((canvas.global_xmin / 25.0).ceil() as i64) * 25;
     let last = ((canvas.global_xmax / 25.0).floor() as i64) * 25;
     for tick in (first..=last).step_by(25) {
         let x = canvas.x(tick as f64);
-        line(out, x, y, x, y + 10.0, "#222222", 1.5, None);
+        line(out, x, y, x, y + 10.0, "#222222", 1.5, None, 1.0);
         text(
             out,
             x,
@@ -379,12 +435,23 @@ fn draw_legend(out: &mut String, canvas: &Canvas, sequence_types: &BTreeSet<Stri
         return;
     }
     let x = canvas.width - canvas.right + 70.0;
-    let y = canvas.top + canvas.row_h * 1.8;
-    let h = 44.0 + 40.0 * sequence_types.len() as f64;
+    let h = 78.0 + 40.0 * sequence_types.len() as f64;
+    let rect_y = 36.0;
+    let y = rect_y + 32.0;
     rect(out, x - 18.0, y - 32.0, 210.0, h, "white", "#d1d5db", 2.0);
+    text(
+        out,
+        x,
+        y,
+        "Region type",
+        24.0,
+        "#000000",
+        TextAnchor::Start,
+        None,
+    );
 
     for (idx, sequence_type) in sequence_types.iter().enumerate() {
-        let row_y = y + idx as f64 * 40.0;
+        let row_y = y + 38.0 + idx as f64 * 40.0;
         rect(
             out,
             x,
@@ -413,22 +480,68 @@ fn region_label(region: &RegionView, mode: LabelMode) -> String {
         LabelMode::Name => region.name.clone(),
         LabelMode::RegionId => region.region_id.clone(),
         LabelMode::Length => region.len.to_string(),
-        LabelMode::NameLength => format!("{} {}", region.name, region.len),
+        LabelMode::NameLength => format!("{} ({})", region.name, region.len),
         LabelMode::None => String::new(),
     }
 }
 
-fn read_label<'a>(label: &'a str, read_id: &'a str) -> &'a str {
-    if label.is_empty() {
-        read_id
-    } else {
-        label
-    }
+fn read_label(label: &str, read_id: &str, start: i64, end: i64) -> String {
+    let display = if label.is_empty() { read_id } else { label };
+    format!("{} ({})", display, (end - start).abs())
 }
 
 fn is_short_region(region: &RegionView, text: &str) -> bool {
     let len = (region.bp_end - region.bp_start).max(0) as f64;
     len < 14.0_f64.max(text.len() as f64 * 2.6)
+}
+
+fn short_region_label_count(regions: &[RegionView], label_mode: LabelMode) -> usize {
+    regions
+        .iter()
+        .filter(|region| {
+            let label = region_label(region, label_mode);
+            !label.is_empty() && is_short_region(region, &label)
+        })
+        .count()
+}
+
+fn callout_lane_capacity(regions: &[RegionView], label_mode: LabelMode) -> usize {
+    let count = short_region_label_count(regions, label_mode);
+    ((count + 1) / 2).clamp(3, 6)
+}
+
+fn estimate_callout_lane_counts(
+    regions: &[RegionView],
+    label_mode: LabelMode,
+    canvas: &Canvas,
+) -> (usize, usize) {
+    let capacity = callout_lane_capacity(regions, label_mode);
+    let mut above_lanes = vec![f64::NEG_INFINITY; capacity];
+    let mut below_lanes = vec![f64::NEG_INFINITY; capacity];
+    let mut above_used = 0_usize;
+    let mut below_used = 0_usize;
+    let mut callout_count = 0_usize;
+
+    for region in regions {
+        let label = region_label(region, label_mode);
+        if label.is_empty() || !is_short_region(region, &label) {
+            continue;
+        }
+
+        let start = canvas.x(region.bp_start as f64);
+        let end = canvas.x(region.bp_end as f64);
+        let center = start + (end - start) / 2.0;
+        if callout_count % 2 == 1 {
+            let (lane, _) = choose_callout_lane(center, &label, &mut above_lanes);
+            above_used = above_used.max(lane + 1);
+        } else {
+            let (lane, _) = choose_callout_lane(center, &label, &mut below_lanes);
+            below_used = below_used.max(lane + 1);
+        }
+        callout_count += 1;
+    }
+
+    (above_used, below_used)
 }
 
 fn estimate_label_width_px(text: &str) -> f64 {
@@ -518,6 +631,13 @@ fn rect(out: &mut String, x: f64, y: f64, w: f64, h: f64, fill: &str, stroke: &s
     out.push('\n');
 }
 
+fn rect_alpha(out: &mut String, x: f64, y: f64, w: f64, h: f64, fill: &str, opacity: f64) {
+    out.push_str(&format!(
+        r#"<rect x="{x:.3}" y="{y:.3}" width="{w:.3}" height="{h:.3}" fill="{fill}" fill-opacity="{opacity:.3}" stroke="none"/>"#
+    ));
+    out.push('\n');
+}
+
 fn line(
     out: &mut String,
     x1: f64,
@@ -527,12 +647,13 @@ fn line(
     color: &str,
     width: f64,
     dash: Option<&str>,
+    opacity: f64,
 ) {
     let dash = dash
         .map(|value| format!(r#" stroke-dasharray="{value}""#))
         .unwrap_or_default();
     out.push_str(&format!(
-        r#"<line x1="{x1:.3}" y1="{y1:.3}" x2="{x2:.3}" y2="{y2:.3}" stroke="{color}" stroke-width="{width:.3}"{dash}/>"#
+        r#"<line x1="{x1:.3}" y1="{y1:.3}" x2="{x2:.3}" y2="{y2:.3}" stroke="{color}" stroke-width="{width:.3}" stroke-opacity="{opacity:.3}"{dash}/>"#
     ));
     out.push('\n');
 }
@@ -605,8 +726,9 @@ mod tests {
     fn test_render_svg_contains_expected_labels_and_reads() {
         let svg = render_svg(&dogma_spec(), LabelMode::NameLength).unwrap();
         assert!(svg.contains("DOGMAseq-DIG"));
-        assert!(svg.contains("Cell Barcode 16"));
-        assert!(svg.contains("rna Read 2"));
+        assert!(svg.contains("Cell Barcode (16)"));
+        assert!(svg.contains("Region type"));
+        assert!(svg.contains("rna Read 2 (102)"));
     }
 
     #[test]
