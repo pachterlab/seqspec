@@ -12,6 +12,7 @@ from typing import Dict, List, Optional
 
 from seqspec.Assay import Assay
 from seqspec.File import File
+from seqspec.region_type import region_type_matches
 from seqspec.utils import is_remote_source, load_spec, local_spec_base
 
 
@@ -399,6 +400,6 @@ def list_files_by_region_type(
         m = spec.get_libspec(modality)
         regions = m.get_region_by_id(region_id)
         r = regions[0]
-        if r.region_type in ids:
+        if any(region_type_matches(r.region_type, id_) for id_ in ids):
             new_files[region_id].extend(region_files)
     return new_files

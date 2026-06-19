@@ -3,6 +3,14 @@ from typing import List, Optional, Set, Union
 
 from pydantic import BaseModel, Field
 
+from seqspec.region_type import (
+    RegionType,  # noqa: F401 - re-exported for existing user imports
+    RegionTypeValue,
+    region_type_display,
+    region_type_matches,
+    region_type_values,
+)
+
 # from ._core import Onlist as _RustOnlist
 # from ._core import Region as _RustRegion
 
@@ -12,43 +20,6 @@ class SequenceType(str, Enum):
     RANDOM = "random"
     ONLIST = "onlist"
     JOINED = "joined"
-
-
-class RegionType(str, Enum):
-    ATAC = "atac"
-    BARCODE = "barcode"
-    CDNA = "cdna"
-    CRISPR = "crispr"
-    CUSTOM_PRIMER = "custom_primer"
-    DNA = "dna"
-    FASTQ = "fastq"
-    FASTQ_LINK = "fastq_link"
-    GDNA = "gdna"
-    HIC = "hic"
-    ILLUMINA_P5 = "illumina_p5"
-    ILLUMINA_P7 = "illumina_p7"
-    INDEX5 = "index5"
-    INDEX7 = "index7"
-    LINKER = "linker"
-    ME1 = "ME1"
-    ME2 = "ME2"
-    METHYL = "methyl"
-    NAMED = "named"
-    NEXTERA_READ1 = "nextera_read1"
-    NEXTERA_READ2 = "nextera_read2"
-    POLY_A = "poly_A"
-    POLY_G = "poly_G"
-    POLY_T = "poly_T"
-    POLY_C = "poly_C"
-    PROTEIN = "protein"
-    RNA = "rna"
-    S5 = "s5"
-    S7 = "s7"
-    TAG = "tag"
-    TRUSEQ_READ1 = "truseq_read1"
-    TRUSEQ_READ2 = "truseq_read2"
-    UMI = "umi"
-    DIFFERENCE = "difference"
 
 
 class Onlist(BaseModel):
@@ -159,7 +130,7 @@ class OnlistInput(BaseModel):
 
 class Region(BaseModel):
     region_id: str
-    region_type: Union[str, RegionType]
+    region_type: RegionTypeValue
     name: str
     sequence_type: Union[str, SequenceType]
     sequence: str = ""
@@ -169,7 +140,7 @@ class Region(BaseModel):
     regions: List["Region"] = []
 
     def __repr__(self) -> str:
-        s = f"{self.region_type}({self.min_len}, {self.max_len})"
+        s = f"{region_type_display(self.region_type)}({self.min_len}, {self.max_len})"
         return s
 
     def get_sequence(self, s: str = "") -> str:
@@ -217,7 +188,7 @@ class Region(BaseModel):
     ) -> List["Region"]:
         if found is None:
             found = []
-        if str(self.region_type) == str(region_type):
+        if region_type_matches(self.region_type, region_type):
             found.append(self)
         if self.regions:
             for r in self.regions:
@@ -270,7 +241,10 @@ class Region(BaseModel):
         return leaves
 
     def get_leaf_region_types(self) -> Set[str]:
-        return set(r.region_type for r in self.get_leaves())
+        region_types: Set[str] = set()
+        for r in self.get_leaves():
+            region_types.update(region_type_values(r.region_type))
+        return region_types
 
     def to_newick(self, n="") -> str:
         if self.regions:
@@ -531,7 +505,7 @@ class RegionInput(BaseModel):
         default=None,
         description=("Stable identifier for the region (unique within its parent)."),
     )
-    region_type: Optional[Union[str, RegionType]] = Field(
+    region_type: Optional[RegionTypeValue] = Field(
         default=None,
         description=(
             "Semantic type of the region (e.g., 'umi', 'barcode', 'cdna'). "
@@ -597,7 +571,11 @@ class RegionInput(BaseModel):
 
         return Region(
             region_id=self.region_id or "",
-            region_type=self.region_type or self.region_id or "",
+            region_type=(
+                self.region_type
+                if self.region_type is not None
+                else self.region_id or ""
+            ),
             name=self.name or self.region_id or "",
             sequence_type=seq_type,
             sequence=sequence,
@@ -616,10 +594,10 @@ class RegionCoordinate(Region):
     stop: int = 0
 
     def __str__(self):
-        return f"RegionCoordinate {self.name} [{self.region_type}]: [{self.start}, {self.stop})"
+        return f"RegionCoordinate {self.name} [{region_type_display(self.region_type)}]: [{self.start}, {self.stop})"
 
     def __repr__(self) -> str:
-        s = f"{self.region_type}({self.start}, {self.stop})"
+        s = f"{region_type_display(self.region_type)}({self.start}, {self.stop})"
         return s
 
     def __sub__(self, other):

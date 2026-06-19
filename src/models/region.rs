@@ -1,12 +1,13 @@
 use serde::{Deserialize, Serialize};
 
 use crate::models::onlist::Onlist;
+use crate::models::region_type::{RegionType, RegionTypeValue};
 use crate::utils::complement_seq;
 
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Region {
     pub region_id: String,
-    pub region_type: String, // keep String for simplicity
+    pub region_type: RegionTypeValue,
     pub name: String,
     pub sequence_type: String, // "fixed" | "random" | "onlist" | "joined"
     pub sequence: String,
@@ -20,6 +21,30 @@ impl Region {
     pub fn new(
         region_id: String,
         region_type: String,
+        name: String,
+        sequence_type: String,
+        sequence: String,
+        min_len: i64,
+        max_len: i64,
+        onlist: Option<Onlist>,
+        regions: Vec<Region>,
+    ) -> Self {
+        Self {
+            region_id,
+            region_type: RegionTypeValue::from(region_type),
+            name,
+            sequence_type,
+            sequence,
+            min_len,
+            max_len,
+            onlist,
+            regions,
+        }
+    }
+
+    pub fn new_with_region_type_value(
+        region_id: String,
+        region_type: RegionTypeValue,
         name: String,
         sequence_type: String,
         sequence: String,
@@ -110,7 +135,7 @@ impl Region {
 
     pub fn get_region_by_region_type(&self, region_type: &str) -> Vec<Region> {
         let mut found = Vec::new();
-        if self.region_type == region_type {
+        if self.region_type.matches(region_type) {
             found.push(self.clone());
         }
         for r in &self.regions {
@@ -166,7 +191,9 @@ impl Region {
         use std::collections::BTreeSet;
         let mut set = BTreeSet::new();
         for r in self.get_leaves() {
-            set.insert(r.region_type.clone());
+            for value in r.region_type.values() {
+                set.insert(value.to_string());
+            }
         }
         set.into_iter().collect()
     }
@@ -193,7 +220,7 @@ impl Region {
         onlist: Option<Onlist>,
     ) {
         self.region_id = region_id;
-        self.region_type = region_type;
+        self.region_type = RegionTypeValue::from(region_type);
         self.name = name;
         self.sequence_type = sequence_type;
         self.sequence = sequence;
@@ -206,7 +233,7 @@ impl Region {
         &mut self,
         target_region_id: String,
         region_id: Option<String>,
-        region_type: Option<String>,
+        region_type: Option<RegionTypeValue>,
         name: Option<String>,
         sequence_type: Option<String>,
         sequence: Option<String>,
@@ -327,7 +354,7 @@ impl RegionCoordinate {
 
         let new_region = Region {
             region_id: format!("{} - {}", self.region.region_id, other.region.region_id),
-            region_type: "difference".to_string(),
+            region_type: RegionTypeValue::Single(RegionType::from("difference")),
             name: format!("{} - {}", self.region.name, other.region.name),
             sequence_type: "diff".to_string(),
             sequence: seq,

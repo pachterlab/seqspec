@@ -486,7 +486,7 @@ def yaml_safe_dump(obj):
     if isinstance(obj, list):
         return [yaml_safe_dump(o) for o in obj]
     if hasattr(obj, "model_dump"):
-        return obj.model_dump()
+        return obj.model_dump(mode="json")
     # allow engines/proxies to serialize via snapshot()
     snap = getattr(obj, "snapshot", None)
     if callable(snap):

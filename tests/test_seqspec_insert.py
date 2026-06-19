@@ -124,6 +124,25 @@ def test_seqspec_insert_regions(temp_spec):
     assert "test_region_2" in region_ids
 
 
+def test_seqspec_insert_region_accepts_region_type_list(temp_spec):
+    """Test inserting ontology-list region types into a spec."""
+    new_region = RegionInput(
+        region_id="test_sample_index",
+        region_type=["RGN:partition:sample", "RGN:technical:index7"],
+        name="Test Sample Index",
+        sequence_type="onlist",
+        sequence="NNNN",
+        min_len=4,
+        max_len=4,
+    )
+
+    updated_spec = seqspec_insert_regions(temp_spec, "rna", [new_region])
+
+    region = updated_spec.get_libspec("rna").get_region_by_id("test_sample_index")[0]
+    assert region.region_type == ["RGN:partition:sample", "RGN:technical:index7"]
+    assert region.get_region_by_region_type("index7")[0].region_id == "test_sample_index"
+
+
 def test_seqspec_insert_regions_after_specific_region(temp_spec):
     """Test inserting regions after a specific region"""
     # Create a test region

@@ -263,7 +263,7 @@ Regions:
         return s
 
     def to_YAML(self, fname: Optional[str] = None):
-        yaml_str = yaml.dump(self.model_dump(), sort_keys=False)
+        yaml_str = yaml.dump(self.model_dump(mode="json"), sort_keys=False)
         if fname is None:
             return yaml_str
         else:

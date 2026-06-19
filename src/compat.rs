@@ -6,6 +6,7 @@ use crate::models::file::File;
 use crate::models::onlist::Onlist;
 use crate::models::read::Read;
 use crate::models::region::Region;
+use crate::models::region_type::RegionTypeValue;
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct AssayCompat {
@@ -318,7 +319,7 @@ impl CompatRead {
 #[derive(Clone, Debug, Deserialize)]
 pub struct CompatRegion {
     pub region_id: Option<String>,
-    pub region_type: Option<String>,
+    pub region_type: Option<RegionTypeValue>,
     pub name: Option<String>,
     pub sequence_type: Option<String>,
     pub sequence: Option<String>,
@@ -343,9 +344,10 @@ impl CompatRegion {
             None => String::new(),
         };
 
-        Region::new(
+        Region::new_with_region_type_value(
             region_id.clone(),
-            self.region_type.unwrap_or_else(|| region_id.clone()),
+            self.region_type
+                .unwrap_or_else(|| RegionTypeValue::from(region_id.clone())),
             self.name.unwrap_or(region_id),
             sequence_type,
             sequence,

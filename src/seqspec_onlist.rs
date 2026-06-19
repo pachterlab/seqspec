@@ -107,7 +107,7 @@ fn get_onlists(
                 {
                     let mut ordered: Vec<Onlist> = Vec::new();
                     for r in rgns {
-                        if r.region_type == id.unwrap_or("") {
+                        if r.region_type.matches(id.unwrap_or("")) {
                             if let Some(ol) = r.get_onlist() {
                                 ordered.push(ol);
                             }

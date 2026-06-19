@@ -9,6 +9,7 @@ use crate::models::assay::Assay;
 use crate::models::coordinate::Coordinate;
 use crate::models::file::File;
 use crate::models::region::{Region, RegionCoordinate, RegionCoordinateDifference};
+use crate::models::region_type::RegionTypeValue;
 use crate::seqspec_find::find_by_region_id;
 use clap::Args;
 use std::collections::{HashMap, HashSet};
@@ -263,17 +264,55 @@ fn filter_index_no_overlap(mut indices: Vec<Coordinate>) -> Vec<Coordinate> {
     }
     indices
 }
-fn fgbio_operator(region_type: &str) -> Result<char, String> {
-    match region_type.to_uppercase().as_str() {
-        "BARCODE" => Ok('C'),
-        "UMI" => Ok('M'),
-        "INDEX5" | "INDEX7" => Ok('B'),
-        "ATAC" | "CDNA" | "CRISPR" | "GDNA" | "HIC" | "METHYL" | "PROTEIN" | "RNA"
-        | "SGRNA_TARGET" | "TAG" => Ok('T'),
-        "ILLUMINA_P5" | "ILLUMINA_P7" | "LINKER" | "ME1" | "ME2" | "NEXTERA_READ1"
-        | "NEXTERA_READ2" | "POLY_A" | "POLY_C" | "POLY_G" | "POLY_T" | "S5" | "S7"
-        | "TRUSEQ_READ1" | "TRUSEQ_READ2" => Ok('S'),
-        other => Err(format!("fgbio does not support region_type '{other}'")),
+fn fgbio_operator(region_type: &RegionTypeValue) -> Result<char, String> {
+    let rt = region_type.to_uppercase();
+    if region_type.is_cell_barcode() {
+        Ok('C')
+    } else if region_type.is_molecule_barcode() {
+        Ok('M')
+    } else if region_type.is_index5() || region_type.is_index7() {
+        Ok('B')
+    } else if region_type.is_feature()
+        || matches!(
+            rt.as_str(),
+            "ATAC"
+                | "CDNA"
+                | "CRISPR"
+                | "GDNA"
+                | "HIC"
+                | "METHYL"
+                | "PROTEIN"
+                | "RNA"
+                | "SGRNA_TARGET"
+                | "TAG"
+        )
+    {
+        Ok('T')
+    } else if matches!(
+        rt.as_str(),
+        "ILLUMINA_P5"
+            | "ILLUMINA_P7"
+            | "LINKER"
+            | "ME1"
+            | "ME2"
+            | "NEXTERA_READ1"
+            | "NEXTERA_READ2"
+            | "POLY_A"
+            | "POLY_C"
+            | "POLY_G"
+            | "POLY_T"
+            | "S5"
+            | "S7"
+            | "TRUSEQ_READ1"
+            | "TRUSEQ_READ2"
+    ) || region_type.is_technical_skip()
+    {
+        Ok('S')
+    } else {
+        Err(format!(
+            "fgbio does not support region_type '{}'",
+            region_type.display()
+        ))
     }
 }
 
@@ -358,15 +397,11 @@ fn format_kallisto_bus(indices: &Vec<Coordinate>) -> String {
     let mut feature: Vec<String> = Vec::new();
     for (idx, obj) in indices.iter().enumerate() {
         for cut in &obj.rcv {
-            let rt = cut.region.region_type.to_uppercase();
-            if rt == "BARCODE" {
+            if cut.region.region_type.is_cell_barcode() {
                 bcs.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
-            } else if rt == "UMI" {
+            } else if cut.region.region_type.is_molecule_barcode() {
                 umi.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
-            } else if matches!(
-                rt.as_str(),
-                "CDNA" | "GDNA" | "PROTEIN" | "TAG" | "SGRNA_TARGET"
-            ) {
+            } else if cut.region.region_type.is_feature() {
                 feature.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
             }
         }
@@ -387,15 +422,11 @@ fn format_kallisto_bus_force_single(indices: &Vec<Coordinate>) -> String {
     let mut max_length: i64 = 0;
     for (idx, coord) in indices.iter().enumerate() {
         for cut in &coord.rcv {
-            let rt = cut.region.region_type.to_uppercase();
-            if rt == "BARCODE" {
+            if cut.region.region_type.is_cell_barcode() {
                 bcs.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
-            } else if rt == "UMI" {
+            } else if cut.region.region_type.is_molecule_barcode() {
                 umi.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
-            } else if matches!(
-                rt.as_str(),
-                "CDNA" | "GDNA" | "PROTEIN" | "TAG" | "SGRNA_TARGET"
-            ) {
+            } else if cut.region.region_type.is_feature() {
                 let length = cut.stop - cut.start;
                 if length > max_length {
                     max_length = length;
@@ -423,7 +454,7 @@ fn format_seqkit_subseq(indices: &Vec<Coordinate>, subregion_type: Option<&str>)
     let mut x = String::new();
     if let Some(srt) = subregion_type {
         for cut in &coord.rcv {
-            if cut.region.region_type == srt {
+            if cut.region.region_type.matches(srt) {
                 x = format!("{}:{}\n", cut.start + 1, cut.stop);
             }
         }
@@ -436,7 +467,11 @@ fn format_tab(indices: &Vec<Coordinate>) -> String {
         for cut in &coord.rcv {
             x.push_str(&format!(
                 "{}\t{}\t{}\t{}\t{}\n",
-                coord.query_id, cut.region.name, cut.region.region_type, cut.start, cut.stop
+                coord.query_id,
+                cut.region.name,
+                cut.region.region_type.tool_label(),
+                cut.start,
+                cut.stop
             ));
         }
     }
@@ -450,14 +485,13 @@ fn format_starsolo(indices: &Vec<Coordinate>) -> String {
     let mut umi: Vec<String> = Vec::new();
     for coord in indices {
         for cut in &coord.rcv {
-            let rt = cut.region.region_type.to_uppercase();
-            if rt == "BARCODE" {
+            if cut.region.region_type.is_cell_barcode() {
                 bcs.push(format!(
                     "--soloCBstart {} --soloCBlen {}",
                     cut.start + 1,
                     cut.stop - cut.start
                 ));
-            } else if rt == "UMI" {
+            } else if cut.region.region_type.is_molecule_barcode() {
                 umi.push(format!(
                     "--soloUMIstart {} --soloUMIlen {}",
                     cut.start + 1,
@@ -477,13 +511,12 @@ fn format_simpleaf(indices: &Vec<Coordinate>) -> String {
     for (idx, coord) in indices.iter().enumerate() {
         let mut x = format!("{}{{", idx + 1);
         for cut in &coord.rcv {
-            let rt = cut.region.region_type.to_uppercase();
             let len = cut.stop - cut.start;
-            if rt == "BARCODE" {
+            if cut.region.region_type.is_cell_barcode() {
                 x.push_str(&format!("b[{}]", len));
-            } else if rt == "UMI" {
+            } else if cut.region.region_type.is_molecule_barcode() {
                 x.push_str(&format!("u[{}]", len));
-            } else if rt == "CDNA" {
+            } else if cut.region.region_type.is_transcript() {
                 x.push_str(&format!("r[{}]", len));
             }
         }
@@ -497,12 +530,11 @@ fn format_zumis(indices: &Vec<Coordinate>) -> String {
     for coord in indices {
         let mut x = String::new();
         for cut in &coord.rcv {
-            let rt = cut.region.region_type.to_uppercase();
-            if rt == "BARCODE" {
+            if cut.region.region_type.is_cell_barcode() {
                 x.push_str(&format!("- BCS({}-{})\n", cut.start + 1, cut.stop));
-            } else if rt == "UMI" {
+            } else if cut.region.region_type.is_molecule_barcode() {
                 x.push_str(&format!("- UMI({}-{})\n", cut.start + 1, cut.stop));
-            } else if rt == "CDNA" {
+            } else if cut.region.region_type.is_transcript() {
                 x.push_str(&format!("- cDNA({}-{})\n", cut.start + 1, cut.stop));
             }
         }
@@ -526,8 +558,7 @@ fn format_chromap(indices: &Vec<Coordinate>) -> String {
             ":-".to_string()
         };
         for cut in &coord.rcv {
-            let rt = cut.region.region_type.to_uppercase();
-            if rt == "BARCODE" {
+            if cut.region.region_type.is_cell_barcode() {
                 bc_fqs.push(coord.query_id.clone());
                 bc_str.push(format!(
                     "bc:{}:{}{}",
@@ -535,7 +566,7 @@ fn format_chromap(indices: &Vec<Coordinate>) -> String {
                     cut.stop - 1,
                     strand_suffix
                 ));
-            } else if rt == "GDNA" {
+            } else if cut.region.region_type.is_genome() {
                 gdna_fqs.push(coord.query_id.clone());
                 gdna_str.push(format!("{}:{}", cut.start, cut.stop - 1));
             }
@@ -594,8 +625,8 @@ fn filter_differences(
 ) -> Vec<RegionCoordinateDifference> {
     let mut f: Vec<RegionCoordinateDifference> = Vec::new();
     for rcd in d.into_iter() {
-        if rcd.obj.region.region_type != filter_region_type
-            && rcd.fixed.region.region_type == filter_region_type
+        if !rcd.obj.region.region_type.matches(filter_region_type)
+            && rcd.fixed.region.region_type.matches(filter_region_type)
         {
             f.push(rcd);
         }
@@ -607,7 +638,7 @@ fn format_relative(indices: &Vec<Coordinate>) -> String {
     for coord in indices {
         let diffs = compute_relative(&coord.rcv);
         let mut filtered = filter_differences(diffs, "linker");
-        filtered.sort_by_key(|diff| diff.obj.region.region_type.clone());
+        filtered.sort_by_key(|diff| diff.obj.region.region_type.tool_label());
         for diff in filtered {
             x.push_str(&format!(
                 "{}\t{}\t{}\t{}\t{}\n",
@@ -653,8 +684,8 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
     ) -> Vec<RegionCoordinateDifference> {
         let mut f: Vec<RegionCoordinateDifference> = Vec::new();
         for rcd in d.into_iter() {
-            if rcd.obj.region.region_type != filter_region_type
-                && rcd.fixed.region.region_type == filter_region_type
+            if !rcd.obj.region.region_type.matches(filter_region_type)
+                && rcd.fixed.region.region_type.matches(filter_region_type)
             {
                 f.push(rcd);
             }
@@ -682,7 +713,7 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
         let keys: Vec<String> = g.keys().cloned().collect();
         for k in keys {
             let (obj, _) = g.get(&k).unwrap();
-            let t = obj.region.region_type.to_lowercase();
+            let t = obj.region.region_type.tool_label();
             if t != "umi" && t != "barcode" && t != "cdna" {
                 g.remove(&k);
             }
@@ -697,7 +728,8 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
         complement: bool,
     ) -> SplitRow {
         let mut e = String::new();
-        if obj.region.region_type.to_lowercase() == "cdna" {
+        let obj_label = obj.region.region_type.tool_label();
+        if obj_label == "cdna" {
             if rev && !complement {
                 e.push_str(&format!("<r_{}>", obj.region.region_id));
             } else if rev && complement {
@@ -722,10 +754,7 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
             } else {
                 "f"
             };
-            e.push_str(&format!(
-                "<{}_{}[{}]>",
-                tag, obj.region.region_type, obj.region.min_len
-            ));
+            e.push_str(&format!("<{}_{}[{}]>", tag, obj_label, obj.region.min_len));
         }
 
         let mut p1 = false;
@@ -736,7 +765,7 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
             let fixed = &diffs.fixed.region;
             let loc = &diffs.loc;
             let diff = &diffs.rgncdiff;
-            if fixed.region_type == "linker" {
+            if fixed.region_type.is_linker() {
                 let minl = diff.region.min_len;
                 let minl_str = if minl == 0 {
                     String::new()
@@ -769,7 +798,7 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
             }
         }
         SplitRow {
-            region_type: obj.region.region_type.clone(),
+            region_type: obj_label,
             fmt: e,
         }
     }
@@ -858,7 +887,7 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
         x.push_str("groups\tids\ttags\tdistances\tlocations\n");
         let mut idx = 1;
         for cut in &coord.rcv {
-            if cut.region.region_type == "linker" {
+            if cut.region.region_type.is_linker() {
                 x.push_str(&format!(
                     "group{}\t{}f\t{}\t3:3:3\t0:0:0\n",
                     idx, cut.region.name, cut.region.sequence

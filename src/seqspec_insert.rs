@@ -2,6 +2,7 @@ use crate::models::assay::Assay;
 use crate::models::file::File;
 use crate::models::read::Read;
 use crate::models::region::Region;
+use crate::models::region_type::RegionTypeValue;
 use crate::utils;
 use clap::Args;
 use serde::Deserialize;
@@ -178,7 +179,7 @@ impl ReadInput {
 #[derive(Debug, Deserialize, Clone)]
 struct RegionInput {
     region_id: Option<String>,
-    region_type: Option<String>,
+    region_type: Option<RegionTypeValue>,
     name: Option<String>,
     sequence_type: Option<String>,
     sequence: Option<String>,
@@ -196,9 +197,11 @@ impl RegionInput {
             .as_ref()
             .map(|v| v.iter().filter_map(|c| c.to_region()).collect())
             .unwrap_or_else(|| Vec::new());
-        Some(Region::new(
+        Some(Region::new_with_region_type_value(
             region_id,
-            self.region_type.clone().unwrap_or_default(),
+            self.region_type
+                .clone()
+                .unwrap_or_else(|| RegionTypeValue::from("")),
             name,
             self.sequence_type.clone().unwrap_or_default(),
             self.sequence.clone().unwrap_or_default(),
@@ -414,6 +417,16 @@ mod tests {
         assert_eq!(regions[0].region_id, "r1");
         assert_eq!(regions[0].region_type, "barcode");
         assert_eq!(regions[0].sequence, "NNNN");
+    }
+
+    #[test]
+    fn test_parse_resource_regions_accepts_region_type_list() {
+        let json = r#"[{"region_id":"r1","region_type":["RGN:partition:sample","RGN:technical:index7"],"name":"I7","sequence_type":"onlist","sequence":"NNNN","min_len":4,"max_len":4}]"#;
+        let val = parse_resource(json);
+        let regions = load_regions_from_value(&val);
+        assert_eq!(regions.len(), 1);
+        assert!(regions[0].region_type.matches("index7"));
+        assert!(regions[0].region_type.matches("RGN:partition:sample"));
     }
 
     #[test]

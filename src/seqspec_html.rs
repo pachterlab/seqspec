@@ -239,7 +239,7 @@ fn build_region_node(
 ) -> RegionView {
     RegionView {
         region_id: region.region_id.clone(),
-        region_type: region.region_type.clone(),
+        region_type: region.region_type.display(),
         name: region.name.clone(),
         sequence_type: region.sequence_type.clone(),
         sequence: region.sequence.clone(),

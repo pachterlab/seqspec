@@ -164,8 +164,8 @@ Below are a list of example errors one may encounter when checking a spec:
 # The "modalities" are not using the controlled vocabulary
 [error 2] 'Ribonucleic acid' is not one of ['rna', 'tag', 'protein', 'atac', 'crispr'] in spec['modalities'][0]
 
-# The "region_type" is not using the controlled vocabulary
-[error 3] 'link_1' is not one of ['atac', 'barcode', 'cdna', 'crispr', 'fastq', 'gdna', 'hic', 'illumina_p5', 'illumina_p7', 'index5', 'index7', 'linker', 'ME1', 'ME2', 'methyl', 'nextera_read1', 'nextera_read2', 'poly_A', 'poly_G', 'poly_T', 'poly_C', 'protein', 'rna', 's5', 's7', 'tag', 'truseq_read1', 'truseq_read2', 'umi'] in spec['library_spec'][0]['regions'][3]['region_type']
+# The "region_type" field must be a string or a non-empty list of strings
+[error 3] [] is not valid under any of the given schemas in spec['library_spec'][0]['regions'][3]['region_type']
 
 # The "sequence_type" is not using the controlled vocabulary
 [error 4] 'linker' is not one of ['fixed', 'random', 'onlist', 'joined'] in spec['library_spec'][0]['regions'][3]['sequence_type']
@@ -812,7 +812,7 @@ seqspec file version: 0.4.0
 
 ## (HIDDEN) `seqspec upgrade`: Upgrade seqspec file from older versions to the current version
 
-This is a hidden subcommand that upgrades an old version of the spec to the current one. It upgrades `0.0.x`, `0.1.x`, `0.2.0`, and `0.3.0` specs to `0.4.0`.
+This is a hidden subcommand that upgrades an old version of the spec to the current one. It upgrades `0.0.x`, `0.1.x`, `0.2.0`, `0.3.0`, and `0.4.0` specs to `0.5.0`. Version `0.5.0` rewrites legacy scalar `region_type` labels into ontology-term lists.
 
 ```bash
 seqspec upgrade [-h] [-o OUT] yaml
@@ -829,6 +829,6 @@ seqspec_upgrade(spec, spec.seqspec_version or "0.0.0")
 ### Examples
 
 ```bash
-# upgrade a 0.3.0 spec to 0.4.0
-$ seqspec upgrade -o spec.v0_4_0.yaml spec.v0_3_0.yaml
+# upgrade a 0.3.0 spec to 0.5.0
+$ seqspec upgrade -o spec.v0_5_0.yaml spec.v0_3_0.yaml
 ```

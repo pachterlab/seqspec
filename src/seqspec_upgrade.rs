@@ -2,11 +2,15 @@ use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::file::File;
 use crate::models::onlist::Onlist;
+use crate::models::region::Region;
+use crate::models::region_type::RegionTypeValue;
 use crate::utils;
 use clap::Args;
 use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
+
+const CURRENT_SEQSPEC_VERSION: &str = "0.5.0";
 
 #[derive(Debug, Args)]
 pub struct UpgradeArgs {
@@ -59,15 +63,38 @@ fn validate_upgrade_args(args: &UpgradeArgs, remote_access: &RemoteAccess) {
 }
 
 pub fn seqspec_upgrade(spec: Assay, version: &str) -> Assay {
-    match version {
+    let upgraded = match version {
         "0.0.0" => upgrade_0_2_0_to_0_4_0(spec),
         "0.1.0" => upgrade_0_2_0_to_0_4_0(spec),
         "0.1.1" => upgrade_0_2_0_to_0_4_0(spec),
         "0.2.0" => upgrade_0_2_0_to_0_4_0(spec),
         "0.3.0" => upgrade_0_3_0_to_0_4_0(spec),
         "0.4.0" => upgrade_0_4_0_to_0_4_0(spec),
+        "0.5.0" => upgrade_0_5_0_to_0_5_0(spec),
         _ => panic!("Unsupported version: {}", version),
+    };
+    upgrade_region_types_to_0_5_0(upgraded)
+}
+
+fn upgrade_region_types_to_0_5_0(spec: Assay) -> Assay {
+    fn visit(region: &mut Region) {
+        let terms = region.region_type.upgraded_terms();
+        region.region_type = RegionTypeValue::from(terms);
+        for child in &mut region.regions {
+            visit(child);
+        }
     }
+
+    let mut spec = spec;
+    for region in &mut spec.library_spec {
+        visit(region);
+    }
+    spec.seqspec_version = Some(CURRENT_SEQSPEC_VERSION.to_string());
+    spec
+}
+
+fn upgrade_0_5_0_to_0_5_0(spec: Assay) -> Assay {
+    spec
 }
 
 fn upgrade_0_3_0_to_0_4_0(spec: Assay) -> Assay {
@@ -161,9 +188,8 @@ mod tests {
     #[test]
     fn test_upgrade_0_4_0_is_idempotent() {
         let spec = dogma_spec();
-        let orig_version = spec.seqspec_version.clone();
         let upgraded = seqspec_upgrade(spec.clone(), "0.4.0");
-        assert_eq!(upgraded.seqspec_version, orig_version);
+        assert_eq!(upgraded.seqspec_version, Some("0.5.0".to_string()));
         assert_eq!(upgraded.modalities, spec.modalities);
         assert_eq!(upgraded.sequence_spec.len(), spec.sequence_spec.len());
     }
@@ -173,7 +199,7 @@ mod tests {
         let mut spec = dogma_spec();
         spec.seqspec_version = Some("0.3.0".to_string());
         let upgraded = seqspec_upgrade(spec, "0.3.0");
-        assert_eq!(upgraded.seqspec_version, Some("0.4.0".to_string()));
+        assert_eq!(upgraded.seqspec_version, Some("0.5.0".to_string()));
     }
 
     #[test]
@@ -202,11 +228,11 @@ mod tests {
     }
 
     #[test]
-    fn test_upgrade_sets_version_0_4_0() {
+    fn test_upgrade_sets_version_0_5_0() {
         let mut spec = dogma_spec();
         spec.seqspec_version = Some("0.2.0".to_string());
         let upgraded = seqspec_upgrade(spec, "0.2.0");
-        assert_eq!(upgraded.seqspec_version, Some("0.4.0".to_string()));
+        assert_eq!(upgraded.seqspec_version, Some("0.5.0".to_string()));
     }
 
     #[test]
@@ -217,7 +243,7 @@ mod tests {
         assert!(spec.sequence_spec[0].files.is_empty());
 
         let upgraded = seqspec_upgrade(spec, "0.2.0");
-        assert_eq!(upgraded.seqspec_version, Some("0.4.0".to_string()));
+        assert_eq!(upgraded.seqspec_version, Some("0.5.0".to_string()));
         assert_eq!(upgraded.sequence_spec[0].files.len(), 1);
         assert_eq!(
             upgraded.sequence_spec[0].files[0].file_id,
@@ -242,7 +268,7 @@ mod tests {
         ));
 
         let upgraded = seqspec_upgrade(spec, "0.3.0");
-        assert_eq!(upgraded.seqspec_version, Some("0.4.0".to_string()));
+        assert_eq!(upgraded.seqspec_version, Some("0.5.0".to_string()));
 
         let sequence_kit = upgraded.sequence_kit.expect("sequence kit");
         assert_eq!(sequence_kit.len(), 1);
@@ -254,5 +280,44 @@ mod tests {
             library_protocol[0].protocol_id,
             "single-cell RNA sequencing assay (OBI:0002631)"
         );
+    }
+
+    #[test]
+    fn test_upgrade_converts_region_types_to_ontology_terms() {
+        let spec = dogma_spec();
+        let upgraded = seqspec_upgrade(spec, "0.4.0");
+        let barcode = upgraded.library_spec[0]
+            .get_region_by_region_type("barcode")
+            .into_iter()
+            .next()
+            .expect("barcode region");
+        assert!(barcode.region_type.has_term("RGN:partition:cell"));
+        assert_eq!(barcode.region_type.values(), vec!["RGN:partition:cell"]);
+    }
+
+    #[test]
+    fn test_upgrade_preserves_index_outputs_for_real_spec() {
+        use crate::seqspec_index::{format_index, seqspec_index};
+
+        let spec = dogma_spec();
+        let upgraded = seqspec_upgrade(spec.clone(), "0.4.0");
+        for tool in ["kb", "simpleaf", "starsolo", "fgbio", "tab"] {
+            let modality = "rna".to_string();
+            let ids: Vec<String> = Vec::new();
+            let idtype = "read".to_string();
+            let rev = false;
+            let tool = tool.to_string();
+            let old = format_index(
+                &seqspec_index(&spec, &modality, &ids, &idtype, &rev),
+                &tool,
+                &None,
+            );
+            let new = format_index(
+                &seqspec_index(&upgraded, &modality, &ids, &idtype, &rev),
+                &tool,
+                &None,
+            );
+            assert_eq!(new, old, "tool {tool}");
+        }
     }
 }

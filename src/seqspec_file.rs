@@ -90,7 +90,9 @@ pub fn run_file(args: &FileArgs) {
 
     if !files.is_empty() {
         let result = match args.format.as_str() {
-            "list" => format_list_files_metadata(&files, &args.key, spec_base.as_deref(), args.fullpath),
+            "list" => {
+                format_list_files_metadata(&files, &args.key, spec_base.as_deref(), args.fullpath)
+            }
             "paired" | "interleaved" | "index" => format_list_files(
                 &files,
                 &args.format,
@@ -471,7 +473,7 @@ fn list_files_by_region_type(
         let m = spec.get_libspec(modality).unwrap();
         let regions = m.get_region_by_id(&region_id);
         let r = regions.first().unwrap().clone();
-        if ids.contains(&r.region_type) {
+        if ids.iter().any(|id| r.region_type.matches(id)) {
             new_files.entry(region_id).or_default().extend(region_files);
         }
     }
@@ -645,12 +647,8 @@ mod tests {
             )],
         );
 
-        let rendered = format_list_files_metadata(
-            &files,
-            &"url".to_string(),
-            Some(Path::new("/tmp")),
-            true,
-        );
+        let rendered =
+            format_list_files_metadata(&files, &"url".to_string(), Some(Path::new("/tmp")), true);
         assert_eq!(rendered, "rna_R1\tr1\trelative/r1.fastq.gz");
     }
 }

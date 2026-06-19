@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict
 
 from seqspec.Assay import Assay
+from seqspec.region_type import region_type_display
 from seqspec.utils import is_remote_source, load_spec
 
 
@@ -284,8 +285,9 @@ def format_library_spec(info: Dict, fmt: str = "tab") -> str:
         for modality, regions in info["library_spec"].items():
             for r in regions:
                 file = r["onlist"]["filename"] if r["onlist"] else None
+                region_type = region_type_display(r["region_type"])
                 lines.append(
-                    f"{modality}\t{r['region_id']}\t{r['region_type']}\t{r['name']}\t{r['sequence_type']}\t{r['sequence']}\t{r['min_len']}\t{r['max_len']}\t{file}"
+                    f"{modality}\t{r['region_id']}\t{region_type}\t{r['name']}\t{r['sequence_type']}\t{r['sequence']}\t{r['min_len']}\t{r['max_len']}\t{file}"
                 )
         return "\n".join(lines)
     elif fmt == "json":

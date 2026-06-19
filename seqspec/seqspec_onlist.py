@@ -11,6 +11,7 @@ from typing import Dict, List
 from seqspec.Assay import Assay
 from seqspec.Read import Read
 from seqspec.Region import Onlist, itx_read, project_regions_to_coordinates
+from seqspec.region_type import region_type_matches
 from seqspec.seqspec_find import find_by_region_id, find_by_region_type
 from seqspec.utils import (
     load_spec,
@@ -165,7 +166,7 @@ def get_onlists(spec: Assay, modality: str, selector: str, id: str) -> List[Onli
                 continue
             ordered_onlists: List[Onlist] = []
             for r in rgns:
-                if str(r.region_type) == str(id):
+                if region_type_matches(r.region_type, id):
                     ol = r.get_onlist()
                     if ol:
                         ordered_onlists.append(ol)

@@ -9,6 +9,7 @@ from typing import List
 
 from seqspec.Assay import Assay
 from seqspec.Region import Region
+from seqspec.region_type import region_type_display, region_type_terms
 from seqspec.utils import load_spec
 
 
@@ -136,9 +137,11 @@ def diff_regions(region_a: Region, region_b: Region) -> List[str]:
     differences = []
 
     # Compare basic properties
-    if region_a.region_type != region_b.region_type:
+    if region_type_terms(region_a.region_type) != region_type_terms(
+        region_b.region_type
+    ):
         differences.append(
-            f"region_type: {region_a.region_type} != {region_b.region_type}"
+            f"region_type: {region_type_display(region_a.region_type)} != {region_type_display(region_b.region_type)}"
         )
     if region_a.name != region_b.name:
         differences.append(f"name: {region_a.name} != {region_b.name}")

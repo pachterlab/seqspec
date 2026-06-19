@@ -11,6 +11,7 @@ from typing import Any
 
 from seqspec.Assay import Assay
 from seqspec.Region import Region, project_regions_to_coordinates
+from seqspec.region_type import region_type_display
 
 REPOSITORY_URL = "https://github.com/pachterlab/seqspec"
 
@@ -150,7 +151,7 @@ def region_node(
     """Build one serialized region node."""
     return {
         "region_id": region.region_id,
-        "region_type": str(region.region_type),
+        "region_type": region_type_display(region.region_type),
         "name": region.name,
         "sequence_type": str(region.sequence_type),
         "sequence": region.sequence,

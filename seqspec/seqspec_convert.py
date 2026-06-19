@@ -13,13 +13,19 @@ import numpy as np
 
 from seqspec.Assay import Assay
 from seqspec.Region import Region
+from seqspec.region_type import (
+    KNOWN_REGION_TYPE_TERMS,
+    UNKNOWN_REGION_TYPE,
+    region_type_display,
+    region_type_terms,
+)
 from seqspec.utils import load_genbank, load_spec
 
 # Load schema and constants
 schema_fn = os.path.join(os.path.dirname(__file__), "schema/seqspec.schema.json")
 with open(schema_fn, "r") as f:
     schema = json.load(f)
-REGION_TYPES = schema["$defs"]["region"]["properties"]["region_type"]["enum"]
+REGION_TYPES = KNOWN_REGION_TYPE_TERMS
 MODALITIES = schema["properties"]["modalities"]["items"]["enum"]
 SEQUENCE_TYPES = schema["$defs"]["region"]["properties"]["sequence_type"]["enum"]
 
@@ -231,9 +237,14 @@ def tokenize_specs(
                 feature_vector[modality_idx] = 1
                 current_idx += n_modality_features
 
-                # Add region_type one-hot
-                region_type_idx = REGION_TYPES.index(region["region_type"])
-                feature_vector[current_idx + region_type_idx] = 1
+                # Add region_type ontology term one-hot
+                terms = region_type_terms(region["region_type"])
+                known_terms = terms.intersection(REGION_TYPES)
+                if not known_terms:
+                    known_terms = {UNKNOWN_REGION_TYPE}
+                for term in known_terms:
+                    region_type_idx = REGION_TYPES.index(term)
+                    feature_vector[current_idx + region_type_idx] = 1
                 current_idx += n_region_type_features
 
                 # Add sequence_type one-hot
@@ -251,7 +262,9 @@ def tokenize_specs(
 
                 # Store feature vector and identifier
                 rows.append(feature_vector)
-                row_identifiers.append((spec_id, modality, region["region_type"]))
+                row_identifiers.append(
+                    (spec_id, modality, region_type_display(region["region_type"]))
+                )
 
     return np.array(rows), row_identifiers
 

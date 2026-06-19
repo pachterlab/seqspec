@@ -90,9 +90,13 @@
     return (pathNames || []).join(" / ");
   }
 
+  function regionTypeLabel(regionType) {
+    return Array.isArray(regionType) ? regionType.join("+") : String(regionType || "");
+  }
+
   function regionTooltip(region) {
     let html = `<div class="tip-name">${esc(region.name)}</div>`;
-    html += `<div>${esc(region.region_type)} \u00b7 ${esc(
+    html += `<div>${esc(regionTypeLabel(region.region_type))} \u00b7 ${esc(
       region.sequence_type,
     )} \u00b7 ${esc(lengthLabel(region.min_len, region.max_len))}</div>`;
     html += `<div class="tip-dim">${esc(bpRangeLabel(region.bp_start, region.bp_end))}</div>`;
@@ -349,7 +353,7 @@
         kind: "region",
         id: region.region_id,
         label: region.name,
-        sub: `${region.region_type} \u00b7 ${region.sequence_type}`,
+        sub: `${regionTypeLabel(region.region_type)} \u00b7 ${region.sequence_type}`,
         meta: region.is_leaf
           ? `${bpRangeLabel(region.bp_start, region.bp_end)}`
           : `${bpRangeLabel(region.bp_start, region.bp_end)} \u00b7 ${
@@ -425,7 +429,7 @@
       ["region id", esc(region.region_id), true],
       ["name", esc(region.name), false],
       ["path", esc(pathLabel(region.path_names)), true],
-      ["region type", esc(region.region_type), true],
+      ["region type", esc(regionTypeLabel(region.region_type)), true],
       ["sequence type", esc(region.sequence_type), true],
       ["length", esc(lengthLabel(region.min_len, region.max_len)), true],
       ["bp range", esc(bpRangeLabel(region.bp_start, region.bp_end)), true],
@@ -444,7 +448,7 @@
             children.map((child) => ({
               region_id: child.region_id,
               name: child.name,
-              region_type: child.region_type,
+              region_type: regionTypeLabel(child.region_type),
               sequence_type: child.sequence_type,
               bp_range: bpRangeLabel(child.bp_start, child.bp_end),
               length: child.len,

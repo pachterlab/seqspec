@@ -21,6 +21,7 @@ from urllib.parse import urlparse
 
 import yaml
 
+from seqspec.region_type import region_type_matches, region_type_values
 from seqspec.seqspec_check import seqspec_check
 from seqspec.seqspec_print_html import print_seqspec_html
 from seqspec.utils import load_spec, safe_load_strip_tags
@@ -484,11 +485,12 @@ def infer_read_anchor(
     libspec: dict[str, Any],
 ) -> dict[str, str] | None:
     """Infer the best primer region for one read from its label and the library tree."""
-    anchors = {
-        leaf["region_type"]: leaf["region_id"]
-        for leaf in region_leaves(libspec)
-        if leaf.get("region_type") in ANCHOR_REGION_TYPES
-    }
+    anchors: dict[str, str] = {}
+    for leaf in region_leaves(libspec):
+        region_type = leaf.get("region_type")
+        for anchor_type in ANCHOR_REGION_TYPES:
+            if region_type_matches(region_type, anchor_type):
+                anchors.setdefault(anchor_type, leaf["region_id"])
     probe = f"{read.get('read_id', '')} {read.get('name', '')}"
 
     def choose(
@@ -724,8 +726,10 @@ def rewrite_legacy_modality(
 
 def is_read_container_candidate(region: dict[str, Any]) -> bool:
     """Return True when a legacy region is really a read container."""
-    region_type = str(region.get("region_type") or "").lower()
-    if region_type in {"fastq", "gz"}:
+    region_types = {
+        value.lower() for value in region_type_values(region.get("region_type"))
+    }
+    if region_types.intersection({"fastq", "gz"}):
         return True
     probe = f"{region.get('region_id', '')} {region.get('name', '')}"
     return bool(READ_CONTAINER_PATTERN.search(probe))
@@ -760,7 +764,10 @@ def infer_primer_and_strand(
 
 def is_anchor_region(region: dict[str, Any]) -> bool:
     """Return True if a sibling region looks like a sequencing primer anchor."""
-    return str(region.get("region_type") or "") in ANCHOR_REGION_TYPES
+    return any(
+        region_type_matches(region.get("region_type"), anchor_type)
+        for anchor_type in ANCHOR_REGION_TYPES
+    )
 
 
 def read_direction_hint(candidate: dict[str, Any]) -> str | None:

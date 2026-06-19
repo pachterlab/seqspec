@@ -10,7 +10,10 @@ from pathlib import Path
 from seqspec.Assay import Assay
 from seqspec.File import File
 from seqspec.Region import Onlist
+from seqspec.region_type import upgrade_region_type
 from seqspec.utils import is_remote_source, load_spec
+
+CURRENT_SEQSPEC_VERSION = "0.5.0"
 
 
 def setup_upgrade_args(parser) -> ArgumentParser:
@@ -81,6 +84,7 @@ def seqspec_upgrade(spec: Assay, version: str) -> Assay:
         "0.2.0": upgrade_0_2_0_to_0_4_0,
         "0.3.0": upgrade_0_3_0_to_0_4_0,
         "0.4.0": upgrade_0_4_0_to_0_4_0,
+        "0.5.0": upgrade_0_5_0_to_0_5_0,
     }
 
     if version not in UPGRADE:
@@ -88,7 +92,27 @@ def seqspec_upgrade(spec: Assay, version: str) -> Assay:
             f"Unsupported version: {version}. Must be one of {list(UPGRADE.keys())}"
         )
 
-    return UPGRADE[version](spec)
+    upgraded = UPGRADE[version](spec)
+    return upgrade_region_types_to_0_5_0(upgraded)
+
+
+def upgrade_region_types_to_0_5_0(spec: Assay) -> Assay:
+    """Convert region_type values to ontology term lists."""
+
+    def visit(region):
+        region.region_type = upgrade_region_type(region.region_type)
+        for child in region.regions:
+            visit(child)
+
+    for region in spec.library_spec:
+        visit(region)
+    spec.seqspec_version = CURRENT_SEQSPEC_VERSION
+    return spec
+
+
+def upgrade_0_5_0_to_0_5_0(spec: Assay) -> Assay:
+    """Normalize current version specs."""
+    return spec
 
 
 def upgrade_0_4_0_to_0_4_0(spec: Assay) -> Assay:

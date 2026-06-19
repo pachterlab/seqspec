@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest import TestCase
 
 import pytest
+import yaml
 from seqspec.Assay import Assay
 from seqspec.seqspec_check import seqspec_check
 from seqspec.utils import load_spec
@@ -120,5 +121,54 @@ def test_seqspec_check_errors_when_local_file_url_is_empty():
     assert any(
         diagnostic["error_type"] == "check_read_files_exist"
         and diagnostic["error_message"] == "local file 'rna_read.fastq.gz' has empty url"
+        for diagnostic in diagnostics
+    )
+
+
+def test_seqspec_check_validates_region_type_list_shape(dogmaseq_dig_spec: Assay):
+    spec = dogmaseq_dig_spec.model_copy(deep=True)
+    barcode = spec.get_libspec("rna").get_region_by_id("rna_cell_bc")[0]
+    barcode.region_type = ["RGN:partition:cell"]
+
+    diagnostics = seqspec_check(spec=spec)
+
+    assert not any(
+        diagnostic["error_type"] == "check_schema"
+        and "region_type" in diagnostic["error_object"]
+        for diagnostic in diagnostics
+    )
+
+    barcode.region_type = []
+    diagnostics = seqspec_check(spec=spec)
+
+    assert any(
+        diagnostic["error_type"] == "check_schema"
+        and "region_type" in diagnostic["error_object"]
+        for diagnostic in diagnostics
+    )
+
+    barcode.region_type = ["barcode"]
+    diagnostics = seqspec_check(spec=spec)
+
+    assert any(
+        diagnostic["error_type"] == "check_schema"
+        and "region_type" in diagnostic["error_object"]
+        for diagnostic in diagnostics
+    )
+
+
+def test_seqspec_check_validates_empty_region_type_list_loaded_from_yaml(tmp_path):
+    data = yaml.safe_load(Path("tests/fixtures/spec.yaml").read_text())
+    data["library_spec"][2]["regions"][1]["region_type"] = []
+    spec_path = tmp_path / "empty_region_type_list.yaml"
+    spec_path.write_text(yaml.safe_dump(data, sort_keys=False))
+
+    spec = load_spec(spec_path, strict=False)
+    diagnostics = seqspec_check(spec=spec)
+
+    assert spec.library_spec[2].regions[1].region_type == []
+    assert any(
+        diagnostic["error_type"] == "check_schema"
+        and "region_type" in diagnostic["error_object"]
         for diagnostic in diagnostics
     )

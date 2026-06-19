@@ -19,6 +19,20 @@ from seqspec.Region import (
     itx_read,
     project_regions_to_coordinates,
 )
+from seqspec.region_type import (
+    is_cell_barcode,
+    is_feature,
+    is_genome,
+    is_index5,
+    is_index7,
+    is_linker,
+    is_molecule_barcode,
+    is_technical_skip,
+    is_transcript,
+    region_type_display,
+    region_type_matches,
+    region_type_tool_label,
+)
 from seqspec.seqspec_file import list_files_by_file_id
 from seqspec.seqspec_find import find_by_region_id
 from seqspec.utils import is_remote_source, load_spec, map_read_id_to_regions
@@ -398,19 +412,21 @@ FGBIO_SKIP_REGION_TYPES = {
 }
 
 
-def fgbio_operator(region_type: str) -> str:
-    region_type = region_type.upper()
-    if region_type == "BARCODE":
+def fgbio_operator(region_type) -> str:
+    rt_upper = region_type_display(region_type).upper()
+    if is_cell_barcode(region_type):
         return "C"
-    if region_type == "UMI":
+    if is_molecule_barcode(region_type):
         return "M"
-    if region_type in {"INDEX5", "INDEX7"}:
+    if is_index5(region_type) or is_index7(region_type):
         return "B"
-    if region_type in FGBIO_TEMPLATE_REGION_TYPES:
+    if is_feature(region_type) or rt_upper in FGBIO_TEMPLATE_REGION_TYPES:
         return "T"
-    if region_type in FGBIO_SKIP_REGION_TYPES:
+    if rt_upper in FGBIO_SKIP_REGION_TYPES or is_technical_skip(region_type):
         return "S"
-    raise Exception(f"fgbio does not support region_type '{region_type.lower()}'")
+    raise Exception(
+        f"fgbio does not support region_type '{region_type_display(region_type)}'"
+    )
 
 
 def format_fgbio_read_structure(coord: Coordinate) -> str:
@@ -466,11 +482,11 @@ def format_kallisto_bus(indices: List[Coordinate], subregion_type=None) -> str:
     feature = []
     for idx, obj in enumerate(indices):
         for cut in obj.rcv:
-            if cut.region_type.upper() == "BARCODE":
+            if is_cell_barcode(cut.region_type):
                 bcs.append(f"{idx},{cut.start},{cut.stop}")
-            elif cut.region_type.upper() == "UMI":
+            elif is_molecule_barcode(cut.region_type):
                 umi.append(f"{idx},{cut.start},{cut.stop}")
-            elif cut.region_type.upper() in FEATURE_REGION_TYPES:
+            elif is_feature(cut.region_type):
                 feature.append(f"{idx},{cut.start},{cut.stop}")
     if len(umi) == 0:
         umi.append("-1,-1,-1")
@@ -492,11 +508,11 @@ def format_kallisto_bus_force_single(
 
     for idx, coord in enumerate(indices):
         for cut in coord.rcv:
-            if cut.region_type.upper() == "BARCODE":
+            if is_cell_barcode(cut.region_type):
                 bcs.append(f"{idx},{cut.start},{cut.stop}")
-            elif cut.region_type.upper() == "UMI":
+            elif is_molecule_barcode(cut.region_type):
                 umi.append(f"{idx},{cut.start},{cut.stop}")
-            elif cut.region_type.upper() in FEATURE_REGION_TYPES:
+            elif is_feature(cut.region_type):
                 length = cut.stop - cut.start
                 if length > max_length:
                     max_length = length
@@ -523,7 +539,9 @@ def format_seqkit_subseq(indices: List[Coordinate], subregion_type=None) -> str:
     x = ""
     coord = indices[0]
     for cut in coord.rcv:
-        if cut.region_type == subregion_type:
+        if subregion_type is not None and region_type_matches(
+            cut.region_type, subregion_type
+        ):
             x = f"{cut.start + 1}:{cut.stop}\n"
 
     return x
@@ -535,7 +553,7 @@ def format_tab(indices: List[Coordinate], subregion_type=None) -> str:
         rcv = coord.rcv
         # for rgn, cuts in rcv.items():
         for cut in rcv:
-            x += f"{coord.query_id}\t{cut.name}\t{cut.region_type}\t{cut.start}\t{cut.stop}\n"
+            x += f"{coord.query_id}\t{cut.name}\t{region_type_tool_label(cut.region_type)}\t{cut.start}\t{cut.stop}\n"
 
     return x[:-1]
 
@@ -546,15 +564,15 @@ def format_starsolo(indices: List[Coordinate], subregion_type=None) -> str:
     cdna = []
     for idx, coord in enumerate(indices):
         for cut in coord.rcv:
-            if cut.region_type.upper() == "BARCODE":
+            if is_cell_barcode(cut.region_type):
                 bcs.append(
                     f"--soloCBstart {cut.start + 1} --soloCBlen {cut.stop - cut.start}"
                 )
-            elif cut.region_type.upper() == "UMI":
+            elif is_molecule_barcode(cut.region_type):
                 umi.append(
                     f"--soloUMIstart {cut.start + 1} --soloUMIlen {cut.stop - cut.start}"
                 )
-            elif cut.region_type.upper() == "CDNA":
+            elif is_transcript(cut.region_type):
                 cdna.append(f"{cut.start},{cut.stop}")
     x = f"--soloType CB_UMI_Simple {bcs[0]} {umi[0]}"
     return x
@@ -567,11 +585,11 @@ def format_simpleaf(indices: List[Coordinate], subregion_type=None) -> str:
         fn = idx
         x = f"{fn + 1}{{"
         for cut in coord.rcv:
-            if cut.region_type.upper() == "BARCODE":
+            if is_cell_barcode(cut.region_type):
                 x += f"b[{cut.stop - cut.start}]"
-            elif cut.region_type.upper() == "UMI":
+            elif is_molecule_barcode(cut.region_type):
                 x += f"u[{cut.stop - cut.start}]"
-            elif cut.region_type.upper() == "CDNA":
+            elif is_transcript(cut.region_type):
                 x += f"r[{cut.stop - cut.start}]"
         x += "x:}"
         xl.append(x)
@@ -583,11 +601,11 @@ def format_zumis(indices: List[Coordinate], subregion_type=None) -> str:
     for idx, coord in enumerate(indices):
         x = ""
         for cut in coord.rcv:
-            if cut.region_type.upper() == "BARCODE":
+            if is_cell_barcode(cut.region_type):
                 x += f"- BCS({cut.start + 1}-{cut.stop})\n"
-            elif cut.region_type.upper() == "UMI":
+            elif is_molecule_barcode(cut.region_type):
                 x += f"- UMI({cut.start + 1}-{cut.stop})\n"
-            elif cut.region_type.upper() == "CDNA":
+            elif is_transcript(cut.region_type):
                 x += f"- cDNA({cut.start + 1}-{cut.stop})\n"
         xl.append(x)
 
@@ -613,11 +631,11 @@ def format_chromap(indices: List[Coordinate], subregion_type=None) -> str:
     for idx, coord in enumerate(indices):
         strand = "" if coord.strand == "pos" else ":-"
         for cut in coord.rcv:
-            if cut.region_type.upper() == "BARCODE":
+            if is_cell_barcode(cut.region_type):
                 bc_fqs.append(coord.query_id)
                 bc_str.append(f"bc:{cut.start}:{cut.stop - 1}{strand}")
                 pass
-            elif cut.region_type.upper() == "GDNA":
+            elif is_genome(cut.region_type):
                 gdna_fqs.append(coord.query_id)
                 gdna_str.append(f"{cut.start}:{cut.stop - 1}")
     if len(set(bc_fqs)) > 1:
@@ -657,17 +675,16 @@ def filter_differences(d, filter_region_type="linker"):
     f = []
     for rcd in d:
         # print(rcd.rgnc1.region_type, rcd.rgnc2.region_type)
-        if (
-            rcd.obj.region_type != filter_region_type
-            and rcd.fixed.region_type == filter_region_type
-        ):
+        if not region_type_matches(
+            rcd.obj.region_type, filter_region_type
+        ) and region_type_matches(rcd.fixed.region_type, filter_region_type):
             f.append(rcd)
     return f
 
 
 def filter_groupby_region_type(g, keep=["umi", "barcode", "cdna"]):
     for k in list(g.keys()):
-        if g[k]["obj"].region_type.lower() not in keep:
+        if region_type_tool_label(g[k]["obj"].region_type) not in keep:
             g.pop(k)
     return g
 
@@ -679,7 +696,7 @@ def format_relative(indices: List[Coordinate], subregion_type=None) -> str:
         # compute differences across all region coordinates for this coordinate
         diffs = compute_relative(coord.rcv)
         filtered = filter_differences(diffs)
-        filtered.sort(key=lambda diff: diff.obj.region_type)
+        filtered.sort(key=lambda diff: region_type_tool_label(diff.obj.region_type))
 
         for diff in filtered:
             x += (
@@ -725,9 +742,10 @@ def groupby_region_id(rgns):
 def groupby_region_type(rgns):
     d = {}
     for rgn in rgns:
-        if rgn.obj.region_type not in d:
-            d[rgn.obj.region_type] = {"obj": rgn.obj, "rgncdiffs": []}
-        d[rgn.obj.region_type]["rgncdiffs"].append(rgn)
+        label = region_type_tool_label(rgn.obj.region_type)
+        if label not in d:
+            d[label] = {"obj": rgn.obj, "rgncdiffs": []}
+        d[label]["rgncdiffs"].append(rgn)
     return d
 
 
@@ -735,7 +753,8 @@ def format_splitcode_row(obj, rgncdiffs, idx=0, rev=False, complement=False):
     # print(obj.region_id, idx)
     # TODO only have one object left and one object right of the sequence
     e = ""
-    if obj.region_type == "cdna":
+    obj_label = region_type_tool_label(obj.region_type)
+    if obj_label == "cdna":
         if rev and not complement:
             e += f"<r_{obj.region_id}>"
         elif rev and complement:
@@ -751,13 +770,13 @@ def format_splitcode_row(obj, rgncdiffs, idx=0, rev=False, complement=False):
             e = e + "0:-1"
     else:
         if rev and not complement:
-            e += f"<r_{obj.region_type}[{obj.min_len}]>"
+            e += f"<r_{obj_label}[{obj.min_len}]>"
         elif rev and complement:
-            e += f"<~rc_{obj.region_type}[{obj.min_len}]>"
+            e += f"<~rc_{obj_label}[{obj.min_len}]>"
         elif not rev and complement:
-            e += f"<~c_{obj.region_type}[{obj.min_len}]>"
+            e += f"<~c_{obj_label}[{obj.min_len}]>"
         elif not rev and not complement:
-            e += f"<f_{obj.region_type}[{obj.min_len}]>"
+            e += f"<f_{obj_label}[{obj.min_len}]>"
 
     # iterate the region coordinate differences
     p1 = False
@@ -768,7 +787,7 @@ def format_splitcode_row(obj, rgncdiffs, idx=0, rev=False, complement=False):
         fixed = diffs.fixed
         loc = diffs.loc
         diff = diffs.rgncdiff
-        if fixed.region_type == "linker":
+        if is_linker(fixed.region_type):
             minl = diff.min_len
             if minl == 0:
                 minl = ""
@@ -792,7 +811,7 @@ def format_splitcode_row(obj, rgncdiffs, idx=0, rev=False, complement=False):
                 elif not rev and not complement:
                     e = e + f"{minl}{{{fixed.region_id}f}}"
                 m1 = True
-    return {"region_type": obj.region_type, "fmt": e}
+    return {"region_type": obj_label, "fmt": e}
 
 
 def format_splitcode(indices: List[Coordinate], subregion_type=None) -> str:
@@ -902,7 +921,7 @@ def format_splitcode(indices: List[Coordinate], subregion_type=None) -> str:
         idx = 1
         for cut in coord.rcv:
             lc += f"{cut.name}[{cut.min_len}]\t{cut.sequence}\n"
-            if cut.region_type == "linker":
+            if is_linker(cut.region_type):
                 # forward, regular and complement
                 x += f"group{idx}\t{cut.name}f\t{cut.sequence}\t3:3:3\t0:0:0\n"
                 x += f"group{idx}\t{cut.name}c\t{complement_sequence(cut.sequence)}\t3:3:3\t0:0:0\n"

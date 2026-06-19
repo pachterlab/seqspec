@@ -59,7 +59,7 @@ The header of a `seqspec` file stores assay metadata including library preparati
 The `library_spec` describes the "regions", or set of standard "blocks" such as a barcode, contained in the sequencing library. Each region is annotated with the following metadata:
 
 - `region_id`: Unique identifier for the region
-- `region_type`: Type of region (e.g., barcode, UMI, cDNA). See the complete list in the technical specification. `meta` is used as a modality placeholder by `seqspec init` for the top-level regions.
+- `region_type`: One region ontology term or a list of terms. Legacy labels such as `barcode`, `umi`, and `cdna` are still accepted and can be upgraded to ontology terms with `seqspec upgrade`.
 - `sequence_type`: Nature of the sequence (fixed, random, onlist)
 - `sequence`: Actual or representative sequence
 - `min_len` and `max_len`: Minimum and maximum length of the region

@@ -42,17 +42,16 @@ pub fn run_check(args: &CheckArgs) -> Vec<ErrorObj> {
         std::process::exit(1);
     });
     let spec_base = utils::spec_base_from_source(&args.yaml);
-    let errors =
-        seqspec_check_with_remote_access_from_base(
-            &spec,
-            args.skip.as_deref(),
-            spec_base.as_deref(),
-            &remote_access,
-        )
-        .unwrap_or_else(|err| {
-            eprintln!("{}", err);
-            std::process::exit(1);
-        });
+    let errors = seqspec_check_with_remote_access_from_base(
+        &spec,
+        args.skip.as_deref(),
+        spec_base.as_deref(),
+        &remote_access,
+    )
+    .unwrap_or_else(|err| {
+        eprintln!("{}", err);
+        std::process::exit(1);
+    });
 
     if let Some(out) = &args.output {
         let mut f = fs::File::create(out).unwrap();
@@ -63,6 +62,9 @@ pub fn run_check(args: &CheckArgs) -> Vec<ErrorObj> {
         for (idx, e) in errors.iter().enumerate() {
             println!("{}", format_error(e, idx + 1));
         }
+    }
+    if has_error_diagnostics(&errors) {
+        std::process::exit(1);
     }
     errors
 }
@@ -90,6 +92,10 @@ pub struct ErrorObj {
 
 fn format_error(e: &ErrorObj, idx: usize) -> String {
     format!("[{} {}] {}", e.severity, idx, e.error_message)
+}
+
+fn has_error_diagnostics(errors: &[ErrorObj]) -> bool {
+    errors.iter().any(|error| error.severity == "error")
 }
 
 pub fn seqspec_check(spec: &Assay, filter_type: Option<&str>, spec_path: &Path) -> Vec<ErrorObj> {
@@ -231,11 +237,9 @@ fn check(
     errors.extend(seqspec_check_structural(spec));
 
     // Filesystem checks
-    let (e_on, _i_on) =
-        check_onlist_files_exist(spec, errors, idx, spec_base, remote_access)?;
+    let (e_on, _i_on) = check_onlist_files_exist(spec, errors, idx, spec_base, remote_access)?;
     errors = e_on;
-    let (e_rf, _i_rf) =
-        check_read_files_exist(spec, errors, idx, spec_base, remote_access)?;
+    let (e_rf, _i_rf) = check_read_files_exist(spec, errors, idx, spec_base, remote_access)?;
     errors = e_rf;
 
     Ok(errors)
@@ -994,6 +998,7 @@ fn check_overlapping_read_regions(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::models::region_type::RegionTypeValue;
     use crate::utils::load_spec;
 
     fn dogma_spec() -> Assay {
@@ -1027,6 +1032,34 @@ mod tests {
             })
             .collect();
         assert!(structural_errors.is_empty());
+    }
+
+    #[test]
+    fn test_check_validates_region_type_list_shape() {
+        let mut spec = dogma_spec();
+        let has_region_type_schema_error = |spec: &Assay| {
+            let (diagnostics, _) = check_schema(spec, Vec::new(), 0);
+            diagnostics.iter().any(|diagnostic| {
+                diagnostic.error_type == "check_schema" && diagnostic.error_object == "region_type"
+            })
+        };
+
+        spec.library_spec[2].regions[1].region_type =
+            RegionTypeValue::from(vec!["RGN:partition:cell".to_string()]);
+        assert!(!has_region_type_schema_error(&spec));
+
+        spec.library_spec[2].regions[1].region_type = RegionTypeValue::from(Vec::<String>::new());
+        assert!(has_region_type_schema_error(&spec));
+
+        spec.library_spec[2].regions[1].region_type =
+            RegionTypeValue::from(vec!["barcode".to_string()]);
+        assert!(has_region_type_schema_error(&spec));
+
+        spec.library_spec[2].regions[1].region_type = RegionTypeValue::from(vec![
+            "RGN:partition:cell".to_string(),
+            "RGN:partition:cell".to_string(),
+        ]);
+        assert!(has_region_type_schema_error(&spec));
     }
 
     #[test]

@@ -32,6 +32,20 @@ def test_seqspec_modify_region(temp_spec: Assay):
     assert region.name == new_name
 
 
+def test_seqspec_modify_region_accepts_region_type_list(temp_spec: Assay):
+    modality = "rna"
+    new_region_inputs: List[RegionInput] = [
+        RegionInput(
+            region_id="rna_cell_bc",
+            region_type=["RGN:partition:cell"],
+        )
+    ]
+    spec = seqspec_modify_region(temp_spec, modality, new_region_inputs)
+    region = spec.get_libspec(modality).get_region_by_id("rna_cell_bc")[0]
+    assert region.region_type == ["RGN:partition:cell"]
+    assert spec.get_libspec(modality).get_region_by_region_type("barcode")[0] == region
+
+
 def test_seqspec_modify_files(temp_spec: Assay):
     modality = "rna"
     new_url = "./fastq/R1.fastq.gz"

@@ -1,5 +1,6 @@
 use crate::models::assay::Assay;
 use crate::models::file::File;
+use crate::models::region_type::RegionTypeValue;
 use crate::utils;
 use clap::Args;
 use serde_json::Value;
@@ -97,6 +98,12 @@ pub fn seqspec_modify(mut spec: Assay, modality: &str, keys: Vec<Value>, selecto
 fn vstr(v: &Value, key: &str) -> Option<String> {
     v.get(key).and_then(|x| x.as_str().map(|s| s.to_string()))
 }
+
+fn vregion_type(v: &Value, key: &str) -> Option<RegionTypeValue> {
+    v.get(key)
+        .and_then(|value| serde_json::from_value(value.clone()).ok())
+}
+
 fn vi64(v: &Value, key: &str) -> Option<i64> {
     v.get(key).and_then(|x| x.as_i64())
 }
@@ -171,7 +178,7 @@ fn modify_regions(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
                 target.update_region_by_id(
                     target_region_id,
                     vstr(patch, "region_id"),
-                    vstr(patch, "region_type"),
+                    vregion_type(patch, "region_type"),
                     vstr(patch, "name"),
                     vstr(patch, "sequence_type"),
                     vstr(patch, "sequence"),
@@ -353,6 +360,20 @@ mod tests {
         let found = lib.get_region_by_id(&target.region_id);
         assert!(!found.is_empty());
         assert_eq!(found[0].name, "New Name");
+    }
+
+    #[test]
+    fn test_modify_region_accepts_region_type_list() {
+        let spec = dogma_spec();
+        let keys = vec![json!({"region_id": "rna_cell_bc", "region_type": ["RGN:partition:cell"]})];
+        let modified = seqspec_modify(spec, "rna", keys, "region");
+        let region = modified
+            .get_libspec("rna")
+            .unwrap()
+            .get_region_by_id("rna_cell_bc")[0]
+            .clone();
+        assert!(region.region_type.matches("barcode"));
+        assert!(region.region_type.matches("RGN:partition:cell"));
     }
 
     #[test]

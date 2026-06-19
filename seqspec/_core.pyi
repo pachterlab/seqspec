@@ -1,4 +1,6 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
+
+RegionTypeValue = Union[str, List[str]]
 
 class File:
     file_id: str
@@ -88,7 +90,7 @@ class Read:
 
 class Region:
     region_id: str
-    region_type: str
+    region_type: RegionTypeValue
     name: str
     sequence_type: str
     sequence: str
@@ -100,7 +102,7 @@ class Region:
     def __init__(
         self,
         region_id: str,
-        region_type: str,
+        region_type: RegionTypeValue,
         name: str,
         sequence_type: str,
         sequence: str,
@@ -132,7 +134,7 @@ class Region:
     def update_region(
         self,
         region_id: str,
-        region_type: str,
+        region_type: RegionTypeValue,
         name: str,
         sequence_type: str,
         sequence: str,
@@ -144,7 +146,7 @@ class Region:
         self,
         target_region_id: str,
         region_id: Optional[str] = ...,
-        region_type: Optional[str] = ...,
+        region_type: Optional[RegionTypeValue] = ...,
         name: Optional[str] = ...,
         sequence_type: Optional[str] = ...,
         sequence: Optional[str] = ...,

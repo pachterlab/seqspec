@@ -108,6 +108,12 @@ def format_error(errobj, idx=0):
     return f"[{severity} {idx}] {errobj['error_message']}"
 
 
+def has_error_diagnostics(diagnostics: List[Dict]) -> bool:
+    return any(
+        diagnostic.get("severity", "error") == "error" for diagnostic in diagnostics
+    )
+
+
 def seqspec_check(
     spec: Assay,
     filter_type: Optional[str] = None,
@@ -143,6 +149,8 @@ def run_check(parser: ArgumentParser, args: Namespace):
     else:
         for idx, e in enumerate(errors, 1):
             print(format_error(e, idx))
+    if has_error_diagnostics(errors):
+        raise SystemExit(1)
     return errors
 
 

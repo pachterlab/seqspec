@@ -1,0 +1,548 @@
+ontology_id: seqspec-region-ontology
+ontology_version: 0.1.0-draft
+status: draft
+term_pattern: "RGN:<role>:<target>"
+
+principles:
+  - sequence_type describes what an interval is as a sequence.
+  - region ontology terms describe what an interval does in the nominal assay design.
+  - partition, measure, and technical terms annotate the nominal read interval directly.
+  - classify terms annotate semantic identity assigned when observations of that interval are aggregated.
+  - regions may carry multiple ontology terms when they have multiple direct roles.
+  - legacy free-text region_type labels should map deterministically to ontology terms during upgrade.
+  - unknown or ambiguous regions should use an unknown term instead of forcing a precise term.
+
+curation_rules:
+  - Every term must have a closed-set role and a curated target.
+  - Every term must define what it means and what it does not mean.
+  - A term should describe direct nominal assay intent, not arbitrary downstream analysis.
+  - Context-dependent mappings should use RGN:unknown:unclassified unless the evidence is strong enough for a deterministic upgrade.
+  - Vendor or protocol names should be aliases unless they define a distinct function.
+
+roles:
+  partition:
+    definition: Assigns reads or molecules to bins in the nominal read model.
+    scope: direct_read_interval
+  measure:
+    definition: Carries the direct biological or molecular signal measured by the assay.
+    scope: direct_read_interval
+  classify:
+    definition: Maps aggregated observations of this read interval to a semantic class.
+    scope: aggregate_read_interval
+  technical:
+    definition: Supports library construction, sequencing, capture, trimming, or validation.
+    scope: direct_read_interval
+  unknown:
+    definition: Marks a region whose nominal role has not yet been curated.
+    scope: uncertain
+
+targets:
+  partition: [cell, nucleus, molecule, sample, library, feature, perturbation]
+  measure: [transcript, genome, chromatin_accessibility, guide, protein_feature, reporter]
+  classify: [sample, feature, perturbation, condition]
+  technical: [adapter, primer, index, index5, index7, linker, spacer, template_switch, capture_sequence, scaffold, unknown_named]
+  unknown: [unclassified]
+
+legacy_region_types:
+  atac: [RGN:measure:chromatin_accessibility]
+  barcode: [RGN:partition:cell]
+  bead_TSO: [RGN:technical:template_switch]
+  cdna: [RGN:measure:transcript]
+  cDNA: [RGN:measure:transcript]
+  crispr: [RGN:measure:guide, RGN:classify:perturbation]
+  custom_primer: [RGN:technical:primer]
+  dna: [RGN:measure:genome]
+  gdna: [RGN:measure:genome]
+  gDNA: [RGN:measure:genome]
+  hic: [RGN:measure:genome]
+  illumina_p5: [RGN:technical:adapter]
+  illumina_p7: [RGN:technical:adapter]
+  index5: [RGN:partition:sample, RGN:technical:index5]
+  index7: [RGN:partition:sample, RGN:technical:index7]
+  linker: [RGN:technical:linker]
+  ME: [RGN:technical:adapter]
+  ME1: [RGN:technical:adapter]
+  ME2: [RGN:technical:adapter]
+  methyl: [RGN:measure:genome]
+  named: [RGN:unknown:unclassified]
+  nextera_read1: [RGN:technical:primer]
+  nextera_read2: [RGN:technical:primer]
+  poly_A: [RGN:technical:capture_sequence]
+  polyA: [RGN:technical:capture_sequence]
+  poly_C: [RGN:technical:capture_sequence]
+  poly_G: [RGN:technical:capture_sequence]
+  poly_T: [RGN:technical:capture_sequence]
+  polyT: [RGN:technical:capture_sequence]
+  protein: [RGN:measure:protein_feature, RGN:classify:feature]
+  rna: [RGN:unknown:unclassified]
+  s5: [RGN:technical:adapter]
+  s7: [RGN:technical:adapter]
+  sgrna_target: [RGN:measure:guide, RGN:classify:perturbation]
+  tag: [RGN:measure:reporter]
+  truseq_read1: [RGN:technical:primer]
+  truseq_read2: [RGN:technical:primer]
+  umi: [RGN:partition:molecule]
+  difference: [RGN:unknown:unclassified]
+
+terms:
+  RGN:partition:cell:
+    label: Cell partition barcode
+    role: partition
+    target: cell
+    status: active
+    definition: Assigns reads or molecules to a cell or cell-containing partition.
+    typical_sequence_types: [onlist, random]
+    aliases: [barcode, cell_bc, cell_barcode, Cell Barcode, R2 Cell Barcode, 10xbarcode, barcode-1, barcode-2, barcode-3, atac Cell Barcode 1, rna Cell Barcode 1]
+    examples:
+      - 10x Genomics cell barcode
+      - SHARE-seq cell barcode tier
+      - Parse SPLiT-seq combinatorial cell barcode
+    does_not_mean:
+      - sample or library index barcode
+      - molecule-level UMI
+      - downstream cell type label inferred from expression
+    notes: In single-nucleus assays, these labels may instead map to RGN:partition:nucleus.
+
+  RGN:partition:nucleus:
+    label: Nucleus partition barcode
+    role: partition
+    target: nucleus
+    status: active
+    definition: Assigns reads or molecules to a nucleus or nucleus-containing partition.
+    typical_sequence_types: [onlist, random]
+    aliases: [nucleus barcode, nuclei barcode, Cell Barcode, barcode, barcode-1, barcode-2, barcode-3]
+    examples:
+      - 10x multiome barcode used on isolated nuclei
+      - Parse SPLiT-seq barcode in a single-nucleus assay
+    does_not_mean:
+      - cell barcode in a whole-cell assay
+      - nuclear genomic DNA measurement
+      - cell type classification
+    notes: Often inferred from assay context rather than explicit region labels.
+
+  RGN:partition:molecule:
+    label: Molecular partition barcode
+    role: partition
+    target: molecule
+    status: active
+    definition: Assigns reads to an original molecule before amplification.
+    typical_sequence_types: [random]
+    aliases: [umi, UMI, GEX UMI, Protein UMI, crispr-umi, rna-umi, umi_rna, 8-bp UMI]
+    examples:
+      - RNA UMI used for molecule deduplication
+      - Protein feature UMI
+      - CRISPR guide capture UMI
+    does_not_mean:
+      - variable transcript insert
+      - cell barcode
+      - sample index
+
+  RGN:partition:sample:
+    label: Sample partition barcode
+    role: partition
+    target: sample
+    status: active
+    definition: Assigns reads to a sample, sample pool, or multiplexed sample group.
+    typical_sequence_types: [onlist, fixed, random]
+    aliases: [index5, index7, i5 index, i7 index, sample_index, Index 1 (i7 index), Index 2 (i5 index), HTO_bc, CMO Barcode, MULTI-seq barcode]
+    examples:
+      - i7 sample index
+      - i5 sample index
+      - MULTI-seq sample barcode
+    does_not_mean:
+      - cell or nucleus partition barcode
+      - molecule-level UMI
+      - technical index role alone without sample assignment
+    related_terms: [RGN:technical:index, RGN:classify:sample]
+
+  RGN:partition:library:
+    label: Library partition barcode
+    role: partition
+    target: library
+    status: experimental
+    definition: Assigns reads to a library or library pool rather than a biological sample.
+    typical_sequence_types: [onlist, fixed, random]
+    aliases: [library index, sample_index, index5, index7]
+    examples:
+      - pooled library index where sample and library are distinct entities
+    does_not_mean:
+      - sample identity when library and sample are the same unit
+      - cell or molecule partitioning
+    notes: This may collapse into RGN:partition:sample if sample and library are not separable in practice.
+
+  RGN:partition:feature:
+    label: Feature partition barcode
+    role: partition
+    target: feature
+    status: experimental
+    definition: Assigns reads to a measured feature such as an antibody, protein tag, or capture feature.
+    typical_sequence_types: [onlist]
+    aliases: [feature_barcode, antibody_barcode, HTO_bc, CMO Barcode, MULTI-seq barcode]
+    examples:
+      - antibody-derived tag barcode
+      - feature barcode in feature barcoding assays
+    does_not_mean:
+      - sample demultiplexing tag unless the feature is the sample tag
+      - transcript or genome insert
+    related_terms: [RGN:classify:feature, RGN:measure:protein_feature]
+
+  RGN:partition:perturbation:
+    label: Perturbation partition barcode
+    role: partition
+    target: perturbation
+    status: experimental
+    definition: Assigns reads directly to a perturbation bin.
+    typical_sequence_types: [onlist, random]
+    aliases: [crispr_barcode, guide barcode]
+    examples:
+      - explicit perturbation barcode region
+    does_not_mean:
+      - guide sequence measured and classified after cell-level aggregation
+      - generic cell barcode in a CRISPR screen
+    notes: Prefer RGN:classify:perturbation for guide readouts assigned after aggregation.
+
+  RGN:measure:transcript:
+    label: Transcript measurement
+    role: measure
+    target: transcript
+    status: active
+    definition: Carries transcript-derived sequence or abundance signal.
+    typical_sequence_types: [random]
+    aliases: [cdna, cDNA, RNA-cDNA, Read 1 cDNA sequence, RNA Read 1 sequence]
+    examples:
+      - cDNA insert in scRNA-seq
+      - transcript-derived read segment used for pseudoalignment
+    does_not_mean:
+      - UMI or molecule barcode
+      - downstream cell type classification from expression profiles
+      - polyT capture sequence
+
+  RGN:measure:genome:
+    label: Genome measurement
+    role: measure
+    target: genome
+    status: active
+    definition: Carries genome-derived sequence signal.
+    typical_sequence_types: [random]
+    aliases: [gdna, gDNA, Genomic DNA, ATAC genomic DNA]
+    examples:
+      - genomic DNA insert
+      - DNA fragment readout
+    does_not_mean:
+      - adapter or linker sequence
+      - sample index
+      - specific chromatin accessibility interpretation unless assay context supports it
+    related_terms: [RGN:measure:chromatin_accessibility]
+
+  RGN:measure:chromatin_accessibility:
+    label: Chromatin accessibility measurement
+    role: measure
+    target: chromatin_accessibility
+    status: active
+    definition: Carries accessible chromatin fragment signal.
+    typical_sequence_types: [random]
+    aliases: [gdna, gDNA, Genomic DNA, ATAC genomic DNA]
+    examples:
+      - ATAC-seq genomic insert
+      - multiome ATAC fragment
+    does_not_mean:
+      - generic genomic DNA measurement outside chromatin accessibility assays
+      - linker or adapter sequence
+    notes: Usually inferred from ATAC or multiome assay context.
+
+  RGN:measure:guide:
+    label: Guide measurement
+    role: measure
+    target: guide
+    status: active
+    definition: Carries guide RNA or guide-derived sequence signal.
+    typical_sequence_types: [onlist, random]
+    aliases: [sgrna_target, guide_target, crispr-guide_target, guide, guide sequence, crispr_read2]
+    examples:
+      - sgRNA guide readout
+      - CRISPR guide capture sequence
+    does_not_mean:
+      - cell barcode in a CRISPR screen
+      - guide scaffold sequence
+      - perturbation identity after aggregation by itself
+    related_terms: [RGN:classify:perturbation]
+
+  RGN:measure:protein_feature:
+    label: Protein feature measurement
+    role: measure
+    target: protein_feature
+    status: active
+    definition: Carries antibody, protein feature, or protein tag signal.
+    typical_sequence_types: [onlist, random]
+    aliases: [protein, protein-cDNA, antibody barcode, feature barcode]
+    examples:
+      - antibody-derived tag readout
+      - protein feature barcode readout
+    does_not_mean:
+      - sample hashing tag unless used as a measured protein feature
+      - transcript insert
+    related_terms: [RGN:classify:feature]
+
+  RGN:measure:reporter:
+    label: Reporter measurement
+    role: measure
+    target: reporter
+    status: experimental
+    definition: Carries reporter or MPRA-derived sequence signal.
+    typical_sequence_types: [fixed, onlist, random]
+    aliases: [reporter_3prime_utr, reporter, oligo, dna]
+    examples:
+      - MPRA reporter readout
+      - reporter UTR readout
+    does_not_mean:
+      - generic DNA oligo with only technical function
+      - genomic DNA insert without reporter interpretation
+
+  RGN:classify:sample:
+    label: Sample classifier
+    role: classify
+    target: sample
+    status: active
+    definition: Assigns sample or multiplexed sample identity after aggregating observations of this interval.
+    typical_sequence_types: [onlist, fixed, random]
+    aliases: [HTO_bc, CMO Barcode, MULTI-seq barcode, sample_index, index5, index7]
+    examples:
+      - hashtag oligo sample assignment
+      - cell multiplexing oligo assignment
+      - sample index demultiplexing after index reads are aggregated
+    does_not_mean:
+      - direct cell partitioning
+      - molecule deduplication
+      - arbitrary downstream batch label
+    related_terms: [RGN:partition:sample]
+
+  RGN:classify:feature:
+    label: Feature classifier
+    role: classify
+    target: feature
+    status: active
+    definition: Assigns feature identity after aggregating observations of this interval.
+    typical_sequence_types: [onlist]
+    aliases: [protein, protein-cDNA, feature_barcode, antibody_barcode, HTO_bc]
+    examples:
+      - antibody feature assignment
+      - feature barcode identity assignment
+    does_not_mean:
+      - sample assignment unless the feature itself is a sample tag
+      - transcript abundance measurement
+    related_terms: [RGN:measure:protein_feature]
+
+  RGN:classify:perturbation:
+    label: Perturbation classifier
+    role: classify
+    target: perturbation
+    status: active
+    definition: Assigns perturbation identity after aggregating guide or perturbation readouts.
+    typical_sequence_types: [onlist, random]
+    aliases: [sgrna_target, guide_target, crispr-guide_target, guide sequence, crispr_barcode]
+    examples:
+      - sgRNA identity used to assign perturbation to a cell
+      - guide readout used to classify perturbation state
+    does_not_mean:
+      - direct cell partitioning
+      - arbitrary downstream clustering label
+      - guide scaffold sequence
+    related_terms: [RGN:measure:guide]
+
+  RGN:classify:condition:
+    label: Condition classifier
+    role: classify
+    target: condition
+    status: experimental
+    definition: Assigns experimental condition after aggregating observations of this interval.
+    typical_sequence_types: [onlist]
+    aliases: [CMO Barcode, MULTI-seq barcode, HTO_bc]
+    examples:
+      - multiplexing tag that denotes treatment condition
+      - oligo tag that denotes sample handling condition
+    does_not_mean:
+      - biological condition inferred from transcriptome
+      - sample identity when condition and sample are not separable
+
+  RGN:technical:adapter:
+    label: Adapter
+    role: technical
+    target: adapter
+    status: active
+    definition: Technical adapter sequence used for library construction or sequencing compatibility.
+    typical_sequence_types: [fixed]
+    aliases: [illumina_p5, illumina_p7, Illumina P5, Illumina P7, p5, p7, ME, ME1, ME2]
+    examples:
+      - Illumina P5 adapter
+      - Illumina P7 adapter
+      - Tn5 mosaic end
+    does_not_mean:
+      - sequencing primer binding site unless annotated as primer
+      - sample index role by itself
+
+  RGN:technical:primer:
+    label: Primer
+    role: technical
+    target: primer
+    status: active
+    definition: Sequencing or assay primer sequence.
+    typical_sequence_types: [fixed]
+    aliases: [truseq_read1, truseq_read2, truseq_r1, truseq_r2, nextera_read1, nextera_read2, read1_primer, custom_primer, U6 primer]
+    examples:
+      - TruSeq Read 1 primer
+      - TruSeq Read 2 primer
+      - U6 guide-capture primer
+    does_not_mean:
+      - adapter sequence outside the priming site
+      - measured insert sequence
+
+  RGN:technical:index:
+    label: Technical index
+    role: technical
+    target: index
+    status: active
+    definition: Index read or technical index position used during sequencing or demultiplexing.
+    typical_sequence_types: [onlist, fixed, random]
+    aliases: [index5, index7, i5 index, i7 index, sample_index, Index 1 (i7 index), Index 2 (i5 index)]
+    examples:
+      - i7 index read
+      - i5 index read
+    does_not_mean:
+      - sample partition semantics unless paired with RGN:partition:sample
+      - cell barcode
+    related_terms: [RGN:partition:sample]
+
+  RGN:technical:index5:
+    label: i5 technical index
+    role: technical
+    target: index5
+    status: active
+    definition: Technical i5 index position used during sequencing or demultiplexing.
+    typical_sequence_types: [onlist, fixed, random]
+    aliases: [index5, i5 index, Index 2 (i5 index)]
+    examples:
+      - Illumina i5 index read
+    does_not_mean:
+      - i7 index position
+      - sample partition semantics unless paired with RGN:partition:sample
+    related_terms: [RGN:technical:index, RGN:partition:sample]
+
+  RGN:technical:index7:
+    label: i7 technical index
+    role: technical
+    target: index7
+    status: active
+    definition: Technical i7 index position used during sequencing or demultiplexing.
+    typical_sequence_types: [onlist, fixed, random]
+    aliases: [index7, i7 index, Index 1 (i7 index)]
+    examples:
+      - Illumina i7 index read
+    does_not_mean:
+      - i5 index position
+      - sample partition semantics unless paired with RGN:partition:sample
+    related_terms: [RGN:technical:index, RGN:partition:sample]
+
+  RGN:technical:linker:
+    label: Linker
+    role: technical
+    target: linker
+    status: active
+    definition: Technical sequence connecting functional regions.
+    typical_sequence_types: [fixed, random]
+    aliases: [linker, linker1, linker2, linker3, linker-1, linker-2, atac linker, MULTI-seq linker, N10_linker, N9_linker]
+    examples:
+      - fixed sequence between barcode tiers
+      - random-length technical linker
+    does_not_mean:
+      - adapter used for sequencing compatibility
+      - measured biological insert
+
+  RGN:technical:spacer:
+    label: Spacer
+    role: technical
+    target: spacer
+    status: active
+    definition: Technical spacer sequence used for geometry, synthesis, or read phasing.
+    typical_sequence_types: [fixed, random]
+    aliases: [spacer, spacer1, spacer2, spacer3, spacer4, double_T, triple_G]
+    examples:
+      - phasing spacer
+      - synthesis spacer between functional elements
+    does_not_mean:
+      - linker with a specific functional connection if linker is more precise
+      - measured insert
+
+  RGN:technical:template_switch:
+    label: Template-switch sequence
+    role: technical
+    target: template_switch
+    status: active
+    definition: Template-switching oligo or template-switch-derived sequence.
+    typical_sequence_types: [fixed]
+    aliases: [tso, TSO, bead_TSO, 10x5pTSO]
+    examples:
+      - 10x 5-prime template switch oligo
+      - bead template switch oligo
+    does_not_mean:
+      - cDNA generated downstream of template switching
+      - generic primer
+
+  RGN:technical:capture_sequence:
+    label: Capture sequence
+    role: technical
+    target: capture_sequence
+    status: active
+    definition: Technical sequence used to capture or prime a target molecule.
+    typical_sequence_types: [fixed]
+    aliases: [poly_T, polyT, ploy_T, poly_A, polyA, capture_sequence]
+    examples:
+      - polyT transcript capture sequence
+      - polyA-compatible capture sequence
+    does_not_mean:
+      - captured transcript insert
+      - UMI or barcode adjacent to capture sequence
+
+  RGN:technical:scaffold:
+    label: Scaffold
+    role: technical
+    target: scaffold
+    status: active
+    definition: Scaffold or backbone sequence required for guide, reporter, or construct geometry.
+    typical_sequence_types: [fixed]
+    aliases: [sgrna_scaffold, guidebackbone, cs1_scaffold, CS1]
+    examples:
+      - sgRNA scaffold
+      - guide backbone sequence
+      - CS1 scaffold
+    does_not_mean:
+      - guide sequence measured for perturbation identity
+      - reporter measurement sequence
+
+  RGN:technical:unknown_named:
+    label: Unknown named technical region
+    role: technical
+    target: unknown_named
+    status: experimental
+    definition: Named technical region whose more specific function has not yet been curated.
+    typical_sequence_types: [fixed, random, onlist]
+    aliases: [named, dna, oligo]
+    examples:
+      - named fixed block without a curated role
+      - oligo segment with unknown technical function
+    does_not_mean:
+      - known measurement or partition region that should be assigned a precise term
+
+  RGN:unknown:unclassified:
+    label: Unclassified region
+    role: unknown
+    target: unclassified
+    status: active
+    definition: Region whose nominal role is unknown or cannot be assigned with available context.
+    typical_sequence_types: [fixed, random, onlist, joined]
+    aliases: [unknown, unclassified]
+    examples:
+      - ambiguous region label without assay context
+      - legacy region whose function cannot be inferred safely
+    does_not_mean:
+      - a reason to discard the original region_type, name, or sequence_type
+      - a permanent ontology assignment once evidence becomes available
