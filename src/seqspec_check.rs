@@ -20,7 +20,7 @@ pub struct CheckArgs {
         help = "Skip checks",
         value_name = "SKIP",
         default_value = None,
-        value_parser = ["igvf", "igvf_onlist_skip", "structural"],
+        value_parser = ["external", "igvf", "igvf_onlist_skip", "structural"],
     )]
     skip: Option<String>,
 
@@ -99,6 +99,9 @@ fn has_error_diagnostics(errors: &[ErrorObj]) -> bool {
 }
 
 pub fn seqspec_check(spec: &Assay, filter_type: Option<&str>, spec_path: &Path) -> Vec<ErrorObj> {
+    if filter_type == Some("external") {
+        return seqspec_check_without_external(spec);
+    }
     let access = RemoteAccess::anonymous();
     let spec_base = spec_path.parent();
     let mut errors = check(spec, spec_base, &access).unwrap();
@@ -124,6 +127,9 @@ pub fn seqspec_check_with_remote_access_from_base(
     spec_base: Option<&Path>,
     remote_access: &RemoteAccess,
 ) -> anyhow::Result<Vec<ErrorObj>> {
+    if filter_type == Some("external") {
+        return Ok(seqspec_check_without_external(spec));
+    }
     let mut errors = check(spec, spec_base, remote_access)?;
     if let Some(ft) = filter_type {
         errors = filter_errors(errors, ft);
@@ -217,7 +223,13 @@ pub fn seqspec_check_structural(spec: &Assay) -> Vec<ErrorObj> {
     let errors = run!(check_region_against_subregion_length, errors);
     let errors = run!(check_region_against_subregion_sequence, errors);
     let errors = run!(check_read_length_against_library, errors);
-    let errors = run!(check_overlapping_read_regions, errors);
+    run!(check_overlapping_read_regions, errors)
+}
+
+/// Run schema and structural checks without accessing onlist or read resources.
+pub fn seqspec_check_without_external(spec: &Assay) -> Vec<ErrorObj> {
+    let (mut errors, _) = check_schema(spec, Vec::new(), 0);
+    errors.extend(seqspec_check_structural(spec));
     errors
 }
 
@@ -1002,7 +1014,23 @@ mod tests {
     use crate::utils::load_spec;
 
     fn dogma_spec() -> Assay {
-        load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
+        fn localize_onlists(region: &mut Region) {
+            if let Some(onlist) = region.onlist.as_mut() {
+                if matches!(onlist.urltype.as_str(), "http" | "https" | "ftp") {
+                    onlist.url = format!("{}.gz", onlist.filename);
+                    onlist.urltype = "local".into();
+                }
+            }
+            for child in &mut region.regions {
+                localize_onlists(child);
+            }
+        }
+
+        let mut spec = load_spec(&PathBuf::from("tests/fixtures/spec.yaml"));
+        for region in &mut spec.library_spec {
+            localize_onlists(region);
+        }
+        spec
     }
 
     #[test]
@@ -1060,6 +1088,26 @@ mod tests {
             "RGN:partition:cell".to_string(),
         ]);
         assert!(has_region_type_schema_error(&spec));
+    }
+
+    #[test]
+    fn test_external_mode_keeps_schema_and_structural_checks() {
+        let mut spec = dogma_spec();
+        spec.modalities.push(spec.modalities[0].clone());
+        spec.library_spec[2].regions[1].region_type = RegionTypeValue::from(Vec::<String>::new());
+
+        let diagnostics = seqspec_check_without_external(&spec);
+
+        assert!(diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.error_type == "check_schema"));
+        assert!(diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.error_type == "check_unique_modalities"));
+        assert!(diagnostics.iter().all(|diagnostic| {
+            diagnostic.error_type != "check_onlist_files_exist"
+                && diagnostic.error_type != "check_read_files_exist"
+        }));
     }
 
     #[test]

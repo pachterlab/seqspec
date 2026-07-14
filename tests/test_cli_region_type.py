@@ -6,7 +6,6 @@ from pathlib import Path
 
 import yaml
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -66,6 +65,16 @@ def test_python_cli_check_exit_status_tracks_error_diagnostics(tmp_path):
     result = run_python_cli_raw(tmp_path, "check", "-s", "igvf_onlist_skip", str(invalid))
     assert result.returncode == 1
     assert "region_type" in result.stdout
+
+
+def test_python_cli_check_can_skip_external_resources(tmp_path):
+    source = copy_onlist_fixture(tmp_path)
+    (tmp_path / "rna_read.fastq.gz").unlink()
+
+    result = run_python_cli_raw(tmp_path, "check", "--skip", "external", str(source))
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "does not exist" not in result.stdout
 
 
 def test_python_cli_region_type_ontology_roundtrip_and_queries(tmp_path):

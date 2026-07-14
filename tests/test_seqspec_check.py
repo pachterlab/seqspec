@@ -1,11 +1,8 @@
-import os
-import tempfile
-from argparse import ArgumentParser
 from pathlib import Path
-from unittest import TestCase
+from unittest.mock import patch
 
-import pytest
 import yaml
+
 from seqspec.Assay import Assay
 from seqspec.seqspec_check import seqspec_check
 from seqspec.utils import load_spec
@@ -15,18 +12,8 @@ def test_seqspec_check(dogmaseq_dig_spec: Assay):
     """Test seqspec_check function"""
     spec = dogmaseq_dig_spec.model_copy(deep=True)
 
-    def localize_onlists(region):
-        if region.onlist is not None and region.onlist.urltype in {"http", "https", "ftp"}:
-            region.onlist.urltype = "local"
-            region.onlist.url = region.onlist.filename + ".gz"
-        for child in region.regions:
-            localize_onlists(child)
-
-    for region in spec.library_spec:
-        localize_onlists(region)
-
     # Test with valid spec
-    diagnostics = seqspec_check(spec=spec)
+    diagnostics = seqspec_check(spec=spec, filter_type="external")
     assert not any(
         diagnostic["severity"] == "error" for diagnostic in diagnostics
     ), "Valid spec should not emit error diagnostics"
@@ -48,8 +35,8 @@ def test_seqspec_check(dogmaseq_dig_spec: Assay):
         sequence_spec=[],
         library_spec=[]
     )
-    
-    diagnostics = seqspec_check(spec=invalid_spec)
+
+    diagnostics = seqspec_check(spec=invalid_spec, filter_type="external")
     assert any(
         diagnostic["severity"] == "error" for diagnostic in diagnostics
     ), "Invalid spec should emit error diagnostics"
@@ -58,7 +45,7 @@ def test_seqspec_check(dogmaseq_dig_spec: Assay):
 def test_seqspec_check_warns_on_overlapping_read_regions():
     spec = load_spec(Path("tests/fixtures/check_overlap_warning/spec.yaml"))
 
-    diagnostics = seqspec_check(spec=spec)
+    diagnostics = seqspec_check(spec=spec, filter_type="external")
 
     errors = [
         diagnostic for diagnostic in diagnostics if diagnostic["severity"] == "error"
@@ -77,6 +64,27 @@ def test_seqspec_check_warns_on_overlapping_read_regions():
     )
     assert "'barcode'" in warnings[0]["error_message"]
     assert "'umi'" in warnings[0]["error_message"]
+
+
+def test_seqspec_check_external_mode_skips_resource_access(dogmaseq_dig_spec: Assay):
+    spec = dogmaseq_dig_spec.model_copy(deep=True)
+    spec.modalities.append(spec.modalities[0])
+
+    with patch(
+        "seqspec.seqspec_check.file_exists",
+        side_effect=AssertionError("external resource check was called"),
+    ):
+        diagnostics = seqspec_check(spec=spec, filter_type="external")
+
+    assert any(
+        diagnostic["error_type"] == "check_unique_modalities"
+        for diagnostic in diagnostics
+    )
+    assert not any(
+        diagnostic["error_type"]
+        in {"check_onlist_files_exist", "check_read_files_exist"}
+        for diagnostic in diagnostics
+    )
 
 
 def test_seqspec_check_prefers_local_onlist_url():
@@ -130,7 +138,7 @@ def test_seqspec_check_validates_region_type_list_shape(dogmaseq_dig_spec: Assay
     barcode = spec.get_libspec("rna").get_region_by_id("rna_cell_bc")[0]
     barcode.region_type = ["RGN:partition:cell"]
 
-    diagnostics = seqspec_check(spec=spec)
+    diagnostics = seqspec_check(spec=spec, filter_type="external")
 
     assert not any(
         diagnostic["error_type"] == "check_schema"
@@ -139,7 +147,7 @@ def test_seqspec_check_validates_region_type_list_shape(dogmaseq_dig_spec: Assay
     )
 
     barcode.region_type = []
-    diagnostics = seqspec_check(spec=spec)
+    diagnostics = seqspec_check(spec=spec, filter_type="external")
 
     assert any(
         diagnostic["error_type"] == "check_schema"
@@ -148,7 +156,7 @@ def test_seqspec_check_validates_region_type_list_shape(dogmaseq_dig_spec: Assay
     )
 
     barcode.region_type = ["barcode"]
-    diagnostics = seqspec_check(spec=spec)
+    diagnostics = seqspec_check(spec=spec, filter_type="external")
 
     assert any(
         diagnostic["error_type"] == "check_schema"
@@ -164,7 +172,7 @@ def test_seqspec_check_validates_empty_region_type_list_loaded_from_yaml(tmp_pat
     spec_path.write_text(yaml.safe_dump(data, sort_keys=False))
 
     spec = load_spec(spec_path, strict=False)
-    diagnostics = seqspec_check(spec=spec)
+    diagnostics = seqspec_check(spec=spec, filter_type="external")
 
     assert spec.library_spec[2].regions[1].region_type == []
     assert any(

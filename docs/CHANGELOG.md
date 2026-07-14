@@ -17,6 +17,7 @@ authors:
 - `seqspec print -f seqspec-png` and `seqspec print -f seqspec-pdf` now use the HTML coordinate model, support `--label` modes, and draw callouts for labels that do not fit inside short regions.
 - Additional parity tests for Python and Rust command behavior.
 - `seqspec check` now emits warning diagnostics for overlapping read geometry, with guidance to use `seqspec index --no-overlap` when needed.
+- `seqspec check --skip external` runs schema and structural checks without accessing onlist or read resources.
 - A generated examples site under `docs/examples/site`, with rendered assay reports, read templates, region templates, and a searchable assay catalog.
 
 ### Changed

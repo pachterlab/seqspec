@@ -105,7 +105,7 @@ seqspec auth resolve https://api.data.igvf.org/reference-files/IGVFFI5429KKCK/
 Check that the `seqspec` file is correctly formatted and consistent with the [specification](https://github.com/IGVF/seqspec/blob/main/docs/SPECIFICATION.md).
 
 ```bash
-seqspec check [-h] [-o OUT] [--skip {igvf,igvf_onlist_skip,structural}] [--auth-profile PROFILE] yaml
+seqspec check [-h] [-o OUT] [--skip {external,igvf,igvf_onlist_skip,structural}] [--auth-profile PROFILE] yaml
 ```
 
 ```python
@@ -117,6 +117,7 @@ seqspec_check(spec, filter_type=None, auth_profile=None)
 ```
 
 - optionally, `-o OUT` can be used to write the output to a file.
+- optionally, `--skip external` runs schema and structural checks without accessing onlist or read resources.
 - optionally, `--skip {igvf,igvf_onlist_skip,structural}` can filter out known diagnostic classes (see source for list).
 - optionally, `--auth-profile PROFILE` uses a named auth profile when checking remote files.
 - `yaml` corresponds to the `seqspec` file and may be plain YAML or `.yaml.gz`.

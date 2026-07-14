@@ -71,6 +71,23 @@ fn rust_cli_check_exit_status_tracks_error_diagnostics() {
 }
 
 #[test]
+fn rust_cli_check_can_skip_external_resources() {
+    let dir = unique_temp_dir("cli-check-skip-external");
+    let source = copy_onlist_fixture(&dir);
+    fs::remove_file(dir.join("rna_read.fastq.gz")).unwrap();
+
+    let result = run_cli_raw(&["check", "--skip", "external", source.to_str().unwrap()]);
+
+    assert!(
+        result.status.success(),
+        "stdout:\n{}\nstderr:\n{}",
+        String::from_utf8_lossy(&result.stdout),
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert!(!String::from_utf8_lossy(&result.stdout).contains("does not exist"));
+}
+
+#[test]
 fn rust_cli_region_type_ontology_roundtrip_and_queries() {
     let dir = unique_temp_dir("cli-region-type-onlist");
     let source = copy_onlist_fixture(&dir);

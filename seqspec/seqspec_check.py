@@ -54,7 +54,7 @@ seqspec check spec.yaml
         help="Skip checks",
         type=str,
         default=None,
-        choices=["igvf", "igvf_onlist_skip", "structural"],
+        choices=["external", "igvf", "igvf_onlist_skip", "structural"],
     )
     subparser.add_argument(
         "--auth-profile",
@@ -123,14 +123,18 @@ def seqspec_check(
 
     Args:
         spec: The Assay object to check
-        filter_type: Optional filter type to apply to diagnostics (e.g. "igvf", "igvf_onlist_skip")
+        filter_type: Optional check mode or diagnostic filter
 
     Returns:
         List of diagnostic dictionaries
     """
-    errors = check(spec, auth_profile=auth_profile)
+    errors = check(
+        spec,
+        auth_profile=auth_profile,
+        include_external=filter_type != "external",
+    )
 
-    if filter_type:
+    if filter_type and filter_type != "external":
         errors = filter_errors(errors, filter_type)
     return errors
 
@@ -216,7 +220,11 @@ def filter_errors(errors, filter_type):
         return errors
 
 
-def check(spec: Assay, auth_profile: Optional[str] = None):
+def check(
+    spec: Assay,
+    auth_profile: Optional[str] = None,
+    include_external: bool = True,
+):
     # Variety of checks against schema
     def check_schema(spec: Assay, errors=[], idx=0):
         schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
@@ -835,7 +843,10 @@ def check(spec: Assay, auth_profile: Optional[str] = None):
         "check_read_length_against_library": check_read_length_against_library,
         "check_overlapping_read_regions": check_overlapping_read_regions,
     }
+    external_checks = {"check_onlist_files_exist", "check_read_files_exist"}
     for k, v in checks.items():
+        if not include_external and k in external_checks:
+            continue
         # print(k)
         errors, idx = v(spec, errors, idx)
 
