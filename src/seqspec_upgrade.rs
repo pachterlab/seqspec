@@ -140,6 +140,8 @@ fn upgrade_0_2_0_to_0_4_0(spec: Assay) -> Assay {
                     url: "".to_string(),
                     urltype: "".to_string(),
                     md5,
+                    sequence_column_index: 0,
+                    skip_rows: 0,
                 };
                 // update the region by id with new onlist fields
                 top.update_region_by_id(

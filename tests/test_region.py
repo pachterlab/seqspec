@@ -540,6 +540,8 @@ def test_onlist_creation():
     assert onlist.url == "file://barcodes.txt"
     assert onlist.urltype == "local"
     assert onlist.md5 == "d41d8cd98f00b204e9800998ecf8427e"
+    assert onlist.sequence_column_index == 0
+    assert onlist.skip_rows == 0
 
 def test_onlist_input():
     """Test OnlistInput class"""
@@ -550,7 +552,9 @@ def test_onlist_input():
         filesize=1000,
         url="file://barcodes.txt",
         urltype="local",
-        md5="d41d8cd98f00b204e9800998ecf8427e"
+        md5="d41d8cd98f00b204e9800998ecf8427e",
+        sequence_column_index=1,
+        skip_rows=1,
     )
     
     onlist = onlist_input.to_onlist()
@@ -561,6 +565,22 @@ def test_onlist_input():
     assert onlist.url == "file://barcodes.txt"
     assert onlist.urltype == "local"
     assert onlist.md5 == "d41d8cd98f00b204e9800998ecf8427e"
+    assert onlist.sequence_column_index == 1
+    assert onlist.skip_rows == 1
+
+
+def test_onlist_projection_fields_must_be_nonnegative():
+    with pytest.raises(ValueError):
+        Onlist(
+            file_id="test_file",
+            filename="barcodes.txt",
+            filetype="txt",
+            filesize=1000,
+            url="barcodes.txt",
+            urltype="local",
+            md5="",
+            sequence_column_index=-1,
+        )
 
 def test_region_coordinate_creation():
     """Test RegionCoordinate creation"""
