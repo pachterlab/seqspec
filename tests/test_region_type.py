@@ -1,15 +1,33 @@
+from pathlib import Path
+
+import yaml
+
 from seqspec.region_type import (
+    LEGACY_REGION_TYPE_MAP,
     UNKNOWN_REGION_TYPE,
     is_cell_barcode,
     is_feature,
     is_index7,
-    is_transcript,
     is_technical_skip,
+    is_transcript,
     region_type_matches,
     region_type_terms,
     region_type_tool_label,
     upgrade_region_type,
 )
+
+REGISTRY = Path(__file__).resolve().parents[1] / "docs/region_ontology_registry.yaml"
+
+
+def test_registry_legacy_map_matches_runtime_map():
+    registry = yaml.safe_load(REGISTRY.read_text())
+
+    assert registry["legacy_region_types"] == LEGACY_REGION_TYPE_MAP
+    assert {
+        term
+        for terms in LEGACY_REGION_TYPE_MAP.values()
+        for term in terms
+    } <= set(registry["terms"])
 
 
 def test_region_type_matches_legacy_and_ontology_values():

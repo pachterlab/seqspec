@@ -46,6 +46,7 @@ targets:
 legacy_region_types:
   atac: [RGN:measure:chromatin_accessibility]
   barcode: [RGN:partition:cell]
+  bead_tso: [RGN:technical:template_switch]
   bead_TSO: [RGN:technical:template_switch]
   cdna: [RGN:measure:transcript]
   cDNA: [RGN:measure:transcript]
