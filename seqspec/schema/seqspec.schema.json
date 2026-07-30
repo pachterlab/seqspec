@@ -409,6 +409,18 @@
               "description": "md5sum for the file pointed to by filename",
               "type": "string",
               "pattern": "^[a-f0-9]{32}$"
+            },
+            "sequence_column_index": {
+              "description": "Zero-based whitespace-delimited field index containing each sequence. Defaults to 0.",
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            },
+            "skip_rows": {
+              "description": "Number of physical rows to skip before reading sequences. Defaults to 0.",
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
             }
           },
           "required": [

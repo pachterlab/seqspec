@@ -171,8 +171,42 @@ pub fn local_onlist_locator(onlist: &Onlist) -> Result<&str, String> {
     local_resource_url(&onlist.url, &onlist.filename, "onlist")
 }
 
-/// Read a local text file into Vec<String>, handling optional .gz
-pub fn read_local_list(path: &std::path::Path) -> Result<Vec<String>, String> {
+fn project_onlist_text(
+    text: &str,
+    sequence_column_index: usize,
+    skip_rows: usize,
+) -> Result<Vec<String>, String> {
+    text.lines()
+        .enumerate()
+        .skip(skip_rows)
+        .filter_map(|(row_index, line)| {
+            let fields: Vec<&str> = line.split_whitespace().collect();
+            if fields.is_empty() {
+                return None;
+            }
+            Some(
+                fields
+                    .get(sequence_column_index)
+                    .map(|field| (*field).to_string())
+                    .ok_or_else(|| {
+                        format!(
+                            "onlist row {} has {} field(s); cannot select zero-based column index {}",
+                            row_index + 1,
+                            fields.len(),
+                            sequence_column_index
+                        )
+                    }),
+            )
+        })
+        .collect()
+}
+
+/// Read and project a local onlist text file, handling optional .gz.
+pub fn read_local_list(
+    path: &std::path::Path,
+    sequence_column_index: usize,
+    skip_rows: usize,
+) -> Result<Vec<String>, String> {
     let p = if path.exists() {
         path.to_path_buf()
     } else {
@@ -188,21 +222,20 @@ pub fn read_local_list(path: &std::path::Path) -> Result<Vec<String>, String> {
         let mut s = String::new();
         use std::io::Read;
         dec.read_to_string(&mut s).map_err(|e| e.to_string())?;
-        Ok(s.lines()
-            .map(|l| l.trim().to_string())
-            .filter(|l| !l.is_empty())
-            .collect())
+        project_onlist_text(&s, sequence_column_index, skip_rows)
     } else {
         let s = std::fs::read_to_string(&p).map_err(|e| e.to_string())?;
-        Ok(s.lines()
-            .map(|l| l.trim().to_string())
-            .filter(|l| !l.is_empty())
-            .collect())
+        project_onlist_text(&s, sequence_column_index, skip_rows)
     }
 }
 
-/// Fetch a remote text file (http/https/ftp) and return lines
-pub fn read_remote_list(url: &str, remote_access: &RemoteAccess) -> Result<Vec<String>, String> {
+/// Fetch and project a remote onlist (http/https/ftp).
+pub fn read_remote_list(
+    url: &str,
+    remote_access: &RemoteAccess,
+    sequence_column_index: usize,
+    skip_rows: usize,
+) -> Result<Vec<String>, String> {
     let text = remote_access
         .with_reader(url, |mut reader| {
             let mut data = Vec::new();
@@ -218,11 +251,7 @@ pub fn read_remote_list(url: &str, remote_access: &RemoteAccess) -> Result<Vec<S
             Ok(text)
         })
         .map_err(|e| e.to_string())?;
-    Ok(text
-        .lines()
-        .map(|l| l.trim().to_string())
-        .filter(|l| !l.is_empty())
-        .collect())
+    project_onlist_text(&text, sequence_column_index, skip_rows)
 }
 
 /// Map a read_id to the ordered list of regions on that read's strand.
@@ -321,6 +350,30 @@ mod tests {
     use std::net::TcpListener;
     use std::path::PathBuf;
     use std::thread;
+
+    fn gzip_bytes(text: &str) -> Vec<u8> {
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+        encoder.write_all(text.as_bytes()).unwrap();
+        encoder.finish().unwrap()
+    }
+
+    fn serve_once(body: Vec<u8>) -> (String, thread::JoinHandle<()>) {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = thread::spawn(move || {
+            let (mut stream, _) = listener.accept().unwrap();
+            let mut request = [0_u8; 4096];
+            stream.read(&mut request).unwrap();
+            write!(
+                stream,
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            )
+            .unwrap();
+            stream.write_all(&body).unwrap();
+        });
+        (format!("http://{}/plate.tsv.gz", addr), server)
+    }
 
     fn dogma_spec() -> Assay {
         load_spec(&PathBuf::from("tests/fixtures/spec.yaml"))
@@ -654,7 +707,7 @@ mod tests {
     #[test]
     fn test_read_local_list_plain() {
         let path = PathBuf::from("tests/fixtures/onlist_joined.txt");
-        let result = read_local_list(&path).unwrap();
+        let result = read_local_list(&path, 0, 0).unwrap();
         assert_eq!(result.len(), 736320);
         assert_eq!(result[0], "AAACAGCCAAACAACA");
     }
@@ -662,7 +715,7 @@ mod tests {
     #[test]
     fn test_read_local_list_gz() {
         let path = PathBuf::from("tests/fixtures/RNA-737K-arc-v1.txt.gz");
-        let result = read_local_list(&path).unwrap();
+        let result = read_local_list(&path, 0, 0).unwrap();
         assert_eq!(result.len(), 736320);
     }
 
@@ -670,15 +723,64 @@ mod tests {
     fn test_read_local_list_gz_fallback() {
         // Try path without .gz extension — read_local_list should find the .gz variant
         let path = PathBuf::from("tests/fixtures/RNA-737K-arc-v1.txt");
-        let result = read_local_list(&path).unwrap();
+        let result = read_local_list(&path, 0, 0).unwrap();
         assert_eq!(result.len(), 736320);
     }
 
     #[test]
     fn test_read_local_list_not_found() {
         let path = PathBuf::from("tests/fixtures/nonexistent.txt");
-        let result = read_local_list(&path);
+        let result = read_local_list(&path, 0, 0);
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_read_local_list_projects_column_after_skipping_header() {
+        let path = PathBuf::from("tests/fixtures/tabular_onlist.txt");
+        let result = read_local_list(&path, 1, 1).unwrap();
+
+        assert_eq!(
+            result,
+            vec!["TCAGTTGTCGAAGG".to_string(), "CTGGACCTAATACC".to_string()]
+        );
+    }
+
+    #[test]
+    fn test_read_local_list_projects_gzipped_column_after_skipping_header() {
+        let path = std::env::temp_dir().join(format!(
+            "seqspec-tabular-onlist-{}-{}.tsv.gz",
+            std::process::id(),
+            std::thread::current().name().unwrap_or("test")
+        ));
+        std::fs::write(&path, gzip_bytes("Name Barcode\nA01 AAAA\nA02 CCCC\n")).unwrap();
+
+        let result = read_local_list(&path, 1, 1).unwrap();
+
+        assert_eq!(result, vec!["AAAA".to_string(), "CCCC".to_string()]);
+        std::fs::remove_file(path).unwrap();
+    }
+
+    #[test]
+    fn test_read_remote_list_projects_gzipped_column_after_skipping_header() {
+        let (url, server) = serve_once(gzip_bytes("Name Barcode\nA01 AAAA\nA02 CCCC\n"));
+
+        let result = read_remote_list(&url, &RemoteAccess::anonymous(), 1, 1).unwrap();
+        server.join().unwrap();
+
+        assert_eq!(result, vec!["AAAA".to_string(), "CCCC".to_string()]);
+    }
+
+    #[test]
+    fn test_read_local_list_errors_when_projection_column_is_missing() {
+        let root =
+            std::env::temp_dir().join(format!("seqspec-malformed-onlist-{}", std::process::id()));
+        std::fs::write(&root, "Name Barcode\nA01\n").unwrap();
+
+        let err = read_local_list(&root, 1, 1).unwrap_err();
+
+        assert!(err.contains("row 2 has 1 field"));
+        assert!(err.contains("column index 1"));
+        std::fs::remove_file(root).unwrap();
     }
 
     #[test]
@@ -691,6 +793,8 @@ mod tests {
             "nested/whitelist.txt".into(),
             "local".into(),
             String::new(),
+            0,
+            0,
         );
 
         assert_eq!(
@@ -709,6 +813,8 @@ mod tests {
             String::new(),
             "local".into(),
             String::new(),
+            0,
+            0,
         );
 
         assert_eq!(

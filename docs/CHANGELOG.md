@@ -19,11 +19,13 @@ authors:
 - `seqspec check` now emits warning diagnostics for overlapping read geometry, with guidance to use `seqspec index --no-overlap` when needed.
 - `seqspec check --skip external` runs schema and structural checks without accessing onlist or read resources.
 - A generated examples site under `docs/examples/site`, with rendered assay reports, read templates, region templates, and a searchable assay catalog.
+- Optional `sequence_column_index` and `skip_rows` onlist fields for extracting sequences from whitespace-delimited tabular source files.
 
 ### Changed
 
 - `seqspec upgrade` now upgrades `0.3.0` specs to `0.4.0` in both implementations.
 - Python and Rust now share the same core command surface for `auth`, `check`, `find`, `file`, `format`, `index`, `info`, `init`, `insert`, `methods`, `modify`, `onlist`, `print`, `split`, `upgrade`, and `version`.
+- Python and Rust apply the same onlist row-skipping and column-selection behavior to local, remote, and gzipped sources.
 - `seqspec build` is deprecated in both CLIs and remains as a compatibility stub.
 - Older specs are loaded more permissively before upgrade, which makes `0.2.x` and `0.3.x` specs easier to normalize.
 - `seqspec onlist -s region-type` now errors when matches span multiple reads in a modality. Use `-s read` or `-s region` to disambiguate.

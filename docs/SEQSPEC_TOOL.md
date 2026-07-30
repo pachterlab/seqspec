@@ -635,7 +635,7 @@ spec = load_spec("spec.yaml")
 get_onlists(spec, modality="rna", selector="region-type", id="barcode")
 ```
 
-- optionally, `-o OUT` when set with `-f`, writes the joined onlist to this file; when set without `-f`, downloads remote onlists locally and prints paths.
+- optionally, `-o OUT` when set with `-f`, writes the joined onlist to this file; when set without `-f`, downloads remote onlists locally and prints paths. Local or remote onlists with `sequence_column_index` or `skip_rows` are written as normalized sequence-only files.
 - `-m MODALITY` is the modality in which you are searching for the region.
 - `-i ID` is the `id` of the object to search for the onlist.
 - `-s SELECTOR` is the type of the `id` of the object (default: read). Can be one of:
@@ -647,6 +647,11 @@ get_onlists(spec, modality="rna", selector="region-type", id="barcode")
   - `multi` (row-aligned, zip with padding)
 - optionally, `--auth-profile PROFILE` uses a named auth profile for protected remote onlists.
 - `yaml` corresponds to the `seqspec` file and may be plain YAML or `.yaml.gz`.
+
+Onlist rows are split on arbitrary whitespace. The optional onlist fields
+`sequence_column_index` (zero-based, default `0`) and `skip_rows` (default `0`)
+select sequences from tabular sources while retaining the source URL and checksum
+in the specification.
 
 _Note_: `-s region-type` is only valid when the matching regions come from one read geometry. If the same `region_type` appears across multiple reads in the modality, `seqspec onlist` errors and asks you to use `-s read` or `-s region` instead.
 
