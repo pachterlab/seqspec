@@ -146,6 +146,7 @@ const STRUCTURAL_CHECK_TYPES: &[&str] = &[
     "check_unique_region_ids",
     "check_read_modalities",
     "check_primer_ids_in_region_ids",
+    "check_primer_regions",
     "check_sequence_types",
     "check_region_lengths",
     "check_sequence_lengths",
@@ -216,6 +217,7 @@ pub fn seqspec_check_structural(spec: &Assay) -> Vec<ErrorObj> {
     let errors = run!(check_unique_region_ids, errors);
     let errors = run!(check_read_modalities, errors);
     let errors = run!(check_primer_ids_in_region_ids, errors);
+    let errors = run!(check_primer_regions, errors);
     let errors = run!(check_sequence_types, errors);
     let errors = run!(check_region_lengths, errors);
     let errors = run!(check_sequence_lengths, errors);
@@ -666,6 +668,45 @@ fn check_primer_ids_in_region_ids(
             );
         }
     }
+    (errors, idx)
+}
+
+fn check_primer_regions(
+    spec: &Assay,
+    mut errors: Vec<ErrorObj>,
+    mut idx: usize,
+) -> (Vec<ErrorObj>, usize) {
+    for read in &spec.sequence_spec {
+        let Some(libspec) = spec.get_libspec(&read.modality) else {
+            continue;
+        };
+        let primer = libspec.get_region_by_id(&read.primer_id).into_iter().next();
+        let Some(primer) = primer else {
+            continue;
+        };
+
+        let ghost = primer.min_len == 0 && primer.max_len == 0 && primer.sequence.is_empty();
+        let concrete_fixed = primer.sequence_type == "fixed"
+            && !primer.sequence.is_empty()
+            && primer
+                .sequence
+                .chars()
+                .all(|base| matches!(base.to_ascii_uppercase(), 'A' | 'C' | 'G' | 'T'));
+
+        if !ghost && !concrete_fixed {
+            push_warning(
+                &mut errors,
+                &mut idx,
+                "check_primer_regions",
+                format!(
+                    "read '{}' primer_id '{}' references a region that is neither a concrete fixed A/C/G/T sequence nor a zero-length empty anchor",
+                    read.read_id, read.primer_id
+                ),
+                "read",
+            );
+        }
+    }
+
     (errors, idx)
 }
 
@@ -1350,5 +1391,40 @@ mod tests {
             .contains("seqspec index --no-overlap"));
         assert!(warnings[0].error_message.contains("'barcode'"));
         assert!(warnings[0].error_message.contains("'umi'"));
+    }
+
+    #[test]
+    fn test_check_warns_only_for_non_scannable_primer_region() {
+        let spec_path = PathBuf::from("tests/fixtures/check_primer_warning/spec.yaml");
+        let spec = load_spec(&spec_path);
+        let diagnostics = seqspec_check_without_external(&spec);
+
+        let primer_warnings = diagnostics
+            .iter()
+            .filter(|diagnostic| diagnostic.error_type == "check_primer_regions")
+            .collect::<Vec<_>>();
+
+        assert_eq!(primer_warnings.len(), 1);
+        assert_eq!(primer_warnings[0].severity, "warning");
+        assert!(primer_warnings[0].error_message.contains("bad_R1"));
+        assert!(primer_warnings[0].error_message.contains("bad_primer"));
+    }
+
+    #[test]
+    fn test_check_validates_primer_anchors_across_the_region_tree() {
+        let spec_path = PathBuf::from("tests/fixtures/check_primer_warning/spec.yaml");
+        let mut spec = load_spec(&spec_path);
+        spec.sequence_spec[0].primer_id = "rna".to_string();
+
+        let diagnostics = seqspec_check_without_external(&spec);
+        let primer_warnings = diagnostics
+            .iter()
+            .filter(|diagnostic| diagnostic.error_type == "check_primer_regions")
+            .collect::<Vec<_>>();
+
+        assert!(primer_warnings.iter().any(|diagnostic| {
+            diagnostic.error_message.contains("fixed_R1")
+                && diagnostic.error_message.contains("'rna'")
+        }));
     }
 }

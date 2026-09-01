@@ -66,6 +66,40 @@ def test_seqspec_check_warns_on_overlapping_read_regions():
     assert "'umi'" in warnings[0]["error_message"]
 
 
+def test_seqspec_check_warns_only_for_non_scannable_primer_region():
+    spec = load_spec(Path("tests/fixtures/check_primer_warning/spec.yaml"))
+
+    diagnostics = seqspec_check(spec=spec, filter_type="external")
+    primer_warnings = [
+        diagnostic
+        for diagnostic in diagnostics
+        if diagnostic["error_type"] == "check_primer_regions"
+    ]
+
+    assert len(primer_warnings) == 1
+    assert primer_warnings[0]["severity"] == "warning"
+    assert "bad_R1" in primer_warnings[0]["error_message"]
+    assert "bad_primer" in primer_warnings[0]["error_message"]
+
+
+def test_seqspec_check_validates_primer_anchors_across_the_region_tree():
+    spec = load_spec(Path("tests/fixtures/check_primer_warning/spec.yaml"))
+    spec.sequence_spec[0].primer_id = "rna"
+
+    diagnostics = seqspec_check(spec=spec, filter_type="external")
+    primer_warnings = [
+        diagnostic
+        for diagnostic in diagnostics
+        if diagnostic["error_type"] == "check_primer_regions"
+    ]
+
+    assert any(
+        "fixed_R1" in diagnostic["error_message"]
+        and "'rna'" in diagnostic["error_message"]
+        for diagnostic in primer_warnings
+    )
+
+
 def test_seqspec_check_external_mode_skips_resource_access(dogmaseq_dig_spec: Assay):
     spec = dogmaseq_dig_spec.model_copy(deep=True)
     spec.modalities.append(spec.modalities[0])

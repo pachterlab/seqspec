@@ -141,20 +141,21 @@ A list of checks performed:
 8. Check that the `region_id`s are unique across all regions.
 9. Check that each read `modality` exists in the assay list of modalities.
 10. Check that each read `primer_id` exists among the region IDs in the `library_spec`.
-11. Check `sequence_type` and region annotation consistencies:
+11. Warn when a primer anchor is neither a concrete fixed A/C/G/T sequence nor a valid zero-length empty anchor.
+12. Check `sequence_type` and region annotation consistencies:
 
 - if a region has a sequence type "fixed" then it should not contain subregions
 - if a region has a sequence type "joined" then it should contain subregions
 - if a region has a sequence type "random" then it should not contain subregions and `sequence` should be all X's
 - if a region has a sequence type "onlist" then it should have an onlist object
 
-12. Check that the `min_len` is less than or equal to the `max_len`.
-13. Check that the length of the `sequence` in every region is between the `min_len` and `max_len`.
-14. Check that the number of files in each `Read` is the same across all reads.
-15. Check that for every region with subregions, the region `min_len`/`max_len` equals the sum of the subregions' `min_len`/`max_len`.
-16. Check that for every region with subregions, the region `sequence` equals the left-to-right concatenation of the subregions' `sequence`s.
-17. Check that each read's `max_len` does not exceed the sequence-able range of library elements after (pos strand) or before (neg strand) the primer.
-18. Warn when two reads in the same modality cover the same declared regions. This often needs explicit overlap handling with `seqspec index --no-overlap`.
+13. Check that the `min_len` is less than or equal to the `max_len`.
+14. Check that the length of the `sequence` in every region is between the `min_len` and `max_len`.
+15. Check that the number of files in each `Read` is the same across all reads.
+16. Check that for every region with subregions, the region `min_len`/`max_len` equals the sum of the subregions' `min_len`/`max_len`.
+17. Check that for every region with subregions, the region `sequence` equals the left-to-right concatenation of the subregions' `sequence`s.
+18. Check that each read's `max_len` does not exceed the sequence-able range of library elements after (pos strand) or before (neg strand) the primer.
+19. Warn when two reads in the same modality cover the same declared regions. This often needs explicit overlap handling with `seqspec index --no-overlap`.
 
 Below are a list of example errors one may encounter when checking a spec:
 

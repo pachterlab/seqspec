@@ -177,6 +177,7 @@ STRUCTURAL_CHECK_TYPES = [
     "check_unique_region_ids",
     "check_read_modalities",
     "check_primer_ids_in_region_ids",
+    "check_primer_regions",
     "check_sequence_types",
     "check_region_lengths",
     "check_sequence_lengths",
@@ -517,6 +518,42 @@ def check(
                 idx += 1
         return (errors, idx)
 
+    def check_primer_regions(spec, errors, idx):
+        for read in spec.sequence_spec:
+            try:
+                libspec = spec.get_libspec(read.modality)
+            except ValueError:
+                continue
+
+            primer = next(iter(libspec.get_region_by_id(read.primer_id)), None)
+            if primer is None:
+                continue
+
+            ghost = (
+                primer.min_len == 0 and primer.max_len == 0 and primer.sequence == ""
+            )
+            concrete_fixed = (
+                primer.sequence_type == "fixed"
+                and bool(primer.sequence)
+                and set(primer.sequence.upper()) <= set("ACGT")
+            )
+            if not ghost and not concrete_fixed:
+                errors.append(
+                    make_diagnostic(
+                        severity="warning",
+                        error_type="check_primer_regions",
+                        error_message=(
+                            f"read '{read.read_id}' primer_id '{read.primer_id}' references "
+                            "a region that is neither a concrete fixed A/C/G/T sequence nor "
+                            "a zero-length empty anchor"
+                        ),
+                        error_object="read",
+                    )
+                )
+                idx += 1
+
+        return (errors, idx)
+
     # NOTE: this is a strong assumption that may be relaxed in the future
     # check that the primer id for each read is in the leaves of the spec for that modality
     # def check_primer_ids_in_libspec_leaves(spec, errors, idx):
@@ -833,6 +870,7 @@ def check(
         "check_unique_region_ids": check_unique_region_ids,
         "check_read_modalities": check_read_modalities,
         "check_primer_ids_in_region_ids": check_primer_ids_in_region_ids,
+        "check_primer_regions": check_primer_regions,
         # "check_primer_ids_in_libspec_leaves": check_primer_ids_in_libspec_leaves,
         "check_sequence_types": check_sequence_types,
         "check_region_lengths": check_region_lengths,

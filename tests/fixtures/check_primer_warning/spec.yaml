@@ -1,0 +1,179 @@
+seqspec_version: 0.4.0
+assay_id: primer-warning
+name: Primer Warning Fixture
+doi: https://doi.org/10.0000/primer-warning
+date: 1 September 2026
+description: Primer anchors that are concrete, zero-length, or not scannable.
+modalities:
+  - rna
+  - dna
+  - tag
+lib_struct: ""
+sequence_protocol:
+  - protocol_id: fixed-sequencing
+    name: Fixed sequencing
+    modality: rna
+  - protocol_id: ghost-sequencing
+    name: Ghost sequencing
+    modality: dna
+  - protocol_id: bad-sequencing
+    name: Bad sequencing
+    modality: tag
+sequence_kit:
+  - kit_id: fixed-sequencing-kit
+    name: Fixed sequencing kit
+    modality: rna
+  - kit_id: ghost-sequencing-kit
+    name: Ghost sequencing kit
+    modality: dna
+  - kit_id: bad-sequencing-kit
+    name: Bad sequencing kit
+    modality: tag
+library_protocol:
+  - protocol_id: fixed-library
+    name: Fixed library
+    modality: rna
+  - protocol_id: ghost-library
+    name: Ghost library
+    modality: dna
+  - protocol_id: bad-library
+    name: Bad library
+    modality: tag
+library_kit:
+  - kit_id: fixed-library-kit
+    name: Fixed library kit
+    modality: rna
+  - kit_id: ghost-library-kit
+    name: Ghost library kit
+    modality: dna
+  - kit_id: bad-library-kit
+    name: Bad library kit
+    modality: tag
+sequence_spec:
+  - read_id: fixed_R1
+    name: Fixed Primer Read
+    modality: rna
+    primer_id: fixed_primer
+    min_len: 4
+    max_len: 4
+    strand: pos
+    files:
+      - file_id: fixed.fastq
+        filename: fixed.fastq
+        filetype: fastq
+        filesize: 0
+        url: fixed.fastq
+        urltype: local
+        md5: "00000000000000000000000000000000"
+  - read_id: ghost_R1
+    name: Ghost Primer Read
+    modality: dna
+    primer_id: ghost_primer
+    min_len: 4
+    max_len: 4
+    strand: pos
+    files:
+      - file_id: ghost.fastq
+        filename: ghost.fastq
+        filetype: fastq
+        filesize: 0
+        url: ghost.fastq
+        urltype: local
+        md5: "11111111111111111111111111111111"
+  - read_id: bad_R1
+    name: Non-scannable Primer Read
+    modality: tag
+    primer_id: bad_primer
+    min_len: 4
+    max_len: 4
+    strand: pos
+    files:
+      - file_id: bad.fastq
+        filename: bad.fastq
+        filetype: fastq
+        filesize: 0
+        url: bad.fastq
+        urltype: local
+        md5: "22222222222222222222222222222222"
+library_spec:
+  - region_id: rna
+    region_type: rna
+    name: Fixed Primer Library
+    sequence_type: joined
+    sequence: AAAACCCC
+    min_len: 8
+    max_len: 8
+    onlist: null
+    regions:
+      - region_id: fixed_primer
+        region_type: truseq_read1
+        name: Fixed Primer
+        sequence_type: fixed
+        sequence: AAAA
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
+      - region_id: fixed_payload
+        region_type: cdna
+        name: Fixed Payload
+        sequence_type: fixed
+        sequence: CCCC
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
+  - region_id: dna
+    region_type: dna
+    name: Ghost Primer Library
+    sequence_type: joined
+    sequence: CCCC
+    min_len: 4
+    max_len: 4
+    onlist: null
+    regions:
+      - region_id: ghost_primer
+        region_type: truseq_read1
+        name: Ghost Primer
+        sequence_type: fixed
+        sequence: ""
+        min_len: 0
+        max_len: 0
+        onlist: null
+        regions: []
+      - region_id: ghost_payload
+        region_type: cdna
+        name: Ghost Payload
+        sequence_type: fixed
+        sequence: CCCC
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
+  - region_id: tag
+    region_type: tag
+    name: Non-scannable Primer Library
+    sequence_type: joined
+    sequence: XXCCCC
+    min_len: 6
+    max_len: 6
+    onlist: null
+    regions:
+      - region_id: bad_primer
+        region_type: index7
+        name: Non-scannable Primer
+        sequence_type: random
+        sequence: XX
+        min_len: 2
+        max_len: 2
+        onlist: null
+        regions: []
+      - region_id: bad_payload
+        region_type: cdna
+        name: Bad Payload
+        sequence_type: fixed
+        sequence: CCCC
+        min_len: 4
+        max_len: 4
+        onlist: null
+        regions: []
