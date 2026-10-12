@@ -180,3 +180,20 @@ def test_seqspec_check_validates_empty_region_type_list_loaded_from_yaml(tmp_pat
         and "region_type" in diagnostic["error_object"]
         for diagnostic in diagnostics
     )
+
+
+def test_seqspec_check_uses_schema_draft_keywords(dogmaseq_dig_spec: Assay):
+    """Schema rules that need draft 2020-12 (if/then/else, numeric exclusiveMinimum) are enforced"""
+    spec = dogmaseq_dig_spec.model_copy(deep=True)
+    spec.library_spec[0].regions[0].sequence = "Z" * len(
+        spec.library_spec[0].regions[0].sequence
+    )
+    spec.sequence_spec[0].max_len = 0
+
+    schema_objects = {
+        d["error_object"]
+        for d in seqspec_check(spec=spec)
+        if d["error_type"] == "check_schema"
+    }
+    assert "'sequence'" in schema_objects
+    assert "'max_len'" in schema_objects

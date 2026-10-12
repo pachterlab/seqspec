@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import yaml
-from jsonschema import Draft4Validator
+from jsonschema.validators import validator_for
 
 from seqspec.Assay import Assay
 from seqspec.Region import itx_read, project_regions_to_coordinates
@@ -230,7 +230,8 @@ def check(
         schema_fn = path.join(path.dirname(__file__), "schema/seqspec.schema.json")
         with open(schema_fn, "r") as stream:
             schema = yaml.load(stream, Loader=yaml.Loader)
-        validator = Draft4Validator(schema)
+        # use the draft declared by the schema's $schema (2020-12), as the Rust check does
+        validator = validator_for(schema)(schema)
         for idx, error in enumerate(validator.iter_errors(spec.model_dump()), 1):
             err_elements = [repr(index) for index in error.path]
             err_path = f"spec[{']['.join(err_elements)}]"
