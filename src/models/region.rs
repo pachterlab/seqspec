@@ -13,6 +13,11 @@ pub struct Region {
     pub sequence: String,
     pub min_len: i64,
     pub max_len: i64,
+    /// Orientation of the source RNA relative to this region's sequence as written on the
+    /// library top strand: "sense" | "antisense" | "unstranded". `None` means unknown.
+    /// Inherited by subregions that do not set their own value.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub rna_strand: Option<String>,
     pub onlist: Option<Onlist>,
     pub regions: Vec<Region>,
 }
@@ -37,6 +42,7 @@ impl Region {
             sequence,
             min_len,
             max_len,
+            rna_strand: None,
             onlist,
             regions,
         }
@@ -61,9 +67,15 @@ impl Region {
             sequence,
             min_len,
             max_len,
+            rna_strand: None,
             onlist,
             regions,
         }
+    }
+
+    pub fn with_rna_strand(mut self, rna_strand: Option<String>) -> Self {
+        self.rna_strand = rna_strand;
+        self
     }
 
     // ---- JSON I/O ---------------------------------------------------
@@ -278,6 +290,37 @@ impl Region {
         }
     }
 
+    /// Set (or clear, with `None`) `rna_strand` on the region with `target_region_id`.
+    pub fn set_rna_strand_by_id(&mut self, target_region_id: &str, rna_strand: Option<String>) {
+        if self.region_id == target_region_id {
+            self.rna_strand = rna_strand;
+            return;
+        }
+        for r in &mut self.regions {
+            r.set_rna_strand_by_id(target_region_id, rna_strand.clone());
+        }
+    }
+
+    /// The `rna_strand` in effect for the region with `region_id`: its own value, else that of
+    /// its nearest ancestor that sets one.
+    pub fn get_effective_rna_strand(&self, region_id: &str) -> Option<String> {
+        self.find_effective_rna_strand(region_id, None).flatten()
+    }
+
+    fn find_effective_rna_strand(
+        &self,
+        region_id: &str,
+        inherited: Option<&String>,
+    ) -> Option<Option<String>> {
+        let current = self.rna_strand.as_ref().or(inherited);
+        if self.region_id == region_id {
+            return Some(current.cloned());
+        }
+        self.regions
+            .iter()
+            .find_map(|r| r.find_effective_rna_strand(region_id, current))
+    }
+
     pub fn reverse(&mut self) {
         if self.regions.is_empty() {
             self.sequence = self.sequence.chars().rev().collect();
@@ -360,6 +403,7 @@ impl RegionCoordinate {
             sequence: seq,
             min_len: (new_stop - new_start) as i64,
             max_len: (new_stop - new_start) as i64,
+            rna_strand: None,
             onlist: None,
             regions: Vec::new(),
         };

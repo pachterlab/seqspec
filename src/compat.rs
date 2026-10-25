@@ -325,6 +325,7 @@ pub struct CompatRegion {
     pub sequence: Option<String>,
     pub min_len: Option<i64>,
     pub max_len: Option<i64>,
+    pub rna_strand: Option<String>,
     pub onlist: Option<CompatOnlist>,
     pub regions: Option<Vec<CompatRegion>>,
 }
@@ -360,5 +361,6 @@ impl CompatRegion {
                 .map(CompatRegion::into_region)
                 .collect(),
         )
+        .with_rna_strand(self.rna_strand)
     }
 }

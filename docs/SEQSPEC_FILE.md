@@ -63,6 +63,7 @@ The `library_spec` describes the "regions", or set of standard "blocks" such as 
 - `sequence_type`: Nature of the sequence (fixed, random, onlist)
 - `sequence`: Actual or representative sequence
 - `min_len` and `max_len`: Minimum and maximum length of the region
+- `rna_strand` (optional): For regions that measure RNA, whether the region's sequence as written is the `sense` or `antisense` strand of the source RNA, or `unstranded` if either can occur. Subregions inherit it. Omit it when unknown.
 
 Each region can contain nested regions under the `regions` property. This means a valid library structure could look like:
 
@@ -90,7 +91,7 @@ The `sequence_spec` contains a list of sequencing reads generated from the `libr
 - `read_id`: Identifier for the read
 - `modality`: Associated modality
 - `primer_id`: ID of the primer region in the library structure
-- `strand`: Orientation of the read (pos or neg)
+- `strand`: Orientation of the read (pos or neg) relative to the library top strand
 - `min_len` and `max_len`: Minimum and maximum length of the read
 
 ```{important}

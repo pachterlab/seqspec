@@ -185,6 +185,7 @@ struct RegionInput {
     sequence: Option<String>,
     min_len: Option<i64>,
     max_len: Option<i64>,
+    rna_strand: Option<String>,
     regions: Option<Vec<RegionInput>>, // allow nested
 }
 
@@ -197,7 +198,7 @@ impl RegionInput {
             .as_ref()
             .map(|v| v.iter().filter_map(|c| c.to_region()).collect())
             .unwrap_or_else(|| Vec::new());
-        Some(Region::new_with_region_type_value(
+        let region = Region::new_with_region_type_value(
             region_id,
             self.region_type
                 .clone()
@@ -209,7 +210,8 @@ impl RegionInput {
             self.max_len.unwrap_or(0),
             None,
             children,
-        ))
+        );
+        Some(region.with_rna_strand(self.rna_strand.clone()))
     }
 }
 
@@ -417,6 +419,14 @@ mod tests {
         assert_eq!(regions[0].region_id, "r1");
         assert_eq!(regions[0].region_type, "barcode");
         assert_eq!(regions[0].sequence, "NNNN");
+        assert_eq!(regions[0].rna_strand, None);
+    }
+
+    #[test]
+    fn test_parse_resource_regions_carries_rna_strand() {
+        let json = r#"[{"region_id":"r1","region_type":"cdna","name":"cDNA","sequence_type":"random","sequence":"X","min_len":1,"max_len":98,"rna_strand":"antisense"}]"#;
+        let regions = load_regions_from_value(&parse_resource(json));
+        assert_eq!(regions[0].rna_strand.as_deref(), Some("antisense"));
     }
 
     #[test]

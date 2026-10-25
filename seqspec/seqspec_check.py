@@ -15,6 +15,7 @@ from jsonschema import Draft4Validator
 
 from seqspec.Assay import Assay
 from seqspec.Region import itx_read, project_regions_to_coordinates
+from seqspec.region_type import is_rna_measure
 from seqspec.utils import (
     file_exists,
     is_remote_source,
@@ -22,6 +23,7 @@ from seqspec.utils import (
     local_onlist_locator,
     local_resource_url,
     map_read_id_to_regions,
+    map_read_id_to_rna_strands,
 )
 
 
@@ -185,6 +187,7 @@ STRUCTURAL_CHECK_TYPES = [
     "check_region_against_subregion_sequence",
     "check_read_length_against_library",
     "check_overlapping_read_regions",
+    "check_rna_strand",
 ]
 
 
@@ -636,6 +639,59 @@ def check(
 
         return (errors, idx)
 
+    # warn when rna_strand cannot take effect: set on a region with no RNA-measuring
+    # region beneath it, or a read covering RNA-measuring regions that disagree
+    def check_rna_strand(spec: Assay, errors, idx):
+        def visit(rgn, errors, idx):
+            if rgn.rna_strand is not None and not any(
+                is_rna_measure(leaf.region_type) for leaf in rgn.get_leaves()
+            ):
+                errors.append(
+                    make_diagnostic(
+                        severity="warning",
+                        error_type="check_rna_strand",
+                        error_message=(
+                            f"'{rgn.region_id}' sets rna_strand but contains no region "
+                            "measuring RNA (transcript, guide, or reporter), so it has "
+                            "no effect"
+                        ),
+                        error_object="region",
+                    )
+                )
+                idx += 1
+            for r in rgn.regions:
+                errors, idx = visit(r, errors, idx)
+            return (errors, idx)
+
+        for modality in spec.modalities:
+            errors, idx = visit(spec.get_libspec(modality), errors, idx)
+            for read in spec.get_seqspec(modality):
+                try:
+                    _, strands = map_read_id_to_rna_strands(
+                        spec, modality, read.read_id
+                    )
+                except IndexError:
+                    continue
+                if len({s for _, s in strands if s is not None}) > 1:
+                    listed = ", ".join(
+                        f"'{region_id}' ({s})"
+                        for region_id, s in strands
+                        if s is not None
+                    )
+                    errors.append(
+                        make_diagnostic(
+                            severity="warning",
+                            error_type="check_rna_strand",
+                            error_message=(
+                                f"read '{read.read_id}' covers regions with conflicting "
+                                f"rna_strand values: {listed}"
+                            ),
+                            error_object="read",
+                        )
+                    )
+                    idx += 1
+        return (errors, idx)
+
     def check_sequence_types(spec, errors, idx):
         modes = spec.modalities
 
@@ -842,6 +898,7 @@ def check(
         "check_region_against_subregion_sequence": check_region_against_subregion_sequence,
         "check_read_length_against_library": check_read_length_against_library,
         "check_overlapping_read_regions": check_overlapping_read_regions,
+        "check_rna_strand": check_rna_strand,
     }
     external_checks = {"check_onlist_files_exist", "check_read_files_exist"}
     for k, v in checks.items():

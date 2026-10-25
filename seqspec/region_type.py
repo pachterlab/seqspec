@@ -89,6 +89,12 @@ FEATURE_MEASURE_TERMS = (
     REPORTER_MEASURE_TERM,
 )
 
+RNA_MEASURE_TERMS = (
+    TRANSCRIPT_MEASURE_TERM,
+    GUIDE_MEASURE_TERM,
+    REPORTER_MEASURE_TERM,
+)
+
 TECHNICAL_SKIP_TERMS = (
     "RGN:technical:adapter",
     "RGN:technical:primer",
@@ -225,6 +231,11 @@ def is_molecule_barcode(region_type: RegionTypeValue | str | list[str]) -> bool:
 
 def is_transcript(region_type: RegionTypeValue | str | list[str]) -> bool:
     return has_region_type_term(region_type, TRANSCRIPT_MEASURE_TERM)
+
+
+def is_rna_measure(region_type: RegionTypeValue | str | list[str]) -> bool:
+    """Regions that measure an RNA molecule, the regions `rna_strand` applies to."""
+    return any(has_region_type_term(region_type, term) for term in RNA_MEASURE_TERMS)
 
 
 def is_genome(region_type: RegionTypeValue | str | list[str]) -> bool:

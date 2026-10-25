@@ -30,7 +30,14 @@ from seqspec.Assay import (
 from seqspec.auth import AuthRegistry
 from seqspec.File import File, FileInput
 from seqspec.Read import Read, ReadInput
-from seqspec.Region import Onlist, Region, RegionInput
+from seqspec.Region import (
+    Onlist,
+    Region,
+    RegionInput,
+    itx_read,
+    project_regions_to_coordinates,
+)
+from seqspec.region_type import is_rna_measure
 
 # --- Known tags to strip from the YAML ---
 KNOWN_TAGS = [
@@ -703,6 +710,43 @@ def map_read_id_to_regions(
         rgns = leaves[primer_idx + 1 :]
 
     return (read, rgns)
+
+
+def map_read_id_to_rna_strands(
+    spec: Assay, modality: str, read_id: str
+) -> Tuple[Read, List[Tuple[str, Optional[str]]]]:
+    """The RNA-measuring regions (cDNA, guide, reporter) a read covers, in read order,
+    each with the `rna_strand` in effect for it (its own, else its nearest ancestor's)."""
+    read, regions = map_read_id_to_regions(spec, modality, read_id)
+    libspec = spec.get_libspec(modality)
+    covered = itx_read(project_regions_to_coordinates(regions), 0, read.max_len)
+    strands = [
+        (rc.region_id, libspec.get_effective_rna_strand(rc.region_id))
+        for rc in covered
+        if is_rna_measure(rc.region_type)
+    ]
+    return (read, strands)
+
+
+def get_read_rna_strand(spec: Assay, modality: str, read_id: str) -> Optional[str]:
+    """The strand of the source RNA that a read's sequence matches: "sense",
+    "antisense", or "unstranded". A read sequences the library top strand when its
+    `strand` is "pos" and the reverse complement when "neg", so it is sense exactly when
+    that agrees with the covered region's `rna_strand`. None means unknown: the read
+    covers no RNA-measuring region, one of them has no `rna_strand`, or they disagree."""
+    read, strands = map_read_id_to_rna_strands(spec, modality, read_id)
+    values = {strand for _, strand in strands}
+    if len(values) != 1:
+        return None
+    (value,) = values
+    reads_top_strand = read.strand != "neg"
+    if value == "unstranded":
+        return "unstranded"
+    if value == "sense":
+        return "sense" if reads_top_strand else "antisense"
+    if value == "antisense":
+        return "antisense" if reads_top_strand else "sense"
+    return None
 
 
 ### LLM Utils

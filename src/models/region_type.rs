@@ -161,6 +161,11 @@ const FEATURE_MEASURE_TERMS: &[&str] = &[
     PROTEIN_FEATURE_MEASURE_TERM,
     REPORTER_MEASURE_TERM,
 ];
+const RNA_MEASURE_TERMS: &[&str] = &[
+    TRANSCRIPT_MEASURE_TERM,
+    GUIDE_MEASURE_TERM,
+    REPORTER_MEASURE_TERM,
+];
 const TECHNICAL_SKIP_TERMS: &[&str] = &[
     "RGN:technical:adapter",
     "RGN:technical:primer",
@@ -182,6 +187,11 @@ impl RegionTypeValue {
 
     pub fn is_transcript(&self) -> bool {
         self.has_term(TRANSCRIPT_MEASURE_TERM)
+    }
+
+    /// Regions that measure an RNA molecule, the regions `rna_strand` applies to.
+    pub fn is_rna_measure(&self) -> bool {
+        RNA_MEASURE_TERMS.iter().any(|term| self.has_term(term))
     }
 
     pub fn is_genome(&self) -> bool {

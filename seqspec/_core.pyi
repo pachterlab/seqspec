@@ -96,6 +96,7 @@ class Region:
     sequence: str
     min_len: int
     max_len: int
+    rna_strand: Optional[str]
     onlist: Optional[Onlist]
     regions: List["Region"]
 

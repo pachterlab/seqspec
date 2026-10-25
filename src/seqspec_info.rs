@@ -21,7 +21,7 @@ pub struct InfoArgs {
         help = "Object to display",
         value_name = "KEY",
         default_value = "meta",
-        value_parser = ["modalities", "meta", "sequence_spec", "library_spec"]
+        value_parser = ["modalities", "meta", "sequence_spec", "library_spec", "rna_strand"]
     )]
     key: String,
 
@@ -85,6 +85,7 @@ enum InfoData {
     Meta(Value),
     SequenceSpec(Vec<Read>),
     LibrarySpec(BTreeMap<String, Vec<Region>>),
+    RnaStrand(Vec<Value>),
 }
 
 fn seqspec_info(spec: &Assay, key: &str) -> InfoData {
@@ -93,8 +94,28 @@ fn seqspec_info(spec: &Assay, key: &str) -> InfoData {
         "meta" => InfoData::Meta(seqspec_info_meta(spec)),
         "sequence_spec" => InfoData::SequenceSpec(spec.sequence_spec.clone()),
         "library_spec" => InfoData::LibrarySpec(seqspec_info_library_spec(spec)),
+        "rna_strand" => InfoData::RnaStrand(seqspec_info_rna_strand(spec)),
         _ => panic!("Unsupported info key: {}", key),
     }
+}
+
+/// For each read, the strand of the source RNA its sequence matches (null when unknown).
+fn seqspec_info_rna_strand(spec: &Assay) -> Vec<Value> {
+    let mut rows = Vec::new();
+    for modality in &spec.modalities {
+        for read in spec.get_seqspec(modality) {
+            let rna_strand = utils::get_read_rna_strand(spec, modality, &read.read_id)
+                .ok()
+                .flatten();
+            rows.push(json!({
+                "modality": modality,
+                "read_id": read.read_id,
+                "strand": read.strand,
+                "rna_strand": rna_strand,
+            }));
+        }
+    }
+    rows
 }
 
 fn seqspec_info_meta(spec: &Assay) -> Value {
@@ -147,6 +168,8 @@ fn format_info(_spec: &Assay, info: InfoData, key: &str, fmt: &str) -> String {
         ("sequence_spec", "json") => format_sequence_spec_json(&info),
         ("library_spec", "tab") => format_library_spec_tab(&info),
         ("library_spec", "json") => format_library_spec_json(&info),
+        ("rna_strand", "tab") => format_rna_strand_tab(&info),
+        ("rna_strand", "json") => format_rna_strand_json(&info),
         _ => String::new(),
     }
 }
@@ -230,6 +253,33 @@ fn format_sequence_spec_tab(info: &InfoData) -> String {
 fn format_sequence_spec_json(info: &InfoData) -> String {
     if let InfoData::SequenceSpec(reads) = info {
         serde_json::to_string_pretty(reads).unwrap()
+    } else {
+        String::new()
+    }
+}
+
+fn format_rna_strand_tab(info: &InfoData) -> String {
+    if let InfoData::RnaStrand(rows) = info {
+        rows.iter()
+            .map(|row| {
+                format!(
+                    "{}\t{}\t{}\t{}",
+                    row["modality"].as_str().unwrap_or_default(),
+                    row["read_id"].as_str().unwrap_or_default(),
+                    row["strand"].as_str().unwrap_or_default(),
+                    row["rna_strand"].as_str().unwrap_or("unknown"),
+                )
+            })
+            .collect::<Vec<_>>()
+            .join("\n")
+    } else {
+        String::new()
+    }
+}
+
+fn format_rna_strand_json(info: &InfoData) -> String {
+    if let InfoData::RnaStrand(rows) = info {
+        serde_json::to_string_pretty(rows).unwrap()
     } else {
         String::new()
     }

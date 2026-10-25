@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import List, Optional, Set, Union
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_serializer
 
 from seqspec.region_type import (
     RegionType,  # noqa: F401 - re-exported for existing user imports
@@ -136,8 +136,20 @@ class Region(BaseModel):
     sequence: str = ""
     min_len: int = 0
     max_len: int = 1024
+    # Orientation of the source RNA relative to this region's sequence as written on the
+    # library top strand: "sense" | "antisense" | "unstranded". None means unknown.
+    # Inherited by subregions that do not set their own value.
+    rna_strand: Optional[str] = None
     onlist: Optional[Onlist] = None
     regions: List["Region"] = []
+
+    @model_serializer(mode="wrap")
+    def _omit_unset_rna_strand(self, handler):
+        # keep specs that never set rna_strand byte-identical when written back out
+        data = handler(self)
+        if isinstance(data, dict) and data.get("rna_strand") is None:
+            data.pop("rna_strand", None)
+        return data
 
     def __repr__(self) -> str:
         s = f"{region_type_display(self.region_type)}({self.min_len}, {self.max_len})"
@@ -282,6 +294,7 @@ class Region(BaseModel):
         sequence,
         min_len,
         max_len,
+        rna_strand=None,
     ):
         target = self.get_region_by_id(target_region_id)
         if target:
@@ -300,6 +313,29 @@ class Region(BaseModel):
                 r.min_len = min_len
             if max_len is not None:
                 r.max_len = max_len
+            if rna_strand is not None:
+                r.rna_strand = rna_strand
+
+    def set_rna_strand_by_id(self, target_region_id: str, rna_strand: Optional[str]):
+        """Set (or clear, with None) `rna_strand` on the region with `target_region_id`."""
+        for r in self.get_region_by_id(target_region_id):
+            r.rna_strand = rna_strand
+
+    def get_effective_rna_strand(self, region_id: str) -> Optional[str]:
+        """The `rna_strand` in effect for the region with `region_id`: its own value, else
+        that of its nearest ancestor that sets one."""
+
+        def find(rgn: "Region", inherited: Optional[str]):
+            current = rgn.rna_strand if rgn.rna_strand is not None else inherited
+            if rgn.region_id == region_id:
+                return True, current
+            for r in rgn.regions:
+                found, value = find(r, current)
+                if found:
+                    return True, value
+            return False, None
+
+        return find(self, None)[1]
 
     def reverse(self):
         if self.regions:
@@ -542,6 +578,13 @@ class RegionInput(BaseModel):
             "Maximum length of this region. Defaults to `min_len` if provided, else 1024."
         ),
     )
+    rna_strand: Optional[str] = Field(
+        default=None,
+        description=(
+            "Orientation of the source RNA relative to this region's sequence on the "
+            "library top strand: 'sense' | 'antisense' | 'unstranded'. Omit when unknown."
+        ),
+    )
     onlist: Optional[OnlistInput] = Field(
         default=None,
         description=("Optional on-list Object associated with this region."),
@@ -581,6 +624,7 @@ class RegionInput(BaseModel):
             sequence=sequence,
             min_len=min_len,
             max_len=max_len,
+            rna_strand=self.rna_strand,
             onlist=self.onlist.to_onlist() if self.onlist else None,
             regions=[r.to_region() for r in self.regions] if self.regions else [],
         )

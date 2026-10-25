@@ -169,8 +169,9 @@ Each `Region` has the following properties which are useful to annotate the elem
   - if the `sequence_type` is `joined` then field must be the concatenation of the nested regions
   - if the `sequence_type` is `onlist` then field must an `N` string of length of the shortest sequence on the onlist
   - if the `sequence_type` is `random` then the field must be an `X` string
-- `min_len`: an integer greater than or equal to 0 and less than or equal to 2048. It represents the minimum possible length of the `sequence`
-- `max_len`: an integer greater than or equal to 0 and less than or equal to 2048. It represents the maximum length of the `sequence`
+- `min_len`: an integer greater than or equal to 0 and less than or equal to 1073741824 (2^30). It represents the minimum possible length of the `sequence`
+- `max_len`: an integer greater than or equal to 0 and less than or equal to 1073741824 (2^30), large enough for long reads. It represents the maximum length of the `sequence`
+- `rna_strand` (optional): one of `sense`, `antisense`, or `unstranded`. It records how the source RNA is oriented relative to this region's `sequence` as written (on the library top strand, 5' -> 3'). Omit it when the orientation is not known. See "RNA strandedness" below.
 - `onlist`: can be `null` or contain a `File` object (see `File` Object section below)
   - `file_id`: a freeform string that uniquely identifies the file.
   - `filename`: a freeform string that matches the name of the file being annotated
@@ -202,6 +203,34 @@ onlist: !Onlist
 regions: null
 ```
 
+### RNA strandedness
+
+For regions that measure RNA (`cdna` and other regions with the `RGN:measure:transcript`, `RGN:measure:guide`, or `RGN:measure:reporter` terms), `rna_strand` records which strand of the library molecule carries the RNA's sense sequence:
+
+- `sense`: the region's sequence, as written on the top strand, is the sense sequence of the source RNA.
+- `antisense`: the region's sequence, as written on the top strand, is the reverse complement of the source RNA.
+- `unstranded`: either orientation can occur, e.g. libraries made without strand-specific chemistry.
+
+A region without `rna_strand` inherits the value of its nearest ancestor that sets one, so a value set on a `joined` region applies to the RNA-measuring regions beneath it. A spec that omits `rna_strand` everywhere is valid and means the orientation is unknown.
+
+Library structure alone does not always determine strandedness: stranded (dUTP) and unstranded TruSeq libraries have the same structure, and only the chemistry differs. This is why `rna_strand` is stated explicitly rather than inferred.
+
+`rna_strand` is different from `Read.strand`. `Read.strand` gives the direction a read is sequenced relative to the top strand. `rna_strand` gives how the RNA is oriented on that top strand. Together they determine the RNA strand that each read's sequence matches: a read on the `pos` strand reads the top strand as written, and a `neg` read reads its reverse complement. So the read matches the RNA sense sequence when it is `pos` over a `sense` region or `neg` over an `antisense` region. `seqspec info -k rna_strand` reports this for every read.
+
+For example, in 10x Genomics 3' gene expression libraries the top strand reads P5 - Read 1 - cell barcode - UMI - poly(dT) - cDNA, so the cDNA on the top strand is the reverse complement of the mRNA:
+
+```yaml
+- region_id: rna-cDNA
+  region_type: cdna
+  sequence_type: random
+  sequence: X
+  min_len: 1
+  max_len: 98
+  rna_strand: antisense
+```
+
+Read 2 is a `neg` read over this region, so Read 2 matches the mRNA sense sequence.
+
 For more information about the various fields, please see the JSON schema specification (`seqspec/schema/seqspec.schema.json`). For consistency across assays I suggest following a standard naming conventions for common regions. I've made a collection of "named" regions available; please see `docs/examples/regions` for a list of example regions.
 
 ## `Read` Object
@@ -229,7 +258,7 @@ A `Read` object is annotated with the following attributes:
 - `primer_id`: A string that matches the region id of the primer used to generate the read (in the `library_spec`).
 - `min_len`: An integer greater than or equal to zero specifying the minimum length of the read.
 - `max_len`: An integer greater than or equal to zero specifying the maximum length of the read.
-- `strand`: One of ["pos", "neg"], denotes the strandedness of the read.
+- `strand`: One of ["pos", "neg"]: `pos` if the read sequences the library top strand as written (extending 3' of the primer), `neg` if it sequences the reverse complement (extending 5' of the primer). For the orientation of the source RNA, see `rna_strand` on the `Region` object.
 - `files`: A list of `File` objects that contain sequences that match the structure of the parent `Read`.
 
 Example:
