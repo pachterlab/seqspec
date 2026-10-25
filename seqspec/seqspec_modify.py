@@ -285,6 +285,9 @@ def seqspec_modify_region(
             min_len=patch.min_len,
             max_len=patch.max_len,
         )
+        if "rna_strand" in patch.model_fields_set:
+            # an explicit null clears the field
+            libspec.set_rna_strand_by_id(region_id, patch.rna_strand)
     return spec.model_copy()
 
 

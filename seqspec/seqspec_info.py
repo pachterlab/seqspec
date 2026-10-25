@@ -6,7 +6,7 @@ from typing import Dict
 
 from seqspec.Assay import Assay
 from seqspec.region_type import region_type_display
-from seqspec.utils import is_remote_source, load_spec
+from seqspec.utils import get_read_rna_strand, is_remote_source, load_spec
 
 
 def setup_info_args(parser) -> ArgumentParser:
@@ -30,7 +30,7 @@ seqspec info -f json -k sequence_spec spec.yaml # Get sequence spec in json form
     subparser.add_argument(
         "yaml", help="Path or URL to sequencing specification YAML", type=str
     )
-    choices = ["modalities", "meta", "sequence_spec", "library_spec"]
+    choices = ["modalities", "meta", "sequence_spec", "library_spec", "rna_strand"]
     subparser.add_argument(
         "-k",
         "--key",
@@ -119,6 +119,7 @@ def seqspec_info(spec: Assay, key: str) -> Dict:
         "meta": seqspec_info_meta,
         "sequence_spec": seqspec_info_sequence_spec,
         "library_spec": seqspec_info_library_spec,
+        "rna_strand": seqspec_info_rna_strand,
     }
     if key not in INFO_FUNCS:
         raise KeyError(
@@ -146,6 +147,7 @@ def format_info(info: Dict, key: str, fmt: str = "tab") -> str:
         "meta": format_meta,
         "sequence_spec": format_sequence_spec,
         "library_spec": format_library_spec,
+        "rna_strand": format_rna_strand,
     }
     if key not in FORMAT_FUNCS:
         raise KeyError(
@@ -199,6 +201,33 @@ def seqspec_info_sequence_spec(spec: Assay) -> Dict:
         Dictionary containing sequence specifications
     """
     return {"sequence_spec": [i.model_dump() for i in spec.sequence_spec]}
+
+
+def seqspec_info_rna_strand(spec: Assay) -> Dict:
+    """Get, for each read, the strand of the source RNA its sequence matches.
+
+    Args:
+        spec: The Assay object to get info from
+
+    Returns:
+        Dictionary with one row per read; rna_strand is None when unknown
+    """
+    rows = []
+    for m in spec.modalities:
+        for read in spec.get_seqspec(m):
+            try:
+                rna_strand = get_read_rna_strand(spec, m, read.read_id)
+            except IndexError:
+                rna_strand = None
+            rows.append(
+                {
+                    "modality": m,
+                    "read_id": read.read_id,
+                    "strand": read.strand,
+                    "rna_strand": rna_strand,
+                }
+            )
+    return {"rna_strand": rows}
 
 
 def seqspec_info_modalities(spec: Assay) -> Dict:
@@ -267,6 +296,26 @@ def format_sequence_spec(info: Dict, fmt: str = "tab") -> str:
         return "\n".join(lines)
     elif fmt == "json":
         return json.dumps(info["sequence_spec"], sort_keys=False, indent=4)
+    return ""
+
+
+def format_rna_strand(info: Dict, fmt: str = "tab") -> str:
+    """Format per-read RNA strand.
+
+    Args:
+        info: Dictionary containing rows from seqspec_info_rna_strand
+        fmt: Output format (tab or json)
+
+    Returns:
+        Formatted string
+    """
+    if fmt == "tab":
+        return "\n".join(
+            f"{r['modality']}\t{r['read_id']}\t{r['strand']}\t{r['rna_strand'] or 'unknown'}"
+            for r in info["rna_strand"]
+        )
+    elif fmt == "json":
+        return json.dumps(info["rna_strand"], sort_keys=False, indent=4)
     return ""
 
 

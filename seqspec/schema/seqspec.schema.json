@@ -352,13 +352,22 @@
           "description": "The minimum length of the sequence",
           "type": "integer",
           "minimum": 0,
-          "maximum": 2048
+          "maximum": 1073741824
         },
         "max_len": {
           "description": "The maximum length of the sequence",
           "type": "integer",
           "minimum": 0,
-          "maximum": 2048
+          "maximum": 1073741824
+        },
+        "rna_strand": {
+          "description": "Orientation of the source RNA relative to this region's sequence as written on the library top strand (5'->3'): 'sense' if the written sequence is the RNA sense sequence, 'antisense' if it is the reverse complement, 'unstranded' if either can occur. Applies to this region and its subregions unless a subregion sets its own value. Omit when unknown.",
+          "type": "string",
+          "enum": [
+            "sense",
+            "antisense",
+            "unstranded"
+          ]
         },
         "onlist": {
           "description": "The file containing the sequence if seq_type = onlist",

@@ -114,6 +114,7 @@ library_spec:
     sequence: X
     min_len: 1
     max_len: 98
+    rna_strand: sense
     onlist: null
     regions: []
   - region_id: rna_truseq_r2

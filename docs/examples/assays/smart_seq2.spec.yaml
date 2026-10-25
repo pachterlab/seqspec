@@ -88,6 +88,7 @@ library_spec:
     sequence: X
     min_len: 1
     max_len: 98
+    rna_strand: unstranded
     onlist: null
     regions: []
   - region_id: ME2

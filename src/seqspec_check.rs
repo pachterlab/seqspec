@@ -154,6 +154,7 @@ const STRUCTURAL_CHECK_TYPES: &[&str] = &[
     "check_region_against_subregion_sequence",
     "check_read_length_against_library",
     "check_overlapping_read_regions",
+    "check_rna_strand",
 ];
 
 fn filter_errors(errors: Vec<ErrorObj>, filter_type: &str) -> Vec<ErrorObj> {
@@ -223,7 +224,8 @@ pub fn seqspec_check_structural(spec: &Assay) -> Vec<ErrorObj> {
     let errors = run!(check_region_against_subregion_length, errors);
     let errors = run!(check_region_against_subregion_sequence, errors);
     let errors = run!(check_read_length_against_library, errors);
-    run!(check_overlapping_read_regions, errors)
+    let errors = run!(check_overlapping_read_regions, errors);
+    run!(check_rna_strand, errors)
 }
 
 /// Run schema and structural checks without accessing onlist or read resources.
@@ -997,6 +999,72 @@ fn check_overlapping_read_regions(
                     format!(
                         "reads '{}' and '{}' in modality '{}' both cover region(s) {}. Downstream tools may require explicit overlap handling such as `seqspec index --no-overlap`",
                         left_read_id, right_read_id, modality, region_list
+                    ),
+                    "read",
+                );
+            }
+        }
+    }
+
+    (errors, idx)
+}
+
+/// Warn when `rna_strand` cannot take effect: set on a region with no RNA-measuring
+/// region beneath it, or a read covering RNA-measuring regions that disagree.
+fn check_rna_strand(
+    spec: &Assay,
+    mut errors: Vec<ErrorObj>,
+    mut idx: usize,
+) -> (Vec<ErrorObj>, usize) {
+    fn visit(rgn: &Region, errors: &mut Vec<ErrorObj>, idx: &mut usize) {
+        if rgn.rna_strand.is_some()
+            && !rgn
+                .get_leaves()
+                .iter()
+                .any(|leaf| leaf.region_type.is_rna_measure())
+        {
+            push_warning(
+                errors,
+                idx,
+                "check_rna_strand",
+                format!(
+                    "'{}' sets rna_strand but contains no region measuring RNA (transcript, guide, or reporter), so it has no effect",
+                    rgn.region_id
+                ),
+                "region",
+            );
+        }
+        for r in &rgn.regions {
+            visit(r, errors, idx);
+        }
+    }
+
+    for modality in &spec.modalities {
+        if let Some(rgn) = spec.get_libspec(modality) {
+            visit(&rgn, &mut errors, &mut idx);
+        }
+        for read in spec.get_seqspec(modality) {
+            let Ok((_, strands)) = utils::map_read_id_to_rna_strands(spec, modality, &read.read_id)
+            else {
+                continue;
+            };
+            let set: Vec<String> = strands
+                .iter()
+                .filter_map(|(region_id, strand)| {
+                    strand.as_ref().map(|s| format!("'{}' ({})", region_id, s))
+                })
+                .collect();
+            let distinct: HashSet<&String> =
+                strands.iter().filter_map(|(_, s)| s.as_ref()).collect();
+            if distinct.len() > 1 {
+                push_warning(
+                    &mut errors,
+                    &mut idx,
+                    "check_rna_strand",
+                    format!(
+                        "read '{}' covers regions with conflicting rna_strand values: {}",
+                        read.read_id,
+                        set.join(", ")
                     ),
                     "read",
                 );

@@ -19,9 +19,15 @@ authors:
 - `seqspec check` now emits warning diagnostics for overlapping read geometry, with guidance to use `seqspec index --no-overlap` when needed.
 - `seqspec check --skip external` runs schema and structural checks without accessing onlist or read resources.
 - A generated examples site under `docs/examples/site`, with rendered assay reports, read templates, region templates, and a searchable assay catalog.
+- Optional `rna_strand` on regions (`sense`, `antisense`, `unstranded`) to record RNA strandedness, inherited by subregions, in the schema and both implementations. Specs that do not set it load and write back unchanged. Older seqspec versions accept specs that use it but drop the field if they rewrite the file.
+- `seqspec info -k rna_strand` reports the RNA strand each read matches, and `get_read_rna_strand` / `map_read_id_to_rna_strands` expose it in Python and Rust.
+- `seqspec check` warns when `rna_strand` has no effect or when a read covers regions with conflicting values.
+- `seqspec modify -s region` and `seqspec insert -s region` accept `rna_strand`.
+- `rna_strand` annotations on example assays whose strandedness follows from the library structure and protocol; `docs/examples/build_examples.py` keeps the field when it normalizes examples.
 
 ### Changed
 
+- Region `min_len` and `max_len` may now be up to 1073741824 (2^30), up from 2048, so specs can describe long reads (ONT, PacBio).
 - `seqspec upgrade` now upgrades `0.3.0` specs to `0.4.0` in both implementations.
 - Python and Rust now share the same core command surface for `auth`, `check`, `find`, `file`, `format`, `index`, `info`, `init`, `insert`, `methods`, `modify`, `onlist`, `print`, `split`, `upgrade`, and `version`.
 - `seqspec build` is deprecated in both CLIs and remains as a compatibility stub.

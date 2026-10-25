@@ -311,6 +311,69 @@ pub fn itx_read(
     new_rcs
 }
 
+/// The RNA-measuring regions (cDNA, guide, reporter) a read covers, in read order, each with
+/// the `rna_strand` in effect for it (its own, else its nearest ancestor's).
+pub fn map_read_id_to_rna_strands(
+    spec: &Assay,
+    modality: &str,
+    read_id: &str,
+) -> Result<(Read, Vec<(String, Option<String>)>), String> {
+    let (read, regions) = map_read_id_to_regions(spec, modality, read_id)?;
+    let libspec = spec
+        .get_libspec(modality)
+        .ok_or_else(|| format!("modality '{}' not found in library_spec", modality))?;
+    let covered = itx_read(project_regions_to_coordinates(regions), 0, read.max_len);
+    let strands = covered
+        .into_iter()
+        .filter(|rc| rc.region.region_type.is_rna_measure())
+        .map(|rc| {
+            let strand = libspec.get_effective_rna_strand(&rc.region.region_id);
+            (rc.region.region_id, strand)
+        })
+        .collect();
+    Ok((read, strands))
+}
+
+/// The strand of the source RNA that a read's sequence matches: "sense", "antisense", or
+/// "unstranded". A read sequences the library top strand when its `strand` is "pos" and the
+/// reverse complement when "neg", so it is sense exactly when that agrees with the covered
+/// region's `rna_strand`. `Ok(None)` means unknown: the read covers no RNA-measuring region,
+/// one of them has no `rna_strand`, or they disagree.
+pub fn get_read_rna_strand(
+    spec: &Assay,
+    modality: &str,
+    read_id: &str,
+) -> Result<Option<String>, String> {
+    let (read, strands) = map_read_id_to_rna_strands(spec, modality, read_id)?;
+    let Some((_, first)) = strands.first() else {
+        return Ok(None);
+    };
+    if strands.iter().any(|(_, s)| s != first) {
+        return Ok(None);
+    }
+    let reads_top_strand = read.strand != "neg";
+    Ok(match first.as_deref() {
+        Some("unstranded") => Some("unstranded".to_string()),
+        Some("sense") => Some(
+            if reads_top_strand {
+                "sense"
+            } else {
+                "antisense"
+            }
+            .to_string(),
+        ),
+        Some("antisense") => Some(
+            if reads_top_strand {
+                "antisense"
+            } else {
+                "sense"
+            }
+            .to_string(),
+        ),
+        _ => None,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

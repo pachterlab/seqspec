@@ -155,6 +155,7 @@ A list of checks performed:
 16. Check that for every region with subregions, the region `sequence` equals the left-to-right concatenation of the subregions' `sequence`s.
 17. Check that each read's `max_len` does not exceed the sequence-able range of library elements after (pos strand) or before (neg strand) the primer.
 18. Warn when two reads in the same modality cover the same declared regions. This often needs explicit overlap handling with `seqspec index --no-overlap`.
+19. Warn when `rna_strand` cannot take effect: it is set on a region with no RNA-measuring region beneath it, or a read covers RNA-measuring regions whose `rna_strand` values disagree.
 
 Below are a list of example errors one may encounter when checking a spec:
 
@@ -461,6 +462,7 @@ run_info(spec_fn: str, f: str, k=None, o=None)
   - meta
   - sequence_spec
   - library_spec
+  - rna_strand: for each read, the strand of the source RNA its sequence matches (`sense`, `antisense`, `unstranded`, or `unknown`), derived from `rna_strand` on the regions it covers and the read's `strand`
 - optionally, `-f FORMAT` the output format (default: tab). Can be one of
   - tab
   - json
@@ -518,6 +520,12 @@ $ seqspec info -f json -k sequence_spec spec.yaml
         "files": [
         ...
         # long output omitted
+
+# Get the RNA strand each read matches
+$ seqspec info -k rna_strand spec.yaml
+rna	rna-R1.fastq.gz	pos	unknown
+rna	rna-I1.fastq.gz	pos	unknown
+rna	rna-R2.fastq.gz	neg	sense
 ```
 
 ## `seqspec init`: Generate a new empty seqspec draft
@@ -603,6 +611,9 @@ seqspec modify -m rna -s read -k '[{"read_id":"rna_R1","name":"renamed_rna_R1"}]
 
 # Update a region name
 seqspec modify -m rna -s region -k '[{"region_id":"rna_cell_bc","name":"Cell Barcode"}]' spec.yaml
+
+# set (or, with null, clear) the RNA orientation of a region
+seqspec modify -m rna -s region -k '[{"region_id":"rna_cdna","rna_strand":"antisense"}]' spec.yaml
 
 # Update a file url
 seqspec modify -m rna -s file -k '[{"file_id":"R1.fastq.gz","url":"./fastq/R1.fastq.gz"}]' spec.yaml

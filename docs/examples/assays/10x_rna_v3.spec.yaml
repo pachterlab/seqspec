@@ -96,6 +96,7 @@ library_spec:
     sequence: X
     min_len: 1
     max_len: 50
+    rna_strand: antisense
     onlist: null
     regions: []
   - region_id: rna-truseq_read2

@@ -176,7 +176,7 @@ fn modify_regions(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
                     continue;
                 };
                 target.update_region_by_id(
-                    target_region_id,
+                    target_region_id.clone(),
                     vstr(patch, "region_id"),
                     vregion_type(patch, "region_type"),
                     vstr(patch, "name"),
@@ -185,6 +185,10 @@ fn modify_regions(spec: &mut Assay, modality: &str, keys: &Vec<Value>) {
                     vi64(patch, "min_len"),
                     vi64(patch, "max_len"),
                 );
+                if patch.get("rna_strand").is_some() {
+                    // an explicit null clears the field
+                    target.set_rna_strand_by_id(&target_region_id, vstr(patch, "rna_strand"));
+                }
             }
         }
     }

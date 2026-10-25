@@ -597,7 +597,7 @@ def normalize_region_dict(region: dict[str, Any]) -> dict[str, Any]:
     child_regions = [
         normalize_region_dict(child) for child in (region.get("regions") or [])
     ]
-    return ordered_mapping(
+    normalized = ordered_mapping(
         region_id=region.get("region_id"),
         region_type=region.get("region_type"),
         name=region.get("name"),
@@ -605,9 +605,13 @@ def normalize_region_dict(region: dict[str, Any]) -> dict[str, Any]:
         sequence=region.get("sequence"),
         min_len=region.get("min_len"),
         max_len=region.get("max_len"),
-        onlist=normalize_onlist(region.get("onlist")),
-        regions=child_regions,
     )
+    # optional; written only when set so unannotated examples stay unchanged
+    if region.get("rna_strand") is not None:
+        normalized["rna_strand"] = region["rna_strand"]
+    normalized["onlist"] = normalize_onlist(region.get("onlist"))
+    normalized["regions"] = child_regions
+    return normalized
 
 
 def normalize_onlist(onlist: dict[str, Any] | None) -> dict[str, Any] | None:
