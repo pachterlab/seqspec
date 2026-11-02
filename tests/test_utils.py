@@ -3,6 +3,7 @@ from hashlib import md5
 from io import StringIO, BytesIO
 import os
 from tempfile import TemporaryDirectory
+import requests
 from requests import HTTPError
 from unittest import TestCase
 from unittest.mock import patch
@@ -14,9 +15,15 @@ from seqspec.Region import (
     project_regions_to_coordinates,
 )
 from seqspec.utils import (
+    IGVF_PORTAL_PREFIX,
+    PORTAL_REQUEST_RETRIES,
+    PORTAL_REQUEST_TIMEOUT,
+    PORTAL_RETRY_STATUS_CODES,
+    file_exists,
     get_remote_auth_token,
     load_spec_stream,
     map_read_id_to_regions,
+    portal_session,
     write_read,
     read_local_list,
     read_remote_list,
@@ -324,3 +331,131 @@ class TestUtils(TestCase):
         for i, region_id in expected_regions:
             self.assertEqual(region[i].region_id, region_id)
         self.assertRaises(IndexError, map_read_id_to_regions, spec, "rna", "foo")
+
+
+def _response(status_code, headers=None):
+    response = requests.Response()
+    response.status_code = status_code
+    if headers:
+        response.headers.update(headers)
+    return response
+
+
+class TestFileExists(TestCase):
+    portal_url = (
+        IGVF_PORTAL_PREFIX
+        + "/sequence-files/IGVFFI0000AAAA/@@download/IGVFFI0000AAAA.fastq.gz"
+    )
+    s3_url = "https://s3.amazonaws.com/bucket/IGVFFI0000AAAA.fastq.gz?signature=abc"
+
+    def test_portal_session_retries_transient_errors(self):
+        session = portal_session(("key", "secret"))
+        retry = session.get_adapter(IGVF_PORTAL_PREFIX).max_retries
+        self.assertEqual(session.auth, ("key", "secret"))
+        self.assertEqual(retry.total, PORTAL_REQUEST_RETRIES)
+        self.assertEqual(retry.backoff_factor, 1)
+        self.assertTrue(set(PORTAL_RETRY_STATUS_CODES) <= set(retry.status_forcelist))
+        self.assertTrue({"HEAD", "GET"} <= set(retry.allowed_methods))
+
+    def test_igvf_head_ok(self):
+        def fake_head(session, url, **kwargs):
+            self.assertEqual(session.auth, ("key", "secret"))
+            self.assertEqual(kwargs["timeout"], PORTAL_REQUEST_TIMEOUT)
+            self.assertFalse(kwargs["allow_redirects"])
+            retry = session.get_adapter(url).max_retries
+            self.assertIn("HEAD", retry.allowed_methods)
+            return _response(200)
+
+        env = {"IGVF_API_KEY": "key", "IGVF_SECRET_KEY": "secret"}
+        with patch.dict(os.environ, env):
+            with patch("seqspec.utils.requests.Session.head", fake_head):
+                self.assertTrue(file_exists(self.portal_url))
+
+    def test_igvf_redirect_uses_ranged_get_without_portal_auth(self):
+        def fake_head(session, url, **kwargs):
+            self.assertEqual(session.auth, ("key", "secret"))
+            return _response(307, {"Location": TestFileExists.s3_url})
+
+        def fake_get(session, url, **kwargs):
+            self.assertIsNone(session.auth)
+            self.assertEqual(url, TestFileExists.s3_url)
+            self.assertEqual(kwargs["headers"], {"Range": "bytes=0-0"})
+            self.assertEqual(kwargs["timeout"], PORTAL_REQUEST_TIMEOUT)
+            retry = session.get_adapter(url).max_retries
+            self.assertIn("GET", retry.allowed_methods)
+            self.assertNotIn("HEAD", retry.allowed_methods)
+            return _response(206)
+
+        env = {"IGVF_API_KEY": "key", "IGVF_SECRET_KEY": "secret"}
+        with patch.dict(os.environ, env):
+            with patch("seqspec.utils.requests.Session.head", fake_head):
+                with patch("seqspec.utils.requests.Session.get", fake_get):
+                    self.assertTrue(file_exists(self.portal_url))
+
+    def test_igvf_missing_redirect_location(self):
+        env = {"IGVF_API_KEY": "key", "IGVF_SECRET_KEY": "secret"}
+        with patch.dict(os.environ, env):
+            with patch(
+                "seqspec.utils.requests.Session.head",
+                return_value=_response(307),
+            ):
+                self.assertFalse(file_exists(self.portal_url))
+
+    def test_igvf_not_found(self):
+        env = {"IGVF_API_KEY": "key", "IGVF_SECRET_KEY": "secret"}
+        with patch.dict(os.environ, env):
+            with patch(
+                "seqspec.utils.requests.Session.head",
+                return_value=_response(404),
+            ):
+                self.assertFalse(file_exists(self.portal_url))
+
+    def test_igvf_request_error(self):
+        env = {"IGVF_API_KEY": "key", "IGVF_SECRET_KEY": "secret"}
+        with patch.dict(os.environ, env):
+            with patch(
+                "seqspec.utils.requests.Session.head",
+                side_effect=requests.Timeout("timed out"),
+            ):
+                self.assertFalse(file_exists(self.portal_url))
+
+    def test_igvf_warns_without_credentials(self):
+        seen = {}
+
+        def fake_head(session, url, **kwargs):
+            seen["auth"] = session.auth
+            return _response(200)
+
+        with patch.dict(os.environ, {}, clear=True):
+            with patch("seqspec.utils.requests.Session.head", fake_head):
+                with patch("builtins.print") as mock_print:
+                    self.assertTrue(file_exists(self.portal_url))
+        mock_print.assert_called_once_with(
+            "Warning: IGVF_API_KEY and IGVF_SECRET_KEY not set"
+        )
+        self.assertIsNone(seen["auth"])
+
+    def test_other_url(self):
+        def fake_head(url, **kwargs):
+            calls.append((url, kwargs.get("timeout")))
+            if url.endswith("/a"):
+                return _response(302, {"Location": "https://example.com/b"})
+            return _response(200)
+
+        calls = []
+        with patch("seqspec.utils.requests.head", fake_head):
+            self.assertTrue(file_exists("https://example.com/a"))
+        self.assertEqual(
+            calls,
+            [
+                ("https://example.com/a", PORTAL_REQUEST_TIMEOUT),
+                ("https://example.com/b", PORTAL_REQUEST_TIMEOUT),
+            ],
+        )
+
+    def test_other_url_request_error(self):
+        with patch(
+            "seqspec.utils.requests.head",
+            side_effect=requests.ConnectionError("down"),
+        ):
+            self.assertFalse(file_exists("https://example.com/a"))

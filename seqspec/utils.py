@@ -8,6 +8,8 @@ from seqspec.Region import Region, Onlist
 
 import yaml
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 from Bio import GenBank
 from typing import Tuple, List
 
@@ -129,23 +131,65 @@ def region_ids_in_spec(seqspec, modality, region_ids):
     return found
 
 
+IGVF_PORTAL_PREFIX = "https://api.data.igvf.org"
+
+# (connect, read) in seconds. These calls are a HEAD or a one-byte ranged GET.
+PORTAL_REQUEST_TIMEOUT = (10, 30)
+PORTAL_REQUEST_RETRIES = 5
+PORTAL_REQUEST_BACKOFF_FACTOR = 1
+PORTAL_RETRY_STATUS_CODES = (429, 500, 502, 503, 504)
+
+
+def portal_session(auth=None, methods=("HEAD", "GET")):
+    """Session that retries transient HTTP errors."""
+    session = requests.Session()
+    session.auth = auth
+    retry = Retry(
+        total=PORTAL_REQUEST_RETRIES,
+        backoff_factor=PORTAL_REQUEST_BACKOFF_FACTOR,
+        status_forcelist=PORTAL_RETRY_STATUS_CODES,
+        allowed_methods=frozenset(methods),
+        raise_on_status=False,
+    )
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount("https://", adapter)
+    session.mount("http://", adapter)
+    return session
+
+
 def file_exists(uri):
     try:
-        if uri.startswith("https://api.data.igvf.org"):
+        if uri.startswith(IGVF_PORTAL_PREFIX):
             auth = get_remote_auth_token()
             if auth is None:
                 print("Warning: IGVF_API_KEY and IGVF_SECRET_KEY not set")
-            r = requests.head(uri, auth=auth)
-            if r.status_code == 307:
-                # igvf download link will redirect to a presigned amazon s3 url, HEAD request will not work.
-                r = requests.get(r.headers["Location"], headers={"Range": "bytes=0-0"})
-                return r.status_code == 206
-            return r.status_code == 200
-        r = requests.head(uri)
-        if r.status_code == 302:
-            return file_exists(r.headers["Location"])
-        return r.status_code == 200
-    except requests.ConnectionError:
+            # Do not follow redirects. A 307 Location is a presigned S3 URL,
+            # and HEAD against that URL does not succeed.
+            response = portal_session(auth).head(
+                uri,
+                timeout=PORTAL_REQUEST_TIMEOUT,
+                allow_redirects=False,
+            )
+            if response.status_code == 307:
+                location = response.headers.get("Location")
+                if not location:
+                    return False
+                # Portal credentials must not be sent to the presigned S3 URL.
+                ranged = portal_session(methods=("GET",)).get(
+                    location,
+                    headers={"Range": "bytes=0-0"},
+                    timeout=PORTAL_REQUEST_TIMEOUT,
+                )
+                return ranged.status_code == 206
+            return response.status_code == 200
+        response = requests.head(uri, timeout=PORTAL_REQUEST_TIMEOUT)
+        if response.status_code == 302:
+            location = response.headers.get("Location")
+            if not location:
+                return False
+            return file_exists(location)
+        return response.status_code == 200
+    except requests.RequestException:
         return False
 
 
