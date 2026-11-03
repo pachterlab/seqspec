@@ -134,7 +134,7 @@ fn upgrade_0_2_0_to_0_4_0(spec: Assay) -> Assay {
                 let md5 = ol.md5.clone();
                 let new_ol = Onlist {
                     file_id: filename.clone(),
-                    filename: filename,
+                    filename,
                     filetype: "".to_string(),
                     filesize: 0,
                     url: "".to_string(),

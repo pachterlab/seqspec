@@ -49,7 +49,7 @@ pub struct FindArgs {
     pub auth_profile: Option<String>,
 }
 
-pub fn validate_find_args(args: &FindArgs, remote_access: &RemoteAccess) -> () {
+pub fn validate_find_args(args: &FindArgs, remote_access: &RemoteAccess) {
     if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
         eprintln!("{}", err);
         std::process::exit(1);
@@ -101,7 +101,7 @@ pub fn find_by_region_id(spec: &Assay, modality: &str, region_id: &str) -> Vec<R
 
 pub fn find_by_file_id(spec: &Assay, modality: &str, file_id: &str) -> Vec<File> {
     let selector = "file".to_string();
-    seqspec_file_lookup(spec, &modality.to_string(), None, &selector)
+    seqspec_file_lookup(spec, modality, None, &selector)
         .into_values()
         .flatten()
         .filter(|f| f.file_id == file_id)

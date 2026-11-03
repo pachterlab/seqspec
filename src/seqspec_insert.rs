@@ -162,7 +162,7 @@ impl ReadInput {
             .files
             .as_ref()
             .map(|v| v.iter().map(|f| f.to_file()).collect())
-            .unwrap_or_else(|| Vec::new());
+            .unwrap_or_default();
         Some(Read::new(
             read_id,
             name,
@@ -196,7 +196,7 @@ impl RegionInput {
             .regions
             .as_ref()
             .map(|v| v.iter().filter_map(|c| c.to_region()).collect())
-            .unwrap_or_else(|| Vec::new());
+            .unwrap_or_default();
         Some(Region::new_with_region_type_value(
             region_id,
             self.region_type

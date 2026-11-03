@@ -64,7 +64,7 @@ pub fn spec_base_from_source(source: &str) -> Option<PathBuf> {
     local_source_path(source).and_then(|path| path.parent().map(|parent| parent.to_path_buf()))
 }
 
-pub fn load_spec(spec: &PathBuf) -> Assay {
+pub fn load_spec(spec: &Path) -> Assay {
     load_spec_path(spec).expect("Could not read values.")
 }
 

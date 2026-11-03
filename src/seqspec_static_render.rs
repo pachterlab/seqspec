@@ -507,7 +507,7 @@ fn short_region_label_count(regions: &[RegionView], label_mode: LabelMode) -> us
 
 fn callout_lane_capacity(regions: &[RegionView], label_mode: LabelMode) -> usize {
     let count = short_region_label_count(regions, label_mode);
-    ((count + 1) / 2).clamp(3, 6)
+    count.div_ceil(2).clamp(3, 6)
 }
 
 fn estimate_callout_lane_counts(
@@ -624,6 +624,10 @@ fn arrow_marker(color_idx: usize) -> &'static str {
     }
 }
 
+#[allow(
+    clippy::too_many_arguments,
+    reason = "Arguments mirror SVG geometry and style attributes"
+)]
 fn rect(out: &mut String, x: f64, y: f64, w: f64, h: f64, fill: &str, stroke: &str, sw: f64) {
     out.push_str(&format!(
         r#"<rect x="{x:.3}" y="{y:.3}" width="{w:.3}" height="{h:.3}" fill="{fill}" stroke="{stroke}" stroke-width="{sw:.3}"/>"#
@@ -638,6 +642,10 @@ fn rect_alpha(out: &mut String, x: f64, y: f64, w: f64, h: f64, fill: &str, opac
     out.push('\n');
 }
 
+#[allow(
+    clippy::too_many_arguments,
+    reason = "Arguments mirror SVG geometry and style attributes"
+)]
 fn line(
     out: &mut String,
     x1: f64,
@@ -683,6 +691,10 @@ impl TextAnchor {
     }
 }
 
+#[allow(
+    clippy::too_many_arguments,
+    reason = "Arguments mirror SVG geometry and style attributes"
+)]
 fn text(
     out: &mut String,
     x: f64,

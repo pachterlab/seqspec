@@ -67,7 +67,7 @@ impl RegionTypeValue {
     }
 
     pub fn matches(&self, query: &str) -> bool {
-        if self.values().iter().any(|value| *value == query) {
+        if self.values().contains(&query) {
             return true;
         }
         // Legacy index names select position, not sample/library identity.
@@ -143,7 +143,7 @@ impl PartialEq<&str> for RegionTypeValue {
 
 impl PartialEq<String> for RegionTypeValue {
     fn eq(&self, other: &String) -> bool {
-        self.values().iter().any(|value| *value == other.as_str())
+        self.values().contains(&other.as_str())
     }
 }
 

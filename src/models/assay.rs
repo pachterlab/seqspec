@@ -55,6 +55,10 @@ pub struct Assay {
 }
 
 impl Assay {
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Preserve the public field-wise constructor API"
+    )]
     pub fn new(
         assay_id: String,
         name: String,
@@ -118,7 +122,7 @@ impl Assay {
     }
 
     // Core helpers ----------------------------------------------------
-    pub fn update_spec(&mut self) -> () {
+    pub fn update_spec(&mut self) {
         for r in &mut self.library_spec {
             r.update_attr();
         }

@@ -18,6 +18,10 @@ pub struct Region {
 }
 
 impl Region {
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Preserve the public field-wise constructor API"
+    )]
     pub fn new(
         region_id: String,
         region_type: String,
@@ -42,6 +46,10 @@ impl Region {
         }
     }
 
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Preserve the public field-wise constructor API"
+    )]
     pub fn new_with_region_type_value(
         region_id: String,
         region_type: RegionTypeValue,
@@ -208,6 +216,10 @@ impl Region {
     }
 
     // ---- Mutations --------------------------------------------------
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Preserve the public field-wise update API"
+    )]
     pub fn update_region(
         &mut self,
         region_id: String,
@@ -229,6 +241,10 @@ impl Region {
         self.onlist = onlist;
     }
 
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Preserve the public field-wise update API"
+    )]
     pub fn update_region_by_id(
         &mut self,
         target_region_id: String,
@@ -358,8 +374,8 @@ impl RegionCoordinate {
             name: format!("{} - {}", self.region.name, other.region.name),
             sequence_type: "diff".to_string(),
             sequence: seq,
-            min_len: (new_stop - new_start) as i64,
-            max_len: (new_stop - new_start) as i64,
+            min_len: (new_stop - new_start),
+            max_len: (new_stop - new_start),
             onlist: None,
             regions: Vec::new(),
         };

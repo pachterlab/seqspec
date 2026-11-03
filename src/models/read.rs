@@ -16,6 +16,10 @@ pub struct Read {
 }
 
 impl Read {
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Preserve the public field-wise constructor API"
+    )]
     pub fn new(
         read_id: String,
         name: String,
@@ -50,6 +54,10 @@ impl Read {
         self.files = files;
     }
 
+    #[allow(
+        clippy::too_many_arguments,
+        reason = "Preserve the public field-wise update API"
+    )]
     pub fn update_read_by_id(
         &mut self,
         read_id: Option<String>,

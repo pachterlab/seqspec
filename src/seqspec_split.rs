@@ -49,7 +49,11 @@ pub fn run_split(args: &SplitArgs) {
     let _ = fs::create_dir_all(&args.output);
 
     for mut spec_m in specs {
-        let modality = spec_m.list_modalities().get(0).cloned().unwrap_or_default();
+        let modality = spec_m
+            .list_modalities()
+            .first()
+            .cloned()
+            .unwrap_or_default();
         let out_path = args.output.join(format!("{}{}.yaml", prefix, modality));
         spec_m.update_spec();
         let bytes = spec_m.to_bytes().expect("serialize to YAML");

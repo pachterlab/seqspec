@@ -77,7 +77,7 @@ pub struct IndexArgs {
     auth_profile: Option<String>,
 }
 
-pub fn validate_index_args(args: &IndexArgs, remote_access: &RemoteAccess) -> () {
+pub fn validate_index_args(args: &IndexArgs, remote_access: &RemoteAccess) {
     if let Err(err) = utils::validate_source_exists(&args.yaml, remote_access) {
         eprintln!("{}", err);
         std::process::exit(1);
@@ -121,12 +121,12 @@ pub fn run_index(args: &IndexArgs) {
 
 pub fn seqspec_index(
     spec: &Assay,
-    modality: &String,
-    ids: &Vec<String>,
-    idtype: &String,
+    modality: &str,
+    ids: &[String],
+    idtype: &str,
     _rev: &bool,
 ) -> Vec<Coordinate> {
-    match (idtype.as_str(), ids.is_empty()) {
+    match (idtype, ids.is_empty()) {
         ("file", true) => get_index_by_files(spec, modality),
         ("read", true) => get_index_by_reads(spec, modality),
         ("region", true) => get_index_by_regions(spec, modality),
@@ -137,12 +137,8 @@ pub fn seqspec_index(
     }
 }
 
-pub fn format_index(
-    index: &Vec<Coordinate>,
-    tool: &String,
-    subregion_type: &Option<String>,
-) -> String {
-    match tool.as_str() {
+pub fn format_index(index: &[Coordinate], tool: &str, subregion_type: &Option<String>) -> String {
+    match tool {
         "chromap" => format_chromap(index),
         "fgbio" => format_fgbio(index),
         "kb" => format_kallisto_bus(index),
@@ -159,7 +155,7 @@ pub fn format_index(
 }
 
 // Declarations (implemented below)
-fn get_index_by_files(spec: &Assay, modality: &String) -> Vec<Coordinate> {
+fn get_index_by_files(spec: &Assay, modality: &str) -> Vec<Coordinate> {
     let mut all_files: Vec<File> = Vec::new();
     for r in spec.get_seqspec(modality) {
         for f in r.files {
@@ -169,7 +165,7 @@ fn get_index_by_files(spec: &Assay, modality: &String) -> Vec<Coordinate> {
     let file_ids: Vec<String> = all_files.into_iter().map(|f| f.file_id).collect();
     get_index_by_file_ids(spec, modality, &file_ids)
 }
-fn get_index_by_reads(spec: &Assay, modality: &String) -> Vec<Coordinate> {
+fn get_index_by_reads(spec: &Assay, modality: &str) -> Vec<Coordinate> {
     let read_ids: Vec<String> = spec
         .get_seqspec(modality)
         .into_iter()
@@ -177,15 +173,11 @@ fn get_index_by_reads(spec: &Assay, modality: &String) -> Vec<Coordinate> {
         .collect();
     get_index_by_read_ids(spec, modality, &read_ids)
 }
-fn get_index_by_regions(spec: &Assay, modality: &String) -> Vec<Coordinate> {
+fn get_index_by_regions(spec: &Assay, modality: &str) -> Vec<Coordinate> {
     let rgn = spec.get_libspec(modality).expect("Modality not found");
-    get_index_by_region_ids(spec, modality, &vec![rgn.region_id])
+    get_index_by_region_ids(spec, modality, &[rgn.region_id])
 }
-fn get_index_by_file_ids(
-    spec: &Assay,
-    modality: &String,
-    file_ids: &Vec<String>,
-) -> Vec<Coordinate> {
+fn get_index_by_file_ids(spec: &Assay, modality: &str, file_ids: &[String]) -> Vec<Coordinate> {
     let files_map = list_files_by_file_id(spec, modality, file_ids);
     let mut indices: Vec<Coordinate> = Vec::new();
     for (read_id, files) in files_map {
@@ -199,11 +191,7 @@ fn get_index_by_file_ids(
     }
     indices
 }
-fn get_index_by_region_ids(
-    spec: &Assay,
-    modality: &String,
-    region_ids: &Vec<String>,
-) -> Vec<Coordinate> {
+fn get_index_by_region_ids(spec: &Assay, modality: &str, region_ids: &[String]) -> Vec<Coordinate> {
     let mut indices: Vec<Coordinate> = Vec::new();
     for id in region_ids {
         let coord = get_coordinate_by_region_id(spec, modality, id);
@@ -211,11 +199,7 @@ fn get_index_by_region_ids(
     }
     indices
 }
-fn get_index_by_read_ids(
-    spec: &Assay,
-    modality: &String,
-    read_ids: &Vec<String>,
-) -> Vec<Coordinate> {
+fn get_index_by_read_ids(spec: &Assay, modality: &str, read_ids: &[String]) -> Vec<Coordinate> {
     let mut indices: Vec<Coordinate> = Vec::new();
     for id in read_ids {
         let coord = get_coordinate_by_read_id(spec, modality, id);
@@ -223,7 +207,7 @@ fn get_index_by_read_ids(
     }
     indices
 }
-fn get_coordinate_by_region_id(spec: &Assay, modality: &String, region_id: &str) -> Coordinate {
+fn get_coordinate_by_region_id(spec: &Assay, modality: &str, region_id: &str) -> Coordinate {
     let regions = find_by_region_id(spec, modality, region_id);
     let rgn = regions.first().expect("Region not found").clone();
     let leaves: Vec<Region> = rgn.get_leaves();
@@ -236,7 +220,7 @@ fn get_coordinate_by_region_id(spec: &Assay, modality: &String, region_id: &str)
         strand: "pos".to_string(),
     }
 }
-fn get_coordinate_by_read_id(spec: &Assay, modality: &String, read_id: &str) -> Coordinate {
+fn get_coordinate_by_read_id(spec: &Assay, modality: &str, read_id: &str) -> Coordinate {
     let (read, rgns) =
         utils::map_read_id_to_regions(spec, modality, read_id).expect("read mapping failed");
     let rcs: Vec<RegionCoordinate> = utils::project_regions_to_coordinates(rgns);
@@ -382,7 +366,7 @@ fn format_fgbio_read_structure(coord: &Coordinate) -> Result<String, String> {
         .collect())
 }
 
-fn format_fgbio(indices: &Vec<Coordinate>) -> String {
+fn format_fgbio(indices: &[Coordinate]) -> String {
     indices
         .iter()
         .map(format_fgbio_read_structure)
@@ -391,7 +375,7 @@ fn format_fgbio(indices: &Vec<Coordinate>) -> String {
         .join(" ")
 }
 
-fn format_kallisto_bus(indices: &Vec<Coordinate>) -> String {
+fn format_kallisto_bus(indices: &[Coordinate]) -> String {
     let mut bcs: Vec<String> = Vec::new();
     let mut umi: Vec<String> = Vec::new();
     let mut feature: Vec<String> = Vec::new();
@@ -414,7 +398,7 @@ fn format_kallisto_bus(indices: &Vec<Coordinate>) -> String {
     }
     format!("{}:{}:{}", bcs.join(","), umi.join(","), feature.join(","))
 }
-fn format_kallisto_bus_force_single(indices: &Vec<Coordinate>) -> String {
+fn format_kallisto_bus_force_single(indices: &[Coordinate]) -> String {
     let mut bcs: Vec<String> = Vec::new();
     let mut umi: Vec<String> = Vec::new();
     let mut feature: Vec<String> = Vec::new();
@@ -446,7 +430,7 @@ fn format_kallisto_bus_force_single(indices: &Vec<Coordinate>) -> String {
     }
     format!("{}:{}:{}", bcs.join(","), umi.join(","), feature.join(","))
 }
-fn format_seqkit_subseq(indices: &Vec<Coordinate>, subregion_type: Option<&str>) -> String {
+fn format_seqkit_subseq(indices: &[Coordinate], subregion_type: Option<&str>) -> String {
     if indices.is_empty() {
         return String::new();
     }
@@ -461,7 +445,7 @@ fn format_seqkit_subseq(indices: &Vec<Coordinate>, subregion_type: Option<&str>)
     }
     x
 }
-fn format_tab(indices: &Vec<Coordinate>) -> String {
+fn format_tab(indices: &[Coordinate]) -> String {
     let mut x = String::new();
     for coord in indices {
         for cut in &coord.rcv {
@@ -480,7 +464,7 @@ fn format_tab(indices: &Vec<Coordinate>) -> String {
     }
     x
 }
-fn format_starsolo(indices: &Vec<Coordinate>) -> String {
+fn format_starsolo(indices: &[Coordinate]) -> String {
     let mut bcs: Vec<String> = Vec::new();
     let mut umi: Vec<String> = Vec::new();
     for coord in indices {
@@ -506,7 +490,7 @@ fn format_starsolo(indices: &Vec<Coordinate>) -> String {
         String::new()
     }
 }
-fn format_simpleaf(indices: &Vec<Coordinate>) -> String {
+fn format_simpleaf(indices: &[Coordinate]) -> String {
     let mut xl: Vec<String> = Vec::new();
     for (idx, coord) in indices.iter().enumerate() {
         let mut x = format!("{}{{", idx + 1);
@@ -525,7 +509,7 @@ fn format_simpleaf(indices: &Vec<Coordinate>) -> String {
     }
     xl.join("")
 }
-fn format_zumis(indices: &Vec<Coordinate>) -> String {
+fn format_zumis(indices: &[Coordinate]) -> String {
     let mut xl: Vec<String> = Vec::new();
     for coord in indices {
         let mut x = String::new();
@@ -546,7 +530,7 @@ fn format_zumis(indices: &Vec<Coordinate>) -> String {
     }
     out
 }
-fn format_chromap(indices: &Vec<Coordinate>) -> String {
+fn format_chromap(indices: &[Coordinate]) -> String {
     let mut bc_fqs: Vec<String> = Vec::new();
     let mut bc_str: Vec<String> = Vec::new();
     let mut gdna_fqs: Vec<String> = Vec::new();
@@ -590,7 +574,7 @@ fn format_chromap(indices: &Vec<Coordinate>) -> String {
         }
         out
     };
-    let read1_fq = dedup_gdna_fqs.get(0).cloned().unwrap_or_default();
+    let read1_fq = dedup_gdna_fqs.first().cloned().unwrap_or_default();
     let read2_fq = dedup_gdna_fqs.get(1).cloned().unwrap_or_default();
     let read_str = gdna_str
         .iter()
@@ -604,7 +588,7 @@ fn format_chromap(indices: &Vec<Coordinate>) -> String {
         read1_fq, read2_fq, barcode_fq, bc_str_join, read_str
     )
 }
-fn compute_relative(rcs: &Vec<RegionCoordinate>) -> Vec<RegionCoordinateDifference> {
+fn compute_relative(rcs: &[RegionCoordinate]) -> Vec<RegionCoordinateDifference> {
     let mut d: Vec<RegionCoordinateDifference> = Vec::new();
     for obj in rcs {
         for fixed in rcs {
@@ -633,7 +617,7 @@ fn filter_differences(
     }
     f
 }
-fn format_relative(indices: &Vec<Coordinate>) -> String {
+fn format_relative(indices: &[Coordinate]) -> String {
     let mut x = String::new();
     for coord in indices {
         let diffs = compute_relative(&coord.rcv);
@@ -659,10 +643,10 @@ struct SplitRow {
     fmt: String,
 }
 
-fn format_splitcode(indices: &Vec<Coordinate>) -> String {
+fn format_splitcode(indices: &[Coordinate]) -> String {
     use std::collections::HashMap;
 
-    fn compute_relative(rcs: &Vec<RegionCoordinate>) -> Vec<RegionCoordinateDifference> {
+    fn compute_relative(rcs: &[RegionCoordinate]) -> Vec<RegionCoordinateDifference> {
         let mut d: Vec<RegionCoordinateDifference> = Vec::new();
         for obj in rcs {
             for fixed in rcs {
@@ -694,7 +678,7 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
     }
 
     fn groupby_region_id(
-        rgns: &Vec<RegionCoordinateDifference>,
+        rgns: &[RegionCoordinateDifference],
     ) -> HashMap<String, (RegionCoordinate, Vec<RegionCoordinateDifference>)> {
         let mut d: HashMap<String, (RegionCoordinate, Vec<RegionCoordinateDifference>)> =
             HashMap::new();
@@ -722,7 +706,7 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
 
     fn format_splitcode_row(
         obj: &RegionCoordinate,
-        rgncdiffs: &Vec<RegionCoordinateDifference>,
+        rgncdiffs: &[RegionCoordinateDifference],
         idx: i32,
         rev: bool,
         complement: bool,
@@ -759,7 +743,7 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
 
         let mut p1 = false;
         let mut m1 = false;
-        let mut srtdiffs = rgncdiffs.clone();
+        let mut srtdiffs = rgncdiffs.to_vec();
         srtdiffs.sort_by_key(|x| x.rgncdiff.region.min_len);
         for diffs in srtdiffs.iter() {
             let fixed = &diffs.fixed.region;
@@ -917,8 +901,8 @@ fn format_splitcode(indices: &Vec<Coordinate>) -> String {
 }
 fn list_files_by_file_id(
     spec: &Assay,
-    modality: &String,
-    file_ids: &Vec<String>,
+    modality: &str,
+    file_ids: &[String],
 ) -> HashMap<String, Vec<File>> {
     let mut files: HashMap<String, Vec<File>> = HashMap::new();
     let ids: HashSet<String> = file_ids.iter().cloned().collect();
@@ -984,7 +968,7 @@ mod tests {
     #[test]
     fn test_format_tab() {
         let indices = rna_indices();
-        let result = format_index(&indices, &"tab".to_string(), &None);
+        let result = format_index(&indices, "tab", &None);
         let lines: Vec<&str> = result.lines().collect();
         assert_eq!(lines.len(), 3);
         assert_eq!(lines[0], "rna_R1\tCell Barcode\tbarcode\t0\t16");
@@ -995,7 +979,7 @@ mod tests {
     #[test]
     fn test_format_kb() {
         let indices = rna_indices();
-        let result = format_index(&indices, &"kb".to_string(), &None);
+        let result = format_index(&indices, "kb", &None);
         assert_eq!(result, "0,0,16:0,16,28:1,0,102");
     }
 
@@ -1016,13 +1000,13 @@ mod tests {
 
     fn rna_indices() -> Vec<Coordinate> {
         let spec = dogma_spec();
-        get_index_by_reads(&spec, &"rna".to_string())
+        get_index_by_reads(&spec, "rna")
     }
 
     #[test]
     fn test_format_starsolo() {
         let indices = rna_indices();
-        let result = format_index(&indices, &"starsolo".to_string(), &None);
+        let result = format_index(&indices, "starsolo", &None);
         assert_eq!(
             result,
             "--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 12"
@@ -1032,14 +1016,14 @@ mod tests {
     #[test]
     fn test_format_simpleaf() {
         let indices = rna_indices();
-        let result = format_index(&indices, &"simpleaf".to_string(), &None);
+        let result = format_index(&indices, "simpleaf", &None);
         assert_eq!(result, "1{b[16]u[12]x:}2{r[102]x:}");
     }
 
     #[test]
     fn test_format_zumis() {
         let indices = rna_indices();
-        let result = format_index(&indices, &"zumis".to_string(), &None);
+        let result = format_index(&indices, "zumis", &None);
         assert!(result.contains("BCS(1-16)"));
         assert!(result.contains("UMI(17-28)"));
         assert!(result.contains("cDNA(1-102)"));
@@ -1048,7 +1032,7 @@ mod tests {
     #[test]
     fn test_format_kb_single() {
         let indices = rna_indices();
-        let result = format_index(&indices, &"kb-single".to_string(), &None);
+        let result = format_index(&indices, "kb-single", &None);
         // kb-single selects only the longest feature read
         assert_eq!(result, "0,0,16:0,16,28:1,0,102");
     }
@@ -1056,28 +1040,28 @@ mod tests {
     #[test]
     fn test_format_fgbio() {
         let indices = rna_indices();
-        let result = format_index(&indices, &"fgbio".to_string(), &None);
+        let result = format_index(&indices, "fgbio", &None);
         assert_eq!(result, "16C12M 102T");
 
         let spec = dogma_spec();
         let atac_indices = get_index_by_read_ids(
             &spec,
-            &"atac".to_string(),
-            &vec![
+            "atac",
+            &[
                 "atac_R1".to_string(),
                 "atac_R2".to_string(),
                 "atac_R3".to_string(),
             ],
         );
-        let atac_result = format_index(&atac_indices, &"fgbio".to_string(), &None);
+        let atac_result = format_index(&atac_indices, "fgbio", &None);
         assert_eq!(atac_result, "53T 8S16C 53T");
     }
 
     #[test]
     fn test_format_fgbio_index7_fixture() {
         let spec = load_spec(&PathBuf::from("tests/fixtures/fgbio_index7/spec.yaml"));
-        let indices = get_index_by_read_ids(&spec, &"rna".to_string(), &vec!["I1".to_string()]);
-        let result = format_index(&indices, &"fgbio".to_string(), &None);
+        let indices = get_index_by_read_ids(&spec, "rna", &["I1".to_string()]);
+        let result = format_index(&indices, "fgbio", &None);
         assert_eq!(result, "4B");
     }
 
@@ -1098,7 +1082,7 @@ mod tests {
         let modality = "rna".to_string();
         let lib = spec.get_libspec("rna").unwrap();
         let region_id = lib.region_id.clone();
-        let indices = get_index_by_region_ids(&spec, &modality, &vec![region_id]);
+        let indices = get_index_by_region_ids(&spec, &modality, &[region_id]);
         assert_eq!(indices.len(), 1);
         assert_eq!(indices[0].query_type, "Region");
     }
@@ -1182,7 +1166,8 @@ mod tests {
         let spec = dogma_spec();
         let modality = "rna".to_string();
         let lib = spec.get_libspec("rna").unwrap();
-        let indices = get_index_by_region_ids(&spec, &modality, &vec![lib.region_id.clone()]);
-        let _ = format_index(&indices, &"fgbio".to_string(), &None);
+        let indices =
+            get_index_by_region_ids(&spec, &modality, std::slice::from_ref(&lib.region_id));
+        let _ = format_index(&indices, "fgbio", &None);
     }
 }

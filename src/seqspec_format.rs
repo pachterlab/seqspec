@@ -15,7 +15,7 @@ pub struct FormatArgs {
     yaml: PathBuf,
 }
 
-pub fn validate_format_args(args: &FormatArgs) -> () {
+pub fn validate_format_args(args: &FormatArgs) {
     // just call the runner and print any error nicely
     if !args.yaml.exists() {
         eprintln!("Please use `seqspec format -h` for help.");
@@ -36,7 +36,7 @@ pub fn run_format(args: &FormatArgs) {
     }
 }
 
-fn seqspec_format(spec: &mut Assay) -> () {
+fn seqspec_format(spec: &mut Assay) {
     spec.update_spec();
 }
 

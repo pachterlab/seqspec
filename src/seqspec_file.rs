@@ -131,9 +131,9 @@ fn validate_file_args(args: &FileArgs, remote_access: &RemoteAccess) {
 
 pub fn seqspec_file(
     spec: &Assay,
-    modality: &String,
+    modality: &str,
     ids: Option<&Vec<String>>,
-    selector: &String,
+    selector: &str,
 ) -> HashMap<String, Vec<File>> {
     let list_files = |sel: &str| -> HashMap<String, Vec<File>> {
         match sel {
@@ -144,7 +144,7 @@ pub fn seqspec_file(
         }
     };
 
-    let list_files_by_id = |sel: &str, ids: &Vec<String>| -> HashMap<String, Vec<File>> {
+    let list_files_by_id = |sel: &str, ids: &[String]| -> HashMap<String, Vec<File>> {
         match sel {
             "read" => list_files_by_read_id(spec, modality, ids),
             "file" => list_files_by_file_id(spec, modality, ids),
@@ -155,13 +155,13 @@ pub fn seqspec_file(
     };
 
     match ids {
-        None => list_files(&selector),
-        Some(v) if v.is_empty() => list_files(&selector),
-        Some(v) => list_files_by_id(&selector, v),
+        None => list_files(selector),
+        Some(v) if v.is_empty() => list_files(selector),
+        Some(v) => list_files_by_id(selector, v),
     }
 }
 
-fn list_read_files(spec: &Assay, modality: &String) -> HashMap<String, Vec<File>> {
+fn list_read_files(spec: &Assay, modality: &str) -> HashMap<String, Vec<File>> {
     let mut files: HashMap<String, Vec<File>> = HashMap::new();
     for rd in spec.get_seqspec(modality) {
         if !rd.files.is_empty() {
@@ -171,14 +171,14 @@ fn list_read_files(spec: &Assay, modality: &String) -> HashMap<String, Vec<File>
     files
 }
 
-fn list_all_files(spec: &Assay, modality: &String) -> HashMap<String, Vec<File>> {
+fn list_all_files(spec: &Assay, modality: &str) -> HashMap<String, Vec<File>> {
     let mut rd = list_read_files(spec, modality);
     let rgn = list_region_files(spec, modality);
     rd.extend(rgn);
     rd
 }
 
-fn list_onlist_files(spec: &Assay, modality: &String) -> HashMap<String, Vec<Onlist>> {
+fn list_onlist_files(spec: &Assay, modality: &str) -> HashMap<String, Vec<Onlist>> {
     let mut files: HashMap<String, Vec<Onlist>> = HashMap::new();
     let regions = spec.get_libspec(modality).unwrap().get_onlist_regions();
     for r in regions {
@@ -189,7 +189,7 @@ fn list_onlist_files(spec: &Assay, modality: &String) -> HashMap<String, Vec<Onl
     files
 }
 
-fn list_region_files(spec: &Assay, modality: &String) -> HashMap<String, Vec<File>> {
+fn list_region_files(spec: &Assay, modality: &str) -> HashMap<String, Vec<File>> {
     // convert Onlist to File-shaped map by copying fields
     let onlists = list_onlist_files(spec, modality);
     let mut files: HashMap<String, Vec<File>> = HashMap::new();
@@ -387,15 +387,13 @@ fn format_list_files(
     out.join("\n")
 }
 
-fn ordered_file_columns<'a>(
-    files: &'a HashMap<String, Vec<File>>,
-) -> Vec<(&'a String, &'a Vec<File>)> {
+fn ordered_file_columns(files: &HashMap<String, Vec<File>>) -> Vec<(&String, &Vec<File>)> {
     let mut columns: Vec<(&String, &Vec<File>)> = files.iter().collect();
     columns.sort_by(|(left, _), (right, _)| left.cmp(right));
     columns
 }
 
-fn iter_file_rows<'a>(files: &'a HashMap<String, Vec<File>>) -> Vec<Vec<(&'a String, &'a File)>> {
+fn iter_file_rows(files: &HashMap<String, Vec<File>>) -> Vec<Vec<(&String, &File)>> {
     let columns = ordered_file_columns(files);
     let row_count = columns
         .iter()
@@ -415,8 +413,8 @@ fn iter_file_rows<'a>(files: &'a HashMap<String, Vec<File>>) -> Vec<Vec<(&'a Str
 
 fn list_files_by_read_id(
     spec: &Assay,
-    modality: &String,
-    read_ids: &Vec<String>,
+    modality: &str,
+    read_ids: &[String],
 ) -> HashMap<String, Vec<File>> {
     let mut files: HashMap<String, Vec<File>> = HashMap::new();
     let ids: HashSet<String> = read_ids.iter().cloned().collect();
@@ -430,8 +428,8 @@ fn list_files_by_read_id(
 
 fn list_files_by_file_id(
     spec: &Assay,
-    modality: &String,
-    file_ids: &Vec<String>,
+    modality: &str,
+    file_ids: &[String],
 ) -> HashMap<String, Vec<File>> {
     let mut files: HashMap<String, Vec<File>> = HashMap::new();
     let ids: HashSet<String> = file_ids.iter().cloned().collect();
@@ -447,8 +445,8 @@ fn list_files_by_file_id(
 
 fn list_files_by_region_id(
     spec: &Assay,
-    modality: &String,
-    region_ids: &Vec<String>,
+    modality: &str,
+    region_ids: &[String],
 ) -> HashMap<String, Vec<File>> {
     let files = list_region_files(spec, modality);
     let ids: HashSet<String> = region_ids.iter().cloned().collect();
@@ -463,8 +461,8 @@ fn list_files_by_region_id(
 
 fn list_files_by_region_type(
     spec: &Assay,
-    modality: &String,
-    region_types: &Vec<String>,
+    modality: &str,
+    region_types: &[String],
 ) -> HashMap<String, Vec<File>> {
     let files = list_region_files(spec, modality);
     let ids: HashSet<String> = region_types.iter().cloned().collect();
@@ -506,7 +504,7 @@ mod tests {
     #[test]
     fn test_seqspec_file_read_selector() {
         let spec = dogma_spec();
-        let files = seqspec_file(&spec, &"rna".into(), None, &"read".into());
+        let files = seqspec_file(&spec, "rna", None, "read");
         assert!(!files.is_empty());
         // Each key should be a read_id
         for (read_id, file_list) in &files {
@@ -518,7 +516,7 @@ mod tests {
     #[test]
     fn test_seqspec_file_region_selector() {
         let spec = dogma_spec();
-        let files = seqspec_file(&spec, &"rna".into(), None, &"region".into());
+        let files = seqspec_file(&spec, "rna", None, "region");
         // Region files come from onlists, which the rna modality should have
         assert!(!files.is_empty());
     }
@@ -526,9 +524,9 @@ mod tests {
     #[test]
     fn test_seqspec_file_all_selector() {
         let spec = dogma_spec();
-        let all_files = seqspec_file(&spec, &"rna".into(), None, &"file".into());
-        let read_files = seqspec_file(&spec, &"rna".into(), None, &"read".into());
-        let region_files = seqspec_file(&spec, &"rna".into(), None, &"region".into());
+        let all_files = seqspec_file(&spec, "rna", None, "file");
+        let read_files = seqspec_file(&spec, "rna", None, "read");
+        let region_files = seqspec_file(&spec, "rna", None, "region");
         // "file" selector returns union of read and region files
         assert!(all_files.len() >= read_files.len());
         assert!(all_files.len() >= region_files.len());
@@ -540,7 +538,7 @@ mod tests {
         let rna_reads = spec.get_seqspec("rna");
         let read_id = rna_reads[0].read_id.clone();
         let ids = vec![read_id.clone()];
-        let files = seqspec_file(&spec, &"rna".into(), Some(&ids), &"read".into());
+        let files = seqspec_file(&spec, "rna", Some(&ids), "read");
         assert!(files.contains_key(&read_id));
     }
 
