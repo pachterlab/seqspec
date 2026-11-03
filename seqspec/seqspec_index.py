@@ -20,7 +20,7 @@ from seqspec.Region import (
     project_regions_to_coordinates,
 )
 from seqspec.region_type import (
-    is_cell_barcode,
+    is_cell_or_nucleus_barcode,
     is_feature,
     is_genome,
     is_index5,
@@ -414,7 +414,7 @@ FGBIO_SKIP_REGION_TYPES = {
 
 def fgbio_operator(region_type) -> str:
     rt_upper = region_type_display(region_type).upper()
-    if is_cell_barcode(region_type):
+    if is_cell_or_nucleus_barcode(region_type):
         return "C"
     if is_molecule_barcode(region_type):
         return "M"
@@ -482,7 +482,7 @@ def format_kallisto_bus(indices: List[Coordinate], subregion_type=None) -> str:
     feature = []
     for idx, obj in enumerate(indices):
         for cut in obj.rcv:
-            if is_cell_barcode(cut.region_type):
+            if is_cell_or_nucleus_barcode(cut.region_type):
                 bcs.append(f"{idx},{cut.start},{cut.stop}")
             elif is_molecule_barcode(cut.region_type):
                 umi.append(f"{idx},{cut.start},{cut.stop}")
@@ -508,7 +508,7 @@ def format_kallisto_bus_force_single(
 
     for idx, coord in enumerate(indices):
         for cut in coord.rcv:
-            if is_cell_barcode(cut.region_type):
+            if is_cell_or_nucleus_barcode(cut.region_type):
                 bcs.append(f"{idx},{cut.start},{cut.stop}")
             elif is_molecule_barcode(cut.region_type):
                 umi.append(f"{idx},{cut.start},{cut.stop}")
@@ -564,7 +564,7 @@ def format_starsolo(indices: List[Coordinate], subregion_type=None) -> str:
     cdna = []
     for idx, coord in enumerate(indices):
         for cut in coord.rcv:
-            if is_cell_barcode(cut.region_type):
+            if is_cell_or_nucleus_barcode(cut.region_type):
                 bcs.append(
                     f"--soloCBstart {cut.start + 1} --soloCBlen {cut.stop - cut.start}"
                 )
@@ -585,7 +585,7 @@ def format_simpleaf(indices: List[Coordinate], subregion_type=None) -> str:
         fn = idx
         x = f"{fn + 1}{{"
         for cut in coord.rcv:
-            if is_cell_barcode(cut.region_type):
+            if is_cell_or_nucleus_barcode(cut.region_type):
                 x += f"b[{cut.stop - cut.start}]"
             elif is_molecule_barcode(cut.region_type):
                 x += f"u[{cut.stop - cut.start}]"
@@ -601,7 +601,7 @@ def format_zumis(indices: List[Coordinate], subregion_type=None) -> str:
     for idx, coord in enumerate(indices):
         x = ""
         for cut in coord.rcv:
-            if is_cell_barcode(cut.region_type):
+            if is_cell_or_nucleus_barcode(cut.region_type):
                 x += f"- BCS({cut.start + 1}-{cut.stop})\n"
             elif is_molecule_barcode(cut.region_type):
                 x += f"- UMI({cut.start + 1}-{cut.stop})\n"
@@ -631,7 +631,7 @@ def format_chromap(indices: List[Coordinate], subregion_type=None) -> str:
     for idx, coord in enumerate(indices):
         strand = "" if coord.strand == "pos" else ":-"
         for cut in coord.rcv:
-            if is_cell_barcode(cut.region_type):
+            if is_cell_or_nucleus_barcode(cut.region_type):
                 bc_fqs.append(coord.query_id)
                 bc_str.append(f"bc:{cut.start}:{cut.stop - 1}{strand}")
                 pass

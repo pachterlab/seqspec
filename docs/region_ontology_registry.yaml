@@ -1,5 +1,5 @@
 ontology_id: seqspec-region-ontology
-ontology_version: 0.1.0-draft
+ontology_version: 0.1.1-draft
 status: draft
 term_pattern: "RGN:<role>:<target>"
 
@@ -8,9 +8,9 @@ principles:
   - region ontology terms describe what an interval does in the nominal assay design.
   - partition, measure, and technical terms annotate the nominal read interval directly.
   - classify terms annotate semantic identity assigned when observations of that interval are aggregated.
-  - regions may carry multiple ontology terms when they have multiple direct roles.
+  - regions may carry multiple ontology terms when they have multiple declared roles, including aggregate roles.
   - legacy free-text region_type labels should map deterministically to ontology terms during upgrade.
-  - unknown or ambiguous regions should use an unknown term instead of forcing a precise term.
+  - curated annotations should leave unresolved roles unknown instead of forcing a precise term.
 
 curation_rules:
   - Every term must have a closed-set role and a curated target.
@@ -18,16 +18,23 @@ curation_rules:
   - A term should describe direct nominal assay intent, not arbitrary downstream analysis.
   - Context-dependent mappings should use RGN:unknown:unclassified unless the evidence is strong enough for a deterministic upgrade.
   - Vendor or protocol names should be aliases unless they define a distinct function.
+  - Aliases suggest candidates for review; they are not automatic conversion rules.
+  - A term applies to its region, including a composite region, without inheritance to descendants or through related_terms.
+  - A partition region contributes to an identifier, possibly with other regions; it need not be globally unique.
+  - RGN:unknown:unclassified marks a wholly unresolved role and must stand alone.
+  - Typical sequence types are guidance, not validation constraints; random does not assert uniform sampling or high entropy.
+  - Legacy mappings below preserve historical tool behavior and can be over-specific; retain the original spec and review ambiguous conversions.
+  - Counting or grouping reads does not alone establish a classify role; the intended aggregate assignment must be stated.
 
 roles:
   partition:
-    definition: Assigns reads or molecules to bins in the nominal read model.
+    definition: Contributes an identifier that partitions reads or molecules in the nominal assay design.
     scope: direct_read_interval
   measure:
     definition: Carries the direct biological or molecular signal measured by the assay.
     scope: direct_read_interval
   classify:
-    definition: Maps aggregated observations of this read interval to a semantic class.
+    definition: Supports an intended assignment to an entity from aggregated observations of this interval, such as assigning a sample or perturbation to a cell.
     scope: aggregate_read_interval
   technical:
     definition: Supports library construction, sequencing, capture, trimming, or validation.
@@ -91,7 +98,7 @@ terms:
     role: partition
     target: cell
     status: active
-    definition: Assigns reads or molecules to a cell or cell-containing partition.
+    definition: Contributes to the identifier of a cell or cell-containing partition.
     typical_sequence_types: [onlist, random]
     aliases: [barcode, cell_bc, cell_barcode, Cell Barcode, R2 Cell Barcode, 10xbarcode, barcode-1, barcode-2, barcode-3, atac Cell Barcode 1, rna Cell Barcode 1]
     examples:
@@ -109,7 +116,7 @@ terms:
     role: partition
     target: nucleus
     status: active
-    definition: Assigns reads or molecules to a nucleus or nucleus-containing partition.
+    definition: Contributes to the identifier of a nucleus or nucleus-containing partition.
     typical_sequence_types: [onlist, random]
     aliases: [nucleus barcode, nuclei barcode, Cell Barcode, barcode, barcode-1, barcode-2, barcode-3]
     examples:
@@ -126,7 +133,7 @@ terms:
     role: partition
     target: molecule
     status: active
-    definition: Assigns reads to an original molecule before amplification.
+    definition: Contributes to the identifier of an original molecule before amplification, within the assay's grouping context.
     typical_sequence_types: [random]
     aliases: [umi, UMI, GEX UMI, Protein UMI, crispr-umi, rna-umi, umi_rna, 8-bp UMI]
     examples:
@@ -137,6 +144,7 @@ terms:
       - variable transcript insert
       - cell barcode
       - sample index
+    notes: Finite barcode collisions remain possible under perfect measurement. This term does not guarantee global uniqueness or high observed diversity.
 
   RGN:partition:sample:
     label: Sample partition barcode
@@ -273,7 +281,7 @@ terms:
     role: measure
     target: protein_feature
     status: active
-    definition: Carries antibody, protein feature, or protein tag signal.
+    definition: Carries sequence-tag signal used as a proxy for an intended antibody or protein-feature measurement, not protein sequence itself.
     typical_sequence_types: [onlist, random]
     aliases: [protein, protein-cDNA, antibody barcode, feature barcode]
     examples:
@@ -310,11 +318,12 @@ terms:
     examples:
       - hashtag oligo sample assignment
       - cell multiplexing oligo assignment
-      - sample index demultiplexing after index reads are aggregated
+      - assigning a cell to its sample from aggregated sample-tag observations
     does_not_mean:
       - direct cell partitioning
       - molecule deduplication
       - arbitrary downstream batch label
+      - direct index lookup or pairing index reads from one sequencing cluster
     related_terms: [RGN:partition:sample]
 
   RGN:classify:feature:
@@ -322,15 +331,15 @@ terms:
     role: classify
     target: feature
     status: active
-    definition: Assigns feature identity after aggregating observations of this interval.
+    definition: Supports an intended feature assignment to an entity from aggregated observations, beyond looking up or counting a feature barcode.
     typical_sequence_types: [onlist]
     aliases: [protein, protein-cDNA, feature_barcode, antibody_barcode, HTO_bc]
     examples:
-      - antibody feature assignment
-      - feature barcode identity assignment
+      - assigning antigen-binding specificity to a cell from aggregated barcoded-antigen observations, when this is the assay's intended endpoint
     does_not_mean:
       - sample assignment unless the feature itself is a sample tag
       - transcript abundance measurement
+      - direct feature barcode lookup or abundance counting alone
     related_terms: [RGN:measure:protein_feature]
 
   RGN:classify:perturbation:
@@ -348,6 +357,7 @@ terms:
       - direct cell partitioning
       - arbitrary downstream clustering label
       - guide scaffold sequence
+      - evidence that editing succeeded or caused a biological effect
     related_terms: [RGN:measure:guide]
 
   RGN:classify:condition:
@@ -386,7 +396,7 @@ terms:
     role: technical
     target: primer
     status: active
-    definition: Sequencing or assay primer sequence.
+    definition: Priming sequence or site represented in the nominal molecule, including a zero-length ghost anchor when the primer sequence is not represented.
     typical_sequence_types: [fixed]
     aliases: [truseq_read1, truseq_read2, truseq_r1, truseq_r2, nextera_read1, nextera_read2, read1_primer, custom_primer, U6 primer]
     examples:

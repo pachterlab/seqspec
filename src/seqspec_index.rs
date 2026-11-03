@@ -266,7 +266,7 @@ fn filter_index_no_overlap(mut indices: Vec<Coordinate>) -> Vec<Coordinate> {
 }
 fn fgbio_operator(region_type: &RegionTypeValue) -> Result<char, String> {
     let rt = region_type.to_uppercase();
-    if region_type.is_cell_barcode() {
+    if region_type.is_cell_or_nucleus_barcode() {
         Ok('C')
     } else if region_type.is_molecule_barcode() {
         Ok('M')
@@ -397,7 +397,7 @@ fn format_kallisto_bus(indices: &Vec<Coordinate>) -> String {
     let mut feature: Vec<String> = Vec::new();
     for (idx, obj) in indices.iter().enumerate() {
         for cut in &obj.rcv {
-            if cut.region.region_type.is_cell_barcode() {
+            if cut.region.region_type.is_cell_or_nucleus_barcode() {
                 bcs.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
             } else if cut.region.region_type.is_molecule_barcode() {
                 umi.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
@@ -422,7 +422,7 @@ fn format_kallisto_bus_force_single(indices: &Vec<Coordinate>) -> String {
     let mut max_length: i64 = 0;
     for (idx, coord) in indices.iter().enumerate() {
         for cut in &coord.rcv {
-            if cut.region.region_type.is_cell_barcode() {
+            if cut.region.region_type.is_cell_or_nucleus_barcode() {
                 bcs.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
             } else if cut.region.region_type.is_molecule_barcode() {
                 umi.push(format!("{},{}{}{}", idx, cut.start, ",", cut.stop));
@@ -485,7 +485,7 @@ fn format_starsolo(indices: &Vec<Coordinate>) -> String {
     let mut umi: Vec<String> = Vec::new();
     for coord in indices {
         for cut in &coord.rcv {
-            if cut.region.region_type.is_cell_barcode() {
+            if cut.region.region_type.is_cell_or_nucleus_barcode() {
                 bcs.push(format!(
                     "--soloCBstart {} --soloCBlen {}",
                     cut.start + 1,
@@ -512,7 +512,7 @@ fn format_simpleaf(indices: &Vec<Coordinate>) -> String {
         let mut x = format!("{}{{", idx + 1);
         for cut in &coord.rcv {
             let len = cut.stop - cut.start;
-            if cut.region.region_type.is_cell_barcode() {
+            if cut.region.region_type.is_cell_or_nucleus_barcode() {
                 x.push_str(&format!("b[{}]", len));
             } else if cut.region.region_type.is_molecule_barcode() {
                 x.push_str(&format!("u[{}]", len));
@@ -530,7 +530,7 @@ fn format_zumis(indices: &Vec<Coordinate>) -> String {
     for coord in indices {
         let mut x = String::new();
         for cut in &coord.rcv {
-            if cut.region.region_type.is_cell_barcode() {
+            if cut.region.region_type.is_cell_or_nucleus_barcode() {
                 x.push_str(&format!("- BCS({}-{})\n", cut.start + 1, cut.stop));
             } else if cut.region.region_type.is_molecule_barcode() {
                 x.push_str(&format!("- UMI({}-{})\n", cut.start + 1, cut.stop));
@@ -558,7 +558,7 @@ fn format_chromap(indices: &Vec<Coordinate>) -> String {
             ":-".to_string()
         };
         for cut in &coord.rcv {
-            if cut.region.region_type.is_cell_barcode() {
+            if cut.region.region_type.is_cell_or_nucleus_barcode() {
                 bc_fqs.push(coord.query_id.clone());
                 bc_str.push(format!(
                     "bc:{}:{}{}",

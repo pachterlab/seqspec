@@ -50,7 +50,12 @@ RGN:classify:perturbation
 RGN:technical:linker
 ```
 
-A region may have multiple terms when it has multiple direct roles. During migration, `region_type` accepts either a legacy scalar label or a list of ontology terms. The `seqspec upgrade` command rewrites legacy labels into ontology-term lists.
+A region may have multiple terms when it has multiple declared roles, including aggregate-level roles. During migration, `region_type` accepts either a legacy scalar label or a list of ontology terms. The `seqspec upgrade` command rewrites legacy labels into ontology-term lists.
+
+Terms apply only to the region carrying them. A container term describes the
+composite, not every child. Neither containment nor `related_terms` causes
+automatic inheritance. For example, an ATAC molecule can contain both a genomic
+insert and technical primers without making its primers genome measurements.
 
 ```yaml
 region_type:
@@ -109,7 +114,10 @@ One tool can ask "which regions partition samples?" Another can ask "which regio
 
 ### Partition
 
-A partition region assigns reads or molecules to bins.
+A partition region contributes an identifier used to group reads or molecules.
+Several regions may contribute jointly: a barcode tier need not identify a cell
+by itself. Finite UMI collisions can occur even under perfect base measurement;
+the term does not assert global uniqueness or high observed diversity.
 
 ```text
 RGN:partition:cell
@@ -155,6 +163,14 @@ Classifier terms should describe direct assay intent, not arbitrary downstream a
 
 The distinction is scope. `partition`, `measure`, and `technical` terms annotate the nominal read interval directly. `classify` terms annotate semantic identity assigned when observations of that interval are used in aggregate.
 
+This describes the claim, not merely whether a computation groups reads.
+Counting transcript reads does not make a transcript region a classifier.
+Likewise, looking up a feature barcode is not aggregate feature classification.
+For example, an assay designed to assign antigen-binding specificity to a cell
+from aggregated barcoded-antigen observations can declare `RGN:classify:feature`.
+Guide observations can support an intended perturbation assignment but do not
+prove that editing occurred or had an effect.
+
 ### Technical
 
 A technical region is required for library construction, sequencing, capture, trimming, or validation.
@@ -174,7 +190,9 @@ A technical region can also have another role. An i7 index is both `RGN:partitio
 
 ## Mapping Current Labels
 
-Existing seqspec files use free-text region labels. These labels should map to ontology terms without deleting the original value.
+Existing seqspec files use free-text region labels. Review these labels against
+assay intent before treating their mapped terms as ground truth. Retain original
+specs separately: upgrade replaces `region_type` and does not add a provenance field.
 
 | ontology term | current labels and names |
 |---|---|
@@ -228,7 +246,11 @@ region_type:
 sequence_type: onlist
 ```
 
-Unknown or ambiguous labels upgrade to `RGN:unknown:unclassified`.
+Unmapped legacy labels upgrade to `RGN:unknown:unclassified`. The compatibility
+table still maps some ambiguous labels to specific roles: `barcode` to cell,
+`tag` to reporter, and indices to sample partitions. These historical defaults
+are not verified assay annotations. Review them explicitly; names and aliases
+do not trigger additional automatic mappings.
 
 ```yaml
 region_type:
@@ -241,7 +263,22 @@ Each registry term should define what it means, what it does not mean, typical `
 
 ## Tool Use
 
-`seqspec check` can use ontology terms to choose validation checks. A fixed primer can be motif-checked. An onlist cell barcode can be whitelist-checked. A random UMI can be checked for length and extracted for molecule grouping.
+`seqspec check` validates the nominal spec, not observed reads. It rejects
+malformed ontology IDs and combining `RGN:unknown:unclassified` with another
+term. It warns about unrecognized well-formed terms, which may be new terms or
+typos, and explicit unclassified roles. Warnings do not cause a failing exit
+status. Registry version 0.1.1-draft is bundled with the tool. No new spec fields
+are required. Typical sequence types are guidance, not mandatory constraints;
+`random` does not assert uniform sampling or high entropy.
+
+seqcheck compares observed reads with declared sequence constraints. Neither a
+term nor a typical sequence type by itself defines an empirical QC threshold.
+
+Exact ontology queries test membership without inference. Compound legacy
+queries require all mapped roles, except `index5` and `index7`, which select
+their technical positions irrespective of sample/library assignment. Extraction
+formats use the cellular barcode slot for cell or nucleus barcodes, while
+ontology queries keep those identities distinct.
 
 `seqspec diff` can use ontology terms to distinguish label drift from semantic changes. A change from `cell_bc` to `Cell Barcode` is minor if both map to `RGN:partition:cell`. A change from `RGN:partition:cell` to `RGN:partition:sample` is major.
 

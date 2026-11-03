@@ -1,6 +1,9 @@
 use crate::auth::RemoteAccess;
 use crate::models::assay::Assay;
 use crate::models::region::{Region, RegionCoordinate};
+use crate::models::region_type::{
+    is_ontology_term, is_valid_ontology_term, known_region_type_terms, UNKNOWN_REGION_TYPE,
+};
 use crate::utils;
 use clap::Args;
 use jsonschema;
@@ -139,6 +142,7 @@ pub fn seqspec_check_with_remote_access_from_base(
 
 /// All error_type values produced by structural (non-filesystem) checks.
 const STRUCTURAL_CHECK_TYPES: &[&str] = &[
+    "check_region_types",
     "check_unique_modalities",
     "check_region_ids_modalities",
     "check_unique_read_ids",
@@ -210,6 +214,7 @@ pub fn seqspec_check_structural(spec: &Assay) -> Vec<ErrorObj> {
         }};
     }
 
+    let errors = run!(check_region_types, errors);
     let errors = run!(check_unique_modalities, errors);
     let errors = run!(check_region_ids_modalities, errors);
     let errors = run!(check_unique_read_ids, errors);
@@ -282,6 +287,69 @@ fn push_error(errors: &mut Vec<ErrorObj>, idx: &mut usize, et: &str, msg: String
 
 fn push_warning(errors: &mut Vec<ErrorObj>, idx: &mut usize, et: &str, msg: String, obj: &str) {
     push_diagnostic(errors, idx, "warning", et, msg, obj);
+}
+
+fn check_region_types(
+    spec: &Assay,
+    mut errors: Vec<ErrorObj>,
+    mut idx: usize,
+) -> (Vec<ErrorObj>, usize) {
+    fn visit(region: &Region, parent: &str, errors: &mut Vec<ErrorObj>, idx: &mut usize) {
+        let location = format!("{}/{}", parent, region.region_id);
+        let values: std::collections::BTreeSet<_> =
+            region.region_type.values().into_iter().collect();
+        for value in &values {
+            if !is_ontology_term(value) {
+                continue;
+            }
+            let (severity, message) = if !is_valid_ontology_term(value) {
+                (
+                    "error",
+                    format!(
+                        "Malformed ontology term '{}' in region '{}'; expected RGN:<role>:<target>",
+                        value, location
+                    ),
+                )
+            } else if !known_region_type_terms().contains(*value) {
+                ("warning", format!("Unrecognized ontology term '{}' in region '{}'; review against the assay and registry version", value, location))
+            } else if *value == UNKNOWN_REGION_TYPE {
+                if values.len() > 1 {
+                    (
+                        "error",
+                        format!(
+                            "Unclassified ontology term must stand alone in region '{}'",
+                            location
+                        ),
+                    )
+                } else {
+                    (
+                        "warning",
+                        format!(
+                            "Unclassified role in region '{}'; annotation remains unresolved",
+                            location
+                        ),
+                    )
+                }
+            } else {
+                continue;
+            };
+            push_diagnostic(
+                errors,
+                idx,
+                severity,
+                "check_region_types",
+                message,
+                "region_type",
+            );
+        }
+        for child in &region.regions {
+            visit(child, &location, errors, idx);
+        }
+    }
+    for region in &spec.library_spec {
+        visit(region, "library_spec", &mut errors, &mut idx);
+    }
+    (errors, idx)
 }
 
 fn check_schema(spec: &Assay, mut errors: Vec<ErrorObj>, mut idx: usize) -> (Vec<ErrorObj>, usize) {

@@ -7,6 +7,9 @@ forms to ontology terms before making behavior decisions.
 
 from __future__ import annotations
 
+import json
+import re
+from pathlib import Path
 from typing import Iterable, Union
 
 from pydantic_core import core_schema
@@ -144,10 +147,20 @@ LEGACY_REGION_TYPE_MAP: dict[str, list[str]] = {
     "difference": [UNKNOWN_REGION_TYPE],
 }
 
+# Preserve the existing token-conversion ordering; changing it needs a format version.
 KNOWN_REGION_TYPE_TERMS = sorted(
     {term for terms in LEGACY_REGION_TYPE_MAP.values() for term in terms}
     | {UNKNOWN_REGION_TYPE}
 )
+
+# Compact registry snapshot shared with the Rust build; checked against the registry.
+REGISTERED_REGION_TYPE_TERMS = json.loads(
+    (Path(__file__).parent / "schema/region_terms.json").read_text()
+)["terms"]
+
+
+def is_valid_ontology_term(value: str) -> bool:
+    return re.fullmatch(r"RGN:[a-z][a-z0-9_]*:[a-z][a-z0-9_]*", value) is not None
 
 
 def is_ontology_term(value: str) -> bool:
@@ -184,8 +197,13 @@ def region_type_matches(
     raw_values = set(region_type_values(region_type))
     if query_text in raw_values:
         return True
+    # Legacy index names select a position, irrespective of sample/library role.
+    if query_text == "index5":
+        return is_index5(region_type)
+    if query_text == "index7":
+        return is_index7(region_type)
     query_terms = set(normalize_region_type_value(query_text))
-    return bool(region_type_terms(region_type).intersection(query_terms))
+    return query_terms.issubset(region_type_terms(region_type))
 
 
 def upgrade_region_type(region_type: RegionTypeValue | str | list[str]) -> list[str]:
@@ -219,6 +237,13 @@ def is_cell_barcode(region_type: RegionTypeValue | str | list[str]) -> bool:
     return has_region_type_term(region_type, CELL_PARTITION_TERM)
 
 
+def is_cell_or_nucleus_barcode(region_type: RegionTypeValue | str | list[str]) -> bool:
+    """Select the cellular barcode slot for downstream extraction tools."""
+    return is_cell_barcode(region_type) or has_region_type_term(
+        region_type, "RGN:partition:nucleus"
+    )
+
+
 def is_molecule_barcode(region_type: RegionTypeValue | str | list[str]) -> bool:
     return has_region_type_term(region_type, MOLECULE_PARTITION_TERM)
 
@@ -244,15 +269,11 @@ def is_linker(region_type: RegionTypeValue | str | list[str]) -> bool:
 
 
 def is_index5(region_type: RegionTypeValue | str | list[str]) -> bool:
-    return has_all_region_type_terms(
-        region_type, (SAMPLE_PARTITION_TERM, INDEX5_TECHNICAL_TERM)
-    )
+    return has_region_type_term(region_type, INDEX5_TECHNICAL_TERM)
 
 
 def is_index7(region_type: RegionTypeValue | str | list[str]) -> bool:
-    return has_all_region_type_terms(
-        region_type, (SAMPLE_PARTITION_TERM, INDEX7_TECHNICAL_TERM)
-    )
+    return has_region_type_term(region_type, INDEX7_TECHNICAL_TERM)
 
 
 def is_technical_skip(region_type: RegionTypeValue | str | list[str]) -> bool:
@@ -261,7 +282,7 @@ def is_technical_skip(region_type: RegionTypeValue | str | list[str]) -> bool:
 
 def region_type_tool_label(region_type: RegionTypeValue | str | list[str]) -> str:
     """Return the legacy tool label implied by a region type value."""
-    if is_cell_barcode(region_type):
+    if is_cell_or_nucleus_barcode(region_type):
         return "barcode"
     if is_molecule_barcode(region_type):
         return "umi"

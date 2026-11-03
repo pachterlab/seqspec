@@ -70,11 +70,18 @@ impl RegionTypeValue {
         if self.values().iter().any(|value| *value == query) {
             return true;
         }
+        // Legacy index names select position, not sample/library identity.
+        if query == "index5" {
+            return self.is_index5();
+        }
+        if query == "index7" {
+            return self.is_index7();
+        }
         let query_terms: BTreeSet<String> = normalize_region_type_value(query)
             .into_iter()
             .map(|term| term.to_string())
             .collect();
-        self.terms().iter().any(|term| query_terms.contains(term))
+        query_terms.is_subset(&self.terms())
     }
 
     pub fn has_term(&self, term: &str) -> bool {
@@ -143,7 +150,6 @@ impl PartialEq<String> for RegionTypeValue {
 pub const UNKNOWN_REGION_TYPE: &str = "RGN:unknown:unclassified";
 const CELL_PARTITION_TERM: &str = "RGN:partition:cell";
 const MOLECULE_PARTITION_TERM: &str = "RGN:partition:molecule";
-const SAMPLE_PARTITION_TERM: &str = "RGN:partition:sample";
 const TRANSCRIPT_MEASURE_TERM: &str = "RGN:measure:transcript";
 const GENOME_MEASURE_TERM: &str = "RGN:measure:genome";
 const CHROMATIN_ACCESSIBILITY_MEASURE_TERM: &str = "RGN:measure:chromatin_accessibility";
@@ -176,6 +182,11 @@ impl RegionTypeValue {
         self.has_term(CELL_PARTITION_TERM)
     }
 
+    /// Select the cellular barcode slot for downstream extraction tools.
+    pub fn is_cell_or_nucleus_barcode(&self) -> bool {
+        self.is_cell_barcode() || self.has_term("RGN:partition:nucleus")
+    }
+
     pub fn is_molecule_barcode(&self) -> bool {
         self.has_term(MOLECULE_PARTITION_TERM)
     }
@@ -197,11 +208,11 @@ impl RegionTypeValue {
     }
 
     pub fn is_index5(&self) -> bool {
-        self.has_all_terms(&[SAMPLE_PARTITION_TERM, INDEX5_TECHNICAL_TERM])
+        self.has_term(INDEX5_TECHNICAL_TERM)
     }
 
     pub fn is_index7(&self) -> bool {
-        self.has_all_terms(&[SAMPLE_PARTITION_TERM, INDEX7_TECHNICAL_TERM])
+        self.has_term(INDEX7_TECHNICAL_TERM)
     }
 
     pub fn is_technical_skip(&self) -> bool {
@@ -209,7 +220,7 @@ impl RegionTypeValue {
     }
 
     pub fn tool_label(&self) -> String {
-        if self.is_cell_barcode() {
+        if self.is_cell_or_nucleus_barcode() {
             "barcode".to_string()
         } else if self.is_molecule_barcode() {
             "umi".to_string()
@@ -237,6 +248,29 @@ impl RegionTypeValue {
 
 pub fn is_ontology_term(value: &str) -> bool {
     value.starts_with("RGN:")
+}
+
+pub fn is_valid_ontology_term(value: &str) -> bool {
+    fn identifier(s: &str) -> bool {
+        s.as_bytes().first().is_some_and(u8::is_ascii_lowercase)
+            && s.bytes()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'_')
+    }
+    let parts: Vec<_> = value.split(':').collect();
+    parts.len() == 3 && parts[0] == "RGN" && identifier(parts[1]) && identifier(parts[2])
+}
+
+pub fn known_region_type_terms() -> &'static BTreeSet<String> {
+    static TERMS: std::sync::OnceLock<BTreeSet<String>> = std::sync::OnceLock::new();
+    TERMS.get_or_init(|| {
+        #[derive(Deserialize)]
+        struct Registry {
+            terms: BTreeSet<String>,
+        }
+        serde_json::from_str::<Registry>(include_str!("../../seqspec/schema/region_terms.json"))
+            .expect("invalid bundled region term registry")
+            .terms
+    })
 }
 
 pub fn normalize_region_type_value(value: &str) -> Vec<String> {
@@ -277,6 +311,42 @@ pub fn normalize_region_type_value(value: &str) -> Vec<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn ontology_identity_and_extraction_are_distinct() {
+        let nucleus = RegionTypeValue::from("RGN:partition:nucleus");
+        assert!(!nucleus.is_cell_barcode());
+        assert!(nucleus.is_cell_or_nucleus_barcode());
+        assert_eq!(nucleus.tool_label(), "barcode");
+        assert!(!nucleus.matches("RGN:partition:cell"));
+        assert!(!RegionTypeValue::from("index7").matches("index5"));
+        assert!(RegionTypeValue::from("RGN:technical:index7").matches("index7"));
+        assert!(!RegionTypeValue::from("RGN:classify:perturbation").matches("sgrna_target"));
+    }
+
+    #[test]
+    fn bundled_registry_matches_curated_term_ids() {
+        let registry: serde_yaml::Value =
+            serde_yaml::from_str(include_str!("../../docs/region_ontology_registry.yaml")).unwrap();
+        let ids: BTreeSet<String> = registry["terms"]
+            .as_mapping()
+            .unwrap()
+            .keys()
+            .map(|id| id.as_str().unwrap().to_string())
+            .collect();
+        assert_eq!(&ids, known_region_type_terms());
+        assert!(ids.iter().all(|term| is_valid_ontology_term(term)));
+        for bad in [
+            "RGN:",
+            "RGN:partition:",
+            "RGN:partition:Cell",
+            "RGN:partition:cell:extra",
+            "RGN:partition:cell\n",
+        ] {
+            assert!(!is_valid_ontology_term(bad), "{bad}");
+        }
+        assert!(is_valid_ontology_term("RGN:future_role:future_target"));
+    }
 
     #[test]
     fn test_region_type_matches_legacy_and_ontology_values() {

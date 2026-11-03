@@ -15,6 +15,13 @@ from jsonschema import Draft4Validator
 
 from seqspec.Assay import Assay
 from seqspec.Region import itx_read, project_regions_to_coordinates
+from seqspec.region_type import (
+    REGISTERED_REGION_TYPE_TERMS,
+    UNKNOWN_REGION_TYPE,
+    is_ontology_term,
+    is_valid_ontology_term,
+    region_type_values,
+)
 from seqspec.utils import (
     file_exists,
     is_remote_source,
@@ -170,6 +177,7 @@ IGVF_ONLIST_SKIP_FILTERS = IGVF_FILTERS + [
     {"error_type": "check_onlist_files_exist", "error_object": "onlist"}
 ]
 STRUCTURAL_CHECK_TYPES = [
+    "check_region_types",
     "check_unique_modalities",
     "check_region_ids_modalities",
     "check_unique_read_ids",
@@ -861,6 +869,7 @@ def check(
     idx = 0
     checks = {
         "check_schema": check_schema,
+        "check_region_types": check_region_types,
         "check_unique_modalities": check_unique_modalities,
         "check_region_ids_modalities": check_region_ids_modalities,
         "check_onlist_files_exist": check_onlist_files_exist,
@@ -889,3 +898,38 @@ def check(
         errors, idx = v(spec, errors, idx)
 
     return normalize_diagnostics(errors)
+
+
+def check_region_types(spec: Assay, errors, idx):
+    """Check explicit ontology annotations without guessing legacy assay roles."""
+
+    def visit(region, parent):
+        location = f"{parent}/{region.region_id}"
+        values = set(region_type_values(region.region_type))
+        for value in sorted(values):
+            if not is_ontology_term(value):
+                continue
+            severity = "warning"
+            if not is_valid_ontology_term(value):
+                severity = "error"
+                message = f"Malformed ontology term '{value}' in region '{location}'; expected RGN:<role>:<target>"
+            elif value not in REGISTERED_REGION_TYPE_TERMS:
+                message = f"Unrecognized ontology term '{value}' in region '{location}'; review against the assay and registry version"
+            elif value == UNKNOWN_REGION_TYPE:
+                if len(values) > 1:
+                    severity = "error"
+                    message = f"Unclassified ontology term must stand alone in region '{location}'"
+                else:
+                    message = f"Unclassified role in region '{location}'; annotation remains unresolved"
+            else:
+                continue
+            errors.append(
+                make_diagnostic(severity, "check_region_types", message, "region_type")
+            )
+        for child in region.regions:
+            visit(child, location)
+
+    before = len(errors)
+    for region in spec.library_spec:
+        visit(region, "library_spec")
+    return errors, idx + len(errors) - before
