@@ -389,7 +389,7 @@ fn format_list_files(
 
 fn ordered_file_columns(files: &HashMap<String, Vec<File>>) -> Vec<(&String, &Vec<File>)> {
     let mut columns: Vec<(&String, &Vec<File>)> = files.iter().collect();
-    columns.sort_by(|(left, _), (right, _)| left.cmp(right));
+    columns.sort_by_key(|(left, _)| *left);
     columns
 }
 

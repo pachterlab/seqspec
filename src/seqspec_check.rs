@@ -521,16 +521,16 @@ fn check_onlist_files_exist(
                     );
                 }
             }
-            "http" | "https" | "ftp" => {
-                if ol.url.is_empty() || !remote_access.url_exists(&ol.url)? {
-                    push_error(
-                        &mut errors,
-                        &mut idx,
-                        "check_onlist_files_exist",
-                        format!("{} does not exist", ol.filename),
-                        "onlist",
-                    );
-                }
+            "http" | "https" | "ftp"
+                if ol.url.is_empty() || !remote_access.url_exists(&ol.url)? =>
+            {
+                push_error(
+                    &mut errors,
+                    &mut idx,
+                    "check_onlist_files_exist",
+                    format!("{} does not exist", ol.filename),
+                    "onlist",
+                );
             }
             _ => {}
         }
@@ -615,16 +615,16 @@ fn check_read_files_exist(
                         );
                     }
                 }
-                "http" | "https" | "ftp" => {
-                    if f.url.is_empty() || !remote_access.url_exists(&f.url)? {
-                        push_error(
-                            &mut errors,
-                            &mut idx,
-                            "check_read_files_exist",
-                            format!("{} does not exist", f.filename),
-                            "file",
-                        );
-                    }
+                "http" | "https" | "ftp"
+                    if f.url.is_empty() || !remote_access.url_exists(&f.url)? =>
+                {
+                    push_error(
+                        &mut errors,
+                        &mut idx,
+                        "check_read_files_exist",
+                        format!("{} does not exist", f.filename),
+                        "file",
+                    );
                 }
                 _ => {}
             }
