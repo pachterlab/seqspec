@@ -525,9 +525,20 @@ def write_pydantic_to_file_or_stdout(
         print(yaml.dump(dump, sort_keys=False))
 
 
-def yield_onlist_contents(stream):
-    for line in stream:
-        yield line.strip().split()[0]
+def yield_onlist_contents(stream, sequence_column_index: int, skip_rows: int):
+    for row_number, line in enumerate(stream, start=1):
+        if row_number <= skip_rows:
+            continue
+
+        fields = line.strip().split()
+        if not fields:
+            continue
+        if sequence_column_index >= len(fields):
+            raise ValueError(
+                f"onlist row {row_number} has {len(fields)} field(s); "
+                f"cannot select zero-based column index {sequence_column_index}"
+            )
+        yield fields[sequence_column_index]
 
 
 def local_resource_url(url: str, filename: str, resource: str) -> str:
@@ -551,7 +562,9 @@ def read_local_list(onlist: Onlist, base_path: str = "") -> List[str]:
     stream = io.TextIOWrapper(stream)
 
     results = []
-    for i in yield_onlist_contents(stream):
+    for i in yield_onlist_contents(
+        stream, onlist.sequence_column_index, onlist.skip_rows
+    ):
         results.append(i)
     stream.close()
     return results
@@ -587,7 +600,9 @@ def read_remote_list(
         stream = io.TextIOWrapper(binary_stream)
 
         results = []
-        for i in yield_onlist_contents(stream):
+        for i in yield_onlist_contents(
+            stream, onlist.sequence_column_index, onlist.skip_rows
+        ):
             # add the new line when writing to file
             results.append(i)
     finally:

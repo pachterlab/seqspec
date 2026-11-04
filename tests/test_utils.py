@@ -362,6 +362,105 @@ def test_read_local_list_prefers_url_when_present(tmp_path):
     assert read_local_list(onlist, str(tmp_path)) == ["AAAA", "CCCC"]
 
 
+def test_read_local_list_projects_column_after_skipping_header():
+    onlist = Onlist(
+        file_id="tabular_onlist",
+        filename="tabular_onlist.txt",
+        filetype="txt",
+        filesize=0,
+        url="tests/fixtures/tabular_onlist.txt",
+        urltype="local",
+        md5="",
+        sequence_column_index=1,
+        skip_rows=1,
+    )
+
+    assert read_local_list(onlist) == [
+        "TCAGTTGTCGAAGG",
+        "CTGGACCTAATACC",
+    ]
+
+
+def test_read_local_list_projects_gzipped_column_after_skipping_header(tmp_path):
+    path = tmp_path / "plate.tsv.gz"
+    path.write_bytes(gzip.compress(b"Name Barcode\nA01 AAAA\nA02 CCCC\n"))
+    onlist = Onlist(
+        file_id="local_plate",
+        filename="plate.tsv.gz",
+        filetype="tsv",
+        filesize=0,
+        url="plate.tsv.gz",
+        urltype="local",
+        md5="",
+        sequence_column_index=1,
+        skip_rows=1,
+    )
+
+    assert read_local_list(onlist, str(tmp_path)) == ["AAAA", "CCCC"]
+
+
+def test_read_local_list_errors_when_projection_column_is_missing(tmp_path):
+    (tmp_path / "malformed.txt").write_text("Name Barcode\nA01\n")
+    onlist = Onlist(
+        file_id="malformed",
+        filename="malformed.txt",
+        filetype="txt",
+        filesize=0,
+        url="malformed.txt",
+        urltype="local",
+        md5="",
+        sequence_column_index=1,
+        skip_rows=1,
+    )
+
+    with pytest.raises(ValueError, match="row 2 has 1 field.*column index 1"):
+        read_local_list(onlist, str(tmp_path))
+
+
+def test_read_remote_list_projects_column_after_skipping_header():
+    onlist = Onlist(
+        file_id="remote_plate",
+        filename="plate.tsv",
+        filetype="tsv",
+        filesize=0,
+        url="https://example.org/plate.tsv",
+        urltype="https",
+        md5="",
+        sequence_column_index=1,
+        skip_rows=1,
+    )
+    response = MagicMock()
+    response.content = b"Name Barcode\nA01 AAAA\nA02 CCCC\n"
+
+    with (
+        patch("seqspec.utils.get_remote_auth_token", return_value=None),
+        patch("seqspec.utils.requests.get", return_value=response),
+    ):
+        assert read_remote_list(onlist) == ["AAAA", "CCCC"]
+
+
+def test_read_remote_list_projects_gzipped_column_after_skipping_header():
+    onlist = Onlist(
+        file_id="remote_plate",
+        filename="plate.tsv.gz",
+        filetype="tsv",
+        filesize=0,
+        url="https://example.org/plate.tsv.gz",
+        urltype="https",
+        md5="",
+        sequence_column_index=1,
+        skip_rows=1,
+    )
+    response = MagicMock()
+    response.content = gzip.compress(b"Name Barcode\nA01 AAAA\nA02 CCCC\n")
+
+    with (
+        patch("seqspec.utils.get_remote_auth_token", return_value=None),
+        patch("seqspec.utils.requests.get", return_value=response),
+    ):
+        assert read_remote_list(onlist) == ["AAAA", "CCCC"]
+
+
 def test_local_resource_url_errors_when_url_is_empty():
     with pytest.raises(ValueError, match="local file 'display.fastq.gz' has empty url"):
         local_resource_url("", "display.fastq.gz", "file")

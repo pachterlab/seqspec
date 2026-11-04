@@ -9,6 +9,10 @@ pub struct Onlist {
     pub url: String,
     pub urltype: String,
     pub md5: String,
+    #[serde(default)]
+    pub sequence_column_index: usize,
+    #[serde(default)]
+    pub skip_rows: usize,
 }
 
 impl Onlist {
@@ -20,6 +24,8 @@ impl Onlist {
         url: String,
         urltype: String,
         md5: String,
+        sequence_column_index: usize,
+        skip_rows: usize,
     ) -> Self {
         Self {
             file_id,
@@ -29,6 +35,8 @@ impl Onlist {
             url,
             urltype,
             md5,
+            sequence_column_index,
+            skip_rows,
         }
     }
 
@@ -53,6 +61,8 @@ mod tests {
             "barcodes.txt".into(),
             "local".into(),
             "abc123".into(),
+            0,
+            0,
         )
     }
 
@@ -66,14 +76,36 @@ mod tests {
         assert_eq!(ol.url, "barcodes.txt");
         assert_eq!(ol.urltype, "local");
         assert_eq!(ol.md5, "abc123");
+        assert_eq!(ol.sequence_column_index, 0);
+        assert_eq!(ol.skip_rows, 0);
     }
 
     #[test]
     fn test_onlist_json_roundtrip() {
-        let ol = sample_onlist();
+        let mut ol = sample_onlist();
+        ol.sequence_column_index = 1;
+        ol.skip_rows = 1;
         let json = ol.to_json().unwrap();
         let ol2 = Onlist::from_json(&json).unwrap();
         assert_eq!(ol, ol2);
+    }
+
+    #[test]
+    fn test_onlist_json_defaults_projection_for_legacy_data() {
+        let json = r#"{
+            "file_id":"ol1",
+            "filename":"barcodes.txt",
+            "filetype":"txt",
+            "filesize":1024,
+            "url":"barcodes.txt",
+            "urltype":"local",
+            "md5":"abc123"
+        }"#;
+
+        let onlist = Onlist::from_json(json).unwrap();
+
+        assert_eq!(onlist.sequence_column_index, 0);
+        assert_eq!(onlist.skip_rows, 0);
     }
 
     #[test]

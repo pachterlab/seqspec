@@ -179,6 +179,8 @@ Each `Region` has the following properties which are useful to annotate the elem
   - `url`: a freeform string that specifies either the url location of the file, or the local path of the file (relative to this seqspec file)
   - `urltype`: can be one of ["local", "ftp", "http", "https"] specifies the type of the `url`
   - `md5`: the md5sum of the uncompressed file in `filename`, must match the pattern `^[a-f0-9]{32}$`
+  - `sequence_column_index`: optional zero-based index of the whitespace-delimited field containing each sequence; defaults to `0`
+  - `skip_rows`: optional number of physical rows to skip before reading sequences; defaults to `0`
 - `regions` can either be `null` or contain a list of `regions` as specified above.
 
 Example:
@@ -201,6 +203,27 @@ onlist: !Onlist
   md5: 5b62453df2771f5aa856f78797f16591
 regions: null
 ```
+
+Tabular source files can be used without creating a sequence-only derivative. For
+example, an onlist whose first row is a header and whose second field contains the
+sequence uses:
+
+```yaml
+onlist:
+  file_id: vendor-plate.tsv
+  filename: vendor-plate.tsv
+  filetype: tsv
+  filesize: 120
+  url: https://example.org/vendor-plate.tsv
+  urltype: https
+  md5: 5b62453df2771f5aa856f78797f16591
+  sequence_column_index: 1
+  skip_rows: 1
+```
+
+Rows are split on arbitrary whitespace after the requested physical rows are
+skipped. The `md5` continues to describe the referenced source file, before this
+projection is applied.
 
 For more information about the various fields, please see the JSON schema specification (`seqspec/schema/seqspec.schema.json`). For consistency across assays I suggest following a standard naming conventions for common regions. I've made a collection of "named" regions available; please see `docs/examples/regions` for a list of example regions.
 

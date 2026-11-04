@@ -101,6 +101,30 @@ def test_download_onlists_to_path_threads_auth_profile(tmp_path):
     assert Path(downloaded[0]["url"]).read_text().splitlines() == ["AAA", "CCC"]
 
 
+def test_download_projected_local_onlist_writes_normalized_copy(tmp_path):
+    source = tmp_path / "plate.tsv"
+    source.write_text("Name Barcode\nA01 AAAA\nA02 CCCC\n")
+    onlist = Onlist(
+        file_id="plate",
+        filename="plate.tsv",
+        filetype="tsv",
+        filesize=source.stat().st_size,
+        url="plate.tsv",
+        urltype="local",
+        md5="",
+        sequence_column_index=1,
+        skip_rows=1,
+    )
+
+    downloaded = download_onlists_to_path(
+        [onlist], tmp_path / "normalized.txt", tmp_path
+    )
+
+    normalized = Path(downloaded[0]["url"])
+    assert normalized != source
+    assert normalized.read_text().splitlines() == ["AAAA", "CCCC"]
+
+
 def test_join_onlists_and_save_threads_auth_profile(tmp_path):
     calls = []
 

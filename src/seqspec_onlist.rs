@@ -212,11 +212,44 @@ fn download_onlists_to_path(
                 eprintln!("{}", err);
                 std::process::exit(1);
             }));
+            if ol.sequence_column_index == 0 && ol.skip_rows == 0 {
+                out.push(PathInfo {
+                    url: local.to_string_lossy().to_string(),
+                });
+                continue;
+            }
+            let content = utils::read_local_list(&local, ol.sequence_column_index, ol.skip_rows)
+                .unwrap_or_else(|err| {
+                    eprintln!("{}", err);
+                    std::process::exit(1);
+                });
+            let filename = format!(
+                "{}_{}",
+                ol.file_id,
+                output_path
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+            );
+            let download_path = output_path
+                .parent()
+                .unwrap_or_else(|| Path::new("."))
+                .join(filename);
+            write_onlist(&content, &download_path);
             out.push(PathInfo {
-                url: local.to_string_lossy().to_string(),
+                url: download_path.to_string_lossy().to_string(),
             });
         } else {
-            let content = utils::read_remote_list(&ol.url, remote_access).unwrap_or_default();
+            let content = utils::read_remote_list(
+                &ol.url,
+                remote_access,
+                ol.sequence_column_index,
+                ol.skip_rows,
+            )
+            .unwrap_or_else(|err| {
+                eprintln!("{}", err);
+                std::process::exit(1);
+            });
             let filename = format!(
                 "{}_{}",
                 ol.file_id,
@@ -252,9 +285,26 @@ fn join_onlists_and_save(
                 eprintln!("{}", err);
                 std::process::exit(1);
             });
-            utils::read_local_list(&base_path.join(locator)).unwrap_or_default()
+            utils::read_local_list(
+                &base_path.join(locator),
+                ol.sequence_column_index,
+                ol.skip_rows,
+            )
+            .unwrap_or_else(|err| {
+                eprintln!("{}", err);
+                std::process::exit(1);
+            })
         } else {
-            utils::read_remote_list(&ol.url, remote_access).unwrap_or_default()
+            utils::read_remote_list(
+                &ol.url,
+                remote_access,
+                ol.sequence_column_index,
+                ol.skip_rows,
+            )
+            .unwrap_or_else(|err| {
+                eprintln!("{}", err);
+                std::process::exit(1);
+            })
         };
         contents.push(content);
     }
@@ -475,6 +525,8 @@ mod tests {
             "nested/whitelist.txt".into(),
             "local".into(),
             String::new(),
+            0,
+            0,
         )];
 
         let urls = get_onlist_urls(&onlists, &base);
@@ -496,6 +548,8 @@ mod tests {
             "nested/whitelist.txt".into(),
             "local".into(),
             String::new(),
+            0,
+            0,
         )];
         let output = root.join("joined.txt");
         let remote_access = RemoteAccess::anonymous();
@@ -506,6 +560,33 @@ mod tests {
         assert_eq!(result_path, output);
         assert_eq!(std::fs::read_to_string(&output).unwrap(), "AAAA\nCCCC\n");
 
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn test_download_projected_local_onlist_writes_normalized_copy() {
+        let root = unique_test_dir("seqspec-onlist-projection");
+        std::fs::create_dir_all(&root).unwrap();
+        std::fs::write(root.join("plate.tsv"), "Name Barcode\nA01 AAAA\nA02 CCCC\n").unwrap();
+        let onlist = Onlist::new(
+            "plate".into(),
+            "plate.tsv".into(),
+            "tsv".into(),
+            0,
+            "plate.tsv".into(),
+            "local".into(),
+            String::new(),
+            1,
+            1,
+        );
+        let output = root.join("normalized.txt");
+        let remote_access = RemoteAccess::anonymous();
+
+        let downloaded = download_onlists_to_path(&vec![onlist], &output, &root, &remote_access);
+
+        let normalized = PathBuf::from(&downloaded[0].url);
+        assert_ne!(normalized, root.join("plate.tsv"));
+        assert_eq!(std::fs::read_to_string(normalized).unwrap(), "AAAA\nCCCC\n");
         std::fs::remove_dir_all(root).unwrap();
     }
 }

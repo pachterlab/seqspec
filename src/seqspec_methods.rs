@@ -218,6 +218,8 @@ mod tests {
             "".into(),
             "local".into(),
             "".into(),
+            0,
+            0,
         );
         let region = Region::new(
             "bc".into(),

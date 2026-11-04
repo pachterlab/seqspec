@@ -578,6 +578,8 @@ mod tests {
             "list.txt".into(),
             "local".into(),
             "".into(),
+            0,
+            0,
         );
         let mut r = Region::new(
             "r".into(),
@@ -651,6 +653,8 @@ mod tests {
             "".into(),
             "local".into(),
             "".into(),
+            0,
+            0,
         );
         let parent = joined(
             "parent",
@@ -687,6 +691,8 @@ mod tests {
             "".into(),
             "local".into(),
             "".into(),
+            0,
+            0,
         );
         let r2 = Region::new(
             "bc".into(),

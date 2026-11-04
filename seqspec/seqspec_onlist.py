@@ -242,19 +242,20 @@ def download_onlists_to_path(
 
     for onlist in onlists:
         if onlist.urltype == "local":
-            # Local file - just return the path
             local_path = base_path / Path(local_onlist_locator(onlist))
-            downloaded_paths.append({"file_id": onlist.file_id, "url": str(local_path)})
+            if onlist.sequence_column_index == 0 and onlist.skip_rows == 0:
+                downloaded_paths.append(
+                    {"file_id": onlist.file_id, "url": str(local_path)}
+                )
+                continue
+            onlist_elements = read_local_list(onlist, str(base_path))
         else:
-            # Remote file - download it
             onlist_elements = read_remote_list(onlist, auth_profile=auth_profile)
-            # Create unique filename for this onlist
-            filename = f"{onlist.file_id}_{output_path.name}"
-            download_path = output_path.parent / filename
-            write_onlist(onlist_elements, download_path)
-            downloaded_paths.append(
-                {"file_id": onlist.file_id, "url": str(download_path)}
-            )
+
+        filename = f"{onlist.file_id}_{output_path.name}"
+        download_path = output_path.parent / filename
+        write_onlist(onlist_elements, download_path)
+        downloaded_paths.append({"file_id": onlist.file_id, "url": str(download_path)})
 
     return downloaded_paths
 

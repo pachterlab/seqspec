@@ -33,6 +33,8 @@ class Onlist:
     url: str
     urltype: str
     md5: str
+    sequence_column_index: int
+    skip_rows: int
 
     def __init__(
         self,
@@ -43,6 +45,8 @@ class Onlist:
         url: str,
         urltype: str,
         md5: str,
+        sequence_column_index: int,
+        skip_rows: int,
     ) -> None: ...
     @staticmethod
     def from_json(json_str: str) -> "Onlist": ...

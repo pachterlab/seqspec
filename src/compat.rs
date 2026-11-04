@@ -268,6 +268,8 @@ pub struct CompatOnlist {
     pub url: Option<String>,
     pub urltype: Option<String>,
     pub md5: Option<String>,
+    pub sequence_column_index: Option<usize>,
+    pub skip_rows: Option<usize>,
 }
 
 impl CompatOnlist {
@@ -280,6 +282,8 @@ impl CompatOnlist {
             self.url.unwrap_or_default(),
             self.urltype.unwrap_or_else(|| "local".to_string()),
             self.md5.unwrap_or_default(),
+            self.sequence_column_index.unwrap_or_default(),
+            self.skip_rows.unwrap_or_default(),
         )
     }
 }
@@ -360,5 +364,31 @@ impl CompatRegion {
                 .map(CompatRegion::into_region)
                 .collect(),
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_compat_onlist_preserves_projection_fields() {
+        let yaml = r#"
+file_id: plate
+filename: plate.tsv
+filetype: tsv
+filesize: 42
+url: plate.tsv
+urltype: local
+md5: abc123
+sequence_column_index: 1
+skip_rows: 1
+"#;
+        let compat: CompatOnlist = serde_yaml::from_str(yaml).unwrap();
+
+        let onlist = compat.into_onlist();
+
+        assert_eq!(onlist.sequence_column_index, 1);
+        assert_eq!(onlist.skip_rows, 1);
     }
 }

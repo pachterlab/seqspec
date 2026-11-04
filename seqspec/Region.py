@@ -30,6 +30,8 @@ class Onlist(BaseModel):
     url: str
     urltype: str
     md5: str
+    sequence_column_index: int = Field(default=0, ge=0)
+    skip_rows: int = Field(default=0, ge=0)
 
     # add a update_spec attribute that computes the md5 for the object
 
@@ -82,6 +84,21 @@ class OnlistInput(BaseModel):
         default=None,
         description=("MD5 checksum of the on-list file if available; omit if unknown."),
     )
+    sequence_column_index: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Zero-based whitespace-delimited field index containing each sequence. "
+            "Defaults to 0."
+        ),
+    )
+    skip_rows: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Number of physical rows to skip before reading sequences. Defaults to 0."
+        ),
+    )
 
     def to_onlist(self) -> Onlist:
         return Onlist(
@@ -92,6 +109,8 @@ class OnlistInput(BaseModel):
             url=self.url or "",
             urltype=self.urltype or "local",
             md5=self.md5 or "",
+            sequence_column_index=self.sequence_column_index or 0,
+            skip_rows=self.skip_rows or 0,
         )
 
 
