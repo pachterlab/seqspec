@@ -27,7 +27,7 @@ classifiers = [
 ]
 dependencies = [
     "pyyaml>=6.0",
-    "jsonschema",
+    "jsonschema>=4.0",
     "newick",
     "requests",
     "biopython",
